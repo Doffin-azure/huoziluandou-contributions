@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_7du2w"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_cmir3"]
+
+[sub_resource type="Resource" id="Resource_wp0xb"]
+script = ExtResource("1_7du2w")
+handler = "hard_stop"
+note = "清空热度并移除本回合溢热生成的灼热【热】（字袋/弃字堆/盘面），立即结束出字阶段"
+
+[resource]
+script = ExtResource("2_cmir3")
+id = "w056"
+word = "急停"
+glyphs = Array[String](["急", "停"])
+description = "一次清零热度并立即结束出字阶段的设计尝试"
+effects = Array[ExtResource("1_7du2w")]([SubResource("Resource_wp0xb")])
+group = "热暴"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "一次清零热度并立即结束出字阶段的设计尝试"
+effect_handler_id = "hard_stop"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P3·补全词效"
+implemented = true

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_0kmmt"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_8ehla"]
+
+[sub_resource type="Resource" id="Resource_st6cv"]
+script = ExtResource("2_8ehla")
+handler = "block_persist"
+amount = 2
+note = "获得 2 点持久盾"
+
+[resource]
+script = ExtResource("1_0kmmt")
+id = "hu"
+glyph = "护"
+pinyin = "hu"
+description = "获得 2 点持久盾"
+tags = Array[String](["defense"])
+solo_effects = Array[ExtResource("2_8ehla")]([SubResource("Resource_st6cv")])
+solo_handler = "block_persist"
+rarity = 1

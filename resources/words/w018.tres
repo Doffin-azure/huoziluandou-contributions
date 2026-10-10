@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_nbyuk"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_8xurl"]
+
+[sub_resource type="Resource" id="Resource_2p5ug"]
+script = ExtResource("1_nbyuk")
+handler = "damage"
+amount = 7
+note = "造成 7 点伤害"
+
+[sub_resource type="Resource" id="Resource_nnscn"]
+script = ExtResource("1_nbyuk")
+handler = "conditional_draw_after_attack"
+amount = 1
+note = "若此前已有即时攻击则补 1 字"
+
+[resource]
+script = ExtResource("2_8xurl")
+id = "w018"
+word = "回击"
+glyphs = Array[String](["回", "击"])
+description = "造成即时伤害；若此前已有攻击可额外补字"
+effects = Array[ExtResource("1_nbyuk")]([SubResource("Resource_2p5ug"), SubResource("Resource_nnscn")])
+group = "连携"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "造成即时伤害；若此前已有攻击可额外补字"
+effect_handler_id = "damage"
+p25_implemented = true
+implementation_delta = "—"
+priority = "P2·已试运行"
+implemented = true

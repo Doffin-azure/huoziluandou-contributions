@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_jiw44"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_cx27r"]
+
+[sub_resource type="Resource" id="Resource_28ayj"]
+script = ExtResource("2_cx27r")
+handler = "replace_self"
+target = 5
+note = "在原位置随机换一枚字"
+
+[resource]
+script = ExtResource("1_jiw44")
+id = "hui"
+glyph = "回"
+pinyin = "hui"
+description = "在原位置随机换一枚字"
+tags = Array[String](["space", "flow"])
+solo_effects = Array[ExtResource("2_cx27r")]([SubResource("Resource_28ayj")])
+solo_handler = "replace_self"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://src/data/status_data.gd" id="1_1rsn0"]
+
+[resource]
+script = ExtResource("1_1rsn0")
+id = "vulnerable"
+name = "易伤"
+glyph = "脆"
+description = "受到的伤害提高 50%。"
+kind = 1
+decay_per_turn = 1
+color = Color(0.47843137, 0.2901961, 0.3882353, 1)

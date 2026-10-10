@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_pg3bq"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_3eydw"]
+
+[sub_resource type="Resource" id="Resource_33ir2"]
+script = ExtResource("1_pg3bq")
+handler = "apply_status_self"
+amount = 1
+target = 3
+status_id = "next_double"
+note = "获得状态【超强】×1"
+
+[resource]
+script = ExtResource("2_3eydw")
+id = "w024"
+word = "超强"
+glyphs = Array[String](["超", "强"])
+description = "下一次真实造成伤害的攻击翻倍，跨回合保留至发动"
+effects = Array[ExtResource("1_pg3bq")]([SubResource("Resource_33ir2")])
+group = "连携"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "下一次真实造成伤害的攻击翻倍，跨回合保留至发动"
+effect_handler_id = "apply_status_self"
+p25_implemented = true
+implementation_delta = "—"
+priority = "P2·已试运行"
+implemented = true

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PollutionData" format=3]
+
+[ext_resource type="Script" path="res://src/data/pollution_data.gd" id="1_6f4t3"]
+
+[resource]
+script = ExtResource("1_6f4t3")
+id = "scorch"
+name = "灼热"
+glyph = "灼"
+description = "自我过热生成的【热】带有灼热，打出时失去 1 点生命；本场循环，战后清除。"
+hp_loss_on_play = 1
+color = Color(0.6901961, 0.32156864, 0.18039216, 1)
+self_generated = true

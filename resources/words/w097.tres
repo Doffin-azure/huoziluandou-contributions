@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_x6boj"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_018kk"]
+
+[sub_resource type="Resource" id="Resource_e2x8x"]
+script = ExtResource("1_x6boj")
+handler = "ability_diagonal_next"
+amount = 1
+timing = "next_word"
+note = "下一次组词允许最多一步对角线"
+
+[resource]
+script = ExtResource("2_018kk")
+id = "w097"
+word = "流利"
+glyphs = Array[String](["流", "利"])
+description = "下一次组词路径允许最多一步对角线，其余均四邻接"
+effects = Array[ExtResource("1_x6boj")]([SubResource("Resource_e2x8x")])
+group = "经济"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "下一次组词路径允许最多一步对角线，其余均四邻接"
+effect_handler_id = "ability_diagonal_next"
+timing = "next_word"
+implementation_delta = "需要改路径校验器（容许一次斜连），不是直接词效加数字"
+priority = "P1·重点机制"
+implemented = true

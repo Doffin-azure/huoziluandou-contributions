@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="470" viewBox="0 0 940 470">
+  <rect width="940" height="470" fill="#f4ecd8"/>
+  <text x="30" y="44" font-family="Noto Serif SC, SimSun, serif" font-size="26" font-weight="bold" fill="#221f1a">战斗资源一览</text>
+
+  <!-- A: 临挡 vs 持久盾 -->
+  <rect x="30" y="70" width="400" height="170" rx="12" fill="#f0e6d2" stroke="#c8b68d" stroke-width="2"/>
+  <text x="50" y="102" font-family="Noto Serif SC, SimSun, serif" font-size="19" font-weight="bold" fill="#221f1a">临挡 / 持久盾</text>
+  <rect x="50" y="120" width="330" height="26" rx="13" fill="#5f7f9a"/>
+  <text x="58" y="139" font-family="Noto Serif SC, SimSun, serif" font-size="15" fill="#f4ecd8">临挡（回合内挡伤，敌方行动后清空）</text>
+  <rect x="50" y="158" width="330" height="26" rx="13" fill="#c9a35a"/>
+  <text x="58" y="177" font-family="Noto Serif SC, SimSun, serif" font-size="15" fill="#2b1c0c">持久盾（跨回合保留，可被盾击消耗）</text>
+  <text x="50" y="212" font-family="Noto Serif SC, SimSun, serif" font-size="15" fill="#7c7360">护甲=回合末把部分临挡转持久盾；反击用剩余临挡</text>
+
+  <!-- B: 储能 -->
+  <rect x="460" y="70" width="390" height="170" rx="12" fill="#f0e6d2" stroke="#c8b68d" stroke-width="2"/>
+  <text x="480" y="102" font-family="Noto Serif SC, SimSun, serif" font-size="19" font-weight="bold" fill="#221a0a">储能</text>
+  <g font-family="Noto Serif SC, SimSun, serif" font-size="15" fill="#4a4438">
+    <text x="480" y="134">整场战斗存在的电池，不限制正常出牌。</text>
+    <text x="480" y="162">【充电】【蓄电】【充能】【电流】产出；</text>
+    <text x="480" y="190">【放电】【充放电】【蓄力】【合资】消费。</text>
+    <text x="480" y="218" fill="#7c7360">放电：每 1 储能 = 一段 4 伤电击。</text>
+  </g>
+
+  <!-- C: 热度 -->
+  <rect x="30" y="260" width="400" height="180" rx="12" fill="#f0e6d2" stroke="#c8b68d" stroke-width="2"/>
+  <text x="50" y="292" font-family="Noto Serif SC, SimSun, serif" font-size="19" font-weight="bold" fill="#b0522e">热度 / 热容</text>
+  <rect x="50" y="312" width="330" height="26" rx="13" fill="#e2c9a0"/>
+  <rect x="50" y="312" width="210" height="26" rx="13" fill="#c9662e"/>
+  <line x1="270" y1="304" x2="270" y2="346" stroke="#221f1a" stroke-width="3" stroke-dasharray="5,4"/>
+  <text x="278" y="334" font-family="Noto Serif SC, SimSun, serif" font-size="14" fill="#221f1a">热容</text>
+  <g font-family="Noto Serif SC, SimSun, serif" font-size="15" fill="#4a4438">
+    <text x="50" y="370">热度 &gt; 热容：每 1 点溢出向本场抽字袋塞 1 枚灼热【热】。</text>
+    <text x="50" y="398">热系高风险高收益：【火爆】【热流】【过火】兑现；</text>
+    <text x="50" y="426">【冷却】【急冷】【清热】【急停】【停息】管理。</text>
+  </g>
+
+  <!-- D: 经济 -->
+  <rect x="460" y="260" width="390" height="180" rx="12" fill="#f0e6d2" stroke="#c8b68d" stroke-width="2"/>
+  <text x="480" y="292" font-family="Noto Serif SC, SimSun, serif" font-size="19" font-weight="bold" fill="#5f7d6a">金币 / 临时资金 / 股权</text>
+  <g font-family="Noto Serif SC, SimSun, serif" font-size="15" fill="#4a4438">
+    <text x="480" y="322">金币：可带到战后商店的正式货币（有反刷安全阀）。</text>
+    <text x="480" y="350">临时资金：仅本回合可用于经济词支付，回合末过期。</text>
+    <text x="480" y="378">股权：投资锁定，战后未耗尽本金返还；炼金兑现。</text>
+    <text x="480" y="406" fill="#7c7360">支付顺序：临时资金 →（合资）储能 → 金币。</text>
+  </g>
+</svg>

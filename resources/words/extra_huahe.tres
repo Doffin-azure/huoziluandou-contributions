@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_8ilgq"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_sldkl"]
+
+[sub_resource type="Resource" id="Resource_152x0"]
+script = ExtResource("1_8ilgq")
+handler = "fuse_cards"
+note = "选择两张相邻的己方牌融合为一格（本场不可拆）"
+
+[resource]
+script = ExtResource("2_sldkl")
+id = "extra_huahe"
+word = "化合"
+glyphs = Array[String](["合", "化"])
+description = "选择两张相邻的己方牌融合成一个占 1 格的复合单位（本场有效；进出字袋/弃字堆不拆散）"
+effects = Array[ExtResource("1_8ilgq")]([SubResource("Resource_152x0")])
+group = "空间"
+design_stage = "设计负责人新增"
+effect_summary = "选择两张相邻的己方牌融合成一个占 1 格的复合单位（本场有效；进出字袋/弃字堆不拆散）"
+effect_handler_id = "fuse_cards"
+priority = "空间"
+implemented = true
+interaction = "choose_fuse_pair"

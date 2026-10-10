@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_yejd0"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_tyln6"]
+
+[sub_resource type="Resource" id="Resource_2nnpm"]
+script = ExtResource("1_yejd0")
+handler = "temp_funds"
+amount = 3
+note = "获得 3 点临时资金（本回合有效）"
+
+[resource]
+script = ExtResource("2_tyln6")
+id = "w068"
+word = "资金"
+glyphs = Array[String](["资", "金"])
+description = "本回合获得3点仅可用于经济效果的临时支付额，回合末过期"
+effects = Array[ExtResource("1_yejd0")]([SubResource("Resource_2nnpm")])
+group = "经济"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "本回合获得3点仅可用于经济效果的临时支付额，回合末过期"
+effect_handler_id = "temp_funds"
+p25_implemented = true
+implementation_delta = "P25发2真金币；设计为本回合3临时支付额度（明确不等价）"
+priority = "P2·已试运行"
+implemented = true

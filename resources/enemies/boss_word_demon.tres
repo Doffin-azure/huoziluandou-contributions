@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_ktbge"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_e3vrc"]
+
+[sub_resource type="Resource" id="Resource_wioof"]
+script = ExtResource("1_ktbge")
+title = "撕字"
+damage = 9
+
+[sub_resource type="Resource" id="Resource_ojo2j"]
+script = ExtResource("1_ktbge")
+kind = 1
+title = "结阵"
+damage = 0
+block = 8
+
+[sub_resource type="Resource" id="Resource_5jpo2"]
+script = ExtResource("1_ktbge")
+kind = 6
+title = "散字"
+damage = 0
+inject_count = 2
+pollution_id = "rush"
+
+[resource]
+script = ExtResource("2_e3vrc")
+id = "boss_word_demon"
+name = "字魔"
+glyph = "魔"
+max_hp = 78
+moves = Array[ExtResource("1_ktbge")]([SubResource("Resource_wioof"), SubResource("Resource_ojo2j"), SubResource("Resource_5jpo2")])
+is_boss = true

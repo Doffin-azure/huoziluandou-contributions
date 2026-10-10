@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_lig3s"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_5fs27"]
+
+[sub_resource type="Resource" id="Resource_cx0sp"]
+script = ExtResource("1_lig3s")
+handler = "energy_discharge"
+amount = 4
+args = {
+"draw_per": 1
+}
+note = "清空全部储能，每点 4 伤并随机补 1 字"
+
+[resource]
+script = ExtResource("2_5fs27")
+id = "w046"
+word = "充放电"
+glyphs = Array[String](["充", "放", "电"])
+description = "清空全部储能，每点造成一段4伤并随机补1字"
+effects = Array[ExtResource("1_lig3s")]([SubResource("Resource_cx0sp")])
+group = "蓄放"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "清空全部储能，每点造成一段4伤并随机补1字"
+effect_handler_id = "energy_discharge"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P1·重点机制"
+implemented = true

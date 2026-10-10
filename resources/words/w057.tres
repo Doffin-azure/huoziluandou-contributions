@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_esmk1"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_evhyi"]
+
+[sub_resource type="Resource" id="Resource_27cmk"]
+script = ExtResource("1_esmk1")
+handler = "ceasefire"
+amount = 1
+timing = "persistent"
+note = "本回合未造成敌伤则免疫敌方攻击"
+
+[resource]
+script = ExtResource("2_evhyi")
+id = "w057"
+word = "停火"
+glyphs = Array[String](["停", "火"])
+description = "本回合从头到尾没有造成敌伤才免疫敌方攻击的候选方向"
+effects = Array[ExtResource("1_esmk1")]([SubResource("Resource_27cmk")])
+group = "热暴"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "本回合从头到尾没有造成敌伤才免疫敌方攻击的候选方向"
+effect_handler_id = "ceasefire"
+timing = "persistent"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P3·补全词效"
+implemented = true

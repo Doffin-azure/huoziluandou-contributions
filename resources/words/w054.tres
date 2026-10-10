@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_bsxaf"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_cr0n8"]
+
+[sub_resource type="Resource" id="Resource_s04lg"]
+script = ExtResource("1_bsxaf")
+handler = "ability_double_draw_next"
+amount = 4
+timing = "next_word"
+note = "本回合下一次补字翻倍，最多额外 4 字；每额外 1 字升温 1"
+
+[resource]
+script = ExtResource("2_cr0n8")
+id = "w054"
+word = "超速"
+glyphs = Array[String](["超", "速"])
+description = "把本回合下一次补字效果的实际补字量翻倍，额外最多4；每额外补1字升热1"
+effects = Array[ExtResource("1_bsxaf")]([SubResource("Resource_s04lg")])
+group = "热暴"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "把本回合下一次补字效果的实际补字量翻倍，额外最多4；每额外补1字升热1"
+effect_handler_id = "ability_double_draw_next"
+timing = "next_word"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P3·补全词效"
+implemented = true

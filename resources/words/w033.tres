@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_g1cmm"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_ks5mw"]
+
+[sub_resource type="Resource" id="Resource_sxjq3"]
+script = ExtResource("1_g1cmm")
+handler = "buyback"
+amount = 3
+target = 8
+args = {
+"cost": 3
+}
+note = "支付 3 金币，回收本回合消耗的 1 枚字到袋顶"
+
+[resource]
+script = ExtResource("2_ks5mw")
+id = "w033"
+word = "回购"
+glyphs = Array[String](["回", "购"])
+description = "付金币定向回收已消耗实体字的候选方向"
+effects = Array[ExtResource("1_g1cmm")]([SubResource("Resource_sxjq3")])
+group = "流转"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "付金币定向回收已消耗实体字的候选方向"
+effect_handler_id = "buyback"
+requires_target = 8
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P3·补全词效"
+implemented = true

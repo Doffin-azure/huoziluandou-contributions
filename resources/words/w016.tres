@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_jbv53"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_40e45"]
+
+[sub_resource type="Resource" id="Resource_kevre"]
+script = ExtResource("1_jbv53")
+handler = "gravity_damage"
+amount = 6
+args = {
+"per": 2
+}
+note = "6 伤 + 重力移动的每枚字块 2 伤"
+
+[resource]
+script = ExtResource("2_40e45")
+id = "w016"
+word = "重击"
+glyphs = Array[String](["重", "击"])
+description = "消耗重击后强制一次向下重力；造成6+2×实际移动的其余字块数伤害"
+effects = Array[ExtResource("1_jbv53")]([SubResource("Resource_kevre")])
+group = "连携"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "消耗重击后强制一次向下重力；造成6+2×实际移动的其余字块数伤害"
+effect_handler_id = "gravity_damage"
+p25_implemented = true
+implementation_delta = "—"
+priority = "P1·重点机制"
+implemented = true

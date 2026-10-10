@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PollutionData" format=3]
+
+[ext_resource type="Script" path="res://src/data/pollution_data.gd" id="1_h4s4v"]
+
+[resource]
+script = ExtResource("1_h4s4v")
+id = "block"
+name = "堵塞"
+glyph = "堵"
+description = "打出附着堵塞的字后，下一次正常补字数量 -1（一次性）。"
+draw_penalty_on_play = 1
+color = Color(0.41960785, 0.3882353, 0.32941177, 1)

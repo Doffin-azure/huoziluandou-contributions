@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_s1jik"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_j0okk"]
+
+[sub_resource type="Resource" id="Resource_85yoy"]
+script = ExtResource("1_s1jik")
+handler = "compound_equity"
+amount = 1
+timing = "persistent"
+note = "本回合首次存股权时额外 +1 股权"
+
+[resource]
+script = ExtResource("2_j0okk")
+id = "w073"
+word = "复利"
+glyphs = Array[String](["复", "利"])
+description = "持续能力：本回合首次存入股权时额外获得1股权"
+effects = Array[ExtResource("1_s1jik")]([SubResource("Resource_85yoy")])
+group = "经济"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "持续能力：本回合首次存入股权时额外获得1股权"
+effect_handler_id = "compound_equity"
+timing = "persistent"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P3·补全词效"
+implemented = true

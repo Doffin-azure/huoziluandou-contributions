@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_1j43v"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_jgd4d"]
+
+[sub_resource type="Resource" id="Resource_frlld"]
+script = ExtResource("1_1j43v")
+handler = "electric_strike"
+amount = 6
+args = {
+"per": 2
+}
+note = "造成 6 伤 + 2×储能"
+
+[resource]
+script = ExtResource("2_jgd4d")
+id = "w019"
+word = "电击"
+glyphs = Array[String](["电", "击"])
+description = "联动电/储能体系的即时攻击"
+effects = Array[ExtResource("1_1j43v")]([SubResource("Resource_frlld")])
+group = "连携"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "联动电/储能体系的即时攻击"
+effect_handler_id = "electric_strike"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P3·补全词效"
+implemented = true

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_6ab26"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_csuw7"]
+
+[sub_resource type="Resource" id="Resource_pgd2w"]
+script = ExtResource("1_6ab26")
+handler = "merge_duplicates"
+target = 5
+note = "汇聚同字：保留 1 实体并获得同数量临时层，其余回字袋"
+
+[resource]
+script = ExtResource("2_csuw7")
+id = "w025"
+word = "重合"
+glyphs = Array[String](["重", "合"])
+description = "盘上每种重复己方字选择原格；一枚实体留格获得同数量可用层，其余真实副本立刻洗入抽字袋"
+effects = Array[ExtResource("1_6ab26")]([SubResource("Resource_pgd2w")])
+group = "连携"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "盘上每种重复己方字选择原格；一枚实体留格获得同数量可用层，其余真实副本立刻洗入抽字袋"
+effect_handler_id = "merge_duplicates"
+requires_target = 5
+p25_implemented = true
+implementation_delta = "P25有叠层/洗回，但需进一步核对不同字叠层、回换、抽袋守恒"
+priority = "P1·重点机制"
+implemented = true

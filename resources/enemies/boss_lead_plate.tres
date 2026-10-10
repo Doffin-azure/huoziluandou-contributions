@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_l8bih"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_iq1wa"]
+
+[sub_resource type="Resource" id="Resource_dj5ce"]
+script = ExtResource("1_l8bih")
+kind = 2
+title = "压印"
+damage = 10
+block = 8
+
+[sub_resource type="Resource" id="Resource_lops2"]
+script = ExtResource("1_l8bih")
+kind = 5
+title = "连铸"
+hits = 2
+
+[sub_resource type="Resource" id="Resource_ax3yg"]
+script = ExtResource("1_l8bih")
+kind = 6
+title = "蚀版"
+damage = 0
+inject_count = 3
+pollution_id = "block"
+
+[resource]
+script = ExtResource("2_iq1wa")
+id = "boss_lead_plate"
+name = "铅版"
+glyph = "铅"
+max_hp = 112
+accent = Color(0.22745098, 0.22745098, 0.26666668, 1)
+moves = Array[ExtResource("1_l8bih")]([SubResource("Resource_dj5ce"), SubResource("Resource_lops2"), SubResource("Resource_ax3yg")])
+is_boss = true

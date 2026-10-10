@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_x2rdb"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_vug4r"]
+
+[sub_resource type="Resource" id="Resource_hqxuf"]
+script = ExtResource("2_vug4r")
+handler = "block_temp"
+amount = 2
+note = "占位：获得 2 临时格挡（单字用途未定）"
+
+[resource]
+script = ExtResource("1_x2rdb")
+id = "jia"
+glyph = "甲"
+pinyin = "jia"
+description = "占位：获得 2 临时格挡（单字用途未定）"
+tags = Array[String](["defense"])
+solo_effects = Array[ExtResource("2_vug4r")]([SubResource("Resource_hqxuf")])
+solo_handler = "block_temp"
+rarity = 1

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="330" viewBox="0 0 1000 330">
+  <rect width="1000" height="330" fill="#f4ecd8"/>
+  <text x="34" y="46" font-family="Noto Serif SC, SimSun, serif" font-size="26" font-weight="bold" fill="#221f1a">定义：临时牌（角标「临」）</text>
+
+  <!-- 普通实体字 -->
+  <g transform="translate(50,100)">
+    <rect width="120" height="120" rx="14" fill="#a9773f" stroke="#6f4a24" stroke-width="3"/>
+    <text x="60" y="84" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="64" fill="#2b1c0c">护</text>
+  </g>
+  <text x="110" y="252" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="17" fill="#4a4438">实体字</text>
+  <text x="110" y="276" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="14" fill="#7c7360">会进字袋/弃字堆循环</text>
+  <text x="110" y="298" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="14" fill="#7c7360">战后保留</text>
+
+  <text x="200" y="170" font-family="Noto Serif SC, SimSun, serif" font-size="40" fill="#b83a2e">→</text>
+
+  <!-- 临时牌 -->
+  <g transform="translate(270,100)">
+    <rect width="120" height="120" rx="14" fill="#8fc7d6" stroke="#2f6f88" stroke-width="3"/>
+    <text x="60" y="84" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="64" fill="#12303c">护</text>
+    <text x="100" y="32" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="26" font-weight="bold" fill="#12303c">临</text>
+  </g>
+  <text x="330" y="252" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="17" fill="#2f6f88" font-weight="bold">临时牌</text>
+
+  <g font-family="Noto Serif SC, SimSun, serif" font-size="17" fill="#221f1a">
+    <text x="440" y="120">· 打出即消耗，不再回到任何牌堆</text>
+    <text x="440" y="154">· 不进抽字袋，也不进弃字堆</text>
+    <text x="440" y="188">· 只在本场存在，战斗结束即消失</text>
+    <text x="440" y="222">· 来源：【分化】生长、【再铸】复制、【铸币】临时币</text>
+    <text x="440" y="256" fill="#7c7360">对比：灼热【热】会进袋循环（不是临时牌）；</text>
+    <text x="440" y="280" fill="#7c7360">　　　敌方注入字打出后直接消失。</text>
+  </g>
+</svg>

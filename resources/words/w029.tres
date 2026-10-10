@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_ovu5g"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_pirac"]
+
+[sub_resource type="Resource" id="Resource_owaf3"]
+script = ExtResource("1_ovu5g")
+handler = "draw_random"
+amount = 4
+note = "随机补 4 字"
+
+[resource]
+script = ExtResource("2_pirac")
+id = "w029"
+word = "回流"
+glyphs = Array[String](["回", "流"])
+description = "消耗回流，随机补入至多4枚实体字"
+effects = Array[ExtResource("1_ovu5g")]([SubResource("Resource_owaf3")])
+group = "流转"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "消耗回流，随机补入至多4枚实体字"
+effect_handler_id = "draw_random"
+p25_implemented = true
+implementation_delta = "—"
+priority = "P1·重点机制"
+implemented = true

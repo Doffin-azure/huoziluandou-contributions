@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_8ilfq"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_hdyjf"]
+
+[sub_resource type="Resource" id="Resource_o65p7"]
+script = ExtResource("1_8ilfq")
+handler = "block_persist"
+amount = 6
+note = "获得 6 点持久盾"
+
+[resource]
+script = ExtResource("2_hdyjf")
+id = "w004"
+word = "护盾"
+glyphs = Array[String](["护", "盾"])
+description = "获得6点持久盾"
+effects = Array[ExtResource("1_8ilfq")]([SubResource("Resource_o65p7")])
+group = "防反"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "获得6点持久盾"
+effect_handler_id = "block_persist"
+p25_implemented = true
+implementation_delta = "—"
+priority = "P2·已试运行"
+implemented = true

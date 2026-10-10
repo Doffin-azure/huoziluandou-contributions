@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PollutionData" format=3]
+
+[ext_resource type="Script" path="res://src/data/pollution_data.gd" id="1_3eeff"]
+
+[resource]
+script = ExtResource("1_3eeff")
+id = "rush"
+name = "刺痛"
+glyph = "刺"
+description = "打出附着刺痛的字时，失去 2 点生命。"
+hp_loss_on_play = 2
+color = Color(0.54901963, 0.16470589, 0.1254902, 1)

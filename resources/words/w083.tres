@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_736ac"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_sy3p4"]
+
+[sub_resource type="Resource" id="Resource_am4gl"]
+script = ExtResource("1_736ac")
+handler = "refine_layer"
+note = "选择两个相同的己方字，本场它们一直重合（一格可重复使用，另一张回字袋）"
+
+[resource]
+script = ExtResource("2_sy3p4")
+id = "w083"
+word = "精炼"
+glyphs = Array[String](["精", "炼"])
+description = "P23初稿：标记己方字，首次参与长词时重复部分附效"
+effects = Array[ExtResource("1_736ac")]([SubResource("Resource_am4gl")])
+group = "淬炼"
+design_stage = "P23初稿；未完成分组复审"
+effect_summary = "P23初稿：标记己方字，首次参与长词时重复部分附效"
+effect_handler_id = "refine_layer"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P4·待复审"
+implemented = true
+interaction = "choose_same_pair"

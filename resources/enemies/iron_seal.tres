@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_yywke"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_2s8je"]
+
+[sub_resource type="Resource" id="Resource_akes3"]
+script = ExtResource("1_yywke")
+kind = 2
+title = "重压"
+damage = 7
+block = 6
+
+[sub_resource type="Resource" id="Resource_u2wkq"]
+script = ExtResource("1_yywke")
+title = "横扫"
+damage = 11
+
+[resource]
+script = ExtResource("2_2s8je")
+id = "iron_seal"
+name = "铁画"
+glyph = "铁"
+max_hp = 52
+accent = Color(0.2901961, 0.2901961, 0.32156864, 1)
+moves = Array[ExtResource("1_yywke")]([SubResource("Resource_akes3"), SubResource("Resource_u2wkq")])
+is_elite = true

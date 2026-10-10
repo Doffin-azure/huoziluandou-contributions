@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="560" viewBox="0 0 940 560">
+  <rect width="940" height="560" fill="#f4ecd8"/>
+  <text x="40" y="48" font-family="Noto Serif SC, SimSun, serif" font-size="26" font-weight="bold" fill="#221f1a">字盘：4×4 · 四邻接</text>
+  <text x="40" y="78" font-family="Noto Serif SC, SimSun, serif" font-size="16" fill="#7c7360">只能上/下/左/右连接，不能斜连；同一条路径不能重复同一格。</text>
+
+  <!-- 网格 -->
+  <g font-family="Noto Serif SC, SimSun, serif" font-size="52" text-anchor="middle">
+    <!-- row0 -->
+    <g>
+      <rect x="40" y="110" width="92" height="92" rx="12" fill="#a9773f" stroke="#b83a2e" stroke-width="5"/>
+      <text x="86" y="176" fill="#2b1c0c">反</text>
+    </g>
+    <g>
+      <rect x="144" y="110" width="92" height="92" rx="12" fill="#a9773f" stroke="#b83a2e" stroke-width="5"/>
+      <text x="190" y="176" fill="#2b1c0c">击</text>
+    </g>
+    <g>
+      <rect x="248" y="110" width="92" height="92" rx="12" fill="#a9773f" stroke="#6f4a24" stroke-width="3"/>
+      <text x="294" y="176" fill="#2b1c0c">破</text>
+    </g>
+    <g>
+      <rect x="352" y="110" width="92" height="92" rx="12" fill="#a9773f" stroke="#6f4a24" stroke-width="3"/>
+      <text x="398" y="176" fill="#2b1c0c">防</text>
+    </g>
+    <!-- row1 -->
+    <g>
+      <rect x="40" y="214" width="92" height="92" rx="12" fill="#a9773f" stroke="#6f4a24" stroke-width="3"/>
+      <text x="86" y="280" fill="#2b1c0c">回</text>
+    </g>
+    <g>
+      <rect x="144" y="214" width="92" height="92" rx="12" fill="#a9773f" stroke="#6f4a24" stroke-width="3"/>
+      <text x="190" y="280" fill="#2b1c0c">流</text>
+    </g>
+    <g>
+      <rect x="248" y="214" width="92" height="92" rx="12" fill="#a9773f" stroke="#6f4a24" stroke-width="3"/>
+      <text x="294" y="280" fill="#2b1c0c">连</text>
+    </g>
+    <g>
+      <rect x="352" y="214" width="92" height="92" rx="12" fill="#a9773f" stroke="#6f4a24" stroke-width="3"/>
+      <text x="398" y="280" fill="#2b1c0c">御</text>
+    </g>
+    <!-- row2 -->
+    <g>
+      <rect x="40" y="318" width="92" height="92" rx="12" fill="#a9773f" stroke="#6f4a24" stroke-width="3"/>
+      <text x="86" y="384" fill="#2b1c0c">重</text>
+    </g>
+    <g><rect x="144" y="318" width="92" height="92" rx="12" fill="#2b2620" stroke="#1a1712" stroke-width="3"/></g>
+    <g><rect x="248" y="318" width="92" height="92" rx="12" fill="#2b2620" stroke="#1a1712" stroke-width="3"/></g>
+    <g><rect x="352" y="318" width="92" height="92" rx="12" fill="#2b2620" stroke="#1a1712" stroke-width="3"/></g>
+    <!-- row3 -->
+    <g><rect x="40" y="422" width="92" height="92" rx="12" fill="#2b2620" stroke="#1a1712" stroke-width="3"/></g>
+    <g><rect x="144" y="422" width="92" height="92" rx="12" fill="#2b2620" stroke="#1a1712" stroke-width="3"/></g>
+    <g><rect x="248" y="422" width="92" height="92" rx="12" fill="#2b2620" stroke="#1a1712" stroke-width="3"/></g>
+    <g><rect x="352" y="422" width="92" height="92" rx="12" fill="#2b2620" stroke="#1a1712" stroke-width="3"/></g>
+  </g>
+
+  <!-- 连线示意 -->
+  <line x1="132" y1="156" x2="144" y2="156" stroke="#b83a2e" stroke-width="8" stroke-linecap="round"/>
+  <text x="486" y="150" font-family="Noto Serif SC, SimSun, serif" font-size="18" fill="#b83a2e" font-weight="bold">当前连线：反 → 击</text>
+  <text x="486" y="178" font-family="Noto Serif SC, SimSun, serif" font-size="16" fill="#4a4438">识别为【反击】，触发其效果</text>
+
+  <g font-family="Noto Serif SC, SimSun, serif" font-size="16" fill="#4a4438">
+    <text x="486" y="230" fill="#221f1a" font-weight="bold">规则</text>
+    <text x="486" y="258">· 可转弯，但每格只能用一次</text>
+    <text x="486" y="286">· “单字”打出 = 弃字（同一操作）</text>
+    <text x="486" y="314">· 非法多字路径：不消耗、不扣次数</text>
+    <text x="486" y="342">· 出字后不自动补满；回合开始补 3</text>
+    <text x="486" y="370">· 无固定出字次数上限</text>
+    <text x="486" y="398" fill="#7c7360">开局落盘：随机 10 枚（V0.3）</text>
+  </g>
+</svg>

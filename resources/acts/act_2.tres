@@ -1,0 +1,74 @@
+[gd_resource type="Resource" script_class="ActData" format=3]
+
+[ext_resource type="Script" path="res://src/data/map_node_data.gd" id="1_3px3w"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_0tlxa"]
+[ext_resource type="Resource" path="res://resources/enemies/rust_scribe.tres" id="3_phn7j"]
+[ext_resource type="Resource" path="res://resources/enemies/bronze_seal.tres" id="4_e7hyv"]
+[ext_resource type="Resource" path="res://resources/enemies/paper_guard.tres" id="5_5f7h3"]
+[ext_resource type="Resource" path="res://resources/enemies/boss_lead_plate.tres" id="6_6d21g"]
+[ext_resource type="Script" path="res://src/data/act_data.gd" id="7_bj0d8"]
+
+[sub_resource type="Resource" id="Resource_7vtmc"]
+script = ExtResource("1_3px3w")
+title = "初试"
+description = "教授组词与单字的取舍"
+enemies = Array[ExtResource("2_0tlxa")]([ExtResource("3_phn7j")])
+
+[sub_resource type="Resource" id="Resource_3diai"]
+script = ExtResource("1_3px3w")
+order = 2
+title = "第二条线"
+description = "提供第一条新联动"
+enemies = Array[ExtResource("2_0tlxa")]([ExtResource("4_e7hyv")])
+
+[sub_resource type="Resource" id="Resource_agxmr"]
+script = ExtResource("1_3px3w")
+order = 3
+type = 1
+title = "途中小憩"
+description = "叙事与风险、资源取舍"
+
+[sub_resource type="Resource" id="Resource_aq6go"]
+script = ExtResource("1_3px3w")
+order = 4
+title = "机制之敌"
+description = "开始应对机制性敌人"
+enemies = Array[ExtResource("2_0tlxa")]([ExtResource("5_5f7h3")])
+
+[sub_resource type="Resource" id="Resource_ahyvn"]
+script = ExtResource("1_3px3w")
+order = 5
+type = 2
+title = "市集"
+description = "购字、复制、删字或治疗"
+
+[sub_resource type="Resource" id="Resource_6tkya"]
+script = ExtResource("1_3px3w")
+order = 6
+type = 6
+title = "岔路"
+description = "精英（高收益）或事件（较安全）"
+enemies = Array[ExtResource("2_0tlxa")]([ExtResource("4_e7hyv")])
+is_optional_branch = true
+
+[sub_resource type="Resource" id="Resource_jea3j"]
+script = ExtResource("1_3px3w")
+order = 7
+type = 4
+title = "休整"
+description = "治疗 / 删字 / 修饰，三选一"
+
+[sub_resource type="Resource" id="Resource_vhnj6"]
+script = ExtResource("1_3px3w")
+order = 8
+type = 5
+title = "幕末首领"
+description = "验证整套构筑"
+enemies = Array[ExtResource("2_0tlxa")]([ExtResource("6_6d21g")])
+
+[resource]
+script = ExtResource("7_bj0d8")
+index = 2
+title = "第二幕 · 成型"
+theme = "从一个词扩展到联动体系，敌人开始污染盘面。"
+nodes = Array[ExtResource("1_3px3w")]([SubResource("Resource_7vtmc"), SubResource("Resource_3diai"), SubResource("Resource_agxmr"), SubResource("Resource_aq6go"), SubResource("Resource_ahyvn"), SubResource("Resource_6tkya"), SubResource("Resource_jea3j"), SubResource("Resource_vhnj6")])

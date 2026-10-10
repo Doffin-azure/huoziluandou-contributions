@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_fcllb"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_cgml8"]
+
+[sub_resource type="Resource" id="Resource_5rm2f"]
+script = ExtResource("1_fcllb")
+title = "吞字"
+damage = 13
+
+[sub_resource type="Resource" id="Resource_x86o4"]
+script = ExtResource("1_fcllb")
+kind = 5
+title = "乱版"
+damage = 7
+hits = 3
+
+[sub_resource type="Resource" id="Resource_nc41y"]
+script = ExtResource("1_fcllb")
+kind = 1
+title = "封泥"
+damage = 0
+block = 12
+
+[sub_resource type="Resource" id="Resource_1xxeu"]
+script = ExtResource("1_fcllb")
+kind = 6
+title = "蚀海"
+damage = 0
+inject_count = 4
+pollution_id = "scorch"
+
+[resource]
+script = ExtResource("2_cgml8")
+id = "boss_chaos_press"
+name = "混铅海"
+glyph = "沌"
+max_hp = 150
+accent = Color(0.17254902, 0.17254902, 0.22745098, 1)
+moves = Array[ExtResource("1_fcllb")]([SubResource("Resource_5rm2f"), SubResource("Resource_x86o4"), SubResource("Resource_nc41y"), SubResource("Resource_1xxeu")])
+is_boss = true

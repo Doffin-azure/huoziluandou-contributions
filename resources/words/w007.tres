@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_bi6l5"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_73w76"]
+
+[sub_resource type="Resource" id="Resource_2fjij"]
+script = ExtResource("1_bi6l5")
+handler = "shield_smash"
+amount = 4
+args = {
+"bonus": 3,
+"per": 2
+}
+note = "造成 4 伤并消耗全部持久盾，每 2 点额外 3 伤"
+
+[resource]
+script = ExtResource("2_73w76")
+id = "w007"
+word = "盾击"
+glyphs = Array[String](["盾", "击"])
+description = "立刻造成4伤并消耗全部持久盾，每完整2点持久盾额外3伤"
+effects = Array[ExtResource("1_bi6l5")]([SubResource("Resource_2fjij")])
+group = "防反"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "立刻造成4伤并消耗全部持久盾，每完整2点持久盾额外3伤"
+effect_handler_id = "shield_smash"
+p25_implemented = true
+implementation_delta = "—"
+priority = "P2·已试运行"
+implemented = true

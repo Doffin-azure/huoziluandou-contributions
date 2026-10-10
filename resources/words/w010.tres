@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_wveyi"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_ubugt"]
+
+[sub_resource type="Resource" id="Resource_0c2b6"]
+script = ExtResource("1_wveyi")
+handler = "remove_enemy_block"
+note = "移除敌人全部护盾"
+
+[resource]
+script = ExtResource("2_ubugt")
+id = "w010"
+word = "破甲"
+glyphs = Array[String](["破", "甲"])
+description = "移除敌人所有护盾，本身无攻击"
+effects = Array[ExtResource("1_wveyi")]([SubResource("Resource_0c2b6")])
+group = "防反"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "移除敌人所有护盾，本身无攻击"
+effect_handler_id = "remove_enemy_block"
+p25_implemented = true
+implementation_delta = "—"
+priority = "P2·已试运行"
+implemented = true

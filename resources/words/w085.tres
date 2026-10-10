@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_6hf2p"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_o1adn"]
+
+[sub_resource type="Resource" id="Resource_5fy26"]
+script = ExtResource("1_6hf2p")
+handler = "recast_board"
+note = "把盘面上已有的字全部重新替换（己方字回袋重抽，敌方/临时字清除）"
+
+[resource]
+script = ExtResource("2_o1adn")
+id = "w085"
+word = "重铸"
+glyphs = Array[String](["重", "铸"])
+description = "P23初稿：牺牲持久盾，为后续攻击换穿盾"
+effects = Array[ExtResource("1_6hf2p")]([SubResource("Resource_5fy26")])
+group = "淬炼"
+design_stage = "P23初稿；未完成分组复审"
+effect_summary = "P23初稿：牺牲持久盾，为后续攻击换穿盾"
+effect_handler_id = "recast_board"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P4·待复审"
+implemented = true

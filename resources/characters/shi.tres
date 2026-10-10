@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_x22yg"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_u0hfm"]
+
+[resource]
+script = ExtResource("1_x22yg")
+id = "shi"
+glyph = "蚀"
+pinyin = "shi"
+description = "可单字打出（暂无单字效果，用于腾出空格）。"
+tags = Array[String](["enemy"])
+rarity = 2

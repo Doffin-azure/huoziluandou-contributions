@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_ar13a"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_qsyk8"]
+
+[sub_resource type="Resource" id="Resource_e4ft4"]
+script = ExtResource("1_ar13a")
+kind = 5
+title = "连焰"
+damage = 4
+hits = 2
+
+[sub_resource type="Resource" id="Resource_hysvm"]
+script = ExtResource("1_ar13a")
+kind = 6
+title = "落灰"
+damage = 0
+inject_count = 1
+pollution_id = "scorch"
+
+[resource]
+script = ExtResource("2_qsyk8")
+id = "ember_imp"
+name = "焦火"
+glyph = "焦"
+max_hp = 34
+accent = Color(0.6901961, 0.32156864, 0.18039216, 1)
+moves = Array[ExtResource("1_ar13a")]([SubResource("Resource_e4ft4"), SubResource("Resource_hysvm")])

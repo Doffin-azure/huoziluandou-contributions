@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_phxv3"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_ee6wq"]
+
+[sub_resource type="Resource" id="Resource_2cj64"]
+script = ExtResource("1_phxv3")
+handler = "ability_heat_overload_bonus"
+amount = 2
+timing = "persistent"
+note = "本回合首次溢热后，下一次多字词额外补 2 字"
+
+[resource]
+script = ExtResource("2_ee6wq")
+id = "w049"
+word = "过热"
+glyphs = Array[String](["过", "热"])
+description = "持续能力：本回合首次热容溢出后，下一次多字词额外补2字；同时受自污染真实代价"
+effects = Array[ExtResource("1_phxv3")]([SubResource("Resource_2cj64")])
+group = "热暴"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "持续能力：本回合首次热容溢出后，下一次多字词额外补2字；同时受自污染真实代价"
+effect_handler_id = "ability_heat_overload_bonus"
+timing = "persistent"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P1·重点机制"
+implemented = true

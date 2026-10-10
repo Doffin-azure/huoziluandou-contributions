@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://src/data/status_data.gd" id="1_ujbun"]
+
+[resource]
+script = ExtResource("1_ujbun")
+id = "strength"
+name = "强力"
+glyph = "力"
+description = "每层使你的伤害 +1。"
+color = Color(0.72156864, 0.32156864, 0.22745098, 1)

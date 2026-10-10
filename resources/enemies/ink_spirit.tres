@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_dn5li"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_ccuri"]
+
+[sub_resource type="Resource" id="Resource_dib83"]
+script = ExtResource("1_dn5li")
+title = "溅墨"
+
+[sub_resource type="Resource" id="Resource_csrwx"]
+script = ExtResource("1_dn5li")
+kind = 6
+title = "落墨"
+damage = 0
+inject_count = 1
+pollution_id = "rush"
+
+[sub_resource type="Resource" id="Resource_yw1g1"]
+script = ExtResource("1_dn5li")
+kind = 1
+title = "结茧"
+damage = 0
+block = 5
+
+[resource]
+script = ExtResource("2_ccuri")
+id = "ink_spirit"
+name = "墨灵"
+glyph = "墨"
+max_hp = 30
+accent = Color(0.23529412, 0.2901961, 0.41960785, 1)
+moves = Array[ExtResource("1_dn5li")]([SubResource("Resource_dib83"), SubResource("Resource_csrwx"), SubResource("Resource_yw1g1")])

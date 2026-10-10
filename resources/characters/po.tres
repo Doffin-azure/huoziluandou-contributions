@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_k1win"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_3rhhf"]
+
+[sub_resource type="Resource" id="Resource_bd42x"]
+script = ExtResource("2_3rhhf")
+handler = "damage"
+amount = 3
+note = "占位：造成 3 伤害（单字用途未定）"
+
+[resource]
+script = ExtResource("1_k1win")
+id = "po"
+glyph = "破"
+pinyin = "po"
+description = "占位：造成 3 伤害（单字用途未定）"
+tags = Array[String](["attack"])
+solo_effects = Array[ExtResource("2_3rhhf")]([SubResource("Resource_bd42x")])
+solo_handler = "damage"

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://src/data/status_data.gd" id="1_fsd8i"]
+
+[resource]
+script = ExtResource("1_fsd8i")
+id = "next_bonus"
+name = "加强"
+glyph = "增"
+description = "下一次攻击每段 +2 伤害。"
+color = Color(0.23529412, 0.2901961, 0.41960785, 1)

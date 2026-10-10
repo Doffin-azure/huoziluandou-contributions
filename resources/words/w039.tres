@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_u63m2"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_g6yyt"]
+
+[sub_resource type="Resource" id="Resource_0acvr"]
+script = ExtResource("1_u63m2")
+handler = "ability_energy_idle"
+amount = 1
+timing = "persistent"
+note = "回合结束若仍有可用多字词，储能 +1"
+
+[resource]
+script = ExtResource("2_g6yyt")
+id = "w039"
+word = "蓄能"
+glyphs = Array[String](["蓄", "能"])
+description = "持续能力：回合结束若仍有可用多字词留在盘上，储能+1"
+effects = Array[ExtResource("1_u63m2")]([SubResource("Resource_0acvr")])
+group = "蓄放"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "持续能力：回合结束若仍有可用多字词留在盘上，储能+1"
+effect_handler_id = "ability_energy_idle"
+timing = "persistent"
+p25_implemented = true
+implementation_delta = "—"
+priority = "P2·已试运行"
+implemented = true

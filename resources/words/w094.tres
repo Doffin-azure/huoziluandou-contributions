@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_4u2co"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_r0k2f"]
+
+[sub_resource type="Resource" id="Resource_lwibo"]
+script = ExtResource("1_4u2co")
+handler = "ability_overfire"
+timing = "next_word"
+args = {
+"heat": 2,
+"per": 3
+}
+note = "下一次攻击额外 + 当前热度×3 伤，同时热度 +2"
+
+[resource]
+script = ExtResource("2_r0k2f")
+id = "w094"
+word = "过火"
+glyphs = Array[String](["过", "火"])
+description = "下一次攻击额外+当前热度×3伤，同时热度+2"
+effects = Array[ExtResource("1_4u2co")]([SubResource("Resource_lwibo")])
+group = "热暴"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "下一次攻击额外+当前热度×3伤，同时热度+2"
+effect_handler_id = "ability_overfire"
+timing = "next_word"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P3·补全词效"
+implemented = true

@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_ttija"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_jo3l6"]
+
+[sub_resource type="Resource" id="Resource_cs2ke"]
+script = ExtResource("1_ttija")
+handler = "recover_consumed"
+amount = 1
+target = 8
+note = "从弃字堆回收本回合消耗的 1 枚字到袋顶"
+
+[resource]
+script = ExtResource("2_jo3l6")
+id = "w032"
+word = "回收"
+glyphs = Array[String](["回", "收"])
+description = "从本回合此前消耗的己方实体字里指定1枚，放回抽字袋顶"
+effects = Array[ExtResource("1_ttija")]([SubResource("Resource_cs2ke")])
+group = "流转"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "从本回合此前消耗的己方实体字里指定1枚，放回抽字袋顶"
+effect_handler_id = "recover_consumed"
+requires_target = 8
+p25_implemented = true
+implementation_delta = "P25自动取最后一枚弃字，正式需选择本回合用过的实体字"
+priority = "P2·已试运行"
+implemented = true

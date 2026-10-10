@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_rvmfa"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_3r5ji"]
+
+[sub_resource type="Resource" id="Resource_h0inr"]
+script = ExtResource("1_rvmfa")
+handler = "destroy_2x2"
+amount = 4
+target = 6
+note = "摧毁 2×2 区域，每摧毁 1 字造成 4 伤"
+
+[resource]
+script = ExtResource("2_3r5ji")
+id = "w062"
+word = "爆破"
+glyphs = Array[String](["爆", "破"])
+description = "选择2×2区域并摧毁所有字；每摧毁1字造成4伤，创造空位"
+effects = Array[ExtResource("1_rvmfa")]([SubResource("Resource_h0inr")])
+group = "热暴"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "选择2×2区域并摧毁所有字；每摧毁1字造成4伤，创造空位"
+effect_handler_id = "destroy_2x2"
+requires_target = 6
+p25_implemented = true
+implementation_delta = "P25区域摧毁；需核对“摧毁不等于打出”及污染不触发"
+priority = "P2·已试运行"
+implemented = true

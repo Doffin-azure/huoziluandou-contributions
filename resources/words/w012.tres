@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_q7spo"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_wbicq"]
+
+[sub_resource type="Resource" id="Resource_ey02x"]
+script = ExtResource("1_q7spo")
+handler = "fireproof"
+timing = "persistent"
+note = "本场持续：自己打出的灼热【热】不再扣血（仍占字袋、不被自动净化）"
+
+[resource]
+script = ExtResource("2_wbicq")
+id = "w012"
+word = "防火"
+glyphs = Array[String](["防", "火"])
+description = "利用热容或抵御灼热字的防御词，尚未收敛"
+effects = Array[ExtResource("1_q7spo")]([SubResource("Resource_ey02x")])
+group = "防反"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "利用热容或抵御灼热字的防御词，尚未收敛"
+effect_handler_id = "fireproof"
+timing = "persistent"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P3·补全词效"
+implemented = true

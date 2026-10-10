@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://src/data/status_data.gd" id="1_dlwbn"]
+
+[resource]
+script = ExtResource("1_dlwbn")
+id = "burn"
+name = "灼烧"
+glyph = "燃"
+description = "接下来 2 次敌方行动各受到一次灼烧伤害。"
+kind = 1
+color = Color(0.6901961, 0.32156864, 0.18039216, 1)

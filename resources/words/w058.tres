@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_wr1jx"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_gg8dr"]
+
+[sub_resource type="Resource" id="Resource_2p0iq"]
+script = ExtResource("1_wr1jx")
+handler = "suspend"
+note = "立即结束出字阶段：清零全部热度，每 1 热度换 2 持久盾；敌人正常行动"
+
+[resource]
+script = ExtResource("2_gg8dr")
+id = "w058"
+word = "停息"
+glyphs = Array[String](["停", "息"])
+description = "本回合暂时关闭自己的持续能力自动触发；是否附赠补字待定"
+effects = Array[ExtResource("1_wr1jx")]([SubResource("Resource_2p0iq")])
+group = "热暴"
+design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
+effect_summary = "本回合暂时关闭自己的持续能力自动触发；是否附赠补字待定"
+effect_handler_id = "suspend"
+implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+priority = "P3·补全词效"
+implemented = true

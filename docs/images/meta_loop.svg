@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="600" viewBox="0 0 920 600">
+  <rect width="920" height="600" fill="#f4ecd8"/>
+  <text x="30" y="42" font-family="Noto Serif SC, SimSun, serif" font-size="26" font-weight="bold" fill="#221f1a">局内 / 局外循环</text>
+
+  <!-- 局外 -->
+  <rect x="30" y="64" width="860" height="150" rx="14" fill="#ece0c6" stroke="#9a7838" stroke-width="2"/>
+  <text x="48" y="92" font-family="Noto Serif SC, SimSun, serif" font-size="18" font-weight="bold" fill="#9a7838">局外（跨战保留）</text>
+  <g font-family="Noto Serif SC, SimSun, serif" font-size="16" fill="#221f1a">
+    <text x="48" y="126">· 永久字袋（初始 12 枚 → 终局约 16～20 枚）</text>
+    <text x="48" y="156">· 生命上限 / 当前生命 · 金币</text>
+    <text x="48" y="186">· 永久能力：防御力（减伤）、复利投资（金币增长）、镀金字等</text>
+    <text x="470" y="126">· 局外不做“战力数值膨胀”</text>
+    <text x="470" y="156">· 成长=改变“可组词概率”与体系方向</text>
+    <text x="470" y="186">· 删字/复制/加字是核心决策</text>
+  </g>
+
+  <!-- 箭头 -->
+  <path d="M460 214 L460 246" stroke="#b83a2e" stroke-width="4" marker-end="url(#a)"/>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#b83a2e"/>
+    </marker>
+  </defs>
+
+  <!-- 局内 -->
+  <rect x="30" y="250" width="860" height="286" rx="14" fill="#e4ecd8" stroke="#5f7d6a" stroke-width="2"/>
+  <text x="48" y="278" font-family="Noto Serif SC, SimSun, serif" font-size="18" font-weight="bold" fill="#5f7d6a">局内（一局冒险）</text>
+
+  <!-- 三幕 -->
+  <g font-family="Noto Serif SC, SimSun, serif" text-anchor="middle">
+    <!-- act boxes -->
+    <rect x="48" y="296" width="256" height="100" rx="10" fill="#f4ecd8" stroke="#4a4438" stroke-width="2"/>
+    <text x="176" y="322" font-size="17" font-weight="bold" fill="#221f1a">第一幕 · 起步</text>
+    <text x="176" y="348" font-size="14" fill="#4a4438">三普通战 + 事件 + 商店</text>
+    <text x="176" y="372" font-size="14" fill="#4a4438">岔路(精英/事件) + 休整 + Boss</text>
+
+    <rect x="332" y="296" width="256" height="100" rx="10" fill="#f4ecd8" stroke="#4a4438" stroke-width="2"/>
+    <text x="460" y="322" font-size="17" font-weight="bold" fill="#221f1a">第二幕 · 成型</text>
+    <text x="460" y="348" font-size="14" fill="#4a4438">污染 / 破盾 / 行动次序</text>
+    <text x="460" y="372" font-size="14" fill="#4a4438">字袋 14～18</text>
+
+    <rect x="616" y="296" width="256" height="100" rx="10" fill="#f4ecd8" stroke="#b83a2e" stroke-width="2"/>
+    <text x="744" y="322" font-size="17" font-weight="bold" fill="#b83a2e">第三幕 · 兑现</text>
+    <text x="744" y="348" font-size="14" fill="#4a4438">混合压力 / 多段攻击</text>
+    <text x="744" y="372" font-size="14" fill="#4a4438">终局 Boss → 通关</text>
+  </g>
+
+  <!-- 单幕循环 -->
+  <g font-family="Noto Serif SC, SimSun, serif" font-size="15" fill="#221f1a">
+    <rect x="48" y="418" width="150" height="46" rx="8" fill="#f4ecd8" stroke="#4a4438" stroke-width="2"/>
+    <text x="123" y="446" text-anchor="middle">战斗：落盘/连词/结算</text>
+    <rect x="222" y="418" width="130" height="46" rx="8" fill="#f4ecd8" stroke="#4a4438" stroke-width="2"/>
+    <text x="287" y="446" text-anchor="middle">胜利 → 三选一</text>
+    <rect x="376" y="418" width="150" height="46" rx="8" fill="#f4ecd8" stroke="#4a4438" stroke-width="2"/>
+    <text x="451" y="446" text-anchor="middle">商店/休整/事件</text>
+    <rect x="550" y="418" width="130" height="46" rx="8" fill="#f4ecd8" stroke="#b83a2e" stroke-width="2"/>
+    <text x="615" y="446" text-anchor="middle">Boss → 幕末奖励</text>
+    <rect x="704" y="418" width="168" height="46" rx="8" fill="#f4ecd8" stroke="#5f7d6a" stroke-width="2"/>
+    <text x="788" y="446" text-anchor="middle">下一幕 / 通关 / 失败</text>
+  </g>
+  <g stroke="#b83a2e" stroke-width="3" marker-end="url(#a)">
+    <line x1="198" y1="441" x2="220" y2="441"/>
+    <line x1="352" y1="441" x2="374" y2="441"/>
+    <line x1="526" y1="441" x2="548" y2="441"/>
+    <line x1="680" y1="441" x2="702" y2="441"/>
+  </g>
+  <text x="48" y="504" font-family="Noto Serif SC, SimSun, serif" font-size="15" fill="#7c7360">局内资源：临挡/持久盾、储能、热度/热容、战斗内污染、临时牌、融合/叠层、本回合临时资金。</text>
+  <text x="48" y="526" font-family="Noto Serif SC, SimSun, serif" font-size="15" fill="#7c7360">局内结束全部清空（不带走）：临挡、储能、热度、灼热字、临时牌、融合、未兑现股权本金返还。</text>
+</svg>

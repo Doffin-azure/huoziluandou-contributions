@@ -1,0 +1,10 @@
+# 统一换行，避免 Windows 下反复产生 CRLF 差异
+* text=auto eol=lf
+
+# 二进制资源
+*.ttf binary
+*.otf binary
+*.png binary
+*.jpg binary
+*.pck binary
+*.zip binary

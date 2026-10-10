@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_ipx8x"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_feemo"]
+
+[sub_resource type="Resource" id="Resource_j07g8"]
+script = ExtResource("1_ipx8x")
+kind = 4
+title = "污墨"
+damage = 0
+status_id = "vulnerable"
+status_stacks = 1
+
+[sub_resource type="Resource" id="Resource_8k3qx"]
+script = ExtResource("1_ipx8x")
+title = "刺"
+damage = 8
+
+[sub_resource type="Resource" id="Resource_e1ltc"]
+script = ExtResource("1_ipx8x")
+kind = 6
+title = "蚀文"
+damage = 0
+inject_count = 1
+pollution_id = "rush"
+
+[resource]
+script = ExtResource("2_feemo")
+id = "rust_scribe"
+name = "锈笔"
+glyph = "锈"
+max_hp = 40
+accent = Color(0.43529412, 0.47843137, 0.24705882, 1)
+moves = Array[ExtResource("1_ipx8x")]([SubResource("Resource_j07g8"), SubResource("Resource_8k3qx"), SubResource("Resource_e1ltc")])

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_cgvy4"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_1c1qt"]
+
+[resource]
+script = ExtResource("1_cgvy4")
+id = "lian2"
+glyph = "炼"
+pinyin = "lian"
+description = "可单字打出（暂无单字效果，用于腾出空格）。"
+tags = Array[String](["economy"])
+rarity = 2

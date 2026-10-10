@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://src/data/status_data.gd" id="1_ciwqw"]
+
+[resource]
+script = ExtResource("1_ciwqw")
+id = "next_extra"
+name = "超载"
+glyph = "载"
+description = "下一次多字词的即时效果额外执行一次。"
+color = Color(0.6901961, 0.32156864, 0.18039216, 1)

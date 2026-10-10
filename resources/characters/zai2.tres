@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_d5npq"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_3chmg"]
+
+[sub_resource type="Resource" id="Resource_wxfgf"]
+script = ExtResource("2_3chmg")
+handler = "repeat_last"
+note = "单字：重复上一个词/字的最后一个字（临时）"
+
+[resource]
+script = ExtResource("1_d5npq")
+id = "zai2"
+glyph = "再"
+pinyin = "zai"
+description = "单字：重复上一个词/字的最后一个字（临时）"
+tags = Array[String](["economy"])
+solo_effects = Array[ExtResource("2_3chmg")]([SubResource("Resource_wxfgf")])
+solo_handler = "repeat_last"
+rarity = 2

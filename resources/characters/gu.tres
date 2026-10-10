@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_pm0k4"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_wtadr"]
+
+[resource]
+script = ExtResource("1_pm0k4")
+id = "gu"
+glyph = "骨"
+pinyin = "gu"
+description = "可单字打出（暂无单字效果，用于腾出空格）。"
+tags = Array[String](["彩蛋"])
+rarity = 3
