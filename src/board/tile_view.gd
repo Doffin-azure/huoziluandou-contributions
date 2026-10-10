@@ -44,7 +44,7 @@ func _build() -> void:
 	_face = ColorRect.new()
 	_face.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_face.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_wood_mat = Ink.make_wood_material()
+	_wood_mat = Ink.make_tile_material()
 	_face.material = _wood_mat
 	_visual.add_child(_face)
 
@@ -79,7 +79,7 @@ func _build() -> void:
 	_sel_border = PanelContainer.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0, 0, 0, 0)
-	sb.set_corner_radius_all(12)
+	sb.set_corner_radius_all(12 + Palette.CORNER_BONUS)
 	sb.set_border_width_all(4)
 	sb.border_color = Palette.VERMILION
 	sb.shadow_color = Color(Palette.VERMILION.r, Palette.VERMILION.g, Palette.VERMILION.b, 0.5)
@@ -104,7 +104,7 @@ func _update_shader_size() -> void:
 	if _wood_mat == null:
 		return
 	_wood_mat.set_shader_parameter("tile_size", size)
-	_wood_mat.set_shader_parameter("corner_radius", 12.0)
+	_wood_mat.set_shader_parameter("corner_radius", 12.0 + Palette.CORNER_BONUS)
 
 
 func set_instance(inst: CharInstance) -> void:
@@ -137,8 +137,7 @@ func _refresh() -> void:
 	if instance.is_fused():
 		tint = Color(0.72, 0.66, 0.9)
 	if _wood_mat != null:
-		_wood_mat.set_shader_parameter("wood_dark", Palette.WOOD_DARK * tint)
-		_wood_mat.set_shader_parameter("wood_light", Palette.WOOD_LIGHT * tint)
+		Ink.tile_set_tint(_wood_mat, tint)
 	for c in _status_row.get_children():
 		c.queue_free()
 	if instance.temporary:

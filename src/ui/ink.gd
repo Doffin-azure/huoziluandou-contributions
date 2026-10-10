@@ -1,23 +1,35 @@
 extends Node
 ## Ink —— 全局“美术工具箱”。
-## 所有界面都用 Ink.xxx() 组装，不依赖大量 .tscn，改一处即全局换皮。
-## - 主题（字体/颜色/按钮/面板）在 _ready() 里构建并套用到窗口。
-## - 纸纹、木纹用着色器程序化生成，无需美术资源。
+## 所有界面都用 Ink.xxx() 组装；改一处即全局换皮。
+## 风格由 GameStyle 令牌驱动，可运行时切换（宣纸 / 墨芯）。
 
 var theme: Theme
 var serif: Font
 var sans: Font
+var style: GameStyle
 
 var _paper_shader: Shader
+var _bg_neon_shader: Shader
 var _wood_shader: Shader
-var _paper_mat: ShaderMaterial
+var _tile_neon_shader: Shader
 
 
 func _ready() -> void:
 	_load_fonts()
 	_load_shaders()
+	var sid := "paper"
+	if Settings != null and "visual_style" in Settings:
+		sid = Settings.visual_style
+	apply_style(GameStyle.get_style(sid))
+
+
+## 切换风格：更新令牌 + 重建主题。
+func apply_style(new_style: GameStyle) -> void:
+	style = new_style
+	Palette.apply(new_style)
 	theme = _build_theme()
-	get_tree().root.theme = theme
+	if get_tree() != null:
+		get_tree().root.theme = theme
 
 
 func _load_fonts() -> void:
@@ -33,9 +45,9 @@ func _load_fonts() -> void:
 
 func _load_shaders() -> void:
 	_paper_shader = load("res://src/shaders/paper.gdshader")
+	_bg_neon_shader = load("res://src/shaders/bg_neon.gdshader")
 	_wood_shader = load("res://src/shaders/wood.gdshader")
-	_paper_mat = ShaderMaterial.new()
-	_paper_mat.shader = _paper_shader
+	_tile_neon_shader = load("res://src/shaders/tile_neon.gdshader")
 
 
 # ---------------------------------------------------------------- 主题构建
@@ -51,23 +63,23 @@ func _build_theme() -> Theme:
 	t.set_color("default_color", "RichTextLabel", Palette.INK)
 	t.set_stylebox("normal", "RichTextLabel", StyleBoxEmpty.new())
 
-	# --- 按钮：纸签 ---
+	# --- 按钮 ---
 	t.set_font("font", "Button", serif)
 	t.set_font_size("font_size", "Button", 18)
 	t.set_color("font_color", "Button", Palette.INK)
-	t.set_color("font_hover_color", "Button", Palette.VERMILION_DK)
+	t.set_color("font_hover_color", "Button", Palette.VERMILION)
 	t.set_color("font_pressed_color", "Button", Palette.PAPER)
 	t.set_color("font_disabled_color", "Button", Palette.INK_FAINT)
-	t.set_stylebox("normal", "Button", _sb(Palette.PAPER_WARM, 8, Palette.INK_SOFT, 2))
-	t.set_stylebox("hover", "Button", _sb(Palette.PAPER, 8, Palette.VERMILION, 2))
-	t.set_stylebox("pressed", "Button", _sb(Palette.VERMILION_DK, 8, Palette.VERMILION_DK, 2))
-	t.set_stylebox("disabled", "Button", _sb(Palette.PAPER_DARK, 8, Palette.PAPER_SHADE, 2))
+	t.set_stylebox("normal", "Button", _sb(Palette.PAPER_WARM, 8, Palette.BORDER, 2, 0.4))
+	t.set_stylebox("hover", "Button", _sb(Palette.PAPER, 8, Palette.VERMILION, 2, 1.0))
+	t.set_stylebox("pressed", "Button", _sb(Palette.VERMILION_DK, 8, Palette.VERMILION_DK, 2, 0.6))
+	t.set_stylebox("disabled", "Button", _sb(Palette.PAPER_DARK, 8, Palette.BORDER_SOFT, 2))
 	t.set_stylebox("focus", "Button", _sb(Color(0, 0, 0, 0), 8, Palette.GOLD, 2))
 	t.set_constant("outline_size", "Button", 0)
 
-	# --- 面板：纸面卡片 ---
-	t.set_stylebox("panel", "PanelContainer", _sb(Palette.PAPER, 10, Palette.PAPER_SHADE, 2))
-	t.set_stylebox("panel", "Panel", _sb(Palette.PAPER, 10, Palette.PAPER_SHADE, 2))
+	# --- 面板 ---
+	t.set_stylebox("panel", "PanelContainer", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2, 0.8))
+	t.set_stylebox("panel", "Panel", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2, 0.8))
 
 	# --- 滚动条 ---
 	t.set_stylebox("scroll", "VScrollBar", _sb(Palette.PAPER_DARK, 6, Color(0, 0, 0, 0), 0))
@@ -106,59 +118,108 @@ func _build_theme() -> Theme:
 	t.set_color("font_color", "Stat", Palette.INK)
 
 	t.set_type_variation("PanelCard", "PanelContainer")
-	t.set_stylebox("panel", "PanelCard", _sb(Palette.PAPER, 10, Palette.PAPER_SHADE, 2))
+	t.set_stylebox("panel", "PanelCard", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2, 0.8))
 
 	t.set_type_variation("PanelDark", "PanelContainer")
-	t.set_stylebox("panel", "PanelDark", _sb(Color("2b2620"), 12, Palette.GOLD_DK, 2))
+	t.set_stylebox("panel", "PanelDark", _sb(Palette.PANEL_DARK, 12, Palette.GOLD_DK, 2, 0.5))
 
 	t.set_type_variation("PanelInset", "PanelContainer")
-	t.set_stylebox("panel", "PanelInset", _sb(Palette.PAPER_WARM, 8, Palette.PAPER_SHADE, 1))
+	t.set_stylebox("panel", "PanelInset", _sb(Palette.PAPER_WARM, 8, Palette.BORDER_SOFT, 1, 0.4))
 
 	t.set_type_variation("PrimaryButton", "Button")
 	t.set_color("font_color", "PrimaryButton", Palette.PAPER)
 	t.set_color("font_hover_color", "PrimaryButton", Palette.PAPER)
 	t.set_color("font_pressed_color", "PrimaryButton", Palette.PAPER)
-	t.set_stylebox("normal", "PrimaryButton", _sb(Palette.VERMILION, 8, Palette.VERMILION_DK, 2))
-	t.set_stylebox("hover", "PrimaryButton", _sb(Palette.VERMILION_DK, 8, Palette.GOLD, 2))
-	t.set_stylebox("pressed", "PrimaryButton", _sb(Palette.VERMILION_DK, 8, Palette.VERMILION_DK, 2))
+	t.set_stylebox("normal", "PrimaryButton", _sb(Palette.VERMILION, 8, Palette.VERMILION_DK, 2, 1.0))
+	t.set_stylebox("hover", "PrimaryButton", _sb(Palette.VERMILION_DK, 8, Palette.GOLD, 2, 1.2))
+	t.set_stylebox("pressed", "PrimaryButton", _sb(Palette.VERMILION_DK, 8, Palette.VERMILION_DK, 2, 0.6))
 	t.set_stylebox("focus", "PrimaryButton", _sb(Color(0, 0, 0, 0), 8, Palette.GOLD, 2))
 
 	t.set_type_variation("GhostButton", "Button")
 	t.set_color("font_color", "GhostButton", Palette.INK_SOFT)
 	t.set_stylebox("normal", "GhostButton", _sb(Color(0, 0, 0, 0), 8, Palette.INK_FAINT, 1))
-	t.set_stylebox("hover", "GhostButton", _sb(Palette.PAPER_WARM, 8, Palette.INK_SOFT, 1))
+	t.set_stylebox("hover", "GhostButton", _sb(Palette.PAPER_WARM, 8, Palette.INK_SOFT, 1, 0.6))
 
 	t.set_type_variation("DangerButton", "Button")
 	t.set_color("font_color", "DangerButton", Palette.PAPER)
-	t.set_stylebox("normal", "DangerButton", _sb(Palette.PLUM, 8, Palette.VERMILION_DK, 2))
-	t.set_stylebox("hover", "DangerButton", _sb(Palette.VERMILION_DK, 8, Palette.GOLD, 2))
+	t.set_stylebox("normal", "DangerButton", _sb(Palette.PLUM, 8, Palette.VERMILION_DK, 2, 0.8))
+	t.set_stylebox("hover", "DangerButton", _sb(Palette.VERMILION_DK, 8, Palette.GOLD, 2, 1.0))
 
 	return t
 
 
-func _sb(bg: Color, radius: int, border: Color, border_w: int) -> StyleBoxFlat:
+func _sb(bg: Color, radius: int, border: Color, border_w: int, glow := 0.0) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = bg
-	sb.set_corner_radius_all(radius)
+	sb.bg_color = Color(bg.r, bg.g, bg.b, bg.a * Palette.PANEL_ALPHA)
+	sb.set_corner_radius_all(radius + Palette.CORNER_BONUS)
 	sb.set_border_width_all(border_w)
 	sb.border_color = border
 	sb.set_content_margin_all(10)
+	if Palette.GLOW and glow > 0.0:
+		sb.shadow_color = Color(Palette.VERMILION.r, Palette.VERMILION.g, Palette.VERMILION.b, 0.22 * glow)
+		sb.shadow_size = int(7.0 * glow)
+		sb.shadow_offset = Vector2(0, 2)
 	return sb
 
 
-# ---------------------------------------------------------------- 工厂方法
-func paper_layer(stain := 0.45) -> ColorRect:
+# ---------------------------------------------------------------- 背景 / 字块材质
+func background(stain := 0.45) -> ColorRect:
 	var cr := ColorRect.new()
-	var mat := _paper_mat.duplicate() as ShaderMaterial
-	mat.set_shader_parameter("stain_amount", stain)
+	var mat := ShaderMaterial.new()
+	if Palette.BG_KIND == "neon":
+		mat.shader = _bg_neon_shader
+		mat.set_shader_parameter("top_color", Palette.BG_TOP)
+		mat.set_shader_parameter("bottom_color", Palette.BG_BOTTOM)
+		mat.set_shader_parameter("glow_color", Palette.VERMILION)
+		mat.set_shader_parameter("grid_color", Palette.VERMILION)
+	else:
+		mat.shader = _paper_shader
+		mat.set_shader_parameter("stain_amount", stain)
 	cr.material = mat
 	cr.color = Color.WHITE
 	cr.set_anchors_preset(Control.PRESET_FULL_RECT)
 	cr.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	cr.name = "PaperLayer"
+	cr.name = "Background"
 	return cr
 
 
+## 兼容旧名
+func paper_layer(stain := 0.45) -> ColorRect:
+	return background(stain)
+
+
+func make_tile_material(tint := Color.WHITE) -> ShaderMaterial:
+	var mat := ShaderMaterial.new()
+	if Palette.TILE_KIND == "glass":
+		mat.shader = _tile_neon_shader
+		mat.set_shader_parameter("edge", Palette.VERMILION)
+		mat.set_shader_parameter("edge_width", 2.2 + (1.6 if Palette.GLOW else 0.0))
+		mat.set_shader_parameter("glow", 1.0 if Palette.GLOW else 0.6)
+	else:
+		mat.shader = _wood_shader
+	tile_set_tint(mat, tint)
+	return mat
+
+
+## 兼容旧名
+func make_wood_material(tint := Color.WHITE) -> ShaderMaterial:
+	return make_tile_material(tint)
+
+
+## 按当前风格设置字块基色（木纹 or 玻璃）
+func tile_set_tint(mat: ShaderMaterial, tint: Color) -> void:
+	if mat == null:
+		return
+	if Palette.TILE_KIND == "glass":
+		mat.set_shader_parameter("face", Palette.WOOD_DARK * tint)
+		mat.set_shader_parameter("face_light", Palette.WOOD_LIGHT * tint)
+		mat.set_shader_parameter("edge", Palette.VERMILION)
+	else:
+		mat.set_shader_parameter("wood_dark", Palette.WOOD_DARK * tint)
+		mat.set_shader_parameter("wood_light", Palette.WOOD_LIGHT * tint)
+
+
+# ---------------------------------------------------------------- 工厂方法
 func label(text: String, variation: String = "", override_color: Color = Color(0, 0, 0, 0)) -> Label:
 	var l := Label.new()
 	l.text = text
@@ -166,7 +227,7 @@ func label(text: String, variation: String = "", override_color: Color = Color(0
 		l.theme_type_variation = variation
 	if override_color.a > 0.0:
 		l.add_theme_color_override("font_color", override_color)
-	l.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.08))
+	l.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.25 if Palette.GLOW else 0.08))
 	l.add_theme_constant_override("shadow_offset_x", 0)
 	l.add_theme_constant_override("shadow_offset_y", 1)
 	return l
@@ -241,9 +302,9 @@ func spacer(size: float, vertical := true) -> Control:
 	return c
 
 
-func hline(color := Palette.PAPER_SHADE) -> ColorRect:
+func hline(color := Color(0, 0, 0, 0)) -> ColorRect:
 	var c := ColorRect.new()
-	c.color = color
+	c.color = color if color.a > 0.0 else Palette.BORDER_SOFT
 	c.custom_minimum_size = Vector2(0, 2)
 	return c
 
@@ -262,11 +323,3 @@ func rich(text: String) -> RichTextLabel:
 	r.fit_content = true
 	r.scroll_active = false
 	return r
-
-
-func make_wood_material(tint := Color.WHITE) -> ShaderMaterial:
-	var mat := ShaderMaterial.new()
-	mat.shader = _wood_shader
-	mat.set_shader_parameter("wood_dark", Palette.WOOD_DARK * tint)
-	mat.set_shader_parameter("wood_light", Palette.WOOD_LIGHT * tint)
-	return mat

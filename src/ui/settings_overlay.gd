@@ -4,7 +4,7 @@ class_name SettingsOverlay
 
 signal closed
 
-var _cfg: Dictionary = {}
+var _style_row: HBoxContainer
 
 
 func _ready() -> void:
@@ -14,7 +14,7 @@ func _ready() -> void:
 
 func _build() -> void:
 	var dim := ColorRect.new()
-	dim.color = Color(0.07, 0.06, 0.05, 0.66)
+	dim.color = Color(0.04, 0.04, 0.06, 0.72)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(dim)
@@ -24,7 +24,7 @@ func _build() -> void:
 	add_child(center)
 
 	var panel := Ink.panel("PanelCard")
-	panel.custom_minimum_size = Vector2(560, 0)
+	panel.custom_minimum_size = Vector2(600, 0)
 	center.add_child(panel)
 	var pad := Ink.margin(24)
 	panel.add_child(pad)
@@ -32,6 +32,15 @@ func _build() -> void:
 	pad.add_child(col)
 
 	col.add_child(Ink.h2("设置"))
+	col.add_child(Ink.hline())
+
+	# ---- 视觉风格 ----
+	col.add_child(Ink.label("视觉风格", "Subheading"))
+	col.add_child(Ink.caption("切换整套界面风格：宣纸活字（传统）↔ 墨芯（大模型 / 科技）。战斗内切换下一场生效。"))
+	_style_row = Ink.hbox(10)
+	col.add_child(_style_row)
+	_build_style_buttons()
+
 	col.add_child(Ink.hline())
 
 	# ---- 手感：拖拽松手是否立即出字 ----
@@ -57,6 +66,19 @@ func _build() -> void:
 	col.add_child(close)
 
 
+func _build_style_buttons() -> void:
+	for c in _style_row.get_children():
+		c.queue_free()
+	var options := [["paper", "宣纸活字"], ["neon", "墨芯 · 大模型"]]
+	for opt in options:
+		var active: bool = Palette.STYLE_ID == opt[0]
+		var b := Ink.button(opt[1] + ("　✓" if active else ""), active)
+		b.custom_minimum_size = Vector2(180, 44)
+		b.disabled = active
+		b.pressed.connect(_set_style.bind(opt[0]))
+		_style_row.add_child(b)
+
+
 func _toggle_text() -> String:
 	return "开" if Settings.drag_release_play else "关"
 
@@ -64,3 +86,14 @@ func _toggle_text() -> String:
 func _on_toggle(btn: Button) -> void:
 	Settings.set_drag_release_play(not Settings.drag_release_play)
 	btn.text = _toggle_text()
+
+
+func _set_style(style_id: String) -> void:
+	Settings.set_visual_style(style_id)
+	Ink.apply_style(GameStyle.get_style(style_id))
+	# 重建当前界面以套用新配色（战斗界面保持不重建，避免丢失战斗状态）
+	var path := Router.current_path
+	if not path.is_empty() and not path.contains("battle_screen"):
+		Router.goto(path)
+	else:
+		_build_style_buttons()
