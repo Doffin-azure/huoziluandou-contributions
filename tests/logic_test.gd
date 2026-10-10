@@ -465,7 +465,7 @@ func _test_cremate() -> void:
 	_ok(a != null and a.glyph() == "骨" and a.temporary, "【火】原地变成临时【骨】")
 	_ok(c != null and c.glyph() == "灰" and c.temporary, "【化】原地变成临时【灰】")
 	var any_flavor := false
-	for line in EffectHandlers.CREMATE_FLAVOR:
+	for line in EffectHandlersActions.CREMATE_FLAVOR:
 		for m in r.messages:
 			if str(m).contains(line):
 				any_flavor = true

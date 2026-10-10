@@ -1,154 +1,152 @@
-# 活字战斗 · Godot 4.7 脚手架
+# 活字战斗（Huozi）
 
-以 GDD **V0.1 / V0.2（词效交接版）/ V0.3（初始字袋与冒险规模）** 为实现基准的可运行纵向切片。
-目标：**改卡牌像改表格一样简单**；美术用程序化材质，不做“网页堆 div”的样子。
+> 4×4 字盘上的拼词构筑 Roguelike。玩家管理一袋会循环出现的**实体汉字**，按**四邻接**连线拼出真实中文词语，以词义触发攻击、防御、改盘、补字、储能、热度、经济等效果；战后通过加字 / 删字 / 复制 / 镀金改变自己的「可组词概率」，完成 **3 幕 × 8 节点**的冒险。
+
+引擎：**Godot 4.7（stable）· GDScript**。所有内容为数据驱动（`Resource`），美术为程序化着色器，无外部贴图。
 
 ---
 
-## 1. 运行 / 测试
+## 特性
+
+- **字盘策略**：4×4、四邻接、可转弯、同路径不重复格；非法多字路径**不消耗、不扣次数**；单字「出牌 = 弃字」；出字后**不自动补满**；**无固定出字次数上限**。
+- **内容规模**：**106 个词全部实现**（GDD 总账 100 + 新增/彩蛋 6），**65 个实体字**。
+- **六大系统**：防反（临挡 / 持久盾 / 反击）、连携（合击 / 重合 / 连击 / 重复）、流转（回流 / 回收 / 回转 / 反转）、储能（充电 / 放电 / 蓄力 / 合资）、热度（加速 / 火爆 / 过载 / 冷却）、经济（金币 / 临时资金 / 股权 / 镀金）。
+- **空间机制**：融合（化合）、叠层（重合 / 精炼）、临时牌（分化 / 再铸 / 铸币）、揭示与定点改造（转化 / 投放 / 精铸）。
+- **局内循环**：3 幕 × 8 节点 = 24 节点，含普通战 / 事件 / 商店 / 岔路（精英或事件）/ 休整 / Boss，12～15 场战斗。
+- **可复现**：战斗随机数固定种子；特效/台词使用独立 `visual_rng`，不消耗战斗 RNG。
+- **质量保障**：`tests/logic_test.tscn` **96 条断言**；另有内容导出、字网图谱、棋盘组词概率三套工具。
+
+---
+
+## 环境要求
+
+- **Godot 4.7**（stable）。无需额外插件。
+- 字体已随仓库提供：`assets/fonts/NotoSerifSC-VF.ttf`（SIL OFL 1.1）。若缺失会自动回退到系统字体。
+
+---
+
+## 快速开始
 
 ```bash
-# 运行
-"D:/Downloads/Old-F/godot/Godot_v4.7-stable_win64.exe" --path .
+# 方式一：编辑器
+#   Godot 4.7 → 导入 → 选择本目录的 project.godot → F5
 
-# 白盒逻辑测试（12 条规则断言，可重复运行）
-"D:/Downloads/Old-F/godot/Godot_v4.7-stable_win64_console.exe" --headless --path . res://tests/logic_test.tscn
-
-# 重新生成全部内容资源（改完 data/import 的表格后）
-"...Godot...console.exe" --headless --path . --script res://src/tools/build_content.gd
+# 方式二：命令行（把 <godot> 换成本机引擎可执行文件）
+<godot> --path .                                    # 运行游戏
+<godot> --headless --path . res://tests/logic_test.tscn   # 跑逻辑测试
 ```
 
-主场景：`scenes/main.tscn` → `src/screens/main.gd`。
-流程：标题 → 三幕地图（每幕 8 节点）→ 战斗 → 奖励 → 商店 / 休整 / 事件 / 岔路 → 首领 → 通关。
+> 仓库内不写死任何机器路径；`<godot>` 由使用者按本机安装位置替换。
 
 ---
 
-## 2. 已接入的 V0.1 / V0.2 / V0.3 内容
-
-| 来源 | 接入方式 |
-|---|---|
-| V0.2《完整词效总账 105 词》 | `resources/words/*.tres`（总账 105 → 裁撤 5 后 **100 个词**（100 已实现 / 0 待定）+ **6 个新增词**（火化/化合/精金/精铸/精分/开灯）；裁撤见 `docs/裁撤记录.md`） |
-| V0.2 附录 C 单字效果表 | `resources/characters/*.tres` 的 `solo_effects`（击/防/护/御/回/重/清/反/甲/盾/破） |
-| V0.2 Word Data Contract | `WordData` 的 `group/design_stage/effect_summary/effect_handler_id/requires_target/timing/p25_implemented/implementation_delta/priority/test_cases/implemented` |
-| V0.2 战斗机制 | 临挡/持久盾、储能、热度/热容/灼热字、金币/临时资金、污染所有权、临时层、目标选择 |
-| V0.2 敌人三类意图 | 攻击 / 注入污染字（刺痛、堵塞、灼热）/ 护盾 |
-| V0.2 §2.2 回合 | 无固定出字次数上限；补字修正；后置结算（反击、临挡清除） |
-| V0.3 初始字袋 | `resources/starter_decks/v03.tres`：12 枚 / 9 种，开局落 10，回合补 3 |
-| V0.3 三幕八节点 | `resources/acts/act_{1,2,3}.tres` |
-| V0.1 开发任务清单 | 作为验收口径，见 `data/import/dev_tasks.txt` |
-
-导入的权威表格在 `data/import/`：`word_ledger_105.txt`、`solo_effects.txt`、
-`dev_board_105.txt`、`dev_tasks.txt`、`p23_candidates_104.txt`、`GDD_v0.1.md`、`GDD_v0.2.md`。
-
-### 未定稿怎么办
-
-总账里“尚未收敛 / 未复审”的 16 个词**已进库、可在图鉴查看、可组词打出**，
-但 `implemented=false` → 打出只消耗、不产生效果，预览会提示“效果待定”。
-这对应 GDD 的 P0 待决项：是否允许“合法零效词”由 `BattleRules.allow_zero_effect_words` 控制。
-未定稿的词**不会**被悄悄套上通用伤害/抽字。
-
----
-
-## 3. 怎么改卡牌
-
-一切内容都是 `Resource`，在 Godot Inspector 里直接改，无需动代码：
-
-| 想做的事 | 改哪里 |
-|---|---|
-| 一个字的效果/描述/稀有度/美术色 | `resources/characters/<id>.tres` |
-| 一个词的组成字与效果 | `resources/words/wNNN.tres` 的 `glyphs` / `effects` |
-| 把一个“待定”词做成正式效果 | 给它的 `effects` 加一条 `EffectData`，或加 `handler` |
-| 初始字袋 / 开局落字数 / 补字数 / 出字上限 | `resources/starter_decks/v03.tres`、`resources/rules/default_rules.tres` |
-| 污染类型（刺痛/堵塞/灼热代价） | `resources/pollutions/*.tres` |
-| 状态、敌人、幕、节点 | `resources/statuses|enemies|acts/*.tres` |
-
-**效果系统两层**：
-- `effects[].handler` 非空 → `src/core/effect_handlers.gd` 的具名处理器（适合有特殊规则的词，如反击/重合/放电）。
-- 否则走 `EffectData.kind` 的通用数值分支（见 `src/core/effect_resolver.gd`）。
-
-已实现的关键 handler：`block_temp / block_persist / ability_convert_block / counter / shield_smash /
-break_shield_damage / replay_last_attack / gravity_damage / merge_duplicates / draw_random /
-recover_consumed / rotate_2x2 / destroy_2x2 / cleanse_all / energy* / heat* / ability_* /
-spend_gold_damage / capture_glyph / reveal_place / permanent_*` 等 40+ 个。
-
-> 表格生成器 `src/tools/build_content.gd` 会解析 `data/import/word_ledger_105.txt` 生成 105 个词，
-> 并按《总账》的“最近讨论效果方向”映射到 handler。生成后直接改资源即可。
-
----
-
-## 4. 目录结构
+## 目录结构
 
 ```
 src/
-  data/        资源类（字/词/效果/状态/污染/敌人/幕/规则）
-  core/        纯逻辑：BoardState / BattleState / Combatant / CharInstance / EffectResolver / EffectHandlers
-  autoload/    EventBus / Database / GameState / Router
-  board/ map/ battle/  视图
-  screens/     ScreenBase + 各界面
-  ui/          Ink 美术工具箱 / CharCard / CollectionOverlay / ChoiceOverlay / StatBar / SealView
-  shaders/     宣纸、木纹（程序化，无贴图）
-  tools/       build_content.gd
-resources/     characters(63) / words(105) / pollutions(3) / statuses(6) / enemies(9) / acts(3) / rules / starter_decks
-tests/         logic_test.tscn + logic_test.gd
-data/import/   权威策划表格
-assets/fonts/  Noto Serif SC
+  data/        资源类定义（字 / 词 / 效果 / 状态 / 污染 / 敌人 / 幕 / 规则）
+  core/        纯逻辑：BattleState、BattleOps、EffectResolver、EffectHandlers(+Actions/Util)
+  autoload/    Database、GameState、Settings、EventBus、Router
+  board/ battle/ map/   视图
+  screens/     各全屏界面（含 ScreenBase）
+  ui/          Ink 美术工具箱、卡片/浮层/血条/印章等
+  shaders/     宣纸、木纹（程序化）
+  tools/       内容生成器与导出工具
+resources/     生成出的 .tres（可在编辑器直接改）
+data/import/   权威策划表格（总账 / 单字表 / GDD 纯文本）
+docs/          策划案、字表、图谱、提案、裁撤记录 + 配图
+tests/         逻辑测试
+scenes/        入口场景
+assets/fonts/  随仓库字体
 ```
 
 ---
 
-## 5. GDD 规则对照（关键）
+## 内容工作流（改卡牌）
 
-- 4×4、四邻接、可转弯、不重复格；非法多字路径**不消耗**（`BoardState.valid_path`）。
-- 单字出牌 = 弃字，同一操作；无单字效果也能打出。
-- 出字后**不自动补满**；只有回合补字（3）或补字词效。
-- 一回合**无固定出字次数上限**（`plays_per_turn = 0`）。
-- `CharInstance`：`uid / owner / pollutions / modifiers / temporary_uses`，敌字消耗后消失、不进己方袋。
-- 污染不改变字，可与正常词效并行触发（`_apply_pollution`）。
-- 过热：热度 > 热容时每点溢向往本场字袋塞 1 枚带灼热的【热】（战内循环）。
-- 重合：1 实体 + N-1 临时层，其余真实副本回字袋（守恒，见测试）。
-- 反击：敌方整次行动后，用**剩余临挡**+3/层转伤害，不动持久盾。
-- 词效预览与实际结算共用同一 `try_play` 语义（预览只读描述；目标选择在提交前完成）。
+所有内容都是 `Resource`，**在 Godot Inspector 里直接改即可，无需改代码**：
 
-对应测试见 `tests/logic_test.gd`：共 **30 条断言**，覆盖防御/护盾/刺痛/过热/重合/回/反击/注入/击破/股权闭环/储能热度互转/缩放攻击/爆冷/停火/放火/反复/铸币/回购/重力。
+| 想改什么 | 位置 |
+|---|---|
+| 一个字的单字效果 / 描述 / 稀有度 / 美术色 | `resources/characters/<id>.tres` |
+| 一个词的组成字与效果 | `resources/words/<id>.tres` |
+| 4×4 / 开局落盘 / 每回合补字 / 热容 / 每回合出字上限 | `resources/rules/default_rules.tres` |
+| 初始字袋 | `resources/starter_decks/v03.tres` |
+| 污染类型 | `resources/pollutions/*.tres` |
+| 状态 / 敌人 / 三幕节点 | `resources/statuses|enemies|acts/*.tres` |
 
----
+**效果系统三层**（改逻辑时看这里）：
 
-## 6. 美术与 UI
+- `src/core/effect_handlers.gd` —— 调度器：按 `EffectData.handler` 分发。
+- `src/core/effect_handlers_actions.gd` —— 复杂词效实现（盘面改造 / 融合 / 揭示 / 回收 / 持续能力）。
+- `src/core/effect_util.gd` —— 共享工具（伤害 / 支付 / 目标解析）。
 
-- 宣纸底 `paper.gdshader`、木活字 `wood.gdshader`（程序化）。
-- 统一主题/配色/字号：`src/ui/ink.gd` + `src/ui/palette.gd`。
-- 字块显示：所属（敌=偏红、自生=偏琥珀）、污染角标、临时层数 ×N。
-- 战斗屏常驻：气血、临挡、持久盾、储能、热度/热容、临时资金、字袋/弃字堆、战报、实时预览。
+**批量生成 / 重建内容**（改完 `data/import/` 的表格后运行）：
 
----
+```bash
+<godot> --headless --path . --script res://src/tools/build_content.gd
+```
 
-## 7. 字网图谱（出度 / 入度）
+- 内容表（字 / 词效映射 / 默认文案）：`src/tools/content_build.gd`
+- 权威来源：`data/import/word_ledger_105.txt`、`solo_effects.txt` 等
 
-有向边 `A → B` = 存在某个词，其中 A 紧接在 B 之前（按连线顺序）。节点大小 = 总度，颜色 = 所属体系。
-
-- **游戏内**：标题 → **字网图谱**。可切换「全部 105 / 已实现 82 / 初始 9 字」三个视图；点击节点查看该字的出度、入度、加权度、后续字、前置字。
-- **命令行生成报告**：
-  ```bash
-  "...Godot...console.exe" --headless --path . res://src/tools/glyph_graph.tscn
-  ```
-  输出：`docs/glyph_graph_report.md`（表格）、`docs/glyph_graph.dot`（Graphviz）、`docs/glyph_graph.mmd`（Mermaid）。
-
-**初始字袋 9 字的字网（关键结论）**：击 入度 4（反/连/重/回→击）、出度 1（击→破）；回 出度 3（回→击/流/防）、入度 0；防→御；破→防。攻击全部汇入【击】，【回】是唯一的多向连接器——增字/删字时要优先保护这两个枢纽。
-
-## 8. 仍是原型的地方
-
-- **总账词已全部实现**（100/100）；另有 6 个额外词（火化/化合/精金/精铸/精分/开灯）。
-- 已裁撤 4 词 + 1 字（纯化/纯金/纯利/精纯、纯），见 `docs/裁撤记录.md`；临时资金改为可直接支付经济词。
-- **手感设置**：标题/战斗内「设置」可开关「拖拽松手立即出字」（默认关=需确认），持久化 `user://settings.cfg`。
-- 【转化】【分化】【强化】【炼化】【精炼】【精力】由设计负责人重新定义；新增【火化】【化合】【精金】【精铸】【精分】。见 `docs/词效设计提案_V0.4.md`。
-- 数值未平衡；`gold_cap_per_battle=18` 是原型安全阀。
-- `流利`（对角一步）、`复合`（临时层保留）等空间词为“已记录、占位实现”。
-- 存档与可复现 RNG 流尚未完全落地（`BattleState.rng` 已支持固定种子）。
-- 反应梗图（蓝色大肥鱼/惊讶图）未接入——V0.2 要求其仅在合适时机短显，且信息须独立显示。
+> 生成器会**清空并重建** `resources/characters`、`resources/words` 等目录，请勿把手工内容只放在这些目录而不留来源。
 
 ---
 
-## 8. 设计资料
+## 工具
 
-- `../huozi_godot_gdd_v01_package/`、`../huozi_godot_gdd_v02_package/`、`../huozi_godot_gdd_v03_design_pack/`
-- 工程内副本：`data/import/`（表格与 GDD md）
+| 工具 | 命令 | 用途 |
+|---|---|---|
+| 逻辑测试 | `<godot> --headless --path . res://tests/logic_test.tscn` | 96 条规则断言 |
+| 内容生成 | `<godot> --headless --path . --script res://src/tools/build_content.gd` | 从表格重建 `.tres` |
+| 词效表 | `<godot> --headless --path . res://src/tools/dump_words.tscn` | 导出 106 词效果表 |
+| 字表 | `<godot> --headless --path . res://src/tools/dump_chars.tscn` | 导出 65 字表（含出/入度） |
+| 字网图谱 | `<godot> --headless --path . res://src/tools/glyph_graph.tscn` | 度数表 + Graphviz + Mermaid |
+| 字网 SVG | `<godot> --headless --path . res://src/tools/glyph_network_svg.tscn` | 力导向网络图（SVG） |
+| 棋盘概率 | `<godot> --headless --path . res://src/tools/board_sim.tscn` | 4×4 vs 六边形组词概率模拟 |
+
+---
+
+## 文档
+
+- **主策划案**：`docs/活字战斗_GDD_V1.0.md`（含系统图解）
+- 字表：`docs/附录_字表.md`
+- 字网图谱：`docs/附录_字网图谱.md`
+- 词效设计提案：`docs/词效设计提案_V0.4.md`
+- 裁撤记录：`docs/裁撤记录.md`
+
+---
+
+## 操作与设置
+
+- **连词**：在字块上按下并拖过四邻接格；点「出字」或回车/空格确认。
+- **默认手感**：松手**保留选择**（需确认）。可在标题页或战斗内「设置」里打开「拖拽松手立即出字」。
+- **取消**：`ESC` 或「清除」。
+- **选目标**：需要时字盘/浮层会进入选择模式（选格 / 选行或列 / 选弃字堆 / 揭示 N 选 1 等）。
+- 设置持久化到 `user://settings.cfg`。
+
+---
+
+## 协作约定
+
+- 提交前请跑一遍逻辑测试，保持 **96/96**。
+- 改内容优先改 `.tres`；批量改内容改 `data/import/` + `src/tools/content_build.gd` 后重生成。
+- 换行统一 LF（见 `.gitattributes`）；二进制资源（字体 / PNG）已在属性中标注。
+- **不要提交** `.godot/`（编辑器缓存，已在 `.gitignore`）；首次打开工程会自动重建。
+- 顶层职责保持不变：`src/` 代码、`resources/` 数据、`docs/` 文档、`tests/` 测试。
+
+---
+
+## 状态与后续
+
+- 数值为**测试起点**，尚未正式平衡；金币反刷方案待定。
+- 六边形棋盘已评估，结论**维持 4×4**（见 GDD 12.1）。
+- 表现层（动画 / 音效）尚未实现。
+
+---
+
+## 许可
+
+- 字体 `Noto Serif SC`：SIL Open Font License 1.1。
+- 其余代码与内容：**待定**（`LICENSE` 待补充）。

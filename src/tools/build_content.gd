@@ -36,7 +36,6 @@ const GROUP_OVERRIDES := {"转化": "空间", "分化": "空间", "停电": "彩
 var _char_by_glyph: Dictionary = {}
 var _solo_rows: Dictionary = {}
 
-
 func _initialize() -> void:
 	for d in ["characters", "words", "statuses", "pollutions", "enemies", "acts", "starter_decks", "rules"]:
 		DirAccess.make_dir_recursive_absolute(RES.path_join(d))
@@ -56,14 +55,12 @@ func _initialize() -> void:
 	print("[build_content] 完成：字 %d / 词 %d" % [_char_by_glyph.size(), _count_files(RES.path_join("words"))])
 	quit()
 
-
 func _clear_dir(dir_path: String) -> void:
 	if not DirAccess.dir_exists_absolute(dir_path):
 		return
 	for f in DirAccess.get_files_at(dir_path):
 		if f.ends_with(".tres") or f.ends_with(".res"):
 			DirAccess.remove_absolute(dir_path.path_join(f))
-
 
 func _count_files(dir_path: String) -> int:
 	var n := 0
@@ -74,83 +71,6 @@ func _count_files(dir_path: String) -> int:
 
 
 # ---------------------------------------------------------------- 基础构造
-func _e(handler: String, amount := 0, target := -1, status := "", note := "", args := {}, kind := -1, timing := "immediate") -> EffectData:
-	var e: EffectData = EffectDataS.new()
-	e.handler = handler
-	e.amount = amount
-	if target >= 0:
-		e.target = target
-	e.status_id = status
-	e.args = args
-	e.timing = timing
-	if kind >= 0:
-		e.kind = kind
-	e.note = note if not note.is_empty() else _handler_note(handler, amount, status, args)
-	return e
-
-
-## 简易效果的默认文案（保证预览/图鉴/策划案都准确）
-func _handler_note(handler: String, amount: int, status: String, args: Dictionary) -> String:
-	match handler:
-		"block_temp": return "获得 %d 点临时格挡" % amount
-		"block_persist": return "获得 %d 点持久盾" % amount
-		"damage": return "造成 %d 点伤害" % amount
-		"damage_all": return "对所有敌人造成 %d 点伤害" % amount
-		"draw_random": return "随机补 %d 字" % amount
-		"draw_penalty_next": return "下一次正常补字 -%d" % amount
-		"heal": return "回复 %d 点生命" % amount
-		"energy": return "获得 %d 点储能" % amount
-		"heat": return "热度 %+d" % amount if amount != 0 else "热度不变"
-		"heat_clear": return "清空当前热度"
-		"gold": return "获得 %d 金币" % amount
-		"temp_funds": return "获得 %d 点临时资金（本回合有效）" % amount
-		"apply_status_self": return "获得状态【%s】×%d" % [_status_name(status), max(1, amount)]
-		"apply_status_enemy": return "使敌人获得【%s】×%d" % [_status_name(status), max(1, amount)]
-		"remove_enemy_block": return "移除敌人全部护盾"
-		"cleanse_all": return "清除当前字盘的全部污染（所有权不变）"
-		"cleanse_adjacent": return "净化目标及其四邻的污染"
-		"gravity": return "全盘按列向下重力"
-		"rotate_2x2": return "顺时转旋转所选 2×2 区域"
-		"destroy_2x2": return "摧毁所选 2×2，每摧毁 1 字造成 %d 伤" % amount
-		"recover_consumed": return "从弃字堆回收本回合消耗的 1 枚字到袋顶"
-		"replay_last_attack": return "重演上一个即时攻击词的效果"
-		"shield_smash": return "造成 %d 伤并消耗全部持久盾（每 2 点额外 3 伤）" % amount
-		"counter": return "预留 %d 层反击" % max(1, amount)
-		"conditional_draw_after_attack": return "若此前已有即时攻击则补 %d 字" % amount
-		"conditional_draw_half_hp": return "低于半血补 %d 字，否则补 %d 字" % [int(args.get("low", amount)), int(args.get("high", 1))]
-		"break_shield_damage": return "造成 %d 伤；拆盾效率×2；击碎护盾再补 1 字" % amount
-		"permanent_damage_reduction": return "本局永久：每次实际生命伤害 -%d" % amount
-		"permanent_gold_growth": return "本局每场胜利后金币 +%d%%" % amount
-		"transform_board": return "随机揭示 %d 枚实体字，选 1 枚替换盘面指定字" % int(args.get("reveal", 5))
-		"split_grow": return "删除一个盘面字，四周生长可组词临时字"
-		"empower_glyph": return "选择一个字，本场它被打出时额外触发单字效果"
-		"refine_remove": return "热度 -%d、金币 +%d，并移出一张牌" % [int(args.get("heat", 3)), int(args.get("gold", 4))]
-		"fuse_cards": return "选两张相邻己方牌融合为一格（本场不可拆）"
-		"refine_layer": return "选两个相同己方字，本场一直重合（可重复使用）"
-		"gild_glyph": return "选一个字永久镀金；每次参与多字词 +1 金币"
-		"precision_place": return "支付 %d 金币，把弃字堆一枚字放进指定空格" % amount
-		"recast_board": return "把盘面上已有的字全部重新替换"
-		"recast_copy": return "从弃字堆选一张，把临时复制放进指定空格"
-		"repeat_last": return "重复上一个词/字的最后一个字（临时）"
-		"reverse_line": return "选一行或一列，倒转其 4 格（含空格/叠层）"
-		"merge_flow": return "揭示字袋 1 枚 + 弃字堆 1 枚，放入两个相邻空格"
-		"hard_stop": return "清空热度并移除未打出的灼热【热】；立即结束出字"
-		"repeat_word": return "每回合第一次多字词再执行一次"
-		_:
-			return handler
-
-
-func _status_name(id: String) -> String:
-	match id:
-		"strength": return "强力"
-		"vulnerable": return "易伤"
-		"next_bonus": return "加强"
-		"next_double": return "超强"
-		"next_extra": return "超载"
-		"burn": return "灼烧"
-		"poison": return "中毒"
-		_: return id
-
 
 func _teffects(list: Array) -> Array[EffectData]:
 	var out: Array[EffectData] = []
@@ -158,13 +78,11 @@ func _teffects(list: Array) -> Array[EffectData]:
 		out.append(e)
 	return out
 
-
 func _strs(list: Array) -> Array[String]:
 	var out: Array[String] = []
 	for s in list:
 		out.append(str(s))
 	return out
-
 
 func _save(res: Resource, path: String) -> void:
 	var err := ResourceSaver.save(res, path)
@@ -173,6 +91,7 @@ func _save(res: Resource, path: String) -> void:
 
 
 # ---------------------------------------------------------------- 污染
+
 func _build_pollutions() -> void:
 	var defs := [
 		{"id": "rush", "name": "刺痛", "glyph": "刺", "hp": 2, "draw": 0, "color": "8c2a20",
@@ -196,6 +115,7 @@ func _build_pollutions() -> void:
 
 
 # ---------------------------------------------------------------- 状态
+
 func _build_statuses() -> void:
 	var defs := [
 		{"id": "strength", "name": "强力", "glyph": "力", "kind": 0, "color": "b8523a", "decay": 0,
@@ -226,6 +146,7 @@ func _build_statuses() -> void:
 
 
 # ---------------------------------------------------------------- 单字表
+
 func _read_solo_rows() -> void:
 	var f := FileAccess.open(IMPORT.path_join("solo_effects.txt"), FileAccess.READ)
 	if f == null:
@@ -239,6 +160,7 @@ func _read_solo_rows() -> void:
 
 
 ## 单字效果：来自 V0.2 附录 C（击/防/护/御/回/重/清/反/甲/盾/破）。
+
 func _solo_spec(glyph: String) -> Dictionary:
 	match glyph:
 		"击": return {"h": "damage", "a": 4, "note": "造成 4 伤害"}
@@ -254,7 +176,6 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"破": return {"h": "damage", "a": 3, "note": "占位：造成 3 伤害（单字用途未定）"}
 		"再": return {"h": "repeat_last", "note": "单字：重复上一个词/字的最后一个字（临时）"}
 	return {}
-
 
 func _build_curated_characters() -> void:
 	# glyph, id, pinyin, tags, rarity, is_pollution
@@ -333,7 +254,6 @@ func _build_curated_characters() -> void:
 			continue
 		_make_character(d[0], d[1], d[2], d[3], d[4], d[5], false)
 
-
 func _make_character(glyph: String, id: String, pinyin: String, tags: Array, rarity: int, is_pollution: bool, pending: bool, desc := "") -> CharacterData:
 	var c: CharacterData = CharacterDataS.new()
 	c.id = id
@@ -345,7 +265,7 @@ func _make_character(glyph: String, id: String, pinyin: String, tags: Array, rar
 	c.pending_design = pending
 	var spec := _solo_spec(glyph)
 	if not spec.is_empty():
-		var e := _e(spec.get("h", ""), int(spec.get("a", 0)), int(spec.get("target", -1)), "", spec.get("note", ""))
+		var e := ContentBuild.e(spec.get("h", ""), int(spec.get("a", 0)), int(spec.get("target", -1)), "", spec.get("note", ""))
 		c.solo_effects = _teffects([e])
 		c.solo_handler = spec.get("h", "")
 	if not desc.is_empty():
@@ -361,7 +281,6 @@ func _make_character(glyph: String, id: String, pinyin: String, tags: Array, rar
 	_save(c, "%s/characters/%s.tres" % [RES, id])
 	return c
 
-
 func _ensure_glyph(glyph: String) -> CharacterData:
 	if _char_by_glyph.has(glyph):
 		return _char_by_glyph[glyph]
@@ -371,126 +290,6 @@ func _ensure_glyph(glyph: String) -> CharacterData:
 
 
 # ---------------------------------------------------------------- 词（105 条总账）
-func _word_effects(word: String) -> Array:
-	# 按《完整词效总账》的“最近讨论效果方向”实现；未收敛的返回空数组（=待定）。
-	var T := EffectDataS.Target
-	match word:
-		# 防反
-		"防御": return [_e("block_temp", 10)]
-		"防护": return [_e("ability_prevent_interference", 1, -1, "", "本场持续：抵消下一次敌人对字盘的干扰（注入/塞字）", {}, -1, "persistent")]
-		"护甲": return [_e("ability_convert_block", 50, -1, "", "回合结束把一半剩余临挡转为持久盾", {"percent": 50}, -1, "persistent")]
-		"护盾": return [_e("block_persist", 6)]
-		"重甲": return [_e("block_persist", 12), _e("draw_penalty_next", 1)]
-		"反击": return [_e("counter", 3, -1, "", "预留反击；敌人整次行动后把剩余临挡转为伤害并 +3/层", {}, -1, "delayed")]
-		"盾击": return [_e("shield_smash", 4, T.ENEMY, "", "造成 4 伤并消耗全部持久盾，每 2 点额外 3 伤", {"per": 2, "bonus": 3})]
-		"回防": return [_e("block_temp", 8), _e("conditional_draw_after_attack", 1)]
-		"破防": return [_e("apply_status_enemy", 2, T.ENEMY, "vulnerable")]
-		"破甲": return [_e("remove_enemy_block")]
-		"击破": return [_e("break_shield_damage", 8, T.ENEMY, "", "造成 8 伤；拆盾效率×2；击碎护盾再补 1 字", {"mult": 2, "draw": 1})]
-		"防御力": return [_e("permanent_damage_reduction", 1, -1, "", "首次组出后本局永久每次实际生命伤害 -1", {}, -1, "persistent")]
-		"反超": return [_e("conditional_draw_half_hp", 4, -1, "", "低于半血补 4 字，否则补 1 字", {"low": 4, "high": 1})]
-		# 连携
-		"连击": return [_e("replay_last_attack", 0, -1, "", "重演上一个即时攻击词的效果", {}, -1, "immediate")]
-		"重击": return [_e("gravity_damage", 6, T.ENEMY, "", "6 伤 + 重力移动的每枚字块 2 伤", {"per": 2})]
-		"合击": return [_e("ability_shared_attack", 4, -1, "", "本回合后续攻击词共享【击】且每词 +4 伤", {}, -1, "persistent")]
-		"回击": return [_e("damage", 7), _e("conditional_draw_after_attack", 1)]
-		"强力": return [_e("apply_status_self", 2, T.SELF, "strength")]
-		"加强": return [_e("apply_status_self", 2, T.SELF, "next_bonus")]
-		"超强": return [_e("apply_status_self", 1, T.SELF, "next_double")]
-		"重合": return [_e("merge_duplicates", 0, T.BOARD_TILE, "", "汇聚同字：保留 1 实体并获得同数量临时层，其余回字袋")]
-		# 流转
-		"回流": return [_e("draw_random", 4)]
-		"回收": return [_e("recover_consumed", 1, T.DISCARD_GLYPH)]
-		"回转": return [_e("rotate_2x2", 0, T.BOARD_2X2)]
-		"流转": return [_e("ability_flow", 2, -1, "", "本回合每打出 2 种不同多字词补 2 字", {}, -1, "persistent")]
-		"清洗": return [_e("cleanse_all", 0, T.BOARD, "", "清除当前字盘所有污染标签（所有权不变）")]
-		"复合": return [_e("ability_compound_next", 1, -1, "", "下一次≥3字词保留 1 枚用过的字为临时层", {}, -1, "next_word")]
-		"流利": return [_e("ability_diagonal_next", 1, -1, "", "下一次组词允许最多一步对角线", {}, -1, "next_word")]
-		"分流": return [_e("cleanse_all", 0, T.BOARD, "", "清除当前字盘的全部污染（所有权不变）")]
-		# 蓄放
-		"蓄能": return [_e("ability_energy_idle", 1, -1, "", "回合结束若仍有可用多字词，储能 +1", {}, -1, "persistent")]
-		"蓄电": return [_e("energy_around_tail", 1, -1, "", "基础 +1；词尾电周围每个己方四邻字再 +1 储能", {})]
-		"充电": return [_e("energy", 3)]
-		"充能": return [_e("energy", 1), _e("draw_random", 2)]
-		"放电": return [_e("energy_discharge", 4, T.ENEMY, "", "清空全部储能，每点造成一段 4 伤电击", {})]
-		"充放电": return [_e("energy_discharge", 4, T.ENEMY, "", "清空全部储能，每点 4 伤并随机补 1 字", {"draw_per": 1})]
-		# 热暴
-		"过热": return [_e("ability_heat_overload_bonus", 2, -1, "", "本回合首次溢热后，下一次多字词额外补 2 字", {}, -1, "persistent")]
-		"过载": return [_e("draw_random", 6), _e("heat", 3)]
-		"超载": return [_e("apply_status_self", 1, T.SELF, "next_extra"), _e("heat", 3)]
-		"加速": return [_e("ability_accel", 1, -1, "", "本回合每次打出多字词额外补 1 字并热度 +1", {}, -1, "persistent")]
-		"急速": return [_e("ability_rapid_next", 3, -1, "", "下一次多字词结算后在其空格补至多 3 字并升温 2", {"heat": 2}, -1, "next_word")]
-		"冷却": return [_e("heat", -4)]
-		"清热": return [_e("heat_cleanse", 2, -1, "", "热度 -2 并清除灼热污染")] 
-		"热流": return [_e("heat_to_damage_flow", 2, T.ENEMY, "", "按本回合补字数最多降 4 热，每实际降 1 热造成 2 伤", {"max": 4})]
-		"火爆": return [_e("heat_burst", 8, T.ENEMY, "", "消耗全部热度，造成 8 + 4×热度伤害", {"per": 4})]
-		"爆破": return [_e("destroy_2x2", 4, T.BOARD_2X2, "", "摧毁 2×2 区域，每摧毁 1 字造成 4 伤", {})]
-		"重载": return [_e("ability_reload", 3, -1, "", "本场热容 +3，此后每回合基础补字 -1", {"draw_penalty": 1}, -1, "persistent")]
-		"加热": return [_e("heat", 3)]
-		"急冷": return [_e("heat_clear", 0), _e("draw_penalty_next", 1)]
-		"过火": return [_e("ability_overfire", 0, -1, "", "下一次攻击额外 + 当前热度×3 伤，同时热度 +2", {"per": 3, "heat": 2}, -1, "next_word")]
-		"电流过载": return [_e("ability_electric_overload", 3, -1, "", "本战每次溢热：生成灼热热字、储能 +1、对敌 3 伤", {}, -1, "persistent")]
-		"超速": return [_e("ability_double_draw_next", 4, -1, "", "本回合下一次补字翻倍，最多额外 4 字；每额外 1 字升温 1", {}, -1, "next_word")]
-		# 经济
-		"金币": return [_e("gold", 3)]
-		"资金": return [_e("temp_funds", 3)]
-		"投币": return [_e("spend_gold_damage", 5, T.ENEMY, "", "支付最多 3 金币，每金币造成 5 伤", {"max": 3})]
-		"收购": return [_e("capture_glyph", 4, T.ENEMY_GLYPH, "", "支付 4 金币，净化并永久收编一枚敌方实体字", {})]
-		"投放": return [_e("reveal_place", 3, T.EMPTY_TILE, "", "支付 3 金币，随机揭示一枚实体字并指定空格落下", {})]
-		"复利投资": return [_e("permanent_gold_growth", 20, -1, "", "首次打出后，本局每场胜利使现有金币额外增长 20%", {}, -1, "persistent")]
-		# ---- 蓄放进阶 ----
-		"蓄力": return [_e("energy_to_bonus", 2, -1, "", "消耗全部储能，下一次攻击每点储能 +2 伤", {"per": 2})]
-		"放热": return [_e("energy_to_heat_damage", 2, T.ENEMY, "", "消耗全部储能：转为热度并对敌每点 2 伤", {"per": 2})]
-		"热能": return [_e("heat_to_energy", 1, -1, "", "当前热度转为等量储能")]
-		"热力": return [_e("heat_to_bonus", 2, -1, "", "当前热度转为下一次攻击强化（每点 +2）", {"per": 2})]
-		"电流": return [_e("flow_energy_or_draw", 2, -1, "", "本回合已补字则储能 +2，否则补 2 字", {})]
-		# ---- 经济 / 股权 ----
-		"投资": return [_e("invest_equity", 3, -1, "", "支付 3 金币锁定为 3 股权（战后返还本金）", {})]
-		"复利": return [_e("compound_equity", 1, -1, "", "本回合首次存股权时额外 +1 股权", {}, -1, "persistent")]
-		"利息": return [_e("equity_interest", 1, -1, "", "持有≥2股权时，支付 1 股权获得 2 金币并补 1 字", {})]
-		"炼金": return [_e("alchemy", 3, -1, "", "消耗全部股权：每点 +3 金币并补 1 字", {"per": 3})]
-		"纯金": return [_e("pure_gold", 1, -1, "", "把本回合剩余临时资金转为正式金币", {})]
-		"合金": return [_e("alloy", 6, -1, "", "获得 6 持久盾与 2 金币", {"gold": 2})]
-		"铸币": return [_e("mint", 2, -1, "", "获得 2 金币，并在原格生成一枚临时【币】", {"gold": 2})]
-		"再投资": return [_e("reinvest", 6, -1, "", "锁定最多 6 金币，下一场胜利后返还 2 倍", {"max": 6}, -1, "persistent")]
-		"重金": return [_e("bounty", 12, T.ENEMY, "", "支付 5 金币悬赏，本回合击杀返 12，否则本金不返", {"cost": 5})]
-		# ---- 热暴 P3 ----
-		"爆冷": return [_e("cold_snap", 4, T.ENEMY, "", "4 伤 + 上回合每失 1 生命额外 2 伤，清空热度", {"per": 2})]
-		"停火": return [_e("ceasefire", 1, -1, "", "本回合未造成敌伤则免疫敌方攻击", {}, -1, "persistent")]
-		"放火": return [_e("ignite", 3, T.ENEMY, "", "敌方接下来 2 次行动各受 3+施放时热度 伤", {})]
-		# ---- 连携 ----
-		"电击": return [_e("electric_strike", 6, T.ENEMY, "", "造成 6 伤 + 2×储能", {"per": 2})]
-		"火力": return [_e("fire_power", 6, T.ENEMY, "", "造成 6 伤 + 2×热度", {"per": 2})]
-		"合力": return [_e("joint_force", 6, -1, "", "获得 6 临挡与 2 储能", {"energy": 2})]
-		"连载": return [_e("serial", 6, -1, "", "本战每打出 3 种不同多字词，下一次攻击 +6 伤", {"bonus": 6}, -1, "persistent")]
-		"反复": return [_e("repeat_zero", 1, -1, "", "本回合首次无效果单字出牌时，在原格补 1 字", {}, -1, "persistent")]
-		# ---- 流转 P3 ----
-		"清流": return [_e("clear_flow", 2, -1, "", "净化全部灼热并补 2 字", {})]
-		"回购": return [_e("buyback", 3, T.DISCARD_GLYPH, "", "支付 3 金币，回收本回合消耗的 1 枚字到袋顶", {"cost": 3})]
-		# ---- 空间新增词 ----
-		"重力": return [_e("ability_gravity_always", 1, -1, "", "本战每次有效出字后自动全盘向下重力", {}, -1, "persistent")]
-		"停电": return [_e("blackout", 0, -1, "", "彩蛋：停电，屏幕变黑；拖动连出【开灯】才能恢复", {})]
-		"充电过热": return [_e("charge_overheat", 8, -1, "", "获得 8 储能 + 8 热度；本战此后每次出字后立即补满盘面", {"energy": 8, "heat": 8}, -1, "persistent")]
-		"重铸": return [_e("recast_board", 0, -1, "", "把盘面上已有的字全部重新替换（己方字回袋重抽，敌方/临时字清除）", {})]
-		"再铸": return [_e("recast_copy", 0, -1, "", "从弃字堆选一张，把它的临时复制放进指定空格（原牌留在弃字堆）", {})]
-		"反转": return [_e("reverse_line", 0, -1, "", "选择一整行或一整列，倒转其 4 格（含空格与完整叠层）", {})]
-		"合流": return [_e("merge_flow", 0, -1, "", "揭示字袋 1 枚 + 弃字堆指定 1 枚，按任选顺序放入两个相邻空格；无相邻空格则不移动", {})]
-		"急停": return [_e("hard_stop", 0, -1, "", "清空热度并移除本回合溢热生成的灼热【热】（字袋/弃字堆/盘面），立即结束出字阶段", {})]
-		"重复": return [_e("repeat_word", 0, -1, "", "开启后每回合第一次有效多字词再执行一次其即时效果（不重复消耗字；需支付的照常再付）", {}, -1, "persistent")]
-		"防火": return [_e("fireproof", 0, -1, "", "本场持续：自己打出的灼热【热】不再扣血（仍占字袋、不被自动净化）", {}, -1, "persistent")]
-		"防爆": return [_e("blastproof", 0, -1, "", "本场持续：被爆破/爆炸摧毁的己方实体字改为回字袋，每救回 1 枚 +1 持久盾", {}, -1, "persistent")]
-		"合资": return [_e("joint_funding", 0, -1, "", "本场持续：支付金币发动词效时可用 2 储能抵 1 金币，允许混合支付", {}, -1, "persistent")]
-		"分利": return [_e("profit_share", 0, -1, "", "本回合剩余时间，每当实际获得金币就额外获得等量储能", {})]
-		"停息": return [_e("suspend", 0, -1, "", "立即结束出字阶段：清零全部热度，每 1 热度换 2 持久盾；敌人正常行动", {})]
-		# ---- 盘面改造（设计负责人直接定义）----
-		"转化": return [_e("transform_board", 5, T.BOARD_TILE, "", "随机揭示 5 枚实体字，选 1 枚，把一个盘面字定向改成它", {"reveal": 5})]
-		"分化": return [_e("split_grow", 4, T.BOARD_TILE, "", "删除一个盘面字，在其上下左右的空格各生长一枚可组词的临时字（打出即消耗，不进字袋）", {"max": 4})]
-		"强化": return [_e("empower_glyph", 0, -1, "", "选择字袋中一个字；本场它被打出时（单字或成词）额外触发其单字效果", {})]
-		"炼化": return [_e("refine_remove", 3, -1, "", "热度 -3、获得 4 金币，并指定一张牌在本场战斗移出循环", {"heat": 3, "gold": 4})]
-		"精炼": return [_e("refine_layer", 0, -1, "", "选择两个相同的己方字，本场它们一直重合（一格可重复使用，另一张回字袋）", {})]
-		"精力": return [_e("vigor", 0, -1, "", "本回合每打出一种不同的多字词，下回合基础补字 +1", {}, -1, "persistent")]
-	return []
-
 
 func _build_words_from_ledger() -> void:
 	var f := FileAccess.open(IMPORT.path_join("word_ledger_105.txt"), FileAccess.READ)
@@ -508,7 +307,7 @@ func _build_words_from_ledger() -> void:
 		if CUT_WORDS.has(word):
 			continue
 		count += 1
-		var effects_list := _word_effects(word)
+		var effects_list := ContentBuild.word_effects(word)
 		var glyphs: Array[String] = []
 		for i in word.length():
 			var g := word.substr(i, 1)
@@ -546,7 +345,6 @@ func _build_words_from_ledger() -> void:
 	f.close()
 	print("  · 词：总账 %d 条，已实现 %d 条，待定 %d 条" % [count, implemented, count - implemented])
 
-
 func _build_extra_words() -> void:
 	# 彩蛋/设计负责人新增、不在总账 105 里的词
 	var w: WordData = WordDataS.new()
@@ -558,7 +356,7 @@ func _build_extra_words() -> void:
 	w.effect_summary = "彩蛋词：【火化】原地变成【骨灰】（无实际效果）"
 	w.description = w.effect_summary
 	w.priority = "彩蛋"
-	w.effects = _teffects([_e("cremate", 0, -1, "", "【火化】原地变成【骨灰】两个字", {})])
+	w.effects = _teffects([ContentBuild.e("cremate", 0, -1, "", "【火化】原地变成【骨灰】两个字", {})])
 	w.implemented = true
 	w.effect_handler_id = "cremate"
 	for g in w.glyphs:
@@ -576,7 +374,7 @@ func _build_extra_words() -> void:
 	w2.effect_summary = "选择两张相邻的己方牌融合成一个占 1 格的复合单位（本场有效；进出字袋/弃字堆不拆散）"
 	w2.description = w2.effect_summary
 	w2.priority = "空间"
-	w2.effects = _teffects([_e("fuse_cards", 0, -1, "", "选择两张相邻的己方牌融合为一格（本场不可拆）", {})])
+	w2.effects = _teffects([ContentBuild.e("fuse_cards", 0, -1, "", "选择两张相邻的己方牌融合为一格（本场不可拆）", {})])
 	w2.implemented = true
 	w2.effect_handler_id = "fuse_cards"
 	w2.interaction = "choose_fuse_pair"
@@ -588,29 +386,28 @@ func _build_extra_words() -> void:
 	# 精金：永久镀金
 	_save(_extra("extra_jinjin", "精金", ["精", "金"], "经济", "choose_glyph_gild",
 		"选择一枚己方实体字，将其永久镀金；此后它每次参与有效多字词获得 1 金币",
-		_e("gild_glyph", 0, -1, "", "选择一枚己方字永久镀金", {})),
+		ContentBuild.e("gild_glyph", 0, -1, "", "选择一枚己方字永久镀金", {})),
 		"%s/words/extra_jinjin.tres" % RES)
 
 	# 精铸：精准制造
 	_save(_extra("extra_jingzhu", "精铸", ["精", "铸"], "流转", "choose_discard_place",
 		"支付 3 金币，从弃字堆选一枚己方实体字，直接放进指定空格",
-		_e("precision_place", 3, -1, "", "支付 3 金币，把弃字堆中的一枚字放进指定空格", {})),
+		ContentBuild.e("precision_place", 3, -1, "", "支付 3 金币，把弃字堆中的一枚字放进指定空格", {})),
 		"%s/words/extra_jingzhu.tres" % RES)
 
 	# 精分：彩蛋
 	_save(_extra("extra_jingfen", "精分", ["精", "分"], "彩蛋", "",
 		"彩蛋词：本回合内敌人攻击打自己、你的攻击也打自己",
-		_e("split_mind", 0, -1, "", "本回合敌我攻击都打向自己", {})),
+		ContentBuild.e("split_mind", 0, -1, "", "本回合敌我攻击都打向自己", {})),
 		"%s/words/extra_jingfen.tres" % RES)
 	print("  · 新增词：精金/精铸/精分（额外）")
 
 	# 开灯：停电彩蛋的恢复词
 	_save(_extra("extra_kaideng", "开灯", ["开", "灯"], "彩蛋", "",
 		"彩蛋词：来电了",
-		_e("lights_on", 0, -1, "", "来电了", {})),
+		ContentBuild.e("lights_on", 0, -1, "", "来电了", {})),
 		"%s/words/extra_kaideng.tres" % RES)
 	print("  · 彩蛋词：开灯（额外）")
-
 
 func _extra(id: String, word: String, glyphs: Array, group: String, interaction: String, desc: String, effect: EffectData) -> WordData:
 	var w: WordData = WordDataS.new()
@@ -632,6 +429,7 @@ func _extra(id: String, word: String, glyphs: Array, group: String, interaction:
 
 
 # ---------------------------------------------------------------- 敌人
+
 func _move(kind: int, title: String, damage := 0, hits := 1, block := 0, status := "", stacks := 0, inject := 0, pollution := "", desc := "") -> EnemyMoveData:
 	var m: EnemyMoveData = EnemyMoveDataS.new()
 	m.kind = kind
@@ -646,13 +444,11 @@ func _move(kind: int, title: String, damage := 0, hits := 1, block := 0, status 
 	m.description = desc
 	return m
 
-
 func _typed_moves(list: Array) -> Array[EnemyMoveData]:
 	var out: Array[EnemyMoveData] = []
 	for m in list:
 		out.append(m)
 	return out
-
 
 func _make_enemy(id: String, name: String, glyph: String, hp: int, color: String, moves: Array, boss := false, elite := false) -> EnemyData:
 	var e: EnemyData = EnemyDataS.new()
@@ -666,7 +462,6 @@ func _make_enemy(id: String, name: String, glyph: String, hp: int, color: String
 	e.is_elite = elite
 	_save(e, "%s/enemies/%s.tres" % [RES, id])
 	return e
-
 
 func _build_enemies() -> void:
 	var K := EnemyMoveDataS.Kind
@@ -715,12 +510,12 @@ func _build_enemies() -> void:
 		_move(K.INJECT, "蚀海", 0, 1, 0, "", 0, 4, "scorch"),
 	], true)
 
-
 func Database_enemy(id: String) -> EnemyData:
 	return load("%s/enemies/%s.tres" % [RES, id])
 
 
 # ---------------------------------------------------------------- 幕与节点（沿用 V0.3 三幕八节点）
+
 func _node(order: int, type: int, title: String, desc: String, enemies: Array, branch := false) -> MapNodeData:
 	var n: MapNodeData = MapNodeDataS.new()
 	n.order = order
@@ -734,13 +529,11 @@ func _node(order: int, type: int, title: String, desc: String, enemies: Array, b
 	n.is_optional_branch = branch
 	return n
 
-
 func _typed_nodes(list: Array) -> Array[MapNodeData]:
 	var out: Array[MapNodeData] = []
 	for n in list:
 		out.append(n)
 	return out
-
 
 func _build_acts() -> void:
 	var T := MapNodeDataS.Type
@@ -779,6 +572,7 @@ func _build_acts() -> void:
 
 
 # ---------------------------------------------------------------- 初始字袋 / 规则
+
 func _build_starter_deck() -> void:
 	var entries := [
 		["击", 2], ["防", 2], ["回", 2], ["反", 1], ["破", 1],
@@ -797,7 +591,6 @@ func _build_starter_deck() -> void:
 		typed.append(de)
 	deck.entries = typed
 	_save(deck, "%s/starter_decks/v03.tres" % RES)
-
 
 func _build_rules() -> void:
 	var r: BattleRules = BattleRulesS.new()
