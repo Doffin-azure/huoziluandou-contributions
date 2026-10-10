@@ -1,20 +1,25 @@
 extends ScreenBase
-## 战斗界面（V0.2）。顶部资源 / 中部字盘 / 右侧战报。支持目标选择、污染代价预览。
+## 战斗界面（HUD v2 / 参考「墨芯」概念）。
+## 顶部：玩家条 · 回合 · 敌人条；左侧：鲸鱼气泡（预览/结果）+ 已选路径 + 资源；
+## 中部：字盘；右侧：战报；底部：操作行。无效词弹 0.6s 反应。
 
 var battle: BattleState
 var node: MapNodeData
 var _board_view: BoardView
 var _enemy_row: HBoxContainer
-var _enemy_views: Array = []
+var _enemy_widgets: Array = []
 var _player_hp: StatBar
 var _player_block: Label
-var _player_status: VBoxContainer
+var _player_status: HBoxContainer
 var _resource_label: Label
 var _pile_label: Label
 var _turn_label: Label
+var _bubble: SpeechBubble
+var _path_bar: PathBar
 var _preview_glyphs: Label
 var _preview_effect: Label
 var _confirm_btn: Button
+var _reaction: ReactionOverlay
 var _log_box: VBoxContainer
 var _log_scroll: ScrollContainer
 var _target_index := 0
@@ -52,12 +57,18 @@ func build(root: Control) -> void:
 	root.add_child(main)
 	main.add_child(_build_topbar())
 
-	var middle := Ink.hbox(12)
+	var middle := Ink.hbox(10)
 	middle.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main.add_child(middle)
-	middle.add_child(_build_player_panel())
+	middle.add_child(_build_left())
 	middle.add_child(_build_center())
 	middle.add_child(_build_log_panel())
+
+	main.add_child(_build_bottombar())
+
+	_reaction = ReactionOverlay.new()
+	_reaction.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_reaction)
 
 	EventBus.log_message.connect(_on_log)
 	for line in battle.log:
@@ -71,124 +82,140 @@ func _exit_tree() -> void:
 		EventBus.log_message.disconnect(_on_log)
 
 
+# ---------------------------------------------------------------- 顶部：玩家 / 回合 / 敌人
 func _build_topbar() -> Control:
 	var panel := Ink.panel("PanelInset")
-	var pad := Ink.margin(7)
+	var pad := Ink.margin(6)
 	panel.add_child(pad)
-	var row := Ink.hbox(16)
+	var row := Ink.hbox(10)
 	pad.add_child(row)
-	var act := Database.get_act(GameState.act_index)
-	var act_name: String = act.title if act != null else "第一幕"
-	row.add_child(Ink.label("%s · %s · 节点 %d/8" % [act_name, node.type_label(), GameState.node_index], "Subheading"))
-	row.add_child(Ink.expander())
-	_turn_label = Ink.label("回合 1", "Stat")
-	row.add_child(_turn_label)
-	row.add_child(Ink.label("❖ %d" % GameState.gold, "Stat", Palette.GOLD_DK))
-	var deck_btn := Ink.button("字袋 (%d)" % GameState.deck_size())
-	deck_btn.custom_minimum_size = Vector2(100, 30)
-	deck_btn.theme_type_variation = "GhostButton"
-	deck_btn.add_theme_font_size_override("font_size", 15)
-	deck_btn.pressed.connect(_open_deck)
-	row.add_child(deck_btn)
-	var set_btn := Ink.button("设置")
-	set_btn.custom_minimum_size = Vector2(70, 30)
-	set_btn.theme_type_variation = "GhostButton"
-	set_btn.add_theme_font_size_override("font_size", 15)
-	set_btn.pressed.connect(_open_settings)
-	row.add_child(set_btn)
-	return panel
 
-
-func _build_player_panel() -> Control:
-	var panel := Ink.panel("PanelCard")
-	panel.custom_minimum_size = Vector2(220, 0)
-	var pad := Ink.margin(12)
-	panel.add_child(pad)
-	var col := Ink.vbox(8)
-	pad.add_child(col)
-
-	col.add_child(Ink.h2("你"))
+	# 玩家
+	var pblock := Ink.hbox(8)
+	var pseal := SealView.new()
+	pseal.custom_minimum_size = Vector2(44, 44)
+	pseal.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	pseal.setup("你", Palette.INK_SOFT, SealView.Shape.SQUARE, Palette.PAPER)
+	pblock.add_child(pseal)
+	var pcol := Ink.vbox(2)
+	pcol.custom_minimum_size.x = 240
+	pcol.add_child(Ink.label("玩家", "Subheading"))
 	_player_hp = StatBar.new()
-	col.add_child(_player_hp)
+	pcol.add_child(_player_hp)
 	_player_block = Ink.label("", "", Palette.BLOCK)
-	col.add_child(_player_block)
-	_resource_label = Ink.label("", "Muted")
-	_resource_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	col.add_child(_resource_label)
-	col.add_child(Ink.hline())
-	_player_status = Ink.vbox(4)
-	col.add_child(_player_status)
-	col.add_child(Ink.expander())
-	_pile_label = Ink.label("", "Muted")
-	_pile_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	col.add_child(_pile_label)
-	col.add_child(Ink.caption("相邻连字成词；污染字可组词但打出要付代价。"))
+	pcol.add_child(_player_block)
+	pblock.add_child(pcol)
+	row.add_child(pblock)
+	row.add_child(Ink.expander())
+
+	# 回合
+	var rv := Ink.vbox(0)
+	_turn_label = Ink.label("回合 1", "Stat")
+	_turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rv.add_child(_turn_label)
+	var rl := Ink.label("TURN", "Muted")
+	rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rv.add_child(rl)
+	row.add_child(rv)
+	row.add_child(Ink.expander())
+
+	# 敌人
+	_enemy_row = Ink.hbox(10)
+	_enemy_row.alignment = BoxContainer.ALIGNMENT_END
+	row.add_child(_enemy_row)
 	return panel
 
 
-func _build_center() -> Control:
+func _make_enemy_card(i: int, e: Combatant) -> Dictionary:
+	var card := Ink.panel("PanelCard")
+	card.custom_minimum_size = Vector2(236, 0)
+	card.mouse_filter = Control.MOUSE_FILTER_STOP
+	card.gui_input.connect(func(ev):
+		if ev is InputEventMouseButton and ev.pressed:
+			_on_enemy_clicked(i))
+	var pad := Ink.margin(8)
+	card.add_child(pad)
+	var hrow := Ink.hbox(8)
+	pad.add_child(hrow)
+
+	var info := Ink.vbox(2)
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var name := Ink.label(e.display_name, "Subheading")
+	info.add_child(name)
+	var hp := StatBar.new()
+	info.add_child(hp)
+	var intent := Ink.label("", "", Palette.VERMILION)
+	intent.add_theme_font_size_override("font_size", 15)
+	info.add_child(intent)
+	hrow.add_child(info)
+
+	var seal := SealView.new()
+	seal.custom_minimum_size = Vector2(54, 54)
+	seal.shape = SealView.Shape.CIRCLE
+	hrow.add_child(seal)
+	return {"card": card, "seal": seal, "hp": hp, "intent": intent}
+
+
+# ---------------------------------------------------------------- 左侧：鲸鱼气泡 + 路径 + 资源
+func _build_left() -> Control:
 	var col := Ink.vbox(8)
-	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.custom_minimum_size.x = 330
 	col.size_flags_vertical = Control.SIZE_EXPAND_FILL
 
-	_enemy_row = Ink.hbox(14)
-	_enemy_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_enemy_row.custom_minimum_size.y = 150
-	col.add_child(_enemy_row)
+	var top := Ink.hbox(8)
+	top.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var mascot := MascotView.new()
+	mascot.size_flags_vertical = Control.SIZE_SHRINK_END
+	top.add_child(mascot)
+	_bubble = SpeechBubble.new()
+	_bubble.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_bubble.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	top.add_child(_bubble)
+	col.add_child(top)
+	_preview_glyphs = _bubble.title
+	_preview_effect = _bubble.body
+	_bubble.call_deferred("set_idle", _preview_hint())
 
-	var board_center := CenterContainer.new()
-	board_center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	col.add_child(board_center)
+	_path_bar = PathBar.new()
+	col.add_child(_path_bar)
+
+	var rp := Ink.panel("PanelInset")
+	var rpad := Ink.margin(10)
+	rp.add_child(rpad)
+	var rcol := Ink.vbox(4)
+	rpad.add_child(rcol)
+	_resource_label = Ink.label("", "Muted")
+	_resource_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	rcol.add_child(_resource_label)
+	_player_status = Ink.hbox(8)
+	rcol.add_child(_player_status)
+	_pile_label = Ink.label("", "Muted")
+	_pile_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	rcol.add_child(_pile_label)
+	col.add_child(rp)
+	return col
+
+
+# ---------------------------------------------------------------- 中部：字盘
+func _build_center() -> Control:
+	var center := CenterContainer.new()
+	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_board_view = BoardView.new()
 	_board_view.setup(battle.board)
 	_board_view.commit.connect(_on_commit)
 	_board_view.selection_changed.connect(_on_selection_changed)
 	_board_view.tile_picked.connect(_on_tile_picked)
 	_board_view.pick_cancelled.connect(_on_pick_cancelled)
-	board_center.add_child(_board_view)
-
-	col.add_child(_build_actionbar())
-	return col
+	center.add_child(_board_view)
+	return center
 
 
-func _build_actionbar() -> Control:
-	var panel := Ink.panel("PanelCard")
-	var pad := Ink.margin(10)
-	panel.add_child(pad)
-	var row := Ink.hbox(12)
-	pad.add_child(row)
-
-	var preview := Ink.vbox(2)
-	preview.custom_minimum_size.x = 250
-	preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(preview)
-	_preview_glyphs = Ink.label("连线组词…", "Subheading")
-	preview.add_child(_preview_glyphs)
-	_preview_effect = Ink.caption(_preview_hint())
-	preview.add_child(_preview_effect)
-
-	_confirm_btn = Ink.button("出字", true)
-	_confirm_btn.custom_minimum_size = Vector2(84, 42)
-	_confirm_btn.disabled = true
-	_confirm_btn.pressed.connect(func(): _on_commit(_board_view.path.duplicate()))
-	row.add_child(_confirm_btn)
-
-	var clear := Ink.button("清除")
-	clear.custom_minimum_size = Vector2(70, 42)
-	clear.pressed.connect(func(): _board_view.clear_selection())
-	row.add_child(clear)
-
-	var end := Ink.button("结束回合")
-	end.custom_minimum_size = Vector2(96, 42)
-	end.pressed.connect(_on_end_turn)
-	row.add_child(end)
-	return panel
-
-
+# ---------------------------------------------------------------- 右侧：战报
 func _build_log_panel() -> Control:
 	var panel := Ink.panel("PanelCard")
-	panel.custom_minimum_size = Vector2(230, 0)
-	var pad := Ink.margin(10)
+	panel.custom_minimum_size = Vector2(206, 0)
+	var pad := Ink.margin(8)
 	panel.add_child(pad)
 	var col := Ink.vbox(6)
 	pad.add_child(col)
@@ -204,6 +231,46 @@ func _build_log_panel() -> Control:
 	return panel
 
 
+# ---------------------------------------------------------------- 底部：操作行
+func _build_bottombar() -> Control:
+	var panel := Ink.panel("PanelInset")
+	var pad := Ink.margin(6)
+	panel.add_child(pad)
+	var row := Ink.hbox(8)
+	pad.add_child(row)
+	row.add_child(Ink.label("拖动连词　·　回车确认　·　ESC 取消", "Muted"))
+	row.add_child(Ink.expander())
+
+	_confirm_btn = Ink.button("出字", true)
+	_confirm_btn.custom_minimum_size = Vector2(96, 42)
+	_confirm_btn.disabled = true
+	_confirm_btn.pressed.connect(func(): _on_commit(_board_view.path.duplicate()))
+	row.add_child(_confirm_btn)
+
+	var clear := Ink.button("清除")
+	clear.custom_minimum_size = Vector2(72, 42)
+	clear.pressed.connect(func(): _board_view.clear_selection())
+	row.add_child(clear)
+
+	var deck := Ink.button("字袋")
+	deck.custom_minimum_size = Vector2(76, 42)
+	deck.theme_type_variation = "GhostButton"
+	deck.pressed.connect(_open_deck)
+	row.add_child(deck)
+
+	var set_btn := Ink.button("设置")
+	set_btn.custom_minimum_size = Vector2(76, 42)
+	set_btn.theme_type_variation = "GhostButton"
+	set_btn.pressed.connect(_open_settings)
+	row.add_child(set_btn)
+
+	var end := Ink.button("结束回合")
+	end.custom_minimum_size = Vector2(110, 42)
+	end.pressed.connect(_on_end_turn)
+	row.add_child(end)
+	return panel
+
+
 # ---------------------------------------------------------------- 刷新
 func _refresh_all() -> void:
 	_refresh_enemies()
@@ -214,29 +281,32 @@ func _refresh_all() -> void:
 
 
 func _refresh_enemies() -> void:
-	for v in _enemy_views:
-		v.queue_free()
-	_enemy_views.clear()
+	for w in _enemy_widgets:
+		w["card"].queue_free()
+	_enemy_widgets.clear()
 	for i in battle.enemies.size():
 		var e: Combatant = battle.enemies[i]
-		var v := EnemyView.new()
-		v.setup(i, e)
-		v.clicked.connect(_on_enemy_clicked)
-		_enemy_row.add_child(v)
-		_enemy_views.append(v)
+		var w := _make_enemy_card(i, e)
+		_enemy_row.add_child(w["card"])
+		_enemy_widgets.append(w)
 	_refresh_intents()
 
 
 func _refresh_intents() -> void:
 	for i in battle.enemies.size():
 		var e: Combatant = battle.enemies[i]
-		var v: EnemyView = _enemy_views[i]
-		v.refresh()
+		var w: Dictionary = _enemy_widgets[i]
+		var ed: EnemyData = e.enemy_data
+		w["seal"].setup(ed.glyph if ed != null else "敌", ed.accent if ed != null else Palette.VERMILION, SealView.Shape.CIRCLE)
+		w["hp"].setup_bar(e.hp, e.max_hp, Palette.HP)
 		if e.is_alive():
-			v.set_intent(battle.current_intent(e))
+			var mv: EnemyMoveData = battle.current_intent(e)
+			w["intent"].text = ("⟶ " + mv.intent_text()) if mv != null else ""
 		else:
-			v.set_intent(null)
-		v.set_targeted(i == _target_index and battle.alive_enemies().size() > 1)
+			w["intent"].text = "（已倒下）"
+		w["card"].modulate = Color(0.5, 0.48, 0.46, 0.75) if not e.is_alive() else Color.WHITE
+		var targeted := i == _target_index and battle.alive_enemies().size() > 1
+		w["card"].modulate = Color(1.0, 0.85, 0.6) if targeted else w["card"].modulate
 
 
 func _refresh_player() -> void:
@@ -254,6 +324,11 @@ func _refresh_player() -> void:
 		res.append("临时资金 %d" % battle.player.temp_funds)
 	if battle.player.equity > 0:
 		res.append("股权 %d" % battle.player.equity)
+	if battle.player.block > 0:
+		res.append("临挡 %d" % battle.player.block)
+	if battle.player.persistent_block > 0:
+		res.append("持久盾 %d" % battle.player.persistent_block)
+	res.append("金币 %d" % GameState.gold)
 	_resource_label.text = "　".join(res)
 
 	for c in _player_status.get_children():
@@ -279,27 +354,30 @@ func _on_log(text: String) -> void:
 	if _log_box == null:
 		return
 	var l := Ink.label(text, "Muted")
-	l.add_theme_font_size_override("font_size", 14)
+	l.add_theme_font_size_override("font_size", 13)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_log_box.add_child(l)
+	if _log_box.get_child_count() > 80:
+		var first := _log_box.get_child(0)
+		_log_box.remove_child(first)
+		first.queue_free()
 	await get_tree().process_frame
 	if _log_scroll:
 		_log_scroll.scroll_vertical = int(_log_scroll.get_v_scroll_bar().max_value)
 
 
-# ---------------------------------------------------------------- 预览
+# ---------------------------------------------------------------- 预览（走气泡框）
 func _on_selection_changed(path: Array, glyphs: Array, word: WordData) -> void:
+	_path_bar.update(glyphs)
 	if glyphs.is_empty():
 		_current_word = null
-		_preview_glyphs.text = "连线组词…"
-		_preview_effect.text = _preview_hint()
+		_bubble.set_idle(_preview_hint())
 		_confirm_btn.disabled = true
 		return
 	_current_word = word
 	var text := ""
 	for g in glyphs:
 		text += str(g)
-	_preview_glyphs.text = text
 	_confirm_btn.disabled = false
 	if word != null and not Settings.drag_release_play:
 		_pop_confirm()
@@ -307,24 +385,25 @@ func _on_selection_changed(path: Array, glyphs: Array, word: WordData) -> void:
 	var costs := _pollution_cost_text(path)
 	if word == null:
 		if glyphs.size() >= 2:
-			_preview_effect.text = "“%s”不成词。" % text
+			_bubble.set_text("「%s」" % text, "不成词。%s" % costs, SpeechBubble.State.ERROR)
 		else:
 			var cd: CharacterData = null
 			var inst: CharInstance = battle.board.get_xy(path[0])
 			if inst != null:
 				cd = inst.data
-			_preview_effect.text = "单字：%s%s" % [(cd.description if cd != null else ""), costs]
+			_bubble.set_text("「%s」" % text, "单字：%s%s" % [(cd.description if cd != null else ""), costs], SpeechBubble.State.PREVIEW)
 		return
 	if not word.implemented:
-		_preview_effect.text = "【%s】效果待定（P3/P4 未收敛）。%s" % [word.word, costs]
+		_bubble.set_text("《%s》" % word.word, "效果待定。%s" % costs, SpeechBubble.State.PREVIEW)
 		return
 	var parts: Array = []
 	for eff in word.effects:
 		parts.append(eff.describe())
 	var req := ""
 	if word.requires_target != EffectData.Target.NONE:
-		req = " → 需选目标"
-	_preview_effect.text = "%s｜%s%s%s" % [word.effect_summary, " / ".join(parts), req, costs]
+		req = "　→ 需选目标"
+	var body_text: String = " / ".join(parts) if not parts.is_empty() else word.effect_summary
+	_bubble.set_text("《%s》" % word.word, "%s%s%s" % [body_text, req, costs], SpeechBubble.State.PREVIEW)
 
 
 func _pollution_cost_text(path: Array) -> String:
@@ -346,6 +425,11 @@ func _pollution_cost_text(path: Array) -> String:
 func _on_enemy_clicked(index: int) -> void:
 	_target_index = index
 	_refresh_intents()
+
+
+func _show_invalid_reaction() -> void:
+	if _reaction != null:
+		_reaction.show_invalid()
 
 
 func _on_commit(path: Array, target: Dictionary = {}) -> void:
@@ -389,11 +473,16 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 			_request_target(int(result.need_target))
 			return
 		_board_view.flash_invalid()
+		var glyphs: Array = result.get("glyphs", [])
+		if glyphs.size() >= 2 and result.get("word") == null:
+			# 无效词：弹 0.6s 反应
+			_show_invalid_reaction()
 		_on_log("✗ " + str(result.reason))
-		_preview_effect.text = str(result.reason)
+		_bubble.set_error(str(result.reason))
 		return
 	_board_view.clear_selection()
 	_refresh_all()
+	_bubble.set_result(result.word, result.glyphs, result.messages)
 	if result.word != null:
 		_on_log("成词：%s" % result.word.word)
 		_float_at_enemy("《%s》" % result.word.word, Palette.VERMILION_DK)
@@ -419,7 +508,7 @@ func _show_blackout() -> void:
 
 
 func _request_target(target_kind: int) -> void:
-	on_log_safe("请选择目标")
+	_on_log("请选择目标")
 	match target_kind:
 		EffectData.Target.BOARD_2X2:
 			_board_view.begin_pick("2x2")
@@ -431,10 +520,6 @@ func _request_target(target_kind: int) -> void:
 			_board_view.begin_pick("any")
 		EffectData.Target.DISCARD_GLYPH:
 			_choose_discard()
-
-
-func on_log_safe(t: String) -> void:
-	_on_log(t)
 
 
 func _on_tile_picked(pos: Vector2i) -> void:
@@ -639,7 +724,6 @@ func _on_transform_chosen(index: int) -> void:
 	_board_view.begin_pick("any")
 
 
-## 通用选字浮层：用于强化（选字袋中的字）与炼化（选本场在循环中的牌）
 func _open_glyph_picker(path: Array, key: String, glyph_counts: Dictionary, title: String) -> void:
 	_pending_path = path
 	var chars: Array = []
@@ -719,7 +803,6 @@ func _check_battle_over() -> void:
 		EventBus.hp_changed.emit(GameState.player_hp, GameState.player_max_hp)
 		if victory:
 			GameState.add_captured(battle.captured_chars)
-			# 投资/股权：战后未耗尽的本金返还
 			if battle.player.equity > 0:
 				GameState.add_gold(battle.player.equity)
 				_on_log("投资本金返还：+%d 金币" % battle.player.equity)
@@ -754,9 +837,9 @@ func _on_defeat_choice(index: int) -> void:
 func _float_at_enemy(text: String, color: Color) -> void:
 	var pos := Vector2(get_viewport_rect().size.x * 0.5, 200)
 	for i in battle.enemies.size():
-		if battle.enemies[i].is_alive() and i < _enemy_views.size():
-			var v: EnemyView = _enemy_views[i]
-			pos = v.global_position + Vector2(v.size.x * 0.5, 10)
+		if battle.enemies[i].is_alive() and i < _enemy_widgets.size():
+			var card: Control = _enemy_widgets[i]["card"]
+			pos = card.global_position + Vector2(card.size.x * 0.5, 10)
 			break
 	_float_text(text, pos, color)
 
