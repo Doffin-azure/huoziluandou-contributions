@@ -126,6 +126,9 @@ func _build_theme() -> Theme:
 	t.set_type_variation("PanelInset", "PanelContainer")
 	t.set_stylebox("panel", "PanelInset", _sb(Palette.PAPER_WARM, 8, Palette.BORDER_SOFT, 1, 0.4))
 
+	t.set_type_variation("StagePanel", "PanelContainer")
+	t.set_stylebox("panel", "StagePanel", _sb(Palette.STAGE, 12, Palette.STAGE_EDGE, 2, 0.75))
+
 	t.set_type_variation("PrimaryButton", "Button")
 	t.set_color("font_color", "PrimaryButton", Palette.PAPER)
 	t.set_color("font_hover_color", "PrimaryButton", Palette.PAPER)
@@ -265,6 +268,12 @@ func button(text: String, primary := false) -> Button:
 func panel(variation := "PanelCard") -> PanelContainer:
 	var p := PanelContainer.new()
 	p.theme_type_variation = variation
+	return p
+
+
+func stage_panel() -> PanelContainer:
+	var p := PanelContainer.new()
+	p.theme_type_variation = "StagePanel"
 	return p
 
 

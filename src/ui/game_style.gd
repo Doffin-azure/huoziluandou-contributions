@@ -41,6 +41,9 @@ var BLOCK := Color("5f7f9a")
 var BORDER := Color("4a4438")
 var BORDER_SOFT := Color("c8b68d")
 var PANEL_DARK := Color("2b2620")   ## 深色托盘（字盘底）
+var STAGE := Color("251f1a")
+var STAGE_EDGE := Color("5d4430")
+var SURFACE_RAISED := Color("f7eedc")
 var SHADOW := Color(0.08, 0.06, 0.04, 0.45)
 
 
@@ -102,5 +105,8 @@ static func neon() -> GameStyle:
 	s.BORDER = Color("2f5f8f")
 	s.BORDER_SOFT = Color("1f3c5e")
 	s.PANEL_DARK = Color("0a1222")
+	s.STAGE = Color("07101c")
+	s.STAGE_EDGE = Color("24527a")
+	s.SURFACE_RAISED = Color("1d3150")
 	s.SHADOW = Color(0, 0, 0, 0.55)
 	return s
