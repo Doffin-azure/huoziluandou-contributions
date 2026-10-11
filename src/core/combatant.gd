@@ -21,6 +21,8 @@ var temp_funds: int = 0            ## 本回合临时支付额度
 
 # --- 跨战永久 ---
 var permanent_damage_reduction: int = 0
+## 调试用：无敌（玩家免伤）
+var god_mode: bool = false
 
 
 func _init(p_name: String = "", p_max_hp: int = 10, p_is_player: bool = false) -> void:
@@ -33,6 +35,8 @@ func _init(p_name: String = "", p_max_hp: int = 10, p_is_player: bool = false) -
 ## 返回实际损失生命。格挡优先，持久盾其次。
 func take_damage(amount: int) -> int:
 	if amount <= 0:
+		return 0
+	if is_player and god_mode:
 		return 0
 	var dmg: int = amount
 	if statuses.has("vulnerable"):

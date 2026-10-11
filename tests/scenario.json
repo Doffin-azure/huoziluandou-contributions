@@ -1,0 +1,25 @@
+{
+  "seed": 7,
+  "enemies": [
+    "ink_spirit"
+  ],
+  "actions": [
+    {
+      "needs": "none",
+      "path": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "score": 9,
+      "type": "play",
+      "word": "反击"
+    }
+  ],
+  "auto": false
+}

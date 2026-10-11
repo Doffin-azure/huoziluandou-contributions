@@ -47,3 +47,8 @@ assets/mascot/*.png
 assets/mascot/*.jpg
 assets/reactions/*.png
 assets/reactions/*.jpg
+
+# 调试/自动化生成物
+/tests/transcript.json
+/tests/scenario.out.json
+/docs/batch_report.json

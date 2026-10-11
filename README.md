@@ -142,6 +142,37 @@ assets/fonts/  随仓库字体
 
 ---
 
+## 调试与自动化
+
+### 游戏内控制台
+调试构建（编辑器运行 / Debug 导出）下按 **`**（反引号）呼出，`/help` 看命令，`ESC` 关闭。
+
+- **数值/规则**：`/hp /maxhp /gold /heat /heatcap /energy /equity /funds /draw N /turn-draw N /opening N /plays N(0=无限) /goldcap N`
+- **盘面**：`/board`（打印坐标/污染/层/镀金） `/set r c 字` `/clear` `/fill` `/give4 字` `/pollute r c rush|block|scorch` `/enemy-add 字 [污染]` `/gravity` `/rotate r c` `/reverse row|col i` `/fuse r1 c1 r2 c2` `/seed N`
+- **流程**：`/endturn` `/nextturn`（跳过敌人） `/win` `/lose` `/heal` `/god` `/status add|clear id [n]` `/intent`
+- **字袋/构筑**：`/deck` `/add 字 [n]` `/remove 字` `/clone 字` `/gild 字`
+- **查询**：`/word 击破` `/char 化` `/words-of 击` `/reload` `/style paper|neon`
+
+新增命令 = 在 `src/debug/debug_commands.gd` 注册一行。
+
+### AI / 批量测试接口
+- **纯逻辑接口** `BattleHarness`（`src/core/battle_harness.gd`，Gym 风格、固定种子可复现）：
+  `reset(cfg)` · `observe()` · `legal_actions()` · `apply(action)` · `is_done()` · `summary()`
+- **批量跑分**：
+  ```bash
+  <godot> --headless --path . res://src/tools/batch_test.tscn
+  # → docs/batch_report.json（胜率 / 回合数 / 词回合比 / 单字占比 / 金币）
+  ```
+- **JSON 桥（供外部 AI 反复调用）**：
+  ```bash
+  <godot> --headless --path . res://src/tools/agent_bridge.tscn -- <scenario.json> <transcript.json>
+  ```
+  场景形如 `{ "seed":7, "deck":[...], "enemies":[...], "board":[...], "actions":[...], "auto":false }`；
+  输出 `{ steps[], final(observe), legal_actions[], summary }`。`legal_actions` 的 `path` 为 `[[x,y],...]`，可直接回填。
+  AI 循环：传入 `actions:[]` → 读 `legal_actions` → 追加一个 action 再传 → 直到 `final.done`（固定种子，逐步确定性）。
+
+---
+
 ## 状态与后续
 
 - 数值为**测试起点**，尚未正式平衡；金币反刷方案待定。
