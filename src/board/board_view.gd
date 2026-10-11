@@ -160,12 +160,13 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("cancel_selection"):
 		if pick_mode != "":
-			var m := pick_mode
 			end_pick()
 			pick_cancelled.emit()
-		else:
+			get_viewport().set_input_as_handled()
+		elif not path.is_empty():
 			clear_selection()
-		get_viewport().set_input_as_handled()
+			get_viewport().set_input_as_handled()
+		# 否则不消费 ESC，交给暂停菜单
 
 
 # ---------------------------------------------------------------- 目标选择模式

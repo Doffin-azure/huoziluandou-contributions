@@ -268,6 +268,12 @@ func _build_bottombar() -> Control:
 	end.custom_minimum_size = Vector2(110, 42)
 	end.pressed.connect(_on_end_turn)
 	row.add_child(end)
+
+	var menu := Ink.button("菜单")
+	menu.custom_minimum_size = Vector2(76, 42)
+	menu.theme_type_variation = "GhostButton"
+	menu.pressed.connect(func(): PauseMenu.open())
+	row.add_child(menu)
 	return panel
 
 

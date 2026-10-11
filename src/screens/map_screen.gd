@@ -69,6 +69,12 @@ func _build_header() -> Control:
 	row.add_child(deck_btn)
 	_deck_btn = deck_btn
 
+	var menu_btn := Ink.button("菜单")
+	menu_btn.custom_minimum_size = Vector2(76, 38)
+	menu_btn.theme_type_variation = "GhostButton"
+	menu_btn.pressed.connect(func(): PauseMenu.open())
+	row.add_child(menu_btn)
+
 	_hp_bar = bar
 	EventBus.gold_changed.connect(_on_gold_changed)
 	EventBus.hp_changed.connect(_on_hp_changed)

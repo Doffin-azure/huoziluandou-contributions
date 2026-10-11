@@ -145,7 +145,10 @@ assets/fonts/  随仓库字体
 ## 调试与自动化
 
 ### 游戏内控制台
-调试构建（编辑器运行 / Debug 导出）下按 **`**（反引号）呼出，`/help` 看命令，`ESC` 关闭。
+调试构建（编辑器运行 / Debug 导出）下按 **`**（反引号）或 **F1** 呼出，`/help` 看命令，`ESC` 关闭。
+（若按键无反应：可能开的是旧实例，重启游戏；或键盘布局差异，用 F1。）
+
+**暂停 / 中途退出**：`ESC` 或界面上「菜单」按钮 → 继续 / 设置 / 放弃本局（返回标题）/ 退出游戏。
 
 - **数值/规则**：`/hp /maxhp /gold /heat /heatcap /energy /equity /funds /draw N /turn-draw N /opening N /plays N(0=无限) /goldcap N`
 - **盘面**：`/board`（打印坐标/污染/层/镀金） `/set r c 字` `/clear` `/fill` `/give4 字` `/pollute r c rush|block|scorch` `/enemy-add 字 [污染]` `/gravity` `/rotate r c` `/reverse row|col i` `/fuse r1 c1 r2 c2` `/seed N`

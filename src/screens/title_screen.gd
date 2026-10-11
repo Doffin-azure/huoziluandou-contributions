@@ -60,6 +60,12 @@ func build(root: Control) -> void:
 	footer.position = Vector2(-220, -34)
 	root.add_child(footer)
 
+	if OS.is_debug_build():
+		var dbg_hint := Ink.label("调试：按 ~ 或 F1 打开控制台　·　ESC 打开菜单", "Muted")
+		dbg_hint.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		dbg_hint.position = Vector2(16, -34)
+		root.add_child(dbg_hint)
+
 
 func _title_tile(ch: String, rot: float, y_off: float) -> Control:
 	var holder := Control.new()

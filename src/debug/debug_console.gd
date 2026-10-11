@@ -16,18 +16,27 @@ var _open := false
 func _ready() -> void:
 	layer = 128
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	if OS.is_debug_build() and DebugCommands.is_empty():
+	enabled = OS.is_debug_build()
+	if enabled and DebugCommands.is_empty():
 		DebugCommands.install()
 	_build()
 	_set_open(false)
+	if enabled:
+		print("[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）")
+
+
+func is_open() -> bool:
+	return _open
 
 
 func _input(event: InputEvent) -> void:
-	if not enabled or not OS.is_debug_build():
+	if not enabled:
 		return
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_QUOTELEFT:
-		_toggle()
-		get_viewport().set_input_as_handled()
+	if event is InputEventKey and event.pressed and not event.echo:
+		var kc: int = event.keycode
+		if kc == KEY_QUOTELEFT or kc == KEY_F1 or event.is_action_pressed("debug_console"):
+			_toggle()
+			get_viewport().set_input_as_handled()
 
 
 func _toggle() -> void:
