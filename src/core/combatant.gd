@@ -21,6 +21,8 @@ var temp_funds: int = 0            ## 本回合临时支付额度
 
 # --- 跨战永久 ---
 var permanent_damage_reduction: int = 0
+## 心力层数（玩家专属）：抵挡致命伤害，每层可挡一次
+var heart_power: int = 0
 ## 调试用：无敌（玩家免伤）
 var god_mode: bool = false
 
@@ -50,7 +52,13 @@ func take_damage(amount: int) -> int:
 		var persisted: int = min(persistent_block, dmg)
 		persistent_block -= persisted
 		dmg -= persisted
+	# 心力：抵挡一次致命伤害（本次伤害不生效，保留当前生命）
+	if is_player and dmg > 0 and hp - dmg <= 0 and heart_power > 0:
+		heart_power -= 1
+		dmg = 0
 	hp = max(0, hp - dmg)
+	if dmg > 0:
+		EventBus.damage_dealt.emit(is_player, dmg)
 	return dmg
 
 

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_0wxsv"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_vhd6s"]
+
+[sub_resource type="Resource" id="Resource_562a6"]
+script = ExtResource("1_0wxsv")
+handler = "heart_link"
+note = "生命上限与当前生命都和敌人平均"
+
+[resource]
+script = ExtResource("2_vhd6s")
+id = "extra_xinlianxin"
+word = "心连心"
+glyphs = Array[String](["心", "连", "心"])
+description = "将你的生命上限与当前生命都和敌人平均（上限整场有效）"
+effects = Array[ExtResource("1_0wxsv")]([SubResource("Resource_562a6")])
+group = "空间"
+design_stage = "设计负责人新增"
+effect_summary = "将你的生命上限与当前生命都和敌人平均（上限整场有效）"
+effect_handler_id = "heart_link"
+priority = "空间"
+implemented = true

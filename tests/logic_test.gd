@@ -62,6 +62,8 @@ func _run() -> void:
 	_test_direction_words()
 	_test_edge_batch1()
 	_test_edge_batch2()
+	_test_chaozhong()
+	_test_heart_series()
 	print("\n[logic_test] PASS=%d FAIL=%d" % [_pass, _fail])
 	get_tree().quit()
 
@@ -628,25 +630,24 @@ func _test_blast_preconsume() -> void:
 
 func _test_direction_words() -> void:
 	print("[方向] 左/右/左右/左转/右转/左击/右击")
-	# 左：整行向左循环
+	# 左：全盘向左重力
 	var b := _battle()
 	_place(b, 0, 0, "击")
-	_place(b, 1, 0, "防")
-	_place(b, 2, 0, "回")
-	_place(b, 3, 0, "反")
-	_place(b, 0, 3, "左")
-	var r := b.try_play([Vector2i(0, 3)], {"row": 0, "tile": Vector2i(0, 0)})
+	_place(b, 3, 0, "防")
+	_place(b, 1, 1, "回")
+	_place(b, 2, 3, "左")
+	var r := b.try_play([Vector2i(2, 3)])
 	_ok(r.ok, "左 可单字打出")
-	_ok(_find(b, "击") == Vector2i(3, 0) and _find(b, "防") == Vector2i(0, 0), "整行向左循环一格")
-	# 右：整行向右循环
+	_ok(_find(b, "击") == Vector2i(0, 0) and _find(b, "防") == Vector2i(1, 0), "向左重力：第 0 行左对齐")
+	_ok(_find(b, "回") == Vector2i(0, 1), "向左重力：第 1 行左对齐")
+	# 右：全盘向右重力
 	var b2 := _battle()
 	_place(b2, 0, 1, "击")
-	_place(b2, 1, 1, "防")
-	_place(b2, 2, 1, "回")
-	_place(b2, 3, 1, "反")
-	_place(b2, 0, 3, "右")
-	var r2 := b2.try_play([Vector2i(0, 3)], {"row": 1, "tile": Vector2i(0, 1)})
-	_ok(r2.ok and _find(b2, "击") == Vector2i(1, 1) and _find(b2, "反") == Vector2i(0, 1), "整行向右循环一格")
+	_place(b2, 2, 1, "防")
+	_place(b2, 3, 2, "右")
+	var r2 := b2.try_play([Vector2i(3, 2)])
+	_ok(r2.ok, "右 可单字打出")
+	_ok(_find(b2, "击") == Vector2i(2, 1) and _find(b2, "防") == Vector2i(3, 1), "向右重力：右对齐")
 	# 左右：同行两格交换
 	var b3 := _battle()
 	_place(b3, 0, 0, "左")
@@ -881,21 +882,21 @@ func _test_edge_batch2() -> void:
 	var inj := b11.inject_enemy_glyphs(2, "rush")
 	_ok(inj >= 1 and GameState.gold > g1, "加收：敌人注入获得金币")
 	GameState.gold = g1
-	# 电力
+	# 电力（用「左击」的行位移触发额外位移）
 	var b12 := _battle()
+	var e12 := _add_enemy(b12, 200)
 	_place(b12, 0, 0, "电")
 	_place(b12, 1, 0, "力")
 	b12.try_play([Vector2i(0, 0), Vector2i(1, 0)])
 	for i in b12.board.cells.size():
 		b12.board.cells[i] = null
 	_place(b12, 0, 3, "左")
-	_place(b12, 0, 0, "击")
-	_place(b12, 1, 0, "防")
-	_place(b12, 2, 0, "回")
-	_place(b12, 3, 0, "反")
+	_place(b12, 1, 3, "击")
+	_place(b12, 0, 0, "防")
+	_place(b12, 1, 0, "回")
 	b12.add_energy(1)
-	b12.try_play([Vector2i(0, 3)], {"row": 0})
-	_ok(b12.board.get_xy(Vector2i(2, 0)) != null and b12.board.get_xy(Vector2i(2, 0)).glyph() == "击", "电力：额外位移一次")
+	b12.try_play([Vector2i(0, 3), Vector2i(1, 3)], {"row": 0})
+	_ok(b12.board.get_xy(Vector2i(2, 0)) != null and b12.board.get_xy(Vector2i(2, 0)).glyph() == "防", "电力：额外位移一次")
 	# 电热
 	var b13 := _battle()
 	_place(b13, 0, 0, "电")
@@ -1192,3 +1193,114 @@ func _test_temp_funds_payment() -> void:
 	_ok(b.player.temp_funds == 0 and GameState.gold == 50, "投币：先花临时资金，金币不变")
 	_ok(200 - e.hp == 15, "投币：支付 3 × 5 = 15 伤（实际 %d）" % (200 - e.hp))
 	GameState.gold = g0
+
+
+func _test_chaozhong() -> void:
+	print("[超重] 清空字盘，每枚 5 伤")
+	var b := _battle()
+	var e := _add_enemy(b, 200)
+	_place(b, 0, 0, "击")
+	_place(b, 1, 0, "蚀", CharInstance.Owner.ENEMY)
+	var tmp := CharInstance.new(Database.get_character_by_glyph("洗"))
+	tmp.owner = CharInstance.Owner.PLAYER
+	tmp.temporary = true
+	b.temp_chars.append(tmp)
+	b.board.set_cell(2, 0, tmp)
+	_place(b, 0, 1, "超")
+	_place(b, 1, 1, "重")
+	var r := b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
+	_ok(r.ok, "超重打出成功")
+	_ok(b.board.fill_count() == 0, "字盘被清空（剩余 %d）" % b.board.fill_count())
+	_ok(200 - e.hp == 25, "清空 5 枚（含超/重自身）× 5 = 25 伤（实际 %d）" % (200 - e.hp))
+	var ji_in_discard := false
+	for c in b.discard:
+		if c.glyph() == "击":
+			ji_in_discard = true
+	_ok(ji_in_discard, "己方【击】进弃字堆")
+	_ok(not b.temp_chars.has(tmp), "临时字被清除")
+
+
+func _test_heart_series() -> void:
+	# 心（单字）：回复 1 血
+	print("[心] 单字回复 1 血")
+	var b := _battle()
+	b.player.hp = 10
+	_place(b, 0, 0, "心")
+	b.try_play([Vector2i(0, 0)])
+	_ok(b.player.hp == 11, "心单字回复 1 血（当前 %d）" % b.player.hp)
+
+	# 重心：向锚点滑动聚拢
+	print("[重心] 向锚点滑动聚拢")
+	var b2 := _battle()
+	_place(b2, 0, 0, "击")
+	_place(b2, 3, 3, "防")
+	_place(b2, 0, 2, "重")
+	_place(b2, 1, 2, "心")
+	var r2 := b2.try_play([Vector2i(0, 2), Vector2i(1, 2)], {"tile": Vector2i(0, 0)})
+	_ok(r2.ok, "重心打出成功")
+	_ok(_find(b2, "防") == Vector2i(1, 0), "防 向锚点滑动到 (1,0)（位置 %s）" % str(_find(b2, "防")))
+
+	# 重心：多字滑动，左上优先占位
+	var b2b := _battle()
+	_place(b2b, 0, 0, "击")
+	_place(b2b, 2, 2, "回")
+	_place(b2b, 3, 3, "防")
+	_place(b2b, 0, 2, "重")
+	_place(b2b, 1, 2, "心")
+	var r2b := b2b.try_play([Vector2i(0, 2), Vector2i(1, 2)], {"tile": Vector2i(0, 0)})
+	_ok(r2b.ok, "重心（多字）打出成功")
+	_ok(_find(b2b, "回") == Vector2i(1, 0), "回（左上）先滑到 (1,0)（位置 %s）" % str(_find(b2b, "回")))
+	_ok(_find(b2b, "防") == Vector2i(2, 0), "防（右下）被挡在 (2,0)（位置 %s）" % str(_find(b2b, "防")))
+
+	# 心力：能力 + 叠加 + 抵挡致命伤害
+	print("[心力] 叠加与致命伤害抵挡")
+	var b3 := _battle()
+	_place(b3, 0, 0, "心")
+	_place(b3, 1, 0, "力")
+	b3.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b3.has_ability("heart_power"), "心力能力启用")
+	_ok(b3.player.heart_power == 1, "心力词含【心】，叠 1 层（当前 %d）" % b3.player.heart_power)
+	_place(b3, 0, 1, "心")
+	b3.try_play([Vector2i(0, 1)])
+	_ok(b3.player.heart_power == 2, "再打一颗心，叠到 2 层（当前 %d）" % b3.player.heart_power)
+	b3.player.hp = 3
+	b3.player.take_damage(100)
+	_ok(b3.player.hp == 3 and b3.player.heart_power == 1, "致命伤害被抵挡（hp %d，心力 %d）" % [b3.player.hp, b3.player.heart_power])
+
+	# 心急：补满盘面 + 下回合少抽 3
+	print("[心急] 补满盘面")
+	var b4 := _battle()
+	_place(b4, 0, 0, "心")
+	_place(b4, 1, 0, "急")
+	for i in 20:
+		b4.bag.append(CharInstance.new(Database.get_character_by_glyph("击")))
+	b4.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b4.board.fill_count() == 16, "心急补满盘面（当前 %d）" % b4.board.fill_count())
+	_ok(b4.next_draw_penalty == 3, "下回合少抽 3（penalty %d）" % b4.next_draw_penalty)
+
+	# 心蚀：敌人每回合扣层数血
+	print("[心蚀] 每回合扣层数血")
+	var b5 := _battle()
+	var e5 := _add_enemy(b5, 100)
+	_place(b5, 0, 0, "心")
+	_place(b5, 1, 0, "蚀")
+	b5.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(e5.status_stacks("heart_corrosion") == 4, "心蚀 4 层（当前 %d）" % e5.status_stacks("heart_corrosion"))
+	b5.end_player_turn()
+	_ok(100 - e5.hp == 4, "敌人每回合扣 4 血（hp %d）" % e5.hp)
+
+	# 心连心：血量与上限平均（跨战保留）
+	print("[心连心] 血量与上限平均（跨战保留）")
+	var mhp0 := GameState.player_max_hp
+	var php0 := GameState.player_hp
+	var b6 := _battle()
+	var e6 := _add_enemy(b6, 100)
+	_place(b6, 0, 0, "心")
+	_place(b6, 1, 0, "连")
+	_place(b6, 2, 0, "心")
+	b6.try_play([Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0)])
+	_ok(b6.player.max_hp == 80 and e6.max_hp == 80, "上限平均 80（玩家 %d 敌 %d）" % [b6.player.max_hp, e6.max_hp])
+	_ok(b6.player.hp == 80 and e6.hp == 80, "当前血平均 80（玩家 %d 敌 %d）" % [b6.player.hp, e6.hp])
+	_ok(GameState.player_max_hp == 80, "跨战：GameState 上限保留 80（当前 %d）" % GameState.player_max_hp)
+	GameState.player_max_hp = mhp0
+	GameState.player_hp = php0

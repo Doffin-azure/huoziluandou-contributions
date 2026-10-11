@@ -33,6 +33,7 @@ var _move_from := Vector2i(-1, -1)
 var _queue_panel: PanelContainer
 var _queue_box: VBoxContainer
 var _reaction: ReactionOverlay
+var _hit_fx: HitFX
 var _log_box: VBoxContainer
 var _log_scroll: ScrollContainer
 var _target_index := 0
@@ -83,7 +84,12 @@ func build(root: Control) -> void:
 	_reaction.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_reaction)
 
+	_hit_fx = HitFX.new()
+	_hit_fx.setup(content)
+	add_child(_hit_fx)
+
 	EventBus.log_message.connect(_on_log)
+	EventBus.damage_dealt.connect(_on_damage_dealt)
 	for line in battle.log:
 		_on_log(line)
 	_refresh_all()
@@ -93,6 +99,8 @@ func build(root: Control) -> void:
 func _exit_tree() -> void:
 	if EventBus.log_message.is_connected(_on_log):
 		EventBus.log_message.disconnect(_on_log)
+	if EventBus.damage_dealt.is_connected(_on_damage_dealt):
+		EventBus.damage_dealt.disconnect(_on_damage_dealt)
 
 
 # ---------------------------------------------------------------- 顶部：玩家 / 回合 / 敌人
@@ -222,9 +230,23 @@ func _build_left() -> Control:
 
 # ---------------------------------------------------------------- 中部：字盘
 func _build_center() -> Control:
+	var shell := Ink.vbox(6)
+	shell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	shell.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var heading := Ink.hbox(8)
+	heading.add_child(Ink.label("字盘", "Heading"))
+	var rule := Ink.label("四方字阵", "Muted")
+	rule.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	heading.add_child(rule)
+	heading.add_child(Ink.expander())
+	shell.add_child(heading)
+	var stage := Ink.stage_panel()
+	stage.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var pad := Ink.margin(10)
+	stage.add_child(pad)
 	var center := CenterContainer.new()
-	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	pad.add_child(center)
 	_board_view = BoardView.new()
 	_board_view.setup(battle.board)
 	_board_view.commit.connect(_on_commit)
@@ -232,7 +254,8 @@ func _build_center() -> Control:
 	_board_view.tile_picked.connect(_on_tile_picked)
 	_board_view.pick_cancelled.connect(_on_pick_cancelled)
 	center.add_child(_board_view)
-	return center
+	shell.add_child(stage)
+	return shell
 
 
 # ---------------------------------------------------------------- 右侧：战报
@@ -675,6 +698,8 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 		return
 	_board_view.clear_selection()
 	_refresh_all()
+	if result.word != null and _hit_fx != null:
+		_hit_fx.word_slam(result.word.word, Vector2(get_viewport_rect().size.x * 0.5, get_viewport_rect().size.y * 0.46))
 	_bubble.set_result(result.word, result.glyphs, result.messages)
 	if result.word != null:
 		_on_log("成词：%s" % result.word.word)
@@ -1215,6 +1240,9 @@ func _check_battle_over() -> void:
 		_finished = true
 		var victory := battle.is_victory()
 		GameState.player_hp = battle.player.hp
+		if victory and node != null and node.type == MapNodeData.Type.BOSS:
+			GameState.player_hp = GameState.player_max_hp
+			_on_log("幕末首领已破：回满生命")
 		EventBus.hp_changed.emit(GameState.player_hp, GameState.player_max_hp)
 		if victory:
 			GameState.add_captured(battle.captured_chars)
@@ -1247,6 +1275,34 @@ func _on_defeat_choice(index: int) -> void:
 		goto("res://src/screens/map_screen.gd")
 	else:
 		goto("res://src/screens/title_screen.gd")
+
+
+func _on_damage_dealt(target_is_player: bool, amount: int) -> void:
+	if _hit_fx == null or _finished:
+		return
+	if target_is_player:
+		# 玩家受击：全屏红闪 + 震动 + 玩家血条弹伤害数字
+		_hit_fx.flash_screen()
+		_hit_fx.add_trauma(amount)
+		var ppos := _player_hp.global_position + Vector2(_player_hp.size.x * 0.5, 2)
+		_hit_fx.damage_popup(ppos, amount, true)
+	else:
+		# 敌人受击：敌人卡闪白 + 震动 + 敌人卡弹伤害数字
+		_hit_fx.add_trauma(amount)
+		var card := _first_alive_enemy_card()
+		if card != null:
+			_hit_fx.flash_target(card)
+			var epos := card.global_position + Vector2(card.size.x * 0.5, 10)
+			_hit_fx.damage_popup(epos, amount, false)
+	if amount >= HitFX.HITSTOP_THRESHOLD:
+		_hit_fx.hit_stop()
+
+
+func _first_alive_enemy_card() -> Control:
+	for i in battle.enemies.size():
+		if battle.enemies[i].is_alive() and i < _enemy_widgets.size():
+			return _enemy_widgets[i]["card"]
+	return null
 
 
 func _float_at_enemy(text: String, color: Color) -> void:

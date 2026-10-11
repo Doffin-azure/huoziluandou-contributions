@@ -454,6 +454,15 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 				result.messages.append("精金：【%s】+1 金币" % inst_g.glyph())
 				_log("精金：【%s】+1 金币" % inst_g.glyph())
 
+	# 心力：每打出一颗【心】，叠加一层心力
+	if has_ability("heart_power"):
+		for c in consumed:
+			var inst_h: CharInstance = c.inst
+			if inst_h.glyph() == "心":
+				player.heart_power += 1
+				result.messages.append("心力：+1 层（当前 %d）" % player.heart_power)
+				_log("心力：+1 层（当前 %d）" % player.heart_power)
+
 	# 反复：本回合首次无效果单字出牌，在原格补 1 字
 	if glyphs.size() == 1 and effects.is_empty() and has_ability("repeat_zero") and ability_value("_repeat_used") == 0:
 		abilities["_repeat_used"] = 1
@@ -857,6 +866,14 @@ func _enemy_act(e: Combatant) -> void:
 		damage_dealt_this_turn += real_b
 		_check_bounty()
 
+	# 心蚀：敌方每次行动后扣等量层数的血（不衰减）
+	if e.is_alive() and e.status_stacks("heart_corrosion") > 0:
+		var hc := e.status_stacks("heart_corrosion")
+		var real_hc := e.take_damage(hc)
+		_log("心蚀：对 %s 造成 %d 伤害" % [e.display_name, real_hc])
+		damage_dealt_this_turn += real_hc
+		_check_bounty()
+
 
 # ---------------------------------------------------------------- 盘面操作（供 handler 调用）
 
@@ -1054,6 +1071,12 @@ func battle_card_counts() -> Dictionary:
 func apply_gravity() -> void:
 	return BattleOps.apply_gravity(self)
 
+func apply_gravity_left() -> void:
+	return BattleOps.apply_gravity_left(self)
+
+func apply_gravity_right() -> void:
+	return BattleOps.apply_gravity_right(self)
+
 func apply_gravity_count() -> int:
 	return BattleOps.apply_gravity_count(self)
 
@@ -1096,6 +1119,12 @@ func swap_cells(a: Vector2i, c: Vector2i) -> void:
 
 func destroy_2x2(top_left: Vector2i) -> int:
 	return BattleOps.destroy_2x2(self, top_left)
+
+func clear_board() -> int:
+	return BattleOps.clear_board(self)
+
+func converge_to(anchor: Vector2i) -> int:
+	return BattleOps.converge_to(self, anchor)
 
 func cleanse_board() -> int:
 	return BattleOps.cleanse_board(self)

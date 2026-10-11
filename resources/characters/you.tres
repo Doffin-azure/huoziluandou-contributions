@@ -5,20 +5,17 @@
 
 [sub_resource type="Resource" id="Resource_tvvcj"]
 script = ExtResource("2_lj5xh")
-handler = "shift_row"
-target = 11
-args = {
-"dir": 1
-}
-note = "选择一行，整行向右循环移动一格"
+handler = "gravity_right"
+target = 4
+note = "字盘按行向右重力"
 
 [resource]
 script = ExtResource("1_0fx7u")
 id = "you"
 glyph = "右"
 pinyin = "you"
-description = "选择一行，整行向右循环移动一格"
+description = "字盘按行向右重力"
 tags = Array[String](["space"])
 solo_effects = Array[ExtResource("2_lj5xh")]([SubResource("Resource_tvvcj")])
-solo_handler = "shift_row"
+solo_handler = "gravity_right"
 rarity = 1

@@ -180,6 +180,40 @@ static func apply_gravity(b: BattleState) -> void:
 			b.board.set_cell(x, y2, null)
 			y2 -= 1
 
+
+## 横向重力：每行向左压缩（字靠左对齐）。
+static func apply_gravity_left(b: BattleState) -> void:
+	for y in b.board.size:
+		var row: Array = []
+		for x in b.board.size:
+			var c := b.board.get_cell(x, y)
+			if c != null:
+				row.append(c)
+		var x2 := 0
+		for i in row.size():
+			b.board.set_cell(x2, y, row[i])
+			x2 += 1
+		while x2 < b.board.size:
+			b.board.set_cell(x2, y, null)
+			x2 += 1
+
+
+## 横向重力：每行向右压缩（字靠右对齐）。
+static func apply_gravity_right(b: BattleState) -> void:
+	for y in b.board.size:
+		var row: Array = []
+		for x in b.board.size:
+			var c := b.board.get_cell(x, y)
+			if c != null:
+				row.append(c)
+		var x2 := b.board.size - 1
+		for i in range(row.size() - 1, -1, -1):
+			b.board.set_cell(x2, y, row[i])
+			x2 -= 1
+		while x2 >= 0:
+			b.board.set_cell(x2, y, null)
+			x2 -= 1
+
 static func apply_gravity_count(b: BattleState) -> int:
 	# 记录移动前的列高度，计算真实移动的实体数
 	var before: Dictionary = {}
@@ -266,6 +300,69 @@ static func destroy_2x2(b: BattleState, top_left: Vector2i) -> int:
 			b.temp_chars.erase(inst)
 		b.board.clear_xy(pos)
 	return destroyed
+
+
+## 超重：清空整个字盘。己方实体字进弃字堆（可循环），敌方/临时字清除，不触发污染。
+static func clear_board(b: BattleState) -> int:
+	var cleared := 0
+	for i in b.board.cells.size():
+		var inst: CharInstance = b.board.cells[i]
+		if inst == null:
+			continue
+		cleared += 1
+		if inst.is_player_owned() and not inst.temporary:
+			if b.has_ability("blastproof"):
+				b.bag.append(inst)
+				b.player.add_persistent_block(1)
+				b._log("防爆：救回【%s】回字袋，持久盾 +1" % inst.glyph())
+			else:
+				b.discard.append(inst)
+		else:
+			b.temp_chars.erase(inst)
+		b.board.cells[i] = null
+	return cleared
+
+
+## 重心：所有字向锚点滑动聚拢。锚点字不动，其余逐字沿最短路径滑向锚点（先上下对齐、再左右对齐），
+## 被占即停；“左上优先”体现在：越靠左上的字越先滑动、越先占住更近的位置。
+static func converge_to(b: BattleState, anchor: Vector2i) -> int:
+	var n: int = b.board.size
+	# 收集非锚点字，按左上优先排序（行小优先，同行列小优先）
+	var items: Array = []
+	for y in n:
+		for x in n:
+			var p := Vector2i(x, y)
+			if p == anchor:
+				continue
+			var inst: CharInstance = b.board.get_xy(p)
+			if inst != null:
+				items.append({"p": p, "inst": inst})
+	var moved := 0
+	for it in items:
+		var cur: Vector2i = it.p
+		var inst: CharInstance = it.inst
+		b.board.set_xy(cur, null)
+		# 反复向锚点移动一格：优先减少垂直距离，再减少水平距离；目标格必须为空
+		while true:
+			var best: Vector2i = cur
+			var best_d: int = abs(cur.x - anchor.x) + abs(cur.y - anchor.y)
+			for dir in [Vector2i(0, -1), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(1, 0)]:
+				var np: Vector2i = cur + dir
+				if np.x < 0 or np.x >= n or np.y < 0 or np.y >= n:
+					continue
+				if b.board.get_xy(np) != null:
+					continue
+				var nd: int = abs(np.x - anchor.x) + abs(np.y - anchor.y)
+				if nd < best_d:
+					best = np
+					best_d = nd
+			if best == cur:
+				break
+			cur = best
+		b.board.set_xy(cur, inst)
+		if cur != it.p:
+			moved += 1
+	return moved
 
 
 ## 化合：把两张相邻的己方牌融合成一个占 1 格的复合单位（本场有效）。

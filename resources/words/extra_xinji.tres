@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_bmehk"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_ahm1b"]
+
+[sub_resource type="Resource" id="Resource_8hxs8"]
+script = ExtResource("1_bmehk")
+handler = "fill_board_full"
+note = "补满盘面"
+
+[sub_resource type="Resource" id="Resource_8we71"]
+script = ExtResource("1_bmehk")
+handler = "draw_penalty_next"
+amount = 3
+note = "下回合基础补字 -3"
+
+[resource]
+script = ExtResource("2_ahm1b")
+id = "extra_xinji"
+word = "心急"
+glyphs = Array[String](["心", "急"])
+description = "补满盘面，下回合基础补字 -3"
+effects = Array[ExtResource("1_bmehk")]([SubResource("Resource_8hxs8"), SubResource("Resource_8we71")])
+group = "流转"
+design_stage = "设计负责人新增"
+effect_summary = "补满盘面，下回合基础补字 -3"
+effect_handler_id = "fill_board_full"
+priority = "流转"
+implemented = true

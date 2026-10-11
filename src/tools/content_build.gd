@@ -43,6 +43,8 @@ static func handler_note(handler: String, amount: int, status: String, args: Dic
 		"cleanse_all": return "清除当前字盘的全部污染（所有权不变）"
 		"cleanse_adjacent": return "净化目标及其四邻的污染"
 		"gravity": return "全盘按列向下重力"
+		"gravity_left": return "全盘按行向左重力"
+		"gravity_right": return "全盘按行向右重力"
 		"rotate_2x2": return "顺时转旋转所选 2×2 区域"
 		"destroy_2x2": return "摧毁所选 2×2，每摧毁 1 字造成 %d 伤" % amount
 		"recover_consumed": return "从弃字堆回收本回合消耗的 1 枚字到袋顶"
@@ -81,6 +83,7 @@ static func status_name(id: String) -> String:
 		"next_extra": return "超载"
 		"burn": return "灼烧"
 		"poison": return "中毒"
+		"heart_corrosion": return "心蚀"
 		_: return id
 
 static func word_effects(word: String) -> Array:

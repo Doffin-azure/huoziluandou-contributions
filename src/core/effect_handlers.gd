@@ -135,6 +135,12 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"gravity":
 			b.apply_gravity()
 			return ["全盘向下重力"]
+		"gravity_left":
+			b.apply_gravity_left()
+			return ["全盘向左重力"]
+		"gravity_right":
+			b.apply_gravity_right()
+			return ["全盘向右重力"]
 		"gravity_damage":
 			var moved := b.apply_gravity_count()
 			var dmg4: int = amount + int(eff.args.get("per", 2)) * moved
@@ -258,6 +264,36 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			var destroyed := b.destroy_2x2(tile2)
 			var dmg5: int = amount * destroyed
 			return EffectUtil.damage(b, enemy, dmg5) + ["爆破摧毁 %d 枚字块" % destroyed]
+		"clear_board":
+			var cleared := b.clear_board()
+			var dmg_cb: int = amount * cleared
+			return EffectUtil.damage(b, enemy, dmg_cb) + ["超重：清空字盘 %d 枚，每枚 %d 伤" % [cleared, amount]]
+		"converge":
+			var anchor := EffectUtil.tile(ctx)
+			var moved := b.converge_to(anchor)
+			return ["重心：%d 枚字向锚点聚拢" % moved]
+		"ability_heart_power":
+			b.enable_ability("heart_power", 1)
+			return ["心力：本场持续——每打出一颗【心】叠加一层心力，可抵挡致命伤害"]
+		"fill_board_full":
+			var placed_fb := 0
+			while b.board.fill_count() < b.board.size * b.board.size:
+				if not b._draw_one():
+					break
+				placed_fb += 1
+			return ["心急：补满盘面（+%d 枚）" % placed_fb]
+		"heart_link":
+			if enemy == null:
+				return ["（无目标）"]
+			var avg_max := int((src.max_hp + enemy.max_hp) / 2)
+			src.max_hp = avg_max
+			enemy.max_hp = avg_max
+			GameState.player_max_hp = avg_max
+			var avg_hp := int((src.hp + enemy.hp) / 2)
+			src.hp = avg_hp
+			enemy.hp = avg_hp
+			GameState.player_hp = avg_hp
+			return ["心连心：双方生命上限与当前生命都平均为 %d（上限 %d，跨战保留）" % [avg_hp, avg_max]]
 		"ability_diagonal_next":
 			b.enable_ability("next_diagonal", 1)
 			return ["流利：下一次组词允许一步对角线（原型：仅记录）"]

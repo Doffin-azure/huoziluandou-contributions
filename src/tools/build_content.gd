@@ -25,7 +25,7 @@ const RES := "res://resources"
 const IMPORT := "res://data/import"
 
 ## 已裁撤内容（见 docs/裁撤记录.md）。总账不删行，生成时跳过。
-const CUT_GLYPHS := ["纯", "攻", "心", "剑", "雷", "毒", "愈"]
+const CUT_GLYPHS := ["纯", "攻", "剑", "雷", "毒", "愈"]
 const CUT_WORDS := ["纯化", "纯金", "纯利", "精纯", "强力反击"]
 
 ## 特殊交互（WordData.interaction）
@@ -132,6 +132,8 @@ func _build_statuses() -> void:
 		 "desc": "下一次多字词的即时效果额外执行一次。"},
 		{"id": "burn", "name": "灼烧", "glyph": "燃", "kind": 1, "color": "b0522e", "decay": 0,
 		 "desc": "接下来 2 次敌方行动各受到一次灼烧伤害。"},
+		{"id": "heart_corrosion", "name": "心蚀", "glyph": "蚀", "kind": 1, "color": "8a4a63", "decay": 0,
+		 "desc": "每回合损失等量层数的生命（不衰减）。"},
 	]
 	for d in defs:
 		var s: StatusData = StatusDataS.new()
@@ -169,14 +171,15 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"御": return {"h": "block_temp", "a": 2, "note": "获得 2 点临时格挡"}
 		"回": return {"h": "replace_self", "note": "在原位置随机换一枚字"}
 		"重": return {"h": "gravity", "target": EffectDataS.Target.BOARD, "note": "字盘按列向下重力"}
+		"心": return {"h": "heal", "a": 1, "note": "回复 1 生命"}
 		"清": return {"h": "cleanse_adjacent", "target": EffectDataS.Target.BOARD_TILE, "note": "净化一个四邻污染标记（保留字与所有权）"}
 		"反": return {"h": "damage", "a": 2, "note": "占位：造成 2 伤害（用户未确认）"}
 		"甲": return {"h": "block_temp", "a": 2, "note": "占位：获得 2 临时格挡（单字用途未定）"}
 		"盾": return {"h": "block_temp", "a": 3, "note": "占位：获得 3 临时格挡（反弹方案已撤回）"}
 		"破": return {"h": "damage", "a": 3, "note": "占位：造成 3 伤害（单字用途未定）"}
 		"再": return {"h": "repeat_last", "note": "单字：重复上一个词/字的最后一个字（临时）"}
-		"左": return {"h": "shift_row", "target": EffectDataS.Target.BOARD_ROW, "args": {"dir": -1}, "note": "选择一行，整行向左循环移动一格"}
-		"右": return {"h": "shift_row", "target": EffectDataS.Target.BOARD_ROW, "args": {"dir": 1}, "note": "选择一行，整行向右循环移动一格"}
+		"左": return {"h": "gravity_left", "target": EffectDataS.Target.BOARD, "note": "字盘按行向左重力"}
+		"右": return {"h": "gravity_right", "target": EffectDataS.Target.BOARD, "note": "字盘按行向右重力"}
 	return {}
 
 func _build_curated_characters() -> void:
@@ -238,7 +241,7 @@ func _build_curated_characters() -> void:
 		# 额外基础字（保护旧脚手架内容）
 		["攻", "gong", "gong", ["attack"], 2, false],
 		["剑", "jian", "jian", ["attack"], 3, false],
-		["心", "xin", "xin", ["utility"], 2, false],
+		["心", "xin", "xin", ["utility", "heal"], 1, false],
 		["愈", "yu2", "yu", ["utility"], 3, false],
 		["毒", "du", "du", ["attack"], 3, false],
 		["雷", "lei", "lei", ["attack"], 3, false],
@@ -551,6 +554,37 @@ func _build_extra_words() -> void:
 		[ContentBuild.e("wash_heat", 0, -1, "", "洗回污染【热】并冷却 2 点", {})]),
 		"%s/words/extra_liuhuo.tres" % RES)
 	print("  · 新增词：流速/火速/加急/蓄冷/冷热/超能/超能力/收回/收放/收息/加收/电力/电热/火电/火热/复电/流火（第二批）")
+
+	# 字网加边 · 第三批（清空字盘，每枚 5 伤；先清空再消耗，超/重自身也计入）
+	_save(_extra_list("extra_chaozhong", "超重", ["超", "重"], "空间", "",
+		"清空整个字盘，每个被清空的字造成 5 伤（己方字进弃字堆，敌方/临时字清除）",
+		[ContentBuild.e("clear_board", 5, -1, "", "清空整个字盘，每个被清空的字造成 5 伤（己方字进弃字堆，敌方/临时字清除）", {}, -1, "immediate", true)]),
+		"%s/words/extra_chaozhong.tres" % RES)
+	print("  · 新增词：超重（第三批）")
+
+	# 心系（设计负责人新增）
+	_save(_extra_list("extra_zhongxin", "重心", ["重", "心"], "空间", "",
+		"选择一个字，让所有字向它聚拢（冲突优先左上）",
+		[ContentBuild.e("converge", 0, EffectDataS.Target.BOARD_TILE, "", "选择一个字，让所有字向它聚拢（冲突优先左上）", {})]),
+		"%s/words/extra_zhongxin.tres" % RES)
+	_save(_extra_list("extra_xinli", "心力", ["心", "力"], "连携", "",
+		"能力牌：每打出一颗【心】，叠加一层心力；心力可抵挡一次致命伤害",
+		[ContentBuild.e("ability_heart_power", 1, -1, "", "能力牌：每打出一颗【心】叠加一层心力，可抵挡一次致命伤害", {}, -1, "persistent")]),
+		"%s/words/extra_xinli.tres" % RES)
+	_save(_extra_list("extra_xinji", "心急", ["心", "急"], "流转", "",
+		"补满盘面，下回合基础补字 -3",
+		[ContentBuild.e("fill_board_full", 0, -1, "", "补满盘面", {}),
+			ContentBuild.e("draw_penalty_next", 3, -1, "", "下回合基础补字 -3", {})]),
+		"%s/words/extra_xinji.tres" % RES)
+	_save(_extra_list("extra_xinshi", "心蚀", ["心", "蚀"], "连携", "",
+		"给敌人叠加 4 层【心蚀】：每回合损失等量层数的生命",
+		[ContentBuild.e("apply_status_enemy", 4, EffectDataS.Target.ENEMY, "heart_corrosion", "给敌人叠加 4 层【心蚀】", {})]),
+		"%s/words/extra_xinshi.tres" % RES)
+	_save(_extra_list("extra_xinlianxin", "心连心", ["心", "连", "心"], "空间", "",
+		"将你的生命上限与当前生命都和敌人平均（上限整场有效）",
+		[ContentBuild.e("heart_link", 0, EffectDataS.Target.ENEMY, "", "生命上限与当前生命都和敌人平均", {})]),
+		"%s/words/extra_xinlianxin.tres" % RES)
+	print("  · 新增词：重心/心力/心急/心蚀/心连心（心系）")
 
 func _extra(id: String, word: String, glyphs: Array, group: String, interaction: String, desc: String, effect: EffectData) -> WordData:
 	var w: WordData = WordDataS.new()

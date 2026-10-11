@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_gtuon"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_orj78"]
+
+[sub_resource type="Resource" id="Resource_obaxg"]
+script = ExtResource("1_gtuon")
+handler = "apply_status_enemy"
+amount = 4
+status_id = "heart_corrosion"
+note = "给敌人叠加 4 层【心蚀】"
+
+[resource]
+script = ExtResource("2_orj78")
+id = "extra_xinshi"
+word = "心蚀"
+glyphs = Array[String](["心", "蚀"])
+description = "给敌人叠加 4 层【心蚀】：每回合损失等量层数的生命"
+effects = Array[ExtResource("1_gtuon")]([SubResource("Resource_obaxg")])
+group = "连携"
+design_stage = "设计负责人新增"
+effect_summary = "给敌人叠加 4 层【心蚀】：每回合损失等量层数的生命"
+effect_handler_id = "apply_status_enemy"
+priority = "连携"
+implemented = true

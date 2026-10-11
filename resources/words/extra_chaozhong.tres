@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_bjikj"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_pywuq"]
+
+[sub_resource type="Resource" id="Resource_o3v8o"]
+script = ExtResource("1_bjikj")
+handler = "clear_board"
+amount = 5
+pre_consume = true
+note = "清空整个字盘，每个被清空的字造成 5 伤（己方字进弃字堆，敌方/临时字清除）"
+
+[resource]
+script = ExtResource("2_pywuq")
+id = "extra_chaozhong"
+word = "超重"
+glyphs = Array[String](["超", "重"])
+description = "清空整个字盘，每个被清空的字造成 5 伤（己方字进弃字堆，敌方/临时字清除）"
+effects = Array[ExtResource("1_bjikj")]([SubResource("Resource_o3v8o")])
+group = "空间"
+design_stage = "设计负责人新增"
+effect_summary = "清空整个字盘，每个被清空的字造成 5 伤（己方字进弃字堆，敌方/临时字清除）"
+effect_handler_id = "clear_board"
+priority = "空间"
+implemented = true

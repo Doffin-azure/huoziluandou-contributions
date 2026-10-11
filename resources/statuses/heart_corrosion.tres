@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://src/data/status_data.gd" id="1_8l0xc"]
+
+[resource]
+script = ExtResource("1_8l0xc")
+id = "heart_corrosion"
+name = "心蚀"
+glyph = "蚀"
+description = "每回合损失等量层数的生命（不衰减）。"
+kind = 1
+color = Color(0.5411765, 0.2901961, 0.3882353, 1)

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_uniyy"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_xo448"]
+
+[sub_resource type="Resource" id="Resource_22wvv"]
+script = ExtResource("2_xo448")
+handler = "heal"
+amount = 1
+note = "回复 1 生命"
+
+[resource]
+script = ExtResource("1_uniyy")
+id = "xin"
+glyph = "心"
+pinyin = "xin"
+description = "回复 1 生命"
+tags = Array[String](["utility", "heal"])
+solo_effects = Array[ExtResource("2_xo448")]([SubResource("Resource_22wvv")])
+solo_handler = "heal"
+rarity = 1
