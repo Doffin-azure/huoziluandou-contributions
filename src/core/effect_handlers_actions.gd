@@ -352,7 +352,11 @@ static func _transform_board(b: BattleState, ctx: Dictionary) -> Array:
 	return ["转化：将【%s】定向改为【%s】" % [old_glyph, chosen.glyph()]]
 
 static func _replace_self(b: BattleState, ctx: Dictionary) -> Array:
+	# 【回】固定用在它自己被打出的那一格（原位），不需要选目标
 	var tile: Vector2i = EffectUtil.tile(ctx)
+	var path: Array = ctx.get("path", [])
+	if not path.is_empty():
+		tile = path[0]
 	if b.board.get_xy(tile) != null:
 		return ["回：目标格已被占用"]
 	if b.bag.is_empty():

@@ -167,7 +167,7 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"防": return {"h": "block_temp", "a": 4, "note": "获得 4 点临时格挡"}
 		"护": return {"h": "block_persist", "a": 2, "note": "获得 2 点持久盾"}
 		"御": return {"h": "block_temp", "a": 2, "note": "获得 2 点临时格挡"}
-		"回": return {"h": "replace_self", "target": EffectDataS.Target.BOARD_TILE, "note": "在原位置随机换一枚字"}
+		"回": return {"h": "replace_self", "note": "在原位置随机换一枚字"}
 		"重": return {"h": "gravity", "target": EffectDataS.Target.BOARD, "note": "字盘按列向下重力"}
 		"清": return {"h": "cleanse_adjacent", "target": EffectDataS.Target.BOARD_TILE, "note": "净化一个四邻污染标记（保留字与所有权）"}
 		"反": return {"h": "damage", "a": 2, "note": "占位：造成 2 伤害（用户未确认）"}

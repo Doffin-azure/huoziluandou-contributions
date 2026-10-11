@@ -289,7 +289,7 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 		if first != null and first.data != null:
 			effects = first.data.solo_effects
 			if first.data.solo_handler == "replace_self":
-				effects = [_synthetic("replace_self", 1, EffectData.Target.BOARD_TILE)]
+				effects = [_synthetic("replace_self", 1, EffectData.Target.SELF)]
 
 	# 污染代价
 	var pollution_msgs := _apply_pollution(consumed)
@@ -402,6 +402,8 @@ func _filter_targetless(effects: Array) -> Array:
 	return out
 
 func _solo_requires_target(cd: CharacterData) -> int:
+	if cd.solo_handler == "cleanse_adjacent":
+		return EffectData.Target.BOARD_TILE
 	for e in cd.solo_effects:
 		if e.target in [EffectData.Target.BOARD_TILE, EffectData.Target.BOARD_2X2, EffectData.Target.EMPTY_TILE, EffectData.Target.ENEMY_GLYPH, EffectData.Target.DISCARD_GLYPH]:
 			return e.target

@@ -50,7 +50,6 @@ count = 2
 [sub_resource type="Resource" id="Resource_28ayj"]
 script = ExtResource("3_6npd1")
 handler = "replace_self"
-target = 5
 note = "在原位置随机换一枚字"
 
 [sub_resource type="Resource" id="Resource_mtd2g"]

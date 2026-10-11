@@ -6,7 +6,6 @@
 [sub_resource type="Resource" id="Resource_28ayj"]
 script = ExtResource("2_cx27r")
 handler = "replace_self"
-target = 5
 note = "在原位置随机换一枚字"
 
 [resource]

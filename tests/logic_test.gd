@@ -163,9 +163,9 @@ func _test_replace_self() -> void:
 	_place(b, 0, 0, "回")
 	var cd: CharacterData = Database.get_character_by_glyph("击")
 	b.bag.append(CharInstance.new(cd))
-	var r := b.try_play([Vector2i(0, 0)], {"tile": Vector2i(0, 0)})
+	var r := b.try_play([Vector2i(0, 0)])
 	_ok(r.ok and b.board.get_cell(0, 0) != null and b.board.get_cell(0, 0).glyph() != "回",
-		"原位被换成另一枚字")
+		"原位被换成另一枚字（无需选目标）")
 
 
 func _test_counter() -> void:
