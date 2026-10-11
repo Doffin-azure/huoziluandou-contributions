@@ -45,6 +45,16 @@ var last_played_glyphs: Array = []   ## 上一个出字的字形序列（供【�
 var blackout_requested: bool = false   ## 停电彩蛋：请求黑屏
 var end_turn_requested: bool = false    ## 急停：请求立即结束出字阶段
 var repeat_armed: bool = false          ## 重复：本回合第一次多字词是否可重演
+var formation_mode: bool = false        ## 合击：结阵（只登记不结算）
+var formation_queue: Array = []         ## 已登记待结算的词
+var reserved_cells: Array = []          ## 结阵中已被占用（锁定）的非【击】格
+var repeat_rotate_tile: Vector2i = Vector2i(-1, -1)  ## 转速：连续旋转的 2×2 锚点
+var repeat_rotate_count: int = 0
+var last_energy_spent: int = 0          ## 复电：上一条储能消耗词的花费
+var flow_row: int = -1                   ## 流速：本回合被指定的行
+var last_shift_row: int = -1             ## 电力：最近一次行位移
+var last_shift_dir: int = 0
+var _double_armed: bool = false          ## 超能力：本词出字前已武装
 
 func _init(p_rules: BattleRules) -> void:
 	rules = p_rules
@@ -66,6 +76,9 @@ func start(deck: Array, enemy_datas: Array, seed_value: int = -1) -> void:
 	blackout_requested = false
 	end_turn_requested = false
 	repeat_armed = false
+	formation_mode = false
+	formation_queue.clear()
+	reserved_cells.clear()
 	last_played_glyphs.clear()
 	board = BoardState.new(rules.board_size)
 	for c in deck:
@@ -134,15 +147,31 @@ func remove_from_battle_glyph(glyph: String) -> CharInstance:
 ## 本场还在循环中的牌（字袋 + 弃字堆）的字形计数，供炼化选牌。
 
 func add_heat(amount: int) -> int:
+	# 过冷：下一次获得的热度改为持久盾，且不生成过热污染
+	if amount > 0 and has_ability("next_heat_to_block"):
+		var mult := ability_value("next_heat_to_block", 2)
+		abilities.erase("next_heat_to_block")
+		player.add_persistent_block(amount * mult)
+		_log("过冷：%d 点热度转为 %d 持久盾" % [amount, amount * mult])
+		return player.heat
 	player.add_heat(amount)
 	if amount > 0 and player.heat > player.heat_capacity:
 		var overflow: int = player.heat - player.heat_capacity
 		# 只在“主动升温超过上限”时结算一次溢出（对应当前热量的超出量）
 		var already: int = int(abilities.get("_overflow_paid", 0))
 		var new_overflow: int = max(0, overflow - already)
+		# 蓄冷：抵消本应生成的污染【热】
+		if new_overflow > 0 and has_ability("overheat_shield"):
+			var saved := mini(ability_value("overheat_shield", 4), new_overflow)
+			new_overflow -= saved
+			abilities.erase("overheat_shield")
+			_log("蓄冷：抵消 %d 点过热污染" % saved)
 		if new_overflow > 0:
 			abilities["_overflow_paid"] = overflow
 			spawn_scorch_into_bag(new_overflow)
+			if has_ability("heat_pollution_damage"):
+				deal_damage(first_alive_enemy(), 5 * new_overflow, false)
+				_log("火热：%d 枚污染【热】造成 %d 伤" % [new_overflow, 5 * new_overflow])
 			if has_ability("electric_overload"):
 				add_energy(new_overflow)
 				deal_damage(first_alive_enemy(), 3 * new_overflow, false)
@@ -157,6 +186,35 @@ func add_heat(amount: int) -> int:
 
 func add_energy(amount: int) -> void:
 	player.add_energy(amount)
+
+
+## 消耗储能（电能：每累计消耗 2 点，随机空格生成临时【电】）
+func spend_energy(amount: int) -> void:
+	if amount <= 0:
+		return
+	player.energy = max(0, player.energy - amount)
+	last_energy_spent = amount
+	if has_ability("electric_material"):
+		abilities["_energy_spent"] = int(abilities.get("_energy_spent", 0)) + amount
+		while int(abilities.get("_energy_spent", 0)) >= 2:
+			abilities["_energy_spent"] = int(abilities["_energy_spent"]) - 2
+			_spawn_temp_dian()
+
+
+func _spawn_temp_dian() -> void:
+	var empties: Array = board.empty_indices()
+	if empties.is_empty():
+		return
+	var cd: CharacterData = Database.get_character_by_glyph("电")
+	if cd == null:
+		return
+	var inst := CharInstance.new(cd)
+	inst.owner = CharInstance.Owner.PLAYER
+	inst.temporary = true
+	var pos: Vector2i = empties[GameState.rng.randi_range(0, empties.size() - 1)]
+	board.set_xy(pos, inst)
+	temp_chars.append(inst)
+	_log("电能：消耗 2 储能，随机空格生成临时【电】")
 
 
 ## 战内获得金币（受安全阀限制）。返回实际获得。
@@ -233,6 +291,7 @@ func can_play() -> bool:
 func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 	var result := {"ok": false, "word": null, "glyphs": [], "solo": false, "reason": "",
 		"need_target": -1, "messages": [], "zero_effect": false, "not_implemented": false}
+	_double_armed = ability_value("double_next", 0) > 0
 	if path.is_empty():
 		result.reason = "未选择任何字"
 		return result
@@ -264,6 +323,14 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 				result.reason = "需要选择目标"
 				return result
 
+	# 合击·结阵：只登记、不消耗、不结算（打出【合击】本身也进队列）
+	var activates := _word_activates_formation(word)
+	if formation_mode or activates:
+		if activates:
+			formation_mode = true
+			_log("合击：进入结阵（之后打出的词（含合击本身）只登记，点「发动」一起结算）")
+		return _queue_play(path, target, word, glyphs)
+
 	# 采集消耗前的盘面信息（供蓄电等读取）
 	var tail_neighbors_own := 0
 	if path.size() > 0:
@@ -273,23 +340,65 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 			if c != null and c.is_player_owned() and not path.has(n):
 				tail_neighbors_own += 1
 
+	# 效果列表（先算出来，便于把“先结算”的效果提前）
+	var effects: Array = []
+	if word != null:
+		effects = word.effects
+	else:
+		var peek2: CharInstance = board.get_xy(path[0])
+		if peek2 != null and peek2.data != null:
+			effects = peek2.data.solo_effects
+			if peek2.data.solo_handler == "replace_self":
+				effects = [_synthetic("replace_self", 1, EffectData.Target.SELF)]
+	var pre: Array = []
+	var post: Array = []
+	for e in effects:
+		if e.pre_consume:
+			pre.append(e)
+		else:
+			post.append(e)
+
+	# 消耗前快照（“先摧毁再消耗”时补记被自己效果搬走的字）
+	var path_insts: Array = []
+	for pos in path:
+		var inst0: CharInstance = board.get_xy(pos)
+		if inst0 != null:
+			path_insts.append(inst0)
+
+	var ctx0 := {
+		"battle": self,
+		"source": player,
+		"glyphs": glyphs,
+		"target": target,
+		"target_index": int(target.get("target_index", 0)),
+		"word": word,
+		"path": path,
+		"tail_neighbors_own": tail_neighbors_own,
+		"consumed": [],
+	}
+	var pre_msgs: Array = []
+	if not pre.is_empty():
+		pre_msgs = EffectResolver.resolve_all(pre, ctx0)
+
 	# 消耗
 	var consumed := _consume_path(path)
+	var consumed_set := {}
+	for cc in consumed:
+		consumed_set[cc.inst] = true
+	for inst_p in path_insts:
+		if consumed_set.has(inst_p):
+			continue
+		consumed.append({"inst": inst_p, "kind": "real"})
+		if not consumed_this_turn.has(inst_p):
+			consumed_this_turn.append(inst_p)
 
 	result.ok = true
 	result.word = word
 	result.solo = glyphs.size() == 1
 	result.not_implemented = word != null and not word.implemented
-
-	var effects: Array = []
-	if word != null:
-		effects = word.effects
-	else:
-		var first: CharInstance = consumed[0].inst if not consumed.is_empty() else null
-		if first != null and first.data != null:
-			effects = first.data.solo_effects
-			if first.data.solo_handler == "replace_self":
-				effects = [_synthetic("replace_self", 1, EffectData.Target.SELF)]
+	result.messages.append_array(pre_msgs)
+	for pm in pre_msgs:
+		_log(pm)
 
 	# 污染代价
 	var pollution_msgs := _apply_pollution(consumed)
@@ -306,7 +415,9 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 		"tail_neighbors_own": tail_neighbors_own,
 		"consumed": consumed,
 	}
-	var msgs := EffectResolver.resolve_all(effects, ctx)
+	last_shift_row = -1
+	last_shift_dir = 0
+	var msgs := EffectResolver.resolve_all(post, ctx)
 	result.messages.append_array(msgs)
 	for m in msgs:
 		_log(m)
@@ -386,6 +497,46 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 		result.zero_effect = true
 		zero_effect_count += 1
 
+	# 流速：本回合指定的行，因本次出字腾出的空格立即从字袋补回
+	if flow_row >= 0:
+		var refilled := 0
+		for p in path:
+			if p.y == flow_row and board.get_xy(p) == null:
+				if draw_one_to(p) != null:
+					refilled += 1
+		if refilled > 0:
+			_log("流速：第 %d 行补回 %d 枚" % [flow_row + 1, refilled])
+	# 超能：下一条 3+ 字词可消耗储能，在被用字原格保留临时复制层
+	if ability_value("next_copy_layer", 0) > 0 and word != null and word.length() >= 3:
+		abilities.erase("next_copy_layer")
+		var kept := 0
+		for i in path.size():
+			if player.energy <= 0:
+				break
+			var cpos: Vector2i = path[i]
+			if board.get_xy(cpos) != null:
+				continue
+			var ccd: CharacterData = Database.get_character_by_glyph(str(glyphs[i]))
+			if ccd == null:
+				continue
+			spend_energy(1)
+			var cp := CharInstance.new(ccd)
+			cp.owner = CharInstance.Owner.PLAYER
+			cp.temporary = true
+			board.set_xy(cpos, cp)
+			temp_chars.append(cp)
+			kept += 1
+		if kept > 0:
+			_log("超能：保留 %d 个临时复制层" % kept)
+	# 电力：本词若位移了行列，可消耗 1 储能额外位移一次
+	if has_ability("instant_power") and last_shift_row >= 0 and player.energy > 0:
+		spend_energy(1)
+		var esr := last_shift_row
+		var esd := last_shift_dir
+		BattleOps.shift_row(self, esr, esd)
+		_log("电力：消耗 1 储能，额外位移第 %d 行" % (esr + 1))
+	last_shift_row = -1
+	last_shift_dir = 0
 	_apply_next_word_flags(word)
 	last_played_glyphs = glyphs.duplicate()
 	return result
@@ -405,7 +556,7 @@ func _solo_requires_target(cd: CharacterData) -> int:
 	if cd.solo_handler == "cleanse_adjacent":
 		return EffectData.Target.BOARD_TILE
 	for e in cd.solo_effects:
-		if e.target in [EffectData.Target.BOARD_TILE, EffectData.Target.BOARD_2X2, EffectData.Target.EMPTY_TILE, EffectData.Target.ENEMY_GLYPH, EffectData.Target.DISCARD_GLYPH]:
+		if e.target in [EffectData.Target.BOARD_TILE, EffectData.Target.BOARD_2X2, EffectData.Target.BOARD_3X3, EffectData.Target.BOARD_ROW, EffectData.Target.EMPTY_TILE, EffectData.Target.ENEMY_GLYPH, EffectData.Target.DISCARD_GLYPH]:
 			return e.target
 	return EffectData.Target.NONE
 
@@ -498,6 +649,19 @@ func _trigger_on_word_abilities(word: WordData) -> void:
 				var sb := ability_value("serial", 6)
 				abilities["next_serial_bonus"] = sb
 				_log("连载：下一次攻击 +%d 伤" % sb)
+	if has_ability("longword_draw") and word.length() >= 3:
+		var nk := draw_to_board(ability_value("longword_draw", 1))
+		_log("能力：打出长词，补 %d 字" % nk)
+	if ability_value("double_next", 0) > 0 and _double_armed:
+		abilities.erase("double_next")
+		_double_armed = false
+		if has_ability("accel"):
+			var na := draw_to_board(1)
+			add_heat(1)
+			_log("超能力：加速再触发，补 %d 字" % na)
+		if has_ability("longword_draw") and word.length() >= 3:
+			var nb := draw_to_board(ability_value("longword_draw", 1))
+			_log("超能力：能力再触发，补 %d 字" % nb)
 
 func _apply_next_word_flags(word: WordData) -> void:
 	if word == null:
@@ -528,12 +692,18 @@ func _apply_next_word_flags(word: WordData) -> void:
 
 func begin_player_turn(draw: bool = true) -> void:
 	turn += 1
+	formation_mode = false
+	formation_queue.clear()
+	reserved_cells.clear()
 	player.clear_block()
 	player.temp_funds = 0
 	words_played_this_turn.clear()
 	attack_words_this_turn = 0
 	drawn_this_turn = 0
 	consumed_this_turn.clear()
+	flow_row = -1
+	last_shift_row = -1
+	last_shift_dir = 0
 	damage_taken_last_turn = 0
 	damage_dealt_this_turn = 0
 	bounty_paid = false
@@ -555,6 +725,9 @@ func begin_player_turn(draw: bool = true) -> void:
 		draw_to_board(amount)
 	abilities.erase("split_mind")
 	abilities.erase("profit_share")
+	abilities.erase("inject_bounty")
+	abilities.erase("gold_to_shield")
+	abilities.erase("double_next")
 	repeat_armed = has_ability("repeat")
 	_tick_player_statuses()
 	_log("—— 第 %d 回合 ——" % turn)
@@ -572,10 +745,21 @@ func _tick_player_statuses() -> void:
 				player.add_status(sid, -sd.decay_per_turn)
 
 func end_player_turn() -> void:
+	# 结阵未发动：自动结算，避免丢掉已登记的牌
+	if formation_mode and not formation_queue.is_empty():
+		resolve_formation()
 	# 蓄能：回合结束若仍有可用多字词留在盘上
 	if has_ability("energy_idle") and _has_any_word_on_board():
 		add_energy(ability_value("energy_idle", 1))
 		_log("蓄能：储能 +%d" % ability_value("energy_idle", 1))
+
+	# 蓄热：回合结束热度 -2，每点转 1 储能（本词专享的"降温"，非全局自然冷却）
+	if has_ability("heat_to_energy"):
+		var cooled := mini(2, player.heat)
+		if cooled > 0:
+			player.heat -= cooled
+			add_energy(cooled)
+			_log("蓄热：热度 -%d，储能 +%d" % [cooled, cooled])
 
 	_log("玩家结束回合")
 	for e in enemies:
@@ -695,6 +879,133 @@ func collect_back(owner_deck: Array) -> void:
 
 var _spawn_pool: Array = []   ## 【分化】生长的字池缓存（BattleOps 使用）
 
+# ---------------------------------------------------------------- 合击·结阵
+func _word_activates_formation(w: WordData) -> bool:
+	if w == null:
+		return false
+	for e in w.effects:
+		if e.handler == "ability_shared_attack":
+			return true
+	return false
+
+
+func begin_formation() -> void:
+	formation_mode = true
+	if formation_queue.is_empty():
+		_log("合击：进入结阵（之后打出的词只登记，点「发动」一起结算）")
+
+
+func _queue_play(path: Array, target: Dictionary, word: WordData, glyphs: Array) -> Dictionary:
+	var res := {"ok": false, "word": word, "glyphs": glyphs, "solo": glyphs.size() == 1,
+		"queued": true, "reason": "", "messages": [], "zero_effect": false,
+		"not_implemented": word != null and not word.implemented}
+	# 锁定的字不能再用（【击】除外，可共享）
+	for p in path:
+		if reserved_cells.has(p):
+			res.queued = false
+			res.reason = "该字已用于本次结阵"
+			return res
+	var tail_neighbors_own := 0
+	if not path.is_empty():
+		var tail: Vector2i = path[path.size() - 1]
+		for n in board.neighbors(tail):
+			var c: CharInstance = board.get_xy(n)
+			if c != null and c.is_player_owned() and not path.has(n):
+				tail_neighbors_own += 1
+	for p in path:
+		var inst: CharInstance = board.get_xy(p)
+		if inst != null and inst.glyph() != "击" and not reserved_cells.has(p):
+			reserved_cells.append(p)
+	var effects: Array = []
+	if word != null:
+		effects = word.effects
+	else:
+		var inst0: CharInstance = board.get_xy(path[0])
+		if inst0 != null and inst0.data != null:
+			effects = inst0.data.solo_effects
+			if inst0.data.solo_handler == "replace_self":
+				effects = [_synthetic("replace_self", 1, EffectData.Target.SELF)]
+	formation_queue.append({
+		"word": word, "glyphs": glyphs.duplicate(), "path": path.duplicate(),
+		"target": target.duplicate(), "effects": effects.duplicate(),
+		"tail_neighbors_own": tail_neighbors_own,
+	})
+	res.ok = true
+	var label: String = word.word if word != null else str(glyphs[0])
+	res.messages = ["结阵登记：" + label]
+	_log("结阵登记：" + label)
+	return res
+
+
+func resolve_formation() -> void:
+	if formation_queue.is_empty():
+		formation_mode = false
+		reserved_cells.clear()
+		return
+	_log("—— 发动结阵（%d）——" % formation_queue.size())
+	var union: Dictionary = {}
+	for item in formation_queue:
+		var w: WordData = item.word
+		var glyphs: Array = item.glyphs
+		var tgt: Dictionary = item.get("target", {})
+		var ctx := {"battle": self, "source": player, "glyphs": glyphs, "target": tgt,
+			"target_index": int(tgt.get("target_index", 0)), "word": w, "path": item.path,
+			"tail_neighbors_own": int(item.get("tail_neighbors_own", 0)), "consumed": []}
+		var msgs := EffectResolver.resolve_all(item.effects, ctx)
+		for m in msgs:
+			_log(m)
+		# 强化：成词时额外触发单字效果
+		if w != null and not empowered_glyphs.is_empty():
+			for p in item.path:
+				var inst_e: CharInstance = board.get_xy(p)
+				if inst_e != null and inst_e.data != null and empowered_glyphs.has(inst_e.glyph()):
+					var solo := _filter_targetless(inst_e.data.solo_effects)
+					if not solo.is_empty():
+						var smsgs := EffectResolver.resolve_all(solo, {"battle": self, "source": player,
+							"glyphs": [inst_e.glyph()], "target": tgt, "target_index": int(tgt.get("target_index", 0)), "word": w})
+						for sm in smsgs:
+							_log("强化【%s】：%s" % [inst_e.glyph(), sm])
+		# 精金：镀金字参与多字词 +1 金币
+		if w != null and w.length() >= 2:
+			for p in item.path:
+				var inst_g: CharInstance = board.get_xy(p)
+				if inst_g != null and inst_g.gilded and earn_gold(1) > 0:
+					_log("精金：【%s】+1 金币" % inst_g.glyph())
+		if w != null:
+			words_played_this_turn.append(w.id)
+			if _is_attack_word(w):
+				attack_words_this_turn += 1
+				last_attack_word = w
+				last_attack_glyphs = glyphs.duplicate()
+				last_attack_effects = item.effects.duplicate()
+				last_attack_target = int(tgt.get("target_index", 0))
+		for p in item.path:
+			union[p] = true
+	# 消耗并集（【击】只算一次）
+	var consumed: Array = []
+	for p in union.keys():
+		var inst: CharInstance = board.get_xy(p)
+		if inst == null:
+			continue
+		if inst.temporary_uses > 0:
+			inst.temporary_uses -= 1
+			continue
+		if inst.is_enemy_owned() or inst.temporary:
+			temp_chars.erase(inst)
+		else:
+			discard.append(inst)
+			consumed_this_turn.append(inst)
+		board.clear_xy(p)
+		consumed.append({"inst": inst})
+	var poll := _apply_pollution(consumed)
+	for m in poll:
+		_log(m)
+	formation_queue.clear()
+	reserved_cells.clear()
+	formation_mode = false
+	_log("结阵结算完毕")
+
+
 # ---------------------------------------------------------------- 转发到 BattleOps（保持外部 API 不变）
 
 func draw_to_board(count: int) -> int:
@@ -719,7 +1030,11 @@ func take_revealed(uid: int) -> CharInstance:
 	return BattleOps.take_revealed(self, uid)
 
 func inject_enemy_glyphs(count: int, pollution_id: String) -> int:
-	return BattleOps.inject_enemy_glyphs(self, count, pollution_id)
+	var n: int = BattleOps.inject_enemy_glyphs(self, count, pollution_id)
+	if n > 0 and has_ability("inject_bounty"):
+		var g := earn_gold(n * 2)
+		_log("加收：敌人注入 %d 枚，获得 %d 金币" % [n, g])
+	return n
 
 func spawn_scorch_into_bag(count: int) -> int:
 	return BattleOps.spawn_scorch_into_bag(self, count)
@@ -744,6 +1059,40 @@ func apply_gravity_count() -> int:
 
 func rotate_2x2(top_left: Vector2i) -> void:
 	return BattleOps.rotate_2x2(self, top_left)
+
+
+## 转速：连续旋转（首次 + 后续「发动」）
+func start_repeat_rotate(tile: Vector2i) -> void:
+	repeat_rotate_tile = tile
+	repeat_rotate_count = 0
+	do_repeat_rotate()
+
+
+func do_repeat_rotate() -> int:
+	if repeat_rotate_tile.x < 0 or repeat_rotate_count >= 3:
+		return repeat_rotate_count
+	rotate_2x2(repeat_rotate_tile)
+	repeat_rotate_count += 1
+	if repeat_rotate_count >= 2:
+		add_heat(1)
+	_log("转速：旋转一次（%d/3）" % repeat_rotate_count)
+	return repeat_rotate_count
+
+
+func end_repeat_rotate() -> void:
+	repeat_rotate_tile = Vector2i(-1, -1)
+	repeat_rotate_count = 0
+
+func shift_row(row: int, dir: int) -> void:
+	last_shift_row = row
+	last_shift_dir = dir
+	return BattleOps.shift_row(self, row, dir)
+
+func rotate_3x3(anchor: Vector2i, dir: int) -> void:
+	return BattleOps.rotate_3x3(self, anchor, dir)
+
+func swap_cells(a: Vector2i, c: Vector2i) -> void:
+	return BattleOps.swap_cells(self, a, c)
 
 func destroy_2x2(top_left: Vector2i) -> int:
 	return BattleOps.destroy_2x2(self, top_left)

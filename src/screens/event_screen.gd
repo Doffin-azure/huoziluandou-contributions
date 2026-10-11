@@ -133,7 +133,7 @@ func _on_removed(ch: CharacterData) -> void:
 func _random_char(min_rarity: int, max_rarity: int) -> CharacterData:
 	var pool: Array = []
 	for c in Database.characters.values():
-		if c.is_pollution or c.pending_design or c.tags.has("enemy"):
+		if c.is_pollution or c.pending_design or c.tags.has("enemy") or c.tags.has("彩蛋"):
 			continue
 		if c.rarity >= min_rarity and c.rarity <= max_rarity:
 			pool.append(c)

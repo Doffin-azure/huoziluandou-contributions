@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_b5bel"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_i81co"]
+
+[sub_resource type="Resource" id="Resource_puvgw"]
+script = ExtResource("1_b5bel")
+handler = "damage"
+amount = 6
+note = "造成 6 点伤害"
+
+[sub_resource type="Resource" id="Resource_g4f0t"]
+script = ExtResource("1_b5bel")
+handler = "shift_row"
+target = 11
+args = {
+"dir": 1
+}
+note = "再选择一行向右循环移动一格"
+
+[resource]
+script = ExtResource("2_i81co")
+id = "extra_youji"
+word = "右击"
+glyphs = Array[String](["右", "击"])
+description = "造成 6 点伤害，再选择一行向右循环移动一格"
+effects = Array[ExtResource("1_b5bel")]([SubResource("Resource_puvgw"), SubResource("Resource_g4f0t")])
+group = "攻击"
+design_stage = "设计负责人新增"
+effect_summary = "造成 6 点伤害，再选择一行向右循环移动一格"
+effect_handler_id = "damage"
+requires_target = 11
+priority = "攻击"
+implemented = true

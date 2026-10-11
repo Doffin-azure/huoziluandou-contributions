@@ -19,6 +19,19 @@ var _path_bar: PathBar
 var _preview_glyphs: Label
 var _preview_effect: Label
 var _confirm_btn: Button
+var _ready_action: Dictionary = {}   ## 已选好、待【发动】执行的操作 {path, target}
+var _pending_target_kind: int = 0     ## 当前目标选择的类型（用于预览）
+var _place_two_active := false        ## 火急：正在放 2 枚
+var _place_two_cell1 := Vector2i(-1, -1)
+var _recover_active := false          ## 收复：正在放回弃字
+var _recover_pairs: Array = []
+var _recover_pick_uid := -1
+var _recover_bag_active := false      ## 收回：盘面字→袋顶，弃字→原格
+var _recover_bag_tile := Vector2i(-1, -1)
+var _move_active := false             ## 收放：把字移到空格
+var _move_from := Vector2i(-1, -1)
+var _queue_panel: PanelContainer
+var _queue_box: VBoxContainer
 var _reaction: ReactionOverlay
 var _log_box: VBoxContainer
 var _log_scroll: ScrollContainer
@@ -179,6 +192,17 @@ func _build_left() -> Control:
 	_path_bar = PathBar.new()
 	col.add_child(_path_bar)
 
+	_queue_panel = Ink.panel("PanelInset")
+	var qpad := Ink.margin(8)
+	_queue_panel.add_child(qpad)
+	var qcol := Ink.vbox(3)
+	qpad.add_child(qcol)
+	qcol.add_child(Ink.label("结阵队列", "Subheading"))
+	_queue_box = Ink.vbox(2)
+	qcol.add_child(_queue_box)
+	_queue_panel.visible = false
+	col.add_child(_queue_panel)
+
 	var rp := Ink.panel("PanelInset")
 	var rpad := Ink.margin(10)
 	rp.add_child(rpad)
@@ -244,12 +268,12 @@ func _build_bottombar() -> Control:
 	_confirm_btn = Ink.button("出字", true)
 	_confirm_btn.custom_minimum_size = Vector2(96, 42)
 	_confirm_btn.disabled = true
-	_confirm_btn.pressed.connect(func(): _on_commit(_board_view.path.duplicate()))
+	_confirm_btn.pressed.connect(_on_primary)
 	row.add_child(_confirm_btn)
 
 	var clear := Ink.button("清除")
 	clear.custom_minimum_size = Vector2(72, 42)
-	clear.pressed.connect(func(): _board_view.clear_selection())
+	clear.pressed.connect(_on_clear)
 	row.add_child(clear)
 
 	var deck := Ink.button("字袋")
@@ -282,8 +306,140 @@ func _refresh_all() -> void:
 	_refresh_enemies()
 	_refresh_player()
 	_refresh_piles()
+	_refresh_queue_panel()
+	_refresh_primary()
 	_turn_label.text = "回合 %d" % battle.turn
+	_board_view.reserved_cells = battle.reserved_cells.duplicate()
 	_board_view.rebuild()
+
+
+# ---------------------------------------------------------------- 统一主按钮（出字 / 发动）
+# 原则：只在“有待交付的操作”时出现【发动】，按它才执行；选对象 ≠ 执行。
+func _refresh_primary() -> void:
+	if _confirm_btn == null:
+		return
+	if not _ready_action.is_empty():
+		if _ready_action.get("repeat_rotate", false):
+			_confirm_btn.text = "发动（转速 %d/3）" % battle.repeat_rotate_count
+		else:
+			_confirm_btn.text = "发动"
+		_confirm_btn.disabled = false
+		return
+	if _board_view != null and _board_view.pick_mode != "":
+		_confirm_btn.text = "发动"
+		_confirm_btn.disabled = true
+		return
+	if battle.formation_mode:
+		_confirm_btn.text = "发动 (%d)" % battle.formation_queue.size()
+		_confirm_btn.disabled = battle.formation_queue.is_empty()
+		return
+	_confirm_btn.text = "出字"
+	_confirm_btn.disabled = _board_view == null or _board_view.path.is_empty()
+
+
+func _on_clear() -> void:
+	# 取消选中 / 取消待发动 / 退出目标选择
+	if _board_view.pick_mode != "":
+		_on_pick_cancelled()
+		_board_view.end_pick()
+		_refresh_primary()
+		return
+	if battle.repeat_rotate_tile.x >= 0:
+		battle.end_repeat_rotate()
+		_ready_action = {}
+		_refresh_all()
+		return
+	_board_view.clear_selection()
+	_ready_action = {}
+	_pending_target_kind = 0
+	_board_view.preview_cells = []
+	_board_view.rebuild()
+	_refresh_primary()
+
+
+func _on_primary() -> void:
+	if _finished:
+		return
+	if not _ready_action.is_empty():
+		var a := _ready_action
+		if a.get("repeat_rotate", false):
+			battle.do_repeat_rotate()
+			if battle.repeat_rotate_count >= 3:
+				battle.end_repeat_rotate()
+				_ready_action = {}
+			_refresh_all()
+			_check_battle_over()
+			return
+		_ready_action = {}
+		_on_commit(a.path, a.target)
+		return
+	if _board_view.pick_mode != "":
+		return
+	if battle.formation_mode and not battle.formation_queue.is_empty():
+		battle.resolve_formation()
+		_board_view.clear_selection()
+		_refresh_all()
+		_check_battle_over()
+		return
+	_on_commit(_board_view.path.duplicate())
+
+
+func _fill_ready(path: Array, target: Dictionary) -> void:
+	_pending_path = []
+	_ready_action = {"path": path, "target": target}
+	if _board_view != null:
+		_board_view.end_pick()
+		_board_view.preview_cells = _preview_cells(target)
+		_board_view.rebuild()
+	_refresh_primary()
+
+
+func _preview_cells(target: Dictionary) -> Array:
+	var out: Array = []
+	if _pending_target_kind == EffectData.Target.BOARD_ROW and target.has("row"):
+		var row: int = target["row"]
+		for x in battle.board.size:
+			out.append(Vector2i(x, row))
+		return out
+	if _pending_target_kind == EffectData.Target.BOARD_3X3 and target.has("tile"):
+		var a: Vector2i = target["tile"]
+		for dx in 3:
+			for dy in 3:
+				out.append(a + Vector2i(dx, dy))
+		return out
+	if target.has("tile2"):
+		out.append(target["tile"])
+		out.append(target["tile2"])
+	elif target.has("cell1"):
+		out.append(target["cell1"])
+		out.append(target["cell2"])
+	elif target.has("tile"):
+		var tile: Vector2i = target["tile"]
+		if _pending_target_kind == EffectData.Target.BOARD_2X2:
+			for dx in 2:
+				for dy in 2:
+					out.append(tile + Vector2i(dx, dy))
+		else:
+			out.append(tile)
+	return out
+
+
+func _refresh_queue_panel() -> void:
+	if _queue_panel == null:
+		return
+	var on := battle.formation_mode
+	_queue_panel.visible = on
+	if not on:
+		return
+	for c in _queue_box.get_children():
+		c.queue_free()
+	if battle.formation_queue.is_empty():
+		_queue_box.add_child(Ink.label("（空）拖动连词登记", "Muted"))
+		return
+	for item in battle.formation_queue:
+		var w: WordData = item.word
+		var label: String = w.word if w != null else str(item.glyphs[0])
+		_queue_box.add_child(Ink.label("· " + label, "Muted"))
 
 
 func _refresh_enemies() -> void:
@@ -378,13 +534,13 @@ func _on_selection_changed(path: Array, glyphs: Array, word: WordData) -> void:
 	if glyphs.is_empty():
 		_current_word = null
 		_bubble.set_idle(_preview_hint())
-		_confirm_btn.disabled = true
+		_refresh_primary()
 		return
 	_current_word = word
 	var text := ""
 	for g in glyphs:
 		text += str(g)
-	_confirm_btn.disabled = false
+	_refresh_primary()
 	if word != null and not Settings.drag_release_play:
 		_pop_confirm()
 
@@ -443,6 +599,9 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 		return
 	if _board_view.pick_mode != "":
 		return
+	if _board_view != null:
+		_board_view.preview_cells = []
+	_pending_target_kind = 0
 	if target.is_empty() and _current_word != null and not _current_word.interaction.is_empty():
 		match _current_word.interaction:
 			"reveal_pick_board":
@@ -459,6 +618,24 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 				return
 			"choose_same_pair":
 				_run_pair(path, "same")
+				return
+			"choose_row_pair":
+				_run_pair(path, "row")
+				return
+			"choose_any_pair":
+				_run_pair(path, "any")
+				return
+			"choose_place_two":
+				_run_place_two(path)
+				return
+			"choose_recover_two":
+				_run_recover_two(path)
+				return
+			"choose_recover_to_bag":
+				_run_recover_to_bag(path)
+				return
+			"choose_move":
+				_run_move(path)
 				return
 			"choose_glyph_gild":
 				_open_glyph_picker(path, "gild_glyph", GameState.glyph_counts(), "精金：选择要永久镀金的字")
@@ -486,6 +663,16 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 		_on_log("✗ " + str(result.reason))
 		_bubble.set_error(str(result.reason))
 		return
+	# 合击·结阵：只登记，不结算
+	if result.get("queued", false):
+		_board_view.clear_selection()
+		_refresh_all()
+		var gs: Array = result.glyphs
+		var qtext := ""
+		for g in gs:
+			qtext += str(g)
+		_bubble.set_text("结阵登记：《%s》" % qtext, "点「发动」与本回合其他词一起结算。", SpeechBubble.State.PREVIEW)
+		return
 	_board_view.clear_selection()
 	_refresh_all()
 	_bubble.set_result(result.word, result.glyphs, result.messages)
@@ -503,6 +690,10 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 		battle.end_turn_requested = false
 		_on_end_turn()
 		return
+	# 转速：结算后保留「发动」，可继续旋转（最多 3 次）
+	if battle.repeat_rotate_tile.x >= 0 and battle.repeat_rotate_count < 3:
+		_ready_action = {"repeat_rotate": true}
+		_refresh_primary()
 	_check_battle_over()
 
 
@@ -515,9 +706,16 @@ func _show_blackout() -> void:
 
 func _request_target(target_kind: int) -> void:
 	_on_log("请选择目标")
+	_pending_target_kind = target_kind
+	if _board_view != null:
+		_board_view.preview_cells = []
 	match target_kind:
 		EffectData.Target.BOARD_2X2:
 			_board_view.begin_pick("2x2")
+		EffectData.Target.BOARD_3X3:
+			_board_view.begin_pick("3x3")
+		EffectData.Target.BOARD_ROW:
+			_board_view.begin_pick("row")
 		EffectData.Target.EMPTY_TILE:
 			_board_view.begin_pick("empty")
 		EffectData.Target.ENEMY_GLYPH:
@@ -526,9 +724,73 @@ func _request_target(target_kind: int) -> void:
 			_board_view.begin_pick("any")
 		EffectData.Target.DISCARD_GLYPH:
 			_choose_discard()
+	_refresh_primary()
 
 
 func _on_tile_picked(pos: Vector2i) -> void:
+	if _recover_bag_active:
+		_recover_bag_tile = pos
+		_recover_bag_active = false
+		_board_view.end_pick()
+		var rlist := battle.discard_instances()
+		if rlist.is_empty():
+			var rp := _pending_path
+			_pending_path = []
+			_fill_ready(rp, {"tile": pos})
+			return
+		var ropts: Array = []
+		for d in rlist:
+			ropts.append({"text": "【%s】" % d["glyph"]})
+		ropts.append({"text": "（不替换，只回袋顶）"})
+		var rov := ChoiceOverlay.new()
+		rov.setup({"title": "收回：从弃字堆选一枚放入原格", "options": ropts})
+		rov.chose.connect(_on_recover_bag_chosen.bind(rlist))
+		rov.set_anchors_preset(Control.PRESET_FULL_RECT)
+		add_child(rov)
+		return
+	if _move_active:
+		if _move_from == Vector2i(-1, -1):
+			_move_from = pos
+			_board_view.begin_pick("empty")
+			_on_log("收放：选择目标空格")
+			return
+		var mp := _pending_path
+		var mf := _move_from
+		_move_active = false
+		_move_from = Vector2i(-1, -1)
+		_fill_ready(mp, {"tile": mf, "tile2": pos})
+		return
+	if _place_two_active:
+		if _place_two_cell1 == Vector2i(-1, -1):
+			_place_two_cell1 = pos
+			_board_view.begin_pick("empty")
+			_on_log("火急：选择第二个空格")
+			return
+		if pos == _place_two_cell1:
+			_board_view.begin_pick("empty")
+			_on_log("火急：两个空格不能相同")
+			return
+		var pp2 := _pending_path
+		_place_two_active = false
+		var c1p := _place_two_cell1
+		_place_two_cell1 = Vector2i(-1, -1)
+		_fill_ready(pp2, {"cell1": c1p, "cell2": pos})
+		return
+	if _recover_active:
+		if _recover_pick_uid < 0:
+			return
+		if not _recover_pairs.is_empty() and not battle.board.is_adjacent(_recover_pairs[0][1], pos):
+			_board_view.begin_pick("empty")
+			_on_log("收复：第二个空格必须与第一个相邻")
+			return
+		_recover_pairs.append([_recover_pick_uid, pos])
+		_recover_pick_uid = -1
+		if _recover_pairs.size() >= 2 or battle.discard_instances().is_empty():
+			_finish_recover()
+		else:
+			_board_view.end_pick()
+			_show_recover_pick(2)
+		return
 	if _merge_active:
 		if _merge_cell1 == Vector2i(-1, -1):
 			_merge_cell1 = pos
@@ -540,58 +802,185 @@ func _on_tile_picked(pos: Vector2i) -> void:
 			_on_log("合流：第二个空格必须与第一个相邻")
 			return
 		var mp := _pending_path
-		_pending_path = []
 		_merge_active = false
-		_on_commit(mp, {"cell1": _merge_cell1, "cell2": pos, "merge_bag_uid": _merge_bag_uid, "merge_discard_uid": _merge_discard_uid})
+		_fill_ready(mp, {"cell1": _merge_cell1, "cell2": pos, "merge_bag_uid": _merge_bag_uid, "merge_discard_uid": _merge_discard_uid})
 		return
 	if _pending_place_uid >= 0:
 		var pp := _pending_path
-		_pending_path = []
 		var uidp := _pending_place_uid
 		_pending_place_uid = -1
-		_on_commit(pp, {"tile": pos, "place_uid": uidp})
+		_fill_ready(pp, {"tile": pos, "place_uid": uidp})
 		return
 	if _fuse_stage == 1:
 		_fuse_first = pos
 		_fuse_stage = 2
-		_board_view.begin_pick("own")
-		_on_log("再选第二张（%s）" % ("与它相邻" if _pair_mode == "fuse" else "与它相同"))
+		_board_view.begin_pick("own" if (_pair_mode == "fuse" or _pair_mode == "same") else "any")
+		if _pair_mode == "row":
+			_on_log("再选同一行的第二格")
+		elif _pair_mode == "any":
+			_on_log("再选第二个格子（与第一个不同）")
+		else:
+			_on_log("再选第二张（%s）" % ("与它相邻" if _pair_mode == "fuse" else "与它相同"))
 		return
 	if _fuse_stage == 2:
 		var ok := false
 		if _pair_mode == "fuse":
 			ok = battle.board.is_adjacent(_fuse_first, pos)
+		elif _pair_mode == "row":
+			ok = pos != _fuse_first and pos.y == _fuse_first.y
+		elif _pair_mode == "any":
+			ok = pos != _fuse_first
 		else:
 			var c1: CharInstance = battle.board.get_xy(_fuse_first)
 			var c2: CharInstance = battle.board.get_xy(pos)
 			ok = c2 != null and pos != _fuse_first and c1 != null and c2.glyph() == c1.glyph()
 		if not ok:
-			_board_view.begin_pick("own")
-			_on_log("选择不合法，请重选第二张")
+			_board_view.begin_pick("own" if (_pair_mode == "fuse" or _pair_mode == "same") else "any")
+			_on_log("选择不合法，请重选第二格")
 			return
 		var fp := _pending_path
-		_pending_path = []
 		_fuse_stage = 0
-		_on_commit(fp, {"tile": _fuse_first, "tile2": pos})
+		_fill_ready(fp, {"tile": _fuse_first, "tile2": pos})
 		return
 	var path := _pending_path
-	_pending_path = []
 	if path.is_empty():
+		_pending_path = []
 		return
-	var t := {"tile": pos, "enemy_glyph": pos}
+	var t: Dictionary = {"tile": pos, "enemy_glyph": pos}
+	if _pending_target_kind == EffectData.Target.BOARD_ROW:
+		t["row"] = pos.y
 	if _transform_uid >= 0:
 		t["transform_uid"] = _transform_uid
 		t["chosen_uid"] = _transform_uid
 	_transform_uid = -1
-	_on_commit(path, t)
+	_fill_ready(path, t)
 
 
 func _run_pair(path: Array, mode: String) -> void:
 	_pending_path = path
 	_pair_mode = mode
 	_fuse_stage = 1
+	_board_view.begin_pick("own" if (mode == "fuse" or mode == "same") else "any")
+	if mode == "row":
+		_on_log("选择同一行的第一格")
+	elif mode == "any":
+		_on_log("选择第一个格子")
+	else:
+		_on_log("选择第一张己方牌")
+	_refresh_primary()
+
+
+func _run_recover_to_bag(path: Array) -> void:
+	_pending_path = path
+	_recover_bag_active = true
+	_recover_bag_tile = Vector2i(-1, -1)
 	_board_view.begin_pick("own")
-	_on_log("选择第一张己方牌")
+	_on_log("收回：选择要放回袋顶的己方字")
+	_refresh_primary()
+
+
+func _on_recover_bag_chosen(index: int, list: Array) -> void:
+	var path := _pending_path
+	_pending_path = []
+	var tile := _recover_bag_tile
+	if index < 0 or index >= list.size():
+		_fill_ready(path, {"tile": tile})
+		return
+	_fill_ready(path, {"tile": tile, "place_uid": int(list[index]["uid"])})
+
+
+func _run_move(path: Array) -> void:
+	_pending_path = path
+	_move_active = true
+	_move_from = Vector2i(-1, -1)
+	_board_view.begin_pick("any")
+	_on_log("收放：选择要移动的字")
+	_refresh_primary()
+
+
+func _run_place_two(path: Array) -> void:
+	var revealed := battle.reveal_from_bag(2)
+	if revealed.is_empty():
+		_on_log("火急：字袋为空")
+		return
+	_pending_path = path
+	_place_two_active = true
+	_place_two_cell1 = Vector2i(-1, -1)
+	_board_view.begin_pick("empty")
+	_on_log("火急：选择第一个空格")
+	_refresh_primary()
+
+
+func _run_recover_two(path: Array) -> void:
+	if battle.discard_instances().is_empty():
+		_on_log("收复：弃字堆为空")
+		return
+	_pending_path = path
+	_recover_active = true
+	_recover_pairs = []
+	_recover_pick_uid = -1
+	_show_recover_pick(1)
+	_refresh_primary()
+
+
+func _show_recover_pick(n: int) -> void:
+	var chosen: Dictionary = {}
+	for pr in _recover_pairs:
+		chosen[int(pr[0])] = true
+	var list: Array = []
+	for d in battle.discard_instances():
+		if not chosen.has(int(d["uid"])):
+			list.append(d)
+	if list.is_empty():
+		if _recover_pairs.is_empty():
+			_abort_recover()
+		else:
+			_finish_recover()
+		return
+	var options: Array = []
+	for d2 in list:
+		options.append({"text": "【%s】" % d2["glyph"]})
+	if n >= 2:
+		options.append({"text": "（就此打住）"})
+	var ov := ChoiceOverlay.new()
+	ov.setup({"title": "收复：选择第 %d 枚（最多 2 枚）" % n, "options": options})
+	ov.chose.connect(_on_recover_chosen.bind(list, n))
+	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(ov)
+
+
+func _on_recover_chosen(index: int, list: Array, n: int) -> void:
+	if not _recover_active:
+		return
+	if index < 0 or index >= list.size():
+		if n <= 1:
+			_abort_recover()
+		else:
+			_finish_recover()
+		return
+	_recover_pick_uid = int(list[index]["uid"])
+	_board_view.begin_pick("empty")
+	_on_log("收复：为第 %d 枚选择落点" % n)
+	_refresh_primary()
+
+
+func _finish_recover() -> void:
+	var path := _pending_path
+	_pending_path = []
+	_recover_active = false
+	var places: Array = _recover_pairs.duplicate()
+	_recover_pairs = []
+	_recover_pick_uid = -1
+	_fill_ready(path, {"places": places})
+
+
+func _abort_recover() -> void:
+	_recover_active = false
+	_recover_pairs = []
+	_recover_pick_uid = -1
+	_pending_path = []
+	_board_view.end_pick()
+	_refresh_primary()
 
 
 func _open_discard_place(path: Array) -> void:
@@ -617,6 +1006,7 @@ func _on_discard_place_chosen(index: int, list: Array) -> void:
 	_pending_place_uid = int(list[index]["uid"])
 	_board_view.begin_pick("empty")
 	_on_log("精铸：选择放置的空格")
+	_refresh_primary()
 
 
 func _on_pick_cancelled() -> void:
@@ -628,6 +1018,23 @@ func _on_pick_cancelled() -> void:
 	_pending_place_uid = -1
 	_merge_active = false
 	_merge_cell1 = Vector2i(-1, -1)
+	_place_two_active = false
+	_place_two_cell1 = Vector2i(-1, -1)
+	_recover_active = false
+	_recover_pairs = []
+	_recover_pick_uid = -1
+	_recover_bag_active = false
+	_recover_bag_tile = Vector2i(-1, -1)
+	_move_active = false
+	_move_from = Vector2i(-1, -1)
+	if battle.repeat_rotate_tile.x >= 0:
+		battle.end_repeat_rotate()
+	_ready_action = {}
+	_pending_target_kind = 0
+	if _board_view != null:
+		_board_view.preview_cells = []
+		_board_view.rebuild()
+	_refresh_primary()
 
 
 func _run_line_pick(path: Array) -> void:
@@ -692,6 +1099,7 @@ func _on_merge_discard_chosen(index: int, list: Array) -> void:
 	_merge_discard_uid = int(list[index]["uid"])
 	_board_view.begin_pick("empty")
 	_on_log("合流：选择第一个空格")
+	_refresh_primary()
 
 
 func _abort_merge() -> void:
@@ -728,6 +1136,7 @@ func _on_transform_chosen(index: int) -> void:
 		return
 	_transform_uid = battle.pending_reveal[index].uid
 	_board_view.begin_pick("any")
+	_refresh_primary()
 
 
 func _open_glyph_picker(path: Array, key: String, glyph_counts: Dictionary, title: String) -> void:

@@ -25,7 +25,7 @@ const RES := "res://resources"
 const IMPORT := "res://data/import"
 
 ## 已裁撤内容（见 docs/裁撤记录.md）。总账不删行，生成时跳过。
-const CUT_GLYPHS := ["纯"]
+const CUT_GLYPHS := ["纯", "攻", "心", "剑", "雷", "毒", "愈"]
 const CUT_WORDS := ["纯化", "纯金", "纯利", "精纯", "强力反击"]
 
 ## 特殊交互（WordData.interaction）
@@ -175,6 +175,8 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"盾": return {"h": "block_temp", "a": 3, "note": "占位：获得 3 临时格挡（反弹方案已撤回）"}
 		"破": return {"h": "damage", "a": 3, "note": "占位：造成 3 伤害（单字用途未定）"}
 		"再": return {"h": "repeat_last", "note": "单字：重复上一个词/字的最后一个字（临时）"}
+		"左": return {"h": "shift_row", "target": EffectDataS.Target.BOARD_ROW, "args": {"dir": -1}, "note": "选择一行，整行向左循环移动一格"}
+		"右": return {"h": "shift_row", "target": EffectDataS.Target.BOARD_ROW, "args": {"dir": 1}, "note": "选择一行，整行向右循环移动一格"}
 	return {}
 
 func _build_curated_characters() -> void:
@@ -199,6 +201,8 @@ func _build_curated_characters() -> void:
 		["超", "chao", "chao", ["utility"], 2, false],
 		["复", "fu", "fu", ["economy", "utility"], 1, false],
 		["转", "zhuan", "zhuan", ["space"], 1, false],
+		["左", "zuo", "zuo", ["space"], 1, false],
+		["右", "you", "you", ["space"], 1, false],
 		["清", "qing", "qing", ["flow"], 1, false],
 		["洗", "xi", "xi", ["flow"], 2, false],
 		["电", "dian", "dian", ["energy"], 1, false],
@@ -265,7 +269,7 @@ func _make_character(glyph: String, id: String, pinyin: String, tags: Array, rar
 	c.pending_design = pending
 	var spec := _solo_spec(glyph)
 	if not spec.is_empty():
-		var e := ContentBuild.e(spec.get("h", ""), int(spec.get("a", 0)), int(spec.get("target", -1)), "", spec.get("note", ""))
+		var e := ContentBuild.e(spec.get("h", ""), int(spec.get("a", 0)), int(spec.get("target", -1)), "", spec.get("note", ""), spec.get("args", {}))
 		c.solo_effects = _teffects([e])
 		c.solo_handler = spec.get("h", "")
 	if not desc.is_empty():
@@ -335,7 +339,7 @@ func _build_words_from_ledger() -> void:
 			var req := 0
 			var timing := "immediate"
 			for e in effects_list:
-				if e.target > req and e.target in [EffectDataS.Target.BOARD_TILE, EffectDataS.Target.BOARD_2X2, EffectDataS.Target.EMPTY_TILE, EffectDataS.Target.DISCARD_GLYPH, EffectDataS.Target.ENEMY_GLYPH]:
+				if e.target > req and e.target in [EffectDataS.Target.BOARD_TILE, EffectDataS.Target.BOARD_2X2, EffectDataS.Target.BOARD_3X3, EffectDataS.Target.BOARD_ROW, EffectDataS.Target.EMPTY_TILE, EffectDataS.Target.DISCARD_GLYPH, EffectDataS.Target.ENEMY_GLYPH]:
 					req = e.target
 				if e.timing != "immediate":
 					timing = e.timing
@@ -409,6 +413,145 @@ func _build_extra_words() -> void:
 		"%s/words/extra_kaideng.tres" % RES)
 	print("  · 彩蛋词：开灯（额外）")
 
+	# 方向与空间：左 / 右 / 左右 / 左转 / 右转 / 左击 / 右击（设计负责人新增）
+	_save(_extra_list("extra_zuoyou", "左右", ["左", "右"], "空间", "choose_row_pair",
+		"选择同一行里的任意两个格子，交换它们的位置",
+		[ContentBuild.e("swap_cells", 0, -1, "", "交换选中的两个格子", {})], -1),
+		"%s/words/extra_zuoyou.tres" % RES)
+	_save(_extra_list("extra_zuozhuan", "左转", ["左", "转"], "空间", "",
+		"选择一块 3×3 区域，将区域逆时针旋转 90°",
+		[ContentBuild.e("rotate_3x3", 0, EffectDataS.Target.BOARD_3X3, "", "3×3 区域逆时针旋转 90°", {"dir": -1})]),
+		"%s/words/extra_zuozhuan.tres" % RES)
+	_save(_extra_list("extra_youzhuan", "右转", ["右", "转"], "空间", "",
+		"选择一块 3×3 区域，将区域顺时针旋转 90°",
+		[ContentBuild.e("rotate_3x3", 0, EffectDataS.Target.BOARD_3X3, "", "3×3 区域顺时针旋转 90°", {"dir": 1})]),
+		"%s/words/extra_youzhuan.tres" % RES)
+	_save(_extra_list("extra_zuoji", "左击", ["左", "击"], "攻击", "",
+		"造成 6 点伤害，再选择一行向左循环移动一格",
+		[ContentBuild.e("damage", 6, -1, "", "造成 6 点伤害", {}),
+		 ContentBuild.e("shift_row", 0, EffectDataS.Target.BOARD_ROW, "", "再选择一行向左循环移动一格", {"dir": -1})],
+		EffectDataS.Target.BOARD_ROW),
+		"%s/words/extra_zuoji.tres" % RES)
+	_save(_extra_list("extra_youji", "右击", ["右", "击"], "攻击", "",
+		"造成 6 点伤害，再选择一行向右循环移动一格",
+		[ContentBuild.e("damage", 6, -1, "", "造成 6 点伤害", {}),
+		 ContentBuild.e("shift_row", 0, EffectDataS.Target.BOARD_ROW, "", "再选择一行向右循环移动一格", {"dir": 1})],
+		EffectDataS.Target.BOARD_ROW),
+		"%s/words/extra_youji.tres" % RES)
+	print("  · 新增词：左右/左转/右转/左击/右击（额外）")
+
+	# 字网加边 · 第一批（方向 / 空间 / 蓄放 / 流转）
+	_save(_extra_list("extra_zhuansu", "转速", ["转", "速"], "空间", "",
+		"选择一块 2×2 区域，点「发动」连续旋转；最多 3 次，第 2、3 次各增加 1 热度",
+		[ContentBuild.e("rotate_repeat", 0, EffectDataS.Target.BOARD_2X2, "", "选择 2×2，点「发动」每次旋转一次（最多 3 次）", {})]),
+		"%s/words/extra_zhuansu.tres" % RES)
+	_save(_extra_list("extra_nengli", "能力", ["能", "力"], "蓄放", "",
+		"本场持续：每成功打出一个三字及以上的词，额外随机补 1 字",
+		[ContentBuild.e("ability_longword_draw", 1, -1, "", "本场持续：3 字及以上词各补 1 字", {}, -1, "persistent")]),
+		"%s/words/extra_nengli.tres" % RES)
+	_save(_extra_list("extra_dianneng", "电能", ["电", "能"], "蓄放", "",
+		"本场持续：每累计消耗 2 点储能，就在随机空格生成一枚一次性临时【电】",
+		[ContentBuild.e("ability_electric_material", 1, -1, "", "本场持续：每消耗 2 储能生成临时【电】", {}, -1, "persistent")]),
+		"%s/words/extra_dianneng.tres" % RES)
+	_save(_extra_list("extra_xure", "蓄热", ["蓄", "热"], "蓄放", "",
+		"本场持续：回合结束时热度 -2，每降低 1 点获得 1 储能",
+		[ContentBuild.e("ability_heat_to_energy", 1, -1, "", "本场持续：回合结束热度 -2，每点转 1 储能", {}, -1, "persistent")]),
+		"%s/words/extra_xure.tres" % RES)
+	_save(_extra_list("extra_guoleng", "过冷", ["过", "冷"], "蓄放", "",
+		"立即清空热度；下一次本应获得的热度改为每点 +2 持久盾，且不生成过热污染",
+		[ContentBuild.e("overcool", 0, -1, "", "清空热度；下次获得的热度转为每点 +2 持久盾", {})]),
+		"%s/words/extra_guoleng.tres" % RES)
+	_save(_extra_list("extra_jizhuan", "急转", ["急", "转"], "空间", "choose_any_pair",
+		"选择盘上任意两个格子交换位置，并增加 2 热度",
+		[ContentBuild.e("swap_cells", 0, -1, "", "交换选中的两格", {}),
+		 ContentBuild.e("heat", 2, -1, "", "热度 +2", {})]),
+		"%s/words/extra_jizhuan.tres" % RES)
+	_save(_extra_list("extra_jiliu", "急流", ["急", "流"], "流转", "choose_line",
+		"选择一行或一列：其中的己方实体字洗回抽字袋，再向原位置随机补入相同数量的字",
+		[ContentBuild.e("reshuffle_line", 0, -1, "", "选一行/列：洗回实体字并原位随机补字", {})]),
+		"%s/words/extra_jiliu.tres" % RES)
+	_save(_extra_list("extra_huoji", "火急", ["火", "急"], "流转", "choose_place_two",
+		"立即从字袋抽 2 字并增加 2 热度；揭示后由玩家逐枚指定空格放入",
+		[ContentBuild.e("place_two", 0, -1, "", "把揭示的 2 枚字放进指定空格", {}),
+		 ContentBuild.e("heat", 2, -1, "", "热度 +2", {})]),
+		"%s/words/extra_huoji.tres" % RES)
+	_save(_extra_list("extra_shoufu", "收复", ["收", "复"], "流转", "choose_recover_two",
+		"从弃字堆选最多两枚己方实体字，直接放入字盘上两个彼此相邻的空格",
+		[ContentBuild.e("recover_two", 0, -1, "", "从弃字堆放回最多 2 枚到相邻空格", {})]),
+		"%s/words/extra_shoufu.tres" % RES)
+	print("  · 新增词：转速/能力/电能/蓄热/过冷/急转/急流/火急/收复（第一批）")
+
+	# 字网加边 · 第二批（蓄放 / 流转 / 经济）
+	_save(_extra_list("extra_liusu", "流速", ["流", "速"], "流转", "",
+		"选定一行：本回合每次打出涉及该行的词，都立即从字袋补回该行被腾出的空格",
+		[ContentBuild.e("flow_row", 0, EffectDataS.Target.BOARD_ROW, "", "选定一行：本回合该行腾出的空格立即补字", {})]),
+		"%s/words/extra_liusu.tres" % RES)
+	_save(_extra_list("extra_huosu", "火速", ["火", "速"], "流转", "",
+		"把盘面补到至少 12 字；每实际补入 1 字，增加 1 热度",
+		[ContentBuild.e("fill_board_heat", 0, -1, "", "补至 12 字，每枚 +1 热度", {})]),
+		"%s/words/extra_huosu.tres" % RES)
+	_save(_extra_list("extra_jiaji", "加急", ["加", "急"], "流转", "",
+		"立即从字袋补入 2 枚字（候选）",
+		[ContentBuild.e("next_draw_bonus_two", 0, -1, "", "立即补 2 字", {})]),
+		"%s/words/extra_jiaji.tres" % RES)
+	_save(_extra_list("extra_xuleng", "蓄冷", ["蓄", "冷"], "蓄放", "",
+		"获得一次性状态：下次过热时抵消最多 4 点污染【热】的溢出量",
+		[ContentBuild.e("overheat_shield", 0, -1, "", "下次过热抵消 4 点污染【热】", {})]),
+		"%s/words/extra_xuleng.tres" % RES)
+	_save(_extra_list("extra_lengre", "冷热", ["冷", "热"], "蓄放", "",
+		"立即消耗当前全部热度，每点转化为 2 点持久盾",
+		[ContentBuild.e("heat_to_persist_block", 0, -1, "", "消耗全部热度，每点 +2 持久盾", {})]),
+		"%s/words/extra_lengre.tres" % RES)
+	_save(_extra_list("extra_chaoneng", "超能", ["超", "能"], "蓄放", "",
+		"下一条三字及以上的词：可消耗储能，每消耗 1 点就在被用字的原格保留一个临时复制层",
+		[ContentBuild.e("next_copy_layer", 0, -1, "", "下一条 3+ 字词可耗储能保留临时复制层", {})]),
+		"%s/words/extra_chaoneng.tres" % RES)
+	_save(_extra_list("extra_chaonengli", "超能力", ["超", "能", "力"], "蓄放", "",
+		"本回合下一次已启动的持续能力触发时，效果结算两遍",
+		[ContentBuild.e("double_next_ability", 0, -1, "", "下一次持续能力触发结算两遍", {})]),
+		"%s/words/extra_chaonengli.tres" % RES)
+	_save(_extra_list("extra_shouhui", "收回", ["收", "回"], "流转", "choose_recover_to_bag",
+		"把盘上一枚己方实体字置于抽字袋顶，再从弃字堆选一枚放到原格",
+		[ContentBuild.e("recover_to_bag", 0, -1, "", "盘面字回袋顶，弃字补入原格", {})]),
+		"%s/words/extra_shouhui.tres" % RES)
+	_save(_extra_list("extra_shoufang", "收放", ["收", "放"], "空间", "choose_move",
+		"选择盘上一枚字或完整叠层，移动到任意空格，不交换其他字",
+		[ContentBuild.e("move_cell", 0, -1, "", "把选中字移动到空格", {})]),
+		"%s/words/extra_shoufang.tres" % RES)
+	_save(_extra_list("extra_shouxi", "收息", ["收", "息"], "经济", "",
+		"本回合每次花金币发动词效，同时获得等额持久盾",
+		[ContentBuild.e("gold_to_shield", 0, -1, "", "本回合花金币附等额持久盾", {})]),
+		"%s/words/extra_shouxi.tres" % RES)
+	_save(_extra_list("extra_jiashou", "加收", ["加", "收"], "经济", "",
+		"本回合敌人每往字盘塞入一枚污染字，获得 2 金币；污染照常存在",
+		[ContentBuild.e("inject_bounty", 0, -1, "", "本回合敌人注入污染字获得金币", {})]),
+		"%s/words/extra_jiashou.tres" % RES)
+	_save(_extra_list("extra_dianli", "电力", ["电", "力"], "蓄放", "",
+		"本场持续：每次行列位移后，可消耗 1 储能额外再位移一次",
+		[ContentBuild.e("instant_power", 0, -1, "", "本场持续：位移后可耗 1 储能再位移", {}, -1, "persistent")]),
+		"%s/words/extra_dianli.tres" % RES)
+	_save(_extra_list("extra_dianre", "电热", ["电", "热"], "蓄放", "",
+		"消耗当前全部储能，每点转为 1 热度与 3 点临挡（可能产生过热污染）",
+		[ContentBuild.e("energy_to_heat_block", 0, -1, "", "储能转热度与临挡", {})]),
+		"%s/words/extra_dianre.tres" % RES)
+	_save(_extra_list("extra_huodian", "火电", ["火", "电"], "蓄放", "",
+		"消耗当前全部热度，每 2 点获得 1 储能，并造成一次 5 点伤害",
+		[ContentBuild.e("heat_to_energy_damage", 0, -1, "", "热度转储能并造成 5 伤", {})]),
+		"%s/words/extra_huodian.tres" % RES)
+	_save(_extra_list("extra_huore", "火热", ["火", "热"], "蓄放", "",
+		"本场持续：每出现一枚污染【热】，就对敌人造成一次 5 点伤害",
+		[ContentBuild.e("heat_pollution_damage", 0, -1, "", "本场持续：污染【热】造成 5 伤", {}, -1, "persistent")]),
+		"%s/words/extra_huore.tres" % RES)
+	_save(_extra_list("extra_fudian", "复电", ["复", "电"], "蓄放", "",
+		"恢复上一条储能消耗词花费的一半储能，向下取整",
+		[ContentBuild.e("refund_energy_half", 0, -1, "", "恢复最近一次储能花费的一半", {})]),
+		"%s/words/extra_fudian.tres" % RES)
+	_save(_extra_list("extra_liuhuo", "流火", ["流", "火"], "流转", "",
+		"将盘上所有污染【热】洗回抽字袋，再冷却 2 点热度；腾出的空间保留",
+		[ContentBuild.e("wash_heat", 0, -1, "", "洗回污染【热】并冷却 2 点", {})]),
+		"%s/words/extra_liuhuo.tres" % RES)
+	print("  · 新增词：流速/火速/加急/蓄冷/冷热/超能/超能力/收回/收放/收息/加收/电力/电热/火电/火热/复电/流火（第二批）")
+
 func _extra(id: String, word: String, glyphs: Array, group: String, interaction: String, desc: String, effect: EffectData) -> WordData:
 	var w: WordData = WordDataS.new()
 	w.id = id
@@ -423,6 +566,33 @@ func _extra(id: String, word: String, glyphs: Array, group: String, interaction:
 	w.implemented = true
 	w.effect_handler_id = effect.handler
 	w.interaction = interaction
+	for g in w.glyphs:
+		_ensure_glyph(g)
+	return w
+
+
+func _extra_list(id: String, word: String, glyphs: Array, group: String, interaction: String, desc: String, effects: Array, requires_target := -1) -> WordData:
+	var w: WordData = WordDataS.new()
+	w.id = id
+	w.word = word
+	w.glyphs = _strs(glyphs)
+	w.group = group
+	w.design_stage = "设计负责人新增"
+	w.effect_summary = desc
+	w.description = desc
+	w.priority = group
+	w.effects = _teffects(effects)
+	w.implemented = true
+	w.effect_handler_id = effects[0].handler
+	w.interaction = interaction
+	if requires_target >= 0:
+		w.requires_target = requires_target
+	else:
+		var req := 0
+		for e in effects:
+			if e.target in [EffectDataS.Target.BOARD_TILE, EffectDataS.Target.BOARD_2X2, EffectDataS.Target.BOARD_3X3, EffectDataS.Target.BOARD_ROW, EffectDataS.Target.EMPTY_TILE, EffectDataS.Target.DISCARD_GLYPH, EffectDataS.Target.ENEMY_GLYPH]:
+				req = e.target
+		w.requires_target = req
 	for g in w.glyphs:
 		_ensure_glyph(g)
 	return w

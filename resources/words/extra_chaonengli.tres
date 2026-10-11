@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_8a7b0"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_x46cw"]
+
+[sub_resource type="Resource" id="Resource_264hq"]
+script = ExtResource("1_8a7b0")
+handler = "double_next_ability"
+note = "下一次持续能力触发结算两遍"
+
+[resource]
+script = ExtResource("2_x46cw")
+id = "extra_chaonengli"
+word = "超能力"
+glyphs = Array[String](["超", "能", "力"])
+description = "本回合下一次已启动的持续能力触发时，效果结算两遍"
+effects = Array[ExtResource("1_8a7b0")]([SubResource("Resource_264hq")])
+group = "蓄放"
+design_stage = "设计负责人新增"
+effect_summary = "本回合下一次已启动的持续能力触发时，效果结算两遍"
+effect_handler_id = "double_next_ability"
+priority = "蓄放"
+implemented = true

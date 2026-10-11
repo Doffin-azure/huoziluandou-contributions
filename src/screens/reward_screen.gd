@@ -58,7 +58,7 @@ func _header(is_boss: bool) -> Control:
 func _roll_options(is_boss: bool) -> Array:
 	var pool: Array = []
 	for c in Database.characters.values():
-		if c.is_pollution or c.pending_design or c.tags.has("enemy"):
+		if c.is_pollution or c.pending_design or c.tags.has("enemy") or c.tags.has("彩蛋"):
 			continue
 		if is_boss:
 			if c.rarity >= 1:

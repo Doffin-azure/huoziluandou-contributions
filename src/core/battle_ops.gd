@@ -208,6 +208,45 @@ static func rotate_2x2(b: BattleState, top_left: Vector2i) -> void:
 	b.board.set_xy(top_left + Vector2i(1, 1), tb)
 	b.board.set_xy(top_left + Vector2i(0, 1), tc)
 
+## 整行循环位移：dir = -1 向左 / +1 向右（每格移动 1 步，出界回绕）。
+static func shift_row(b: BattleState, row: int, dir: int) -> void:
+	var n: int = b.board.size
+	if row < 0 or row >= n or dir == 0:
+		return
+	var line: Array = []
+	for x in n:
+		line.append(b.board.get_xy(Vector2i(x, row)))
+	for x in n:
+		b.board.set_xy(Vector2i(x, row), line[(x - dir + n) % n])
+
+
+## 3×3 区域旋转：dir = -1 逆时针（左转）/ +1 顺时针（右转）。
+static func rotate_3x3(b: BattleState, anchor: Vector2i, dir: int) -> void:
+	var region: Array = []
+	for dy in 3:
+		for dx in 3:
+			region.append(b.board.get_xy(anchor + Vector2i(dx, dy)))
+	for dy in 3:
+		for dx in 3:
+			var sx: int
+			var sy: int
+			if dir > 0:
+				sx = dy
+				sy = 2 - dx
+			else:
+				sx = 2 - dy
+				sy = dx
+			b.board.set_xy(anchor + Vector2i(dx, dy), region[sy * 3 + sx])
+
+
+## 交换两格的内容（同行换位）。
+static func swap_cells(b: BattleState, a: Vector2i, c: Vector2i) -> void:
+	var ta: CharInstance = b.board.get_xy(a)
+	var tc: CharInstance = b.board.get_xy(c)
+	b.board.set_xy(a, tc)
+	b.board.set_xy(c, ta)
+
+
 static func destroy_2x2(b: BattleState, top_left: Vector2i) -> int:
 	var destroyed := 0
 	for off in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]:

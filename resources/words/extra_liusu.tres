@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_ac012"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_vywej"]
+
+[sub_resource type="Resource" id="Resource_m4ui3"]
+script = ExtResource("1_ac012")
+handler = "flow_row"
+target = 11
+note = "选定一行：本回合该行腾出的空格立即补字"
+
+[resource]
+script = ExtResource("2_vywej")
+id = "extra_liusu"
+word = "流速"
+glyphs = Array[String](["流", "速"])
+description = "选定一行：本回合每次打出涉及该行的词，都立即从字袋补回该行被腾出的空格"
+effects = Array[ExtResource("1_ac012")]([SubResource("Resource_m4ui3")])
+group = "流转"
+design_stage = "设计负责人新增"
+effect_summary = "选定一行：本回合每次打出涉及该行的词，都立即从字袋补回该行被腾出的空格"
+effect_handler_id = "flow_row"
+requires_target = 11
+priority = "流转"
+implemented = true

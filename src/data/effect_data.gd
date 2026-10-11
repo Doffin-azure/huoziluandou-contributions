@@ -54,6 +54,8 @@ enum Target {
 	DISCARD_GLYPH,   ## 指定弃字堆中的实体字
 	ENEMY_GLYPH,     ## 指定盘面敌方字
 	RANDOM_TILE,
+	BOARD_ROW,       ## 指定一整行（循环位移用）
+	BOARD_3X3,       ## 指定 3×3 左上角（旋转用）
 }
 
 @export var kind: Kind = Kind.DAMAGE
@@ -67,6 +69,8 @@ enum Target {
 @export var character_id: String = ""
 ## immediate / delayed / next_word / persistent
 @export var timing: String = "immediate"
+## true = 在消耗路径之前结算（如爆破：先摧毁 2×2 再消耗，自己的字也计入摧毁）
+@export var pre_consume: bool = false
 @export var args: Dictionary = {}
 @export_multiline var note: String = ""
 

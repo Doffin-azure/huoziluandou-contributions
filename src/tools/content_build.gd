@@ -5,7 +5,7 @@ class_name ContentBuild
 
 const EffectDataS := preload("res://src/data/effect_data.gd")
 
-static func e(handler: String, amount := 0, target := -1, status := "", note := "", args := {}, kind := -1, timing := "immediate") -> EffectData:
+static func e(handler: String, amount := 0, target := -1, status := "", note := "", args := {}, kind := -1, timing := "immediate", pre_consume := false) -> EffectData:
 	var e: EffectData = EffectDataS.new()
 	e.handler = handler
 	e.amount = amount
@@ -14,6 +14,7 @@ static func e(handler: String, amount := 0, target := -1, status := "", note := 
 	e.status_id = status
 	e.args = args
 	e.timing = timing
+	e.pre_consume = pre_consume
 	if kind >= 0:
 		e.kind = kind
 	e.note = note if not note.is_empty() else handler_note(handler, amount, status, args)
@@ -103,7 +104,7 @@ static func word_effects(word: String) -> Array:
 		# 连携
 		"连击": return [e("replay_last_attack", 0, -1, "", "重演上一个即时攻击词的效果", {}, -1, "immediate")]
 		"重击": return [e("gravity_damage", 6, T.ENEMY, "", "6 伤 + 重力移动的每枚字块 2 伤", {"per": 2})]
-		"合击": return [e("ability_shared_attack", 4, -1, "", "本回合后续攻击词共享【击】且每词 +4 伤", {}, -1, "persistent")]
+		"合击": return [e("ability_shared_attack", 0, -1, "", "进入结阵：之后打出的词只登记不结算，点「发动」一起结算；多词可共享同一枚【击】", {}, -1, "persistent")]
 		"回击": return [e("damage", 7), e("conditional_draw_after_attack", 1)]
 		"强力": return [e("apply_status_self", 2, T.SELF, "strength")]
 		"加强": return [e("apply_status_self", 2, T.SELF, "next_bonus")]
@@ -135,7 +136,7 @@ static func word_effects(word: String) -> Array:
 		"清热": return [e("heat_cleanse", 2, -1, "", "热度 -2 并清除灼热污染")] 
 		"热流": return [e("heat_to_damage_flow", 2, T.ENEMY, "", "按本回合补字数最多降 4 热，每实际降 1 热造成 2 伤", {"max": 4})]
 		"火爆": return [e("heat_burst", 8, T.ENEMY, "", "消耗全部热度，造成 8 + 4×热度伤害", {"per": 4})]
-		"爆破": return [e("destroy_2x2", 4, T.BOARD_2X2, "", "摧毁 2×2 区域，每摧毁 1 字造成 4 伤", {})]
+		"爆破": return [e("destroy_2x2", 4, T.BOARD_2X2, "", "摧毁 2×2 区域（含自己），每摧毁 1 字造成 4 伤", {}, -1, "immediate", true)]
 		"重载": return [e("ability_reload", 3, -1, "", "本场热容 +3，此后每回合基础补字 -1", {"draw_penalty": 1}, -1, "persistent")]
 		"加热": return [e("heat", 3)]
 		"急冷": return [e("heat_clear", 0), e("draw_penalty_next", 1)]

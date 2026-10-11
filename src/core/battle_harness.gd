@@ -200,13 +200,20 @@ func _needs_of(w: WordData) -> String:
 			"reveal_pick_board": return "tile"
 			"choose_glyph_empower", "choose_glyph_gild": return "glyph"
 			"choose_battle_card_remove": return "battle_card"
-			"choose_fuse_pair", "choose_same_pair": return "pair"
+			"choose_fuse_pair", "choose_same_pair", "choose_any_pair": return "pair"
+			"choose_row_pair": return "row_pair"
+			"choose_place_two": return "place_two"
+			"choose_recover_two": return "recover_two"
+			"choose_recover_to_bag": return "recover_to_bag"
+			"choose_move": return "move"
 			"choose_discard_place": return "discard"
 			"choose_line": return "line"
 			"choose_merge_flow": return "merge"
 	match w.requires_target:
 		EffectData.Target.BOARD_TILE: return "tile"
 		EffectData.Target.BOARD_2X2: return "2x2"
+		EffectData.Target.BOARD_3X3: return "3x3"
+		EffectData.Target.BOARD_ROW: return "row"
 		EffectData.Target.EMPTY_TILE: return "empty"
 		EffectData.Target.ENEMY_GLYPH: return "enemy"
 		EffectData.Target.DISCARD_GLYPH: return "discard"
@@ -326,8 +333,39 @@ func _auto_target(needs: String) -> Dictionary:
 			var empties: Array = b.board.empty_indices()
 			if not empties.is_empty():
 				return {"tile": empties[0]}
-		"2x2", "line":
+		"2x2", "3x3":
+			return {"tile": Vector2i(0, 0)}
+		"row", "line":
 			return {"tile": Vector2i(0, 0), "row": 0}
+		"row_pair":
+			for y in b.board.size:
+				var first: int = -1
+				for x in b.board.size:
+					if b.board.get_xy(Vector2i(x, y)) == null:
+						first = -1
+						continue
+					if first < 0:
+						first = x
+					else:
+						return {"tile": Vector2i(first, y), "tile2": Vector2i(x, y)}
+		"place_two":
+			var em: Array = b.board.empty_indices()
+			if em.size() >= 2:
+				return {"cell1": em[0], "cell2": em[1]}
+		"recover_two":
+			var dl: Array = b.discard_instances()
+			var em2: Array = b.board.empty_indices()
+			if not dl.is_empty() and not em2.is_empty():
+				return {"places": [[int(dl[0]["uid"]), em2[0]]]}
+		"recover_to_bag":
+			var dl2: Array = b.discard_instances()
+			var em3: Array = b.board.empty_indices()
+			if not dl2.is_empty() and not em3.is_empty():
+				return {"tile": em3[0], "place_uid": int(dl2[0]["uid"])}
+		"move":
+			var em4: Array = b.board.empty_indices()
+			if not em4.is_empty():
+				return {"tile": Vector2i(0, 0), "tile2": em4[0]}
 		"discard":
 			var list: Array = b.discard_instances()
 			if not list.is_empty():

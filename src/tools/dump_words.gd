@@ -48,6 +48,7 @@ func _target(w: WordData) -> String:
 			"choose_battle_card_remove": return "选本场 1 张牌"
 			"choose_fuse_pair": return "选 2 张相邻己方牌"
 			"choose_same_pair": return "选 2 张相同己方字"
+			"choose_row_pair": return "选同一行 2 格"
 			"choose_glyph_gild": return "选 1 个字永久镀金"
 			"choose_discard_place": return "选弃字堆 1 枚 → 选空格"
 			"choose_line": return "选 1 行 / 1 列"
@@ -61,7 +62,6 @@ func _target(w: WordData) -> String:
 		7: return "空格"
 		8: return "弃字堆"
 		9: return "敌方字"
-		_: return "—"
 
 
 func _effects(w: WordData) -> String:

@@ -8,7 +8,8 @@ script = ExtResource("1_rvmfa")
 handler = "destroy_2x2"
 amount = 4
 target = 6
-note = "摧毁 2×2 区域，每摧毁 1 字造成 4 伤"
+pre_consume = true
+note = "摧毁 2×2 区域（含自己），每摧毁 1 字造成 4 伤"
 
 [resource]
 script = ExtResource("2_3r5ji")

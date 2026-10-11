@@ -6,9 +6,8 @@
 [sub_resource type="Resource" id="Resource_kkapf"]
 script = ExtResource("1_xax0j")
 handler = "ability_shared_attack"
-amount = 4
 timing = "persistent"
-note = "本回合后续攻击词共享【击】且每词 +4 伤"
+note = "进入结阵：之后打出的词只登记不结算，点「发动」一起结算；多词可共享同一枚【击】"
 
 [resource]
 script = ExtResource("2_02qxn")

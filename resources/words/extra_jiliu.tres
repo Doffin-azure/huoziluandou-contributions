@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_tsnra"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_s6yna"]
+
+[sub_resource type="Resource" id="Resource_hhwdf"]
+script = ExtResource("1_tsnra")
+handler = "reshuffle_line"
+note = "选一行/列：洗回实体字并原位随机补字"
+
+[resource]
+script = ExtResource("2_s6yna")
+id = "extra_jiliu"
+word = "急流"
+glyphs = Array[String](["急", "流"])
+description = "选择一行或一列：其中的己方实体字洗回抽字袋，再向原位置随机补入相同数量的字"
+effects = Array[ExtResource("1_tsnra")]([SubResource("Resource_hhwdf")])
+group = "流转"
+design_stage = "设计负责人新增"
+effect_summary = "选择一行或一列：其中的己方实体字洗回抽字袋，再向原位置随机补入相同数量的字"
+effect_handler_id = "reshuffle_line"
+priority = "流转"
+implemented = true
+interaction = "choose_line"

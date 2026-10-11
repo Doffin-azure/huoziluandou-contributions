@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_3qan4"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_un1gi"]
+
+[sub_resource type="Resource" id="Resource_2d34l"]
+script = ExtResource("1_3qan4")
+handler = "rotate_3x3"
+target = 12
+args = {
+"dir": -1
+}
+note = "3×3 区域逆时针旋转 90°"
+
+[resource]
+script = ExtResource("2_un1gi")
+id = "extra_zuozhuan"
+word = "左转"
+glyphs = Array[String](["左", "转"])
+description = "选择一块 3×3 区域，将区域逆时针旋转 90°"
+effects = Array[ExtResource("1_3qan4")]([SubResource("Resource_2d34l")])
+group = "空间"
+design_stage = "设计负责人新增"
+effect_summary = "选择一块 3×3 区域，将区域逆时针旋转 90°"
+effect_handler_id = "rotate_3x3"
+requires_target = 12
+priority = "空间"
+implemented = true

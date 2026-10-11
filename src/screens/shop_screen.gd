@@ -59,7 +59,7 @@ func _roll_offers() -> Array:
 	var out: Array = []
 	var pool: Array = []
 	for c in Database.characters.values():
-		if not c.is_pollution and not c.pending_design and not c.tags.has("enemy") and c.rarity <= 2:
+		if not c.is_pollution and not c.pending_design and not c.tags.has("enemy") and not c.tags.has("彩蛋") and c.rarity <= 2:
 			pool.append(c)
 	var rng := GameState.rng
 	var picked: Array = []

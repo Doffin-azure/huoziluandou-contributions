@@ -40,12 +40,16 @@ static func pay(b: BattleState, cost: int) -> bool:
 	var from_temp: int = mini(b.player.temp_funds, cost)
 	b.player.temp_funds -= from_temp
 	var remain: int = cost - from_temp
+	var gold_spent := 0
 	if remain > 0 and b.has_ability("joint_funding"):
 		var sub: int = mini(int(b.player.energy / 2), remain)
-		b.player.energy -= sub * 2
+		b.spend_energy(sub * 2)
 		remain -= sub
 	if remain > 0:
+		gold_spent = remain
 		GameState.add_gold(-remain)
+	if gold_spent > 0 and b.has_ability("gold_to_shield"):
+		b.player.add_persistent_block(gold_spent)
 	return true
 
 static func simple_ability(b: BattleState, id: String, msg: String) -> Array:

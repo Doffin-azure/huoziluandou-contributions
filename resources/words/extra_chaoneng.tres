@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_jlku5"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_284oa"]
+
+[sub_resource type="Resource" id="Resource_y2ojm"]
+script = ExtResource("1_jlku5")
+handler = "next_copy_layer"
+note = "下一条 3+ 字词可耗储能保留临时复制层"
+
+[resource]
+script = ExtResource("2_284oa")
+id = "extra_chaoneng"
+word = "超能"
+glyphs = Array[String](["超", "能"])
+description = "下一条三字及以上的词：可消耗储能，每消耗 1 点就在被用字的原格保留一个临时复制层"
+effects = Array[ExtResource("1_jlku5")]([SubResource("Resource_y2ojm")])
+group = "蓄放"
+design_stage = "设计负责人新增"
+effect_summary = "下一条三字及以上的词：可消耗储能，每消耗 1 点就在被用字的原格保留一个临时复制层"
+effect_handler_id = "next_copy_layer"
+priority = "蓄放"
+implemented = true

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_2lwff"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_fcwcd"]
+
+[sub_resource type="Resource" id="Resource_hpehb"]
+script = ExtResource("1_2lwff")
+handler = "heat_to_energy_damage"
+note = "热度转储能并造成 5 伤"
+
+[resource]
+script = ExtResource("2_fcwcd")
+id = "extra_huodian"
+word = "火电"
+glyphs = Array[String](["火", "电"])
+description = "消耗当前全部热度，每 2 点获得 1 储能，并造成一次 5 点伤害"
+effects = Array[ExtResource("1_2lwff")]([SubResource("Resource_hpehb")])
+group = "蓄放"
+design_stage = "设计负责人新增"
+effect_summary = "消耗当前全部热度，每 2 点获得 1 储能，并造成一次 5 点伤害"
+effect_handler_id = "heat_to_energy_damage"
+priority = "蓄放"
+implemented = true

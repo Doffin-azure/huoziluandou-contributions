@@ -13,6 +13,8 @@ var tiles: Array = []          ## Array[TileView]
 var path: Array = []           ## Array[Vector2i]
 
 var pick_mode: String = ""     ## "" / "any" / "empty" / "2x2" / "enemy"
+var reserved_cells: Array = []   ## 结阵中被锁定的格（置暗）
+var preview_cells: Array = []    ## 待发动目标的高亮预览
 
 var _grid: GridContainer
 var _tray: PanelContainer
@@ -78,8 +80,8 @@ func rebuild() -> void:
 	for t in tiles:
 		var inst: CharInstance = board.get_xy(t.grid_pos)
 		t.set_instance(inst)
-		t.set_selected(path.has(t.grid_pos))
-		t.set_dimmed(not _interactable)
+		t.set_selected(path.has(t.grid_pos) or preview_cells.has(t.grid_pos))
+		t.set_dimmed((not _interactable) or reserved_cells.has(t.grid_pos))
 	if not pick_mode.is_empty():
 		_apply_pick_highlight()
 
@@ -197,6 +199,10 @@ func _valid_pick(pos: Vector2i) -> bool:
 			return c2 != null and c2.is_player_owned()
 		"2x2":
 			return pos.x >= 0 and pos.y >= 0 and pos.x <= board.size - 2 and pos.y <= board.size - 2
+		"3x3":
+			return pos.x >= 0 and pos.y >= 0 and pos.x <= board.size - 3 and pos.y <= board.size - 3
+		"row":
+			return pos.y >= 0 and pos.y < board.size
 	return false
 
 

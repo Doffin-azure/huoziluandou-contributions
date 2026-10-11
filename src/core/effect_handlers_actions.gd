@@ -176,6 +176,112 @@ static func _precision_place(b: BattleState, ctx: Dictionary, eff: EffectData) -
 	b.board.set_xy(tile, inst)
 	return ["精铸：支付 %d，将【%s】放入指定空格" % [cost, inst.glyph()]]
 
+## 急流：选一行/列，将己方实体字洗回字袋，再向原位置随机补入相同数量。
+static func _reshuffle_line(b: BattleState, ctx: Dictionary) -> Array:
+	var t: Dictionary = ctx.get("target", {})
+	var positions: Array = []
+	if t.has("row"):
+		var row: int = int(t["row"])
+		for x in b.board.size:
+			positions.append(Vector2i(x, row))
+	elif t.has("col"):
+		var col: int = int(t["col"])
+		for y in b.board.size:
+			positions.append(Vector2i(col, y))
+	else:
+		return ["急流：请选择一行或一列"]
+	var returned: Array = []
+	for p in positions:
+		var inst: CharInstance = b.board.get_xy(p)
+		if inst != null and inst.is_player_owned() and not inst.temporary:
+			returned.append(inst)
+			b.board.clear_xy(p)
+	for inst2 in returned:
+		b.bag.append(inst2)
+	if not returned.is_empty():
+		b._shuffle(b.bag)
+	var filled := 0
+	for p2 in positions:
+		if b.board.get_xy(p2) != null:
+			continue
+		if b.bag.is_empty():
+			break
+		b.board.set_xy(p2, b.bag.pop_back())
+		filled += 1
+	return ["急流：洗回 %d 枚，原格补入 %d 枚" % [returned.size(), filled]]
+
+
+## 火急：把揭示的 2 枚字放进指定空格。
+static func _place_two(b: BattleState, ctx: Dictionary) -> Array:
+	var t: Dictionary = ctx.get("target", {})
+	var cells: Array = [t.get("cell1", Vector2i(-1, -1)), t.get("cell2", Vector2i(-1, -1))]
+	var reveal: Array = b.pending_reveal
+	var placed := 0
+	for i in mini(reveal.size(), 2):
+		var inst: CharInstance = reveal[i]
+		if inst == null:
+			continue
+		if b.board.get_xy(cells[i]) != null:
+			continue
+		inst.owner = CharInstance.Owner.PLAYER
+		b.board.set_xy(cells[i], inst)
+		placed += 1
+	b.pending_reveal = []
+	return ["火急：补入 %d 字（热度 +2）" % placed]
+
+
+## 收复：把弃字堆中的 1～2 枚己方实体字放回指定空格。
+static func _recover_two(b: BattleState, ctx: Dictionary) -> Array:
+	var t: Dictionary = ctx.get("target", {})
+	var places: Array = t.get("places", [])
+	var placed := 0
+	for item in places:
+		var uid: int = int(item[0])
+		var cell: Vector2i = item[1]
+		if b.board.get_xy(cell) != null:
+			continue
+		var inst: CharInstance = b.take_from_discard_by_uid(uid)
+		if inst == null:
+			continue
+		inst.owner = CharInstance.Owner.PLAYER
+		b.board.set_xy(cell, inst)
+		placed += 1
+	return ["收复：从弃字堆放回 %d 枚" % placed]
+
+
+## 收回：把盘上一枚己方实体字置于字袋顶，再从弃字堆放一枚到原格。
+static func _recover_to_bag(b: BattleState, ctx: Dictionary) -> Array:
+	var t: Dictionary = ctx.get("target", {})
+	var tile: Vector2i = t.get("tile", Vector2i(-1, -1))
+	var inst: CharInstance = b.board.get_xy(tile)
+	if inst == null or not inst.is_player_owned():
+		return ["收回：请选择一枚己方实体字"]
+	b.board.clear_xy(tile)
+	b.bag.append(inst)
+	var uid: int = int(t.get("place_uid", -1))
+	var di: CharInstance = b.take_from_discard_by_uid(uid)
+	if di != null:
+		di.owner = CharInstance.Owner.PLAYER
+		b.board.set_xy(tile, di)
+		return ["收回：【%s】回袋顶，从弃字堆放入【%s】" % [inst.glyph(), di.glyph()]]
+	return ["收回：【%s】回袋顶" % inst.glyph()]
+
+
+## 收放：把盘上一枚字移动到任意空格。
+static func _move_cell(b: BattleState, ctx: Dictionary) -> Array:
+	var t: Dictionary = ctx.get("target", {})
+	var a: Vector2i = t.get("tile", Vector2i(-1, -1))
+	var c: Vector2i = t.get("tile2", Vector2i(-1, -1))
+	var inst: CharInstance = b.board.get_xy(a)
+	if inst == null:
+		return ["收放：请选择要移动的字"]
+	if b.board.get_xy(c) != null:
+		return ["收放：目标格已被占用"]
+	b.board.clear_xy(a)
+	b.board.set_xy(c, inst)
+	return ["收放：将【%s】移动一格" % inst.glyph()]
+
+
 static func _split_mind(b: BattleState) -> Array:
 	b.enable_ability("split_mind", 1)
 	return ["精分：本回合敌我攻击都打向自己……"]
