@@ -1,6 +1,4 @@
-# 反应图（可选）
+# 反应图
 
-放一张 `invalid_word.png` 到这里，打出**无效词**时会用它替换程序化的“惊讶脸”
-（`src/ui/shocked_face.gd`），显示约 0.6 秒。
-
-> 版权注意：正式商用请使用原创或已授权素材。图片文件已被 `.gitignore` 忽略，不会进仓库。
+`invalid_word.jpg` = 打出**无效词**时右上角弹约 0.6 秒的“这家伙在说什么呢”。
+想换图：替换成 `invalid_word.png` / `.jpg` / `.webp` 均可（`src/ui/reaction_overlay.gd` 按候选列表加载）。

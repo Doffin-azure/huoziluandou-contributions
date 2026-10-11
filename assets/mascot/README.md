@@ -1,6 +1,5 @@
-# 吉祥物（可选）
+# 吉祥物
 
-放一张 `whale.png` 到这里，界面会用贴图替换程序化的蓝鲸占位（`src/ui/mascot_view.gd`）。
-建议：透明底 PNG，方形或横版，边长 ≥ 256。
-
-> 图片文件已被 `.gitignore` 忽略，不会进仓库（避免把来源不明的图提交上去）。
+`mascot.png` = 界面左下角气泡框旁的蓝发 chibi（本项目为玩梗 demo，素材直接使用参考图）。
+想换图：替换 `mascot.png`（或放 `mascot.jpg` / `mascot.webp`），`src/ui/mascot_view.gd` 会按候选列表自动加载；
+没有图片时退回程序化占位。

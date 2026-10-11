@@ -17,8 +17,8 @@ func _ready() -> void:
 	_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	_panel.offset_left = -320
 	_panel.offset_right = -20
-	_panel.offset_top = 92
-	_panel.offset_bottom = 92 + 108
+	_panel.offset_top = 124
+	_panel.offset_bottom = 124 + 108
 	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_panel.visible = false
 	var psb := (_panel.get_theme_stylebox("panel") as StyleBoxFlat).duplicate()
@@ -43,6 +43,20 @@ func _ready() -> void:
 		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		tr.set_anchors_preset(Control.PRESET_FULL_RECT)
 		face_holder.add_child(tr)
+	elif ResourceLoader.exists("res://assets/reactions/invalid_word.jpg"):
+		var tr2 := TextureRect.new()
+		tr2.texture = load("res://assets/reactions/invalid_word.jpg")
+		tr2.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr2.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		tr2.set_anchors_preset(Control.PRESET_FULL_RECT)
+		face_holder.add_child(tr2)
+	elif ResourceLoader.exists("res://assets/reactions/invalid_word.webp"):
+		var tr3 := TextureRect.new()
+		tr3.texture = load("res://assets/reactions/invalid_word.webp")
+		tr3.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr3.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		tr3.set_anchors_preset(Control.PRESET_FULL_RECT)
+		face_holder.add_child(tr3)
 	else:
 		var face := ShockedFace.new()
 		face.set_anchors_preset(Control.PRESET_FULL_RECT)

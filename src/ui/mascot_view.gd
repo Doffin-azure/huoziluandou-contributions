@@ -9,14 +9,24 @@ const BLUE_LIGHT := Color("7fa0e0")
 const BELLY := Color("cfe0ff")
 const EYE := Color("141c33")
 
+const MASCOT_CANDIDATES := [
+	"res://assets/mascot/mascot.png",
+	"res://assets/mascot/mascot.jpg",
+	"res://assets/mascot/mascot.webp",
+	"res://assets/mascot/whale.png",
+	"res://assets/mascot/whale.jpg",
+]
+
 var _tex: Texture2D
 
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(120, 104)
+	custom_minimum_size = Vector2(140, 128)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if ResourceLoader.exists("res://assets/mascot/whale.png"):
-		_tex = load("res://assets/mascot/whale.png")
+	for p in MASCOT_CANDIDATES:
+		if ResourceLoader.exists(p):
+			_tex = load(p)
+			break
 
 
 func _draw() -> void:

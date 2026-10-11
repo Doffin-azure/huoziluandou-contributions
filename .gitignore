@@ -42,11 +42,6 @@ build/
 *.pck
 *.zip
 
-# 可选美术素材（占位/未授权，不放仓库）
-assets/mascot/*.png
-assets/mascot/*.jpg
-assets/reactions/*.png
-assets/reactions/*.jpg
 
 # 调试/自动化生成物
 /tests/transcript.json
