@@ -6,12 +6,12 @@
 [sub_resource type="Resource" id="Resource_nv5vy"]
 script = ExtResource("1_52uec")
 handler = "ability_rapid_next"
-amount = 3
+amount = 4
 timing = "next_word"
 args = {
 "heat": 2
 }
-note = "下一次多字词结算后在其空格补至多 3 字并升温 2"
+note = "下一次多字词结算后在其空格补至多 4 字并升温 2"
 
 [resource]
 script = ExtResource("2_r0lnf")

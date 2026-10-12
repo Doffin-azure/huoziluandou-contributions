@@ -26,6 +26,7 @@ func _run() -> void:
 	_test_qingxin()
 	_test_chaozai()
 	_test_chaosu()
+	_test_jisu()
 	_test_pollution_rush()
 	_test_heat_overflow()
 	_test_merge_duplicates()
@@ -517,6 +518,24 @@ func _test_chaosu() -> void:
 	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
 	_ok(b.board.fill_count() == 8, "超速：回流补 4 → 8 字（盘面 %d）" % b.board.fill_count())
 	_ok(b.player.heat == 4, "超速：额外 4 字升 4 热（热度 %d）" % b.player.heat)
+
+
+func _test_jisu() -> void:
+	print("[急速] 补 4 字（2 字回原格）+ 升温 2")
+	var b := _battle()
+	for i in 10:
+		b.bag.append(CharInstance.new(Database.get_character_by_glyph("击")))
+	_place(b, 0, 0, "急")
+	_place(b, 1, 0, "速")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b.ability_value("next_rapid") == 4, "急速：设定补 4 字")
+	b.player.heat = 0
+	_place(b, 0, 1, "防")
+	_place(b, 1, 1, "御")
+	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
+	_ok(b.board.fill_count() == 4, "急速：补 4 字（盘面 %d）" % b.board.fill_count())
+	_ok(b.board.get_xy(Vector2i(0, 0)) != null and b.board.get_xy(Vector2i(1, 0)) != null, "急速：2 字回到原格 (0,0)/(1,0)")
+	_ok(b.player.heat == 2, "急速：升温 2（热度 %d）" % b.player.heat)
 
 
 func _test_pollution_rush() -> void:

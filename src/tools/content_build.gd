@@ -148,7 +148,7 @@ static func word_effects(word: String) -> Array:
 		"过载": return [e("draw_random", 6), e("heat", 3)]
 		"超载": return [e("apply_status_self", 1, T.SELF, "next_extra"), e("heat", 3)]
 		"加速": return [e("ability_accel", 1, -1, "", "本回合每次打出多字词额外补 1 字并热度 +1", {}, -1, "persistent")]
-		"急速": return [e("ability_rapid_next", 3, -1, "", "下一次多字词结算后在其空格补至多 3 字并升温 2", {"heat": 2}, -1, "next_word")]
+		"急速": return [e("ability_rapid_next", 4, -1, "", "下一次多字词结算后在其空格补至多 4 字并升温 2", {"heat": 2}, -1, "next_word")]
 		"冷却": return [e("heat", -4)]
 		"清热": return [e("heat_cleanse", 2, -1, "", "热度 -2 并清除灼热污染")] 
 		"热流": return [e("heat_to_damage_flow", 2, T.ENEMY, "", "按本回合补字数最多降 4 热，每实际降 1 热造成 2 伤", {"max": 4})]

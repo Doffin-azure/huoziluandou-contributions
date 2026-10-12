@@ -46,6 +46,7 @@ var last_played_glyphs: Array = []   ## 上一个出字的字形序列（供【�
 var last_played_word: WordData = null  ## 上一个打出的词（供【回放】）
 var last_played_effects: Array = []
 var last_played_consumed: Array = []   ## 上一个词用过的字+原格 [{inst, pos}]（供【回放】放回盘面）
+var rapid_cells: Array = []              ## 急速：打出“急速”时占用的格子（下次多字词优先回填）
 var blackout_requested: bool = false   ## 停电彩蛋：请求黑屏
 var end_turn_requested: bool = false    ## 急停：请求立即结束出字阶段
 var repeat_armed: bool = false          ## 重复：本回合第一次多字词是否可重演
@@ -465,6 +466,20 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 	}
 	last_shift_row = -1
 	last_shift_dir = 0
+	# 「下一次」类标记：在本词结算「之前」消费（消费的是上一个词设的），
+	# 使本次结算里新设的标记留给下一个多字词。
+	_apply_next_word_flags(word)
+	if word != null and word.length() >= 2 and player.status_stacks("next_extra") > 0:
+		player.add_status("next_extra", -1)
+		var extra_effects: Array = []
+		for e in effects:
+			if e.timing != "persistent":
+				extra_effects.append(e)
+		if not extra_effects.is_empty():
+			var nex := EffectResolver.resolve_all(extra_effects, ctx)
+			for nm in nex:
+				result.messages.append(nm)
+				_log("超载：%s" % nm)
 	var msgs := EffectResolver.resolve_all(post, ctx)
 	result.messages.append_array(msgs)
 	for m in msgs:
@@ -477,19 +492,6 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 		for rm in rep_msgs:
 			result.messages.append(rm)
 			_log("重复：%s" % rm)
-
-	# 超载：下一次多字词的即时效果额外执行一次（消耗 1 层；不复制持续启动）
-	if word != null and word.length() >= 2 and player.status_stacks("next_extra") > 0:
-		player.add_status("next_extra", -1)
-		var extra_effects: Array = []
-		for e in effects:
-			if e.timing != "persistent":
-				extra_effects.append(e)
-		if not extra_effects.is_empty():
-			var nex := EffectResolver.resolve_all(extra_effects, ctx)
-			for nm in nex:
-				result.messages.append(nm)
-				_log("超载：%s" % nm)
 
 	# 强化：被强化的字作为词的一部分打出时，额外触发它的单字效果
 	if word != null and not empowered_glyphs.is_empty():
@@ -607,8 +609,9 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 		_log("电力：消耗 1 储能，额外位移第 %d 行" % (esr + 1))
 	last_shift_row = -1
 	last_shift_dir = 0
-	_apply_next_word_flags(word)
 	last_played_glyphs = glyphs.duplicate()
+	if word != null and word.word == "急速":
+		rapid_cells = path.duplicate()
 	if word != null:
 		last_played_word = word
 		last_played_effects = effects.duplicate()
@@ -751,9 +754,22 @@ func _apply_next_word_flags(word: WordData) -> void:
 	if word.length() < 2:
 		return
 	if ability_value("next_rapid") > 0:
-		var n := draw_to_board(ability_value("next_rapid"))
+		var total := ability_value("next_rapid")
+		var placed := 0
+		# 先补 2 字到「急速」打出的原格（若仍为空）
+		var fixed := mini(2, rapid_cells.size())
+		for i in fixed:
+			if placed >= total:
+				break
+			var pos: Vector2i = rapid_cells[i]
+			if board.get_xy(pos) != null:
+				continue
+			if BattleOps.draw_one_to(self, pos) != null:
+				placed += 1
+		var n := placed + draw_to_board(total - placed)
 		add_heat(int(abilities.get("next_rapid_heat", 0)))
-		_log("急速：补 %d 字" % n)
+		_log("急速：补 %d 字（其中 %d 字回原格）" % [n, placed])
+		rapid_cells = []
 		abilities.erase("next_rapid")
 		abilities.erase("next_rapid_heat")
 	if ability_value("next_compound") > 0:
