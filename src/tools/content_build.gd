@@ -27,10 +27,15 @@ static func handler_note(handler: String, amount: int, status: String, args: Dic
 	match handler:
 		"block_temp": return "获得 %d 点临时格挡" % amount
 		"block_persist": return "获得 %d 点持久盾" % amount
+		"guard_reduce": return "本回合每次受伤 -%d" % amount
+		"ability_armor_plating": return "每回合获得 %d 点格挡，格挡被击穿则碎裂" % amount
+		"ability_guard_inject": return "下次敌方塞字减少 %d 个" % amount
 		"damage": return "造成 %d 点伤害" % amount
+		"overdo": return "造成 %d 伤，并重演本场之前所有【过分】的伤害" % amount
 		"damage_all": return "对所有敌人造成 %d 点伤害" % amount
 		"draw_random": return "随机补 %d 字" % amount
 		"draw_penalty_next": return "下一次正常补字 -%d" % amount
+		"draw_bonus_next": return "下回合多抽 %d 字" % amount
 		"heal": return "回复 %d 点生命" % amount
 		"energy": return "获得 %d 点储能" % amount
 		"heat": return "热度 %+d" % amount if amount != 0 else "热度不变"

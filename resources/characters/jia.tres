@@ -5,17 +5,17 @@
 
 [sub_resource type="Resource" id="Resource_hqxuf"]
 script = ExtResource("2_vug4r")
-handler = "block_temp"
-amount = 2
-note = "占位：获得 2 临时格挡（单字用途未定）"
+handler = "ability_armor_plating"
+amount = 1
+note = "每回合获得 1 点格挡，格挡被击穿则碎裂"
 
 [resource]
 script = ExtResource("1_x2rdb")
 id = "jia"
 glyph = "甲"
 pinyin = "jia"
-description = "占位：获得 2 临时格挡（单字用途未定）"
+description = "每回合获得 1 点格挡，格挡被击穿则碎裂"
 tags = Array[String](["defense"])
 solo_effects = Array[ExtResource("2_vug4r")]([SubResource("Resource_hqxuf")])
-solo_handler = "block_temp"
+solo_handler = "ability_armor_plating"
 rarity = 1

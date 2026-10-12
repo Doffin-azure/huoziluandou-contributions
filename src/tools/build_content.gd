@@ -25,8 +25,8 @@ const RES := "res://resources"
 const IMPORT := "res://data/import"
 
 ## 已裁撤内容（见 docs/裁撤记录.md）。总账不删行，生成时跳过。
-const CUT_GLYPHS := ["纯", "攻", "剑", "雷", "毒", "愈"]
-const CUT_WORDS := ["纯化", "纯金", "纯利", "精纯", "强力反击"]
+const CUT_GLYPHS := ["纯", "攻", "剑", "雷", "毒", "愈", "却"]
+const CUT_WORDS := ["纯化", "纯金", "纯利", "精纯", "强力反击", "冷却"]
 
 ## 特殊交互（WordData.interaction）
 const INTERACTIONS := {"转化": "reveal_pick_board", "强化": "choose_glyph_empower", "炼化": "choose_battle_card_remove", "化合": "choose_fuse_pair", "精炼": "choose_same_pair", "精金": "choose_glyph_gild", "精铸": "choose_discard_place", "再铸": "choose_discard_place", "反转": "choose_line", "合流": "choose_merge_flow"}
@@ -167,20 +167,40 @@ func _solo_spec(glyph: String) -> Dictionary:
 	match glyph:
 		"击": return {"h": "damage", "a": 4, "note": "造成 4 伤害"}
 		"防": return {"h": "block_temp", "a": 4, "note": "获得 4 点临时格挡"}
-		"护": return {"h": "block_persist", "a": 2, "note": "获得 2 点持久盾"}
-		"御": return {"h": "block_temp", "a": 2, "note": "获得 2 点临时格挡"}
+		"护": return {"h": "ability_guard_inject", "a": 1, "note": "下次敌方塞字减少 1 个"}
+		"御": return {"h": "guard_reduce", "a": 1, "note": "本回合每次受伤 -1"}
 		"回": return {"h": "replace_self", "note": "在原位置随机换一枚字"}
 		"重": return {"h": "gravity", "target": EffectDataS.Target.BOARD, "note": "字盘按列向下重力"}
 		"心": return {"h": "heal", "a": 1, "note": "回复 1 生命"}
 		"清": return {"h": "cleanse_adjacent", "target": EffectDataS.Target.BOARD_TILE, "note": "净化一个四邻污染标记（保留字与所有权）"}
 		"反": return {"h": "damage", "a": 2, "note": "占位：造成 2 伤害（用户未确认）"}
-		"甲": return {"h": "block_temp", "a": 2, "note": "占位：获得 2 临时格挡（单字用途未定）"}
-		"盾": return {"h": "block_temp", "a": 3, "note": "占位：获得 3 临时格挡（反弹方案已撤回）"}
+		"甲": return {"h": "ability_armor_plating", "a": 1, "note": "每回合获得 1 点格挡，格挡被击穿则碎裂"}
+		"盾": return {"h": "block_persist", "a": 3, "note": "获得 3 点持久盾"}
 		"破": return {"h": "damage", "a": 3, "note": "占位：造成 3 伤害（单字用途未定）"}
 		"再": return {"h": "repeat_last", "note": "单字：重复上一个词/字的最后一个字（临时）"}
 		"左": return {"h": "gravity_left", "target": EffectDataS.Target.BOARD, "note": "字盘按行向左重力"}
 		"右": return {"h": "gravity_right", "target": EffectDataS.Target.BOARD, "note": "字盘按行向右重力"}
+		# 资源 / 主题字（设计负责人补充）
+		"火": return {"h": "heat", "a": 1, "note": "热度 +1"}
+		"热": return {"h": "heat", "a": 2, "note": "热度 +2"}
+		"冷": return {"h": "heat", "a": -2, "note": "热度 -2"}
+		"电": return {"h": "energy", "a": 1, "note": "储能 +1"}
+		"蓄": return {"h": "energy", "a": 2, "note": "储能 +2"}
+		"金": return {"h": "gold", "a": 1, "note": "获得 1 金币"}
+		"力": return {"h": "apply_status_self", "status": "strength", "a": 1, "note": "获得 1 层强力"}
+		"流": return {"h": "draw_bonus_next", "a": 1, "note": "下回合多抽 1 字"}
+		"蚀": return {"h": "damage", "a": 2, "note": "对敌造成 2 伤害"}
+		# 下一批（复合 / 独立定位）
+		"充": return {"effects": [{"h": "energy", "a": 1, "note": "储能 +1"}, {"h": "draw_random", "a": 1, "note": "随机补 1 字"}], "note": "储能 +1，随机补 1 字"}
+		"爆": return {"effects": [{"h": "damage", "a": 2, "note": "造成 2 伤害"}, {"h": "heat", "a": 1, "note": "热度 +1"}], "note": "造成 2 伤，热度 +1"}
+		"资": return {"h": "temp_funds", "a": 2, "note": "获得 2 点临时资金（本回合有效）"}
+		"收": return {"h": "draw_random", "a": 1, "note": "随机补 1 字"}
+		"障": return {"h": "block_temp", "a": 2, "note": "获得 2 点临时格挡"}
 	return {}
+
+
+func _spec_effect(spec: Dictionary) -> EffectData:
+	return ContentBuild.e(spec.get("h", ""), int(spec.get("a", 0)), int(spec.get("target", -1)), spec.get("status", ""), spec.get("note", ""), spec.get("args", {}))
 
 func _build_curated_characters() -> void:
 	# glyph, id, pinyin, tags, rarity, is_pollution
@@ -216,7 +236,7 @@ func _build_curated_characters() -> void:
 		["热", "re", "re", ["heat"], 1, false],
 		["火", "huo", "huo", ["heat"], 1, false],
 		["爆", "bao", "bao", ["heat"], 2, false],
-		["过", "guo", "guo", ["heat"], 1, false],
+		["过", "guo", "guo", ["space"], 1, false, "可单字打出（无触发效果）；连线时【过】可被穿过，扩大连接面积（桥接）。"],
 		["载", "zai", "zai", ["heat"], 1, false],
 		["速", "su", "su", ["heat"], 2, false],
 		["急", "ji2", "ji", ["heat"], 1, false],
@@ -259,7 +279,7 @@ func _build_curated_characters() -> void:
 	for d in defs:
 		if CUT_GLYPHS.has(d[0]):
 			continue
-		_make_character(d[0], d[1], d[2], d[3], d[4], d[5], false)
+		_make_character(d[0], d[1], d[2], d[3], d[4], d[5], false, str(d[6]) if d.size() > 6 else "")
 
 func _make_character(glyph: String, id: String, pinyin: String, tags: Array, rarity: int, is_pollution: bool, pending: bool, desc := "") -> CharacterData:
 	var c: CharacterData = CharacterDataS.new()
@@ -272,9 +292,12 @@ func _make_character(glyph: String, id: String, pinyin: String, tags: Array, rar
 	c.pending_design = pending
 	var spec := _solo_spec(glyph)
 	if not spec.is_empty():
-		var e := ContentBuild.e(spec.get("h", ""), int(spec.get("a", 0)), int(spec.get("target", -1)), "", spec.get("note", ""), spec.get("args", {}))
-		c.solo_effects = _teffects([e])
-		c.solo_handler = spec.get("h", "")
+		var list: Array = spec.get("effects", [spec])
+		var effs: Array = []
+		for s in list:
+			effs.append(_spec_effect(s))
+		c.solo_effects = _teffects(effs)
+		c.solo_handler = str(c.solo_effects[0].handler) if not c.solo_effects.is_empty() else ""
 	if not desc.is_empty():
 		c.description = desc
 	elif not spec.is_empty():
@@ -585,6 +608,13 @@ func _build_extra_words() -> void:
 		[ContentBuild.e("heart_link", 0, EffectDataS.Target.ENEMY, "", "生命上限与当前生命都和敌人平均", {})]),
 		"%s/words/extra_xinlianxin.tres" % RES)
 	print("  · 新增词：重心/心力/心急/心蚀/心连心（心系）")
+
+	# 过系（设计负责人新增）
+	_save(_extra_list("extra_guofen", "过分", ["过", "分"], "连携", "",
+		"造成 6 伤；本场每再打出一次【过分】，就重演之前所有【过分】的伤害（第 N 次共 6×N 伤）",
+		[ContentBuild.e("overdo", 6, EffectDataS.Target.ENEMY, "", "造成 6 伤，并重演本场之前所有【过分】的伤害", {})]),
+		"%s/words/extra_guofen.tres" % RES)
+	print("  · 新增词：过分（过系）")
 
 func _extra(id: String, word: String, glyphs: Array, group: String, interaction: String, desc: String, effect: EffectData) -> WordData:
 	var w: WordData = WordDataS.new()

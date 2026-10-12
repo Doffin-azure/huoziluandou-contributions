@@ -98,7 +98,7 @@ func _decks() -> Array:
 	var mid := v03 + [{"glyph": "力", "count": 1}, {"glyph": "合", "count": 1},
 		{"glyph": "护", "count": 1}, {"glyph": "盾", "count": 1}, {"glyph": "金", "count": 1}]
 	var heat := [{"glyph": "热", "count": 3}, {"glyph": "火", "count": 2}, {"glyph": "过", "count": 2},
-		{"glyph": "载", "count": 1}, {"glyph": "冷", "count": 1}, {"glyph": "却", "count": 1},
+		{"glyph": "载", "count": 1}, {"glyph": "冷", "count": 1},
 		{"glyph": "加", "count": 1}, {"glyph": "蓄", "count": 1}, {"glyph": "充", "count": 1}, {"glyph": "电", "count": 1}]
 	return [
 		{"name": "初始V03(12)", "entries": v03},

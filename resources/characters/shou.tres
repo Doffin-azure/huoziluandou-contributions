@@ -3,11 +3,19 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_sh2cy"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_h8bgm"]
 
+[sub_resource type="Resource" id="Resource_msxct"]
+script = ExtResource("2_h8bgm")
+handler = "draw_random"
+amount = 1
+note = "随机补 1 字"
+
 [resource]
 script = ExtResource("1_sh2cy")
 id = "shou"
 glyph = "收"
 pinyin = "shou"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "随机补 1 字"
 tags = Array[String](["flow"])
+solo_effects = Array[ExtResource("2_h8bgm")]([SubResource("Resource_msxct")])
+solo_handler = "draw_random"
 rarity = 2

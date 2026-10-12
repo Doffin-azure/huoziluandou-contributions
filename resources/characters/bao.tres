@@ -3,11 +3,25 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_4m214"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_3vymt"]
 
+[sub_resource type="Resource" id="Resource_cdjfd"]
+script = ExtResource("2_3vymt")
+handler = "damage"
+amount = 2
+note = "造成 2 伤害"
+
+[sub_resource type="Resource" id="Resource_ts742"]
+script = ExtResource("2_3vymt")
+handler = "heat"
+amount = 1
+note = "热度 +1"
+
 [resource]
 script = ExtResource("1_4m214")
 id = "bao"
 glyph = "爆"
 pinyin = "bao"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "造成 2 伤，热度 +1"
 tags = Array[String](["heat"])
+solo_effects = Array[ExtResource("2_3vymt")]([SubResource("Resource_cdjfd"), SubResource("Resource_ts742")])
+solo_handler = "damage"
 rarity = 2

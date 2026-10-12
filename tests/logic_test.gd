@@ -14,6 +14,11 @@ func _ready() -> void:
 func _run() -> void:
 	_test_defense_block()
 	_test_persistent_shield()
+	_test_defense_glyphs()
+	_test_resource_glyphs()
+	_test_batch2_glyphs()
+	_test_overdo()
+	_test_bridge_over()
 	_test_pollution_rush()
 	_test_heat_overflow()
 	_test_merge_duplicates()
@@ -121,6 +126,189 @@ func _test_persistent_shield() -> void:
 	_ok(b.player.persistent_block == 6, "护盾 获得 6 持久盾")
 	b.end_player_turn()
 	_ok(b.player.persistent_block == 6, "敌行动后持久盾仍为 6")
+
+
+func _test_defense_glyphs() -> void:
+	# 御：本回合每次受伤 -1（防多段）
+	print("[御] 本回合每次受伤 -1")
+	var b := _battle()
+	_place(b, 0, 0, "御")
+	b.try_play([Vector2i(0, 0)])
+	_ok(b.player.turn_damage_reduction == 1, "御：减伤 1 层")
+	b.player.hp = 60
+	b.player.take_damage(5)
+	_ok(b.player.hp == 56, "御：5 伤 → 4（hp %d）" % b.player.hp)
+	b.player.take_damage(5)
+	_ok(b.player.hp == 52, "御：多段再 -1（hp %d）" % b.player.hp)
+
+	# 甲：每回合 +1 格挡，被破则碎裂
+	print("[甲] 每回合 +1 格挡，被破则碎裂")
+	var b2 := _battle()
+	_add_enemy(b2, 200)
+	_place(b2, 0, 0, "甲")
+	b2.try_play([Vector2i(0, 0)])
+	_ok(b2.has_ability("armor_plating"), "甲：能力启用")
+	b2.end_player_turn()
+	_ok(b2.player.block == 1, "甲：新回合 +1 格挡（%d）" % b2.player.block)
+	b2.player.take_damage(3)
+	_ok(b2.player.block_broken, "甲：格挡被击穿")
+	b2.end_player_turn()
+	_ok(not b2.has_ability("armor_plating"), "甲：护甲碎裂")
+
+	# 盾：3 持久盾
+	print("[盾] 3 持久盾")
+	var b3 := _battle()
+	_place(b3, 0, 0, "盾")
+	b3.try_play([Vector2i(0, 0)])
+	_ok(b3.player.persistent_block == 3, "盾：3 持久盾（%d）" % b3.player.persistent_block)
+
+	# 护：下次塞字减 1
+	print("[护] 下次塞字减 1")
+	var b4 := _battle()
+	_add_enemy(b4, 200)
+	_place(b4, 0, 0, "护")
+	b4.try_play([Vector2i(0, 0)])
+	_ok(b4.has_ability("guard_inject"), "护：能力启用")
+	var n := b4.inject_enemy_glyphs(2, "rush")
+	_ok(n == 1, "护：塞 2 减为 1（实际 %d）" % n)
+	_ok(not b4.has_ability("guard_inject"), "护：能力消耗")
+
+
+func _test_resource_glyphs() -> void:
+	# 火/热/冷：热度增减
+	print("[火/热/冷] 热度增减")
+	var b := _battle()
+	b.player.heat = 0
+	_place(b, 0, 0, "火")
+	b.try_play([Vector2i(0, 0)])
+	_ok(b.player.heat == 1, "火：热度 +1（%d）" % b.player.heat)
+	_place(b, 0, 0, "热")
+	b.try_play([Vector2i(0, 0)])
+	_ok(b.player.heat == 3, "热：热度 +2（%d）" % b.player.heat)
+	_place(b, 0, 0, "冷")
+	b.try_play([Vector2i(0, 0)])
+	_ok(b.player.heat == 1, "冷：热度 -2（%d）" % b.player.heat)
+
+	# 电/蓄：储能
+	print("[电/蓄] 储能")
+	var b2 := _battle()
+	b2.player.energy = 0
+	_place(b2, 0, 0, "电")
+	b2.try_play([Vector2i(0, 0)])
+	_ok(b2.player.energy == 1, "电：储能 +1（%d）" % b2.player.energy)
+	_place(b2, 0, 0, "蓄")
+	b2.try_play([Vector2i(0, 0)])
+	_ok(b2.player.energy == 3, "蓄：储能 +2（%d）" % b2.player.energy)
+
+	# 金：金币
+	print("[金] 金币")
+	var b3 := _battle()
+	var g0 := GameState.gold
+	GameState.gold = 0
+	_place(b3, 0, 0, "金")
+	b3.try_play([Vector2i(0, 0)])
+	_ok(GameState.gold == 1, "金：金币 +1（%d）" % GameState.gold)
+	GameState.gold = g0
+
+	# 力：强力
+	print("[力] 强力")
+	var b4 := _battle()
+	_place(b4, 0, 0, "力")
+	b4.try_play([Vector2i(0, 0)])
+	_ok(b4.player.status_stacks("strength") == 1, "力：强力 +1（%d）" % b4.player.status_stacks("strength"))
+
+	# 流：下回合多抽 1
+	print("[流] 下回合多抽 1")
+	var b5 := _battle()
+	_place(b5, 0, 0, "流")
+	b5.try_play([Vector2i(0, 0)])
+	_ok(b5.next_draw_penalty == -1, "流：下回合多抽 1（penalty %d）" % b5.next_draw_penalty)
+
+	# 蚀：对敌 2 伤
+	print("[蚀] 对敌 2 伤")
+	var b6 := _battle()
+	var e6 := _add_enemy(b6, 100)
+	_place(b6, 0, 0, "蚀")
+	b6.try_play([Vector2i(0, 0)])
+	_ok(100 - e6.hp == 2, "蚀：对敌 2 伤（实际 %d）" % (100 - e6.hp))
+
+
+func _test_batch2_glyphs() -> void:
+	# 充：储能 +1，随机补 1 字（复合效果）
+	print("[充] 储能 +1，随机补 1 字")
+	var b := _battle()
+	b.player.energy = 0
+	b.bag.append(CharInstance.new(Database.get_character_by_glyph("击")))
+	_place(b, 0, 0, "充")
+	b.try_play([Vector2i(0, 0)])
+	_ok(b.player.energy == 1, "充：储能 +1（%d）" % b.player.energy)
+	_ok(b.board.fill_count() == 1, "充：随机补 1 字（%d）" % b.board.fill_count())
+
+	# 爆：2 伤 + 1 热（复合效果）
+	print("[爆] 2 伤 + 1 热")
+	var b2 := _battle()
+	var e2 := _add_enemy(b2, 100)
+	b2.player.heat = 0
+	_place(b2, 0, 0, "爆")
+	b2.try_play([Vector2i(0, 0)])
+	_ok(100 - e2.hp == 2, "爆：2 伤（实际 %d）" % (100 - e2.hp))
+	_ok(b2.player.heat == 1, "爆：热度 +1（%d）" % b2.player.heat)
+
+	# 资：临时资金 +2
+	print("[资] 临时资金 +2")
+	var b3 := _battle()
+	b3.player.temp_funds = 0
+	_place(b3, 0, 0, "资")
+	b3.try_play([Vector2i(0, 0)])
+	_ok(b3.player.temp_funds == 2, "资：临时资金 +2（%d）" % b3.player.temp_funds)
+
+	# 收：随机补 1 字
+	print("[收] 随机补 1 字")
+	var b4 := _battle()
+	b4.bag.append(CharInstance.new(Database.get_character_by_glyph("击")))
+	_place(b4, 0, 0, "收")
+	b4.try_play([Vector2i(0, 0)])
+	_ok(b4.board.fill_count() == 1, "收：随机补 1 字（%d）" % b4.board.fill_count())
+
+	# 障：临时格挡 +2
+	print("[障] 临时格挡 +2")
+	var b5 := _battle()
+	_place(b5, 0, 0, "障")
+	b5.try_play([Vector2i(0, 0)])
+	_ok(b5.player.block == 2, "障：临时格挡 +2（%d）" % b5.player.block)
+
+
+func _test_overdo() -> void:
+	print("[过分] 本场累积重演")
+	var b := _battle()
+	var e := _add_enemy(b, 100)
+	_place(b, 0, 0, "过")
+	_place(b, 1, 0, "分")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(100 - e.hp == 6, "过分 第1次 6 伤（实际 %d）" % (100 - e.hp))
+	_place(b, 0, 0, "过")
+	_place(b, 1, 0, "分")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(100 - e.hp == 18, "过分 第2次 +12（累计 18，实际 %d）" % (100 - e.hp))
+	_place(b, 0, 0, "过")
+	_place(b, 1, 0, "分")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(100 - e.hp == 36, "过分 第3次 +18（累计 36，实际 %d）" % (100 - e.hp))
+
+
+func _test_bridge_over() -> void:
+	print("[过] 桥接：连线经过【过】")
+	var b := _battle()
+	_place(b, 0, 0, "防")
+	_place(b, 1, 0, "过")
+	_place(b, 2, 0, "御")
+	var r := b.try_play([Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0)])
+	_ok(r.ok and b.player.block == 10, "过 桥接：防-过-御 → 防御（临挡 %d）" % b.player.block)
+	var b2 := _battle()
+	_place(b2, 0, 0, "过")
+	_place(b2, 1, 0, "热")
+	var r2 := b2.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(r2.ok and r2.word != null and r2.word.word == "过热", "过 仍优先匹配含【过】的真词")
 
 
 func _test_pollution_rush() -> void:

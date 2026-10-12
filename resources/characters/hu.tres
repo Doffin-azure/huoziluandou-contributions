@@ -5,17 +5,17 @@
 
 [sub_resource type="Resource" id="Resource_st6cv"]
 script = ExtResource("2_8ehla")
-handler = "block_persist"
-amount = 2
-note = "获得 2 点持久盾"
+handler = "ability_guard_inject"
+amount = 1
+note = "下次敌方塞字减少 1 个"
 
 [resource]
 script = ExtResource("1_0kmmt")
 id = "hu"
 glyph = "护"
 pinyin = "hu"
-description = "获得 2 点持久盾"
+description = "下次敌方塞字减少 1 个"
 tags = Array[String](["defense"])
 solo_effects = Array[ExtResource("2_8ehla")]([SubResource("Resource_st6cv")])
-solo_handler = "block_persist"
+solo_handler = "ability_guard_inject"
 rarity = 1

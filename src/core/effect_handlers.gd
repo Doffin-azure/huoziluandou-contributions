@@ -16,6 +16,10 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 	match handler:
 		"damage":
 			return EffectUtil.damage(b, enemy, amount)
+		"overdo":
+			b.overdo_count += 1
+			var overdo_dmg: int = amount * b.overdo_count
+			return EffectUtil.damage(b, enemy, overdo_dmg) + ["过分：第 %d 次，共 %d 伤" % [b.overdo_count, overdo_dmg]]
 		"damage_all":
 			var out: Array = []
 			for e in b.alive_enemies():
@@ -27,6 +31,15 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"block_persist":
 			src.add_persistent_block(amount)
 			return ["获得 %d 点持久盾" % amount]
+		"guard_reduce":
+			src.turn_damage_reduction += amount
+			return ["御：本回合每次受伤 -%d" % amount]
+		"ability_armor_plating":
+			b.enable_ability("armor_plating", 1)
+			return ["甲：每回合获得 1 点格挡，格挡被击穿则碎裂"]
+		"ability_guard_inject":
+			b.enable_ability("guard_inject", b.ability_value("guard_inject") + amount)
+			return ["护：下次敌方塞字减少 %d 个" % amount]
 		"heal":
 			src.heal(amount)
 			return ["回复 %d 点生命" % amount]
@@ -36,6 +49,9 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"draw_penalty_next":
 			b.next_draw_penalty += amount
 			return ["下次补字 -%d" % amount]
+		"draw_bonus_next":
+			b.next_draw_penalty -= amount
+			return ["下回合多抽 %d 字" % amount]
 		"gold":
 			EffectUtil.add_gold(b, amount)
 			return ["获得 %d 金币（本战累计 %d）" % [amount, b.gold_earned]]

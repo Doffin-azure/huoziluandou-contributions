@@ -55,6 +55,7 @@ var flow_row: int = -1                   ## 流速：本回合被指定的行
 var last_shift_row: int = -1             ## 电力：最近一次行位移
 var last_shift_dir: int = 0
 var _double_armed: bool = false          ## 超能力：本词出字前已武装
+var overdo_count: int = 0                ## 过分：本场已打出【过分】的次数（伤害随次数递增）
 
 func _init(p_rules: BattleRules) -> void:
 	rules = p_rules
@@ -75,6 +76,7 @@ func start(deck: Array, enemy_datas: Array, seed_value: int = -1) -> void:
 	removed_this_battle.clear()
 	blackout_requested = false
 	end_turn_requested = false
+	overdo_count = 0
 	repeat_armed = false
 	formation_mode = false
 	formation_queue.clear()
@@ -304,6 +306,17 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 	var word: WordData = null
 	if glyphs.size() >= 2:
 		word = Database.get_word_by_glyphs(glyphs)
+		# 【过】：连线中的【过】可被跳过（桥接），扩大连接面积
+		if word == null and glyphs.has("过"):
+			var filtered: Array = []
+			for g in glyphs:
+				if g != "过":
+					filtered.append(g)
+			if filtered.size() >= 2:
+				var bridged: WordData = Database.get_word_by_glyphs(filtered)
+				if bridged != null:
+					word = bridged
+					result.glyphs = filtered
 		if word == null:
 			result.reason = "“%s”不成词" % _join(glyphs)
 			return result
@@ -705,6 +718,10 @@ func begin_player_turn(draw: bool = true) -> void:
 	formation_queue.clear()
 	reserved_cells.clear()
 	player.clear_block()
+	player.turn_damage_reduction = 0
+	player.block_broken = false
+	if has_ability("armor_plating"):
+		player.add_block(1)
 	player.temp_funds = 0
 	words_played_this_turn.clear()
 	attack_words_this_turn = 0
@@ -789,6 +806,10 @@ func end_player_turn() -> void:
 	# 后置结算：反击
 	if player.is_alive():
 		_resolve_counter()
+	# 甲：格挡被击穿则护甲碎裂
+	if has_ability("armor_plating") and player.block_broken:
+		abilities.erase("armor_plating")
+		_log("甲：格挡被击穿，护甲碎裂")
 	# 临时格挡默认敌行动后清除
 	player.clear_block()
 	player.temp_funds = 0
@@ -1047,6 +1068,17 @@ func take_revealed(uid: int) -> CharInstance:
 	return BattleOps.take_revealed(self, uid)
 
 func inject_enemy_glyphs(count: int, pollution_id: String) -> int:
+	# 护：抵消一部分塞字（一次性，按层数消耗）
+	if has_ability("guard_inject"):
+		var reduced := mini(count, ability_value("guard_inject", 1))
+		if reduced > 0:
+			count -= reduced
+			var v := ability_value("guard_inject", 1) - reduced
+			if v <= 0:
+				abilities.erase("guard_inject")
+			else:
+				abilities["guard_inject"] = v
+			_log("护：抵消 %d 枚塞字" % reduced)
 	var n: int = BattleOps.inject_enemy_glyphs(self, count, pollution_id)
 	if n > 0 and has_ability("inject_bounty"):
 		var g := earn_gold(n * 2)

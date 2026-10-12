@@ -3,11 +3,19 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_1to58"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_2xk6v"]
 
+[sub_resource type="Resource" id="Resource_d4rtp"]
+script = ExtResource("2_2xk6v")
+handler = "block_temp"
+amount = 2
+note = "获得 2 点临时格挡"
+
 [resource]
 script = ExtResource("1_1to58")
 id = "zhang"
 glyph = "障"
 pinyin = "zhang"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "获得 2 点临时格挡"
 tags = Array[String](["enemy"])
+solo_effects = Array[ExtResource("2_2xk6v")]([SubResource("Resource_d4rtp")])
+solo_handler = "block_temp"
 rarity = 2

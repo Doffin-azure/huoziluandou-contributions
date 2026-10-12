@@ -21,6 +21,10 @@ var temp_funds: int = 0            ## 本回合临时支付额度
 
 # --- 跨战永久 ---
 var permanent_damage_reduction: int = 0
+## 御：本回合每次受伤减免（临时，回合结束清零）
+var turn_damage_reduction: int = 0
+## 甲：本回合格挡是否被击穿（用于护甲碎裂判定）
+var block_broken: bool = false
 ## 心力层数（玩家专属）：抵挡致命伤害，每层可挡一次
 var heart_power: int = 0
 ## 调试用：无敌（玩家免伤）
@@ -44,10 +48,12 @@ func take_damage(amount: int) -> int:
 	if statuses.has("vulnerable"):
 		dmg = int(ceil(dmg * 1.5))
 	if is_player:
-		dmg = max(0, dmg - permanent_damage_reduction)
+		dmg = max(0, dmg - permanent_damage_reduction - turn_damage_reduction)
 	var blocked: int = min(block, dmg)
 	block -= blocked
 	dmg -= blocked
+	if is_player and blocked > 0 and dmg > 0:
+		block_broken = true
 	if dmg > 0:
 		var persisted: int = min(persistent_block, dmg)
 		persistent_block -= persisted

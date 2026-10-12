@@ -127,13 +127,21 @@ solo_handler = "gravity"
 script = ExtResource("1_5pocd")
 character = SubResource("Resource_onwkr")
 
+[sub_resource type="Resource" id="Resource_0t5hy"]
+script = ExtResource("3_6npd1")
+handler = "draw_bonus_next"
+amount = 1
+note = "下回合多抽 1 字"
+
 [sub_resource type="Resource" id="Resource_qqn6x"]
 script = ExtResource("2_kshav")
 id = "liu"
 glyph = "流"
 pinyin = "liu"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "下回合多抽 1 字"
 tags = Array[String](["flow"])
+solo_effects = Array[ExtResource("3_6npd1")]([SubResource("Resource_0t5hy")])
+solo_handler = "draw_bonus_next"
 
 [sub_resource type="Resource" id="Resource_mkg0v"]
 script = ExtResource("1_5pocd")
@@ -153,19 +161,19 @@ character = SubResource("Resource_qojk7")
 
 [sub_resource type="Resource" id="Resource_nmmnu"]
 script = ExtResource("3_6npd1")
-handler = "block_temp"
-amount = 2
-note = "获得 2 点临时格挡"
+handler = "guard_reduce"
+amount = 1
+note = "本回合每次受伤 -1"
 
 [sub_resource type="Resource" id="Resource_kbkh1"]
 script = ExtResource("2_kshav")
 id = "yu"
 glyph = "御"
 pinyin = "yu"
-description = "获得 2 点临时格挡"
+description = "本回合每次受伤 -1"
 tags = Array[String](["defense"])
 solo_effects = Array[ExtResource("3_6npd1")]([SubResource("Resource_nmmnu")])
-solo_handler = "block_temp"
+solo_handler = "guard_reduce"
 
 [sub_resource type="Resource" id="Resource_2ho6w"]
 script = ExtResource("1_5pocd")

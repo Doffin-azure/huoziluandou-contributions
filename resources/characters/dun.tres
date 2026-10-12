@@ -5,17 +5,17 @@
 
 [sub_resource type="Resource" id="Resource_yrykw"]
 script = ExtResource("2_8aiqa")
-handler = "block_temp"
+handler = "block_persist"
 amount = 3
-note = "占位：获得 3 临时格挡（反弹方案已撤回）"
+note = "获得 3 点持久盾"
 
 [resource]
 script = ExtResource("1_a4bre")
 id = "dun"
 glyph = "盾"
 pinyin = "dun"
-description = "占位：获得 3 临时格挡（反弹方案已撤回）"
+description = "获得 3 点持久盾"
 tags = Array[String](["defense"])
 solo_effects = Array[ExtResource("2_8aiqa")]([SubResource("Resource_yrykw")])
-solo_handler = "block_temp"
+solo_handler = "block_persist"
 rarity = 1

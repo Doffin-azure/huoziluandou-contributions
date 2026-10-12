@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_rlu0i"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_rcrkm"]
+
+[sub_resource type="Resource" id="Resource_cxww6"]
+script = ExtResource("1_rlu0i")
+handler = "overdo"
+amount = 6
+note = "造成 6 伤，并重演本场之前所有【过分】的伤害"
+
+[resource]
+script = ExtResource("2_rcrkm")
+id = "extra_guofen"
+word = "过分"
+glyphs = Array[String](["过", "分"])
+description = "造成 6 伤；本场每再打出一次【过分】，就重演之前所有【过分】的伤害（第 N 次共 6×N 伤）"
+effects = Array[ExtResource("1_rlu0i")]([SubResource("Resource_cxww6")])
+group = "连携"
+design_stage = "设计负责人新增"
+effect_summary = "造成 6 伤；本场每再打出一次【过分】，就重演之前所有【过分】的伤害（第 N 次共 6×N 伤）"
+effect_handler_id = "overdo"
+priority = "连携"
+implemented = true
