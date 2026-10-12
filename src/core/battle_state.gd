@@ -478,6 +478,19 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 			result.messages.append(rm)
 			_log("重复：%s" % rm)
 
+	# 超载：下一次多字词的即时效果额外执行一次（消耗 1 层；不复制持续启动）
+	if word != null and word.length() >= 2 and player.status_stacks("next_extra") > 0:
+		player.add_status("next_extra", -1)
+		var extra_effects: Array = []
+		for e in effects:
+			if e.timing != "persistent":
+				extra_effects.append(e)
+		if not extra_effects.is_empty():
+			var nex := EffectResolver.resolve_all(extra_effects, ctx)
+			for nm in nex:
+				result.messages.append(nm)
+				_log("超载：%s" % nm)
+
 	# 强化：被强化的字作为词的一部分打出时，额外触发它的单字效果
 	if word != null and not empowered_glyphs.is_empty():
 		for c in consumed:

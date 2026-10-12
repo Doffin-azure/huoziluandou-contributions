@@ -24,6 +24,7 @@ func _run() -> void:
 	_test_xin_series()
 	_test_lengxin()
 	_test_qingxin()
+	_test_chaozai()
 	_test_pollution_rush()
 	_test_heat_overflow()
 	_test_merge_duplicates()
@@ -483,6 +484,21 @@ func _test_qingxin() -> void:
 	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
 	_ok(b.player.status_stacks("vulnerable") == 0 and b.player.status_stacks("poison") == 0, "清心：易伤/中毒已清除")
 	_ok(b.player.status_stacks("strength") == 2, "清心：正面状态保留（强力 %d）" % b.player.status_stacks("strength"))
+
+
+func _test_chaozai() -> void:
+	print("[超载] 多字词额外执行一次")
+	var b := _battle()
+	var e := _add_enemy(b, 100)
+	_place(b, 0, 0, "超")
+	_place(b, 1, 0, "载")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b.player.status_stacks("next_extra") == 1, "超载：获得 1 层（%d）" % b.player.status_stacks("next_extra"))
+	_place(b, 2, 0, "击")
+	_place(b, 3, 0, "破")
+	b.try_play([Vector2i(2, 0), Vector2i(3, 0)])
+	_ok(100 - e.hp == 16, "超载：击破 8 伤 ×2 = 16（实际 %d）" % (100 - e.hp))
+	_ok(b.player.status_stacks("next_extra") == 0, "超载：层数已消耗")
 
 
 func _test_pollution_rush() -> void:
