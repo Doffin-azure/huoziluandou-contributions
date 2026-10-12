@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><title>排版 C3 · 拾字组词</title>
+<link rel="stylesheet" href="style.css"><script src="plate.js"></script>
+<style>
+  .plate-grid .pcell { width: 50px; height: 50px; cursor: default; border-color: #c9a35a2a; }
+  .pcell .tile, .pcell .stampc { width: 46px; height: 46px; font-size: 25px; }
+  .plate-grid .bcell { width: 44px; height: 44px; cursor: pointer; border-color: #c9a35a66; }
+  .bcell .tile { width: 40px; height: 40px; font-size: 22px; }
+  .pcell.wild { background: #a06a8626; }
+  .pcell.trail { background: #b83a2e55; border: 2px solid #e0574a99; }
+  .pcell.can { cursor: pointer; border: 2px dashed var(--gold); background: #c9a35a2e; }
+  .pcell.can:hover { background: #c9a35a5a; }
+  .pcell.look { cursor: help; }
+  .pcell.sensed { background: #b83a2e66; }
+  .pcell.ink { background: #1b1814; border: none; } .pcell.ink::after { content: "墨"; color: #ffffff18; font-size: 20px; }
+  .stampc { border-radius: 9px; display: flex; align-items: center; justify-content: center; color: var(--paper); box-shadow: 0 3px 6px #0006; }
+  .pcell.fixed .tile { background: linear-gradient(160deg, #8a6a46, #6f4a24); color: #f3e3c4; }
+  .pcell.linked .tile { box-shadow: 0 0 0 2px #e0a0c0, 0 3px 6px #0006; }
+  .pcell.guarded .tile { filter: grayscale(.6) brightness(.8); }
+  .pcell.reward .tile { background: linear-gradient(160deg, #f6dc94, #c9a35a); box-shadow: 0 0 14px #f0d48add, inset 0 -3px 0 #0003; }
+  .pcell.foe .tile { background: linear-gradient(160deg, #a06a86, var(--plum)); color: var(--paper); }
+  .pcell.boss .tile { background: linear-gradient(160deg, #3d3730, #000); color: var(--gold); box-shadow: 0 0 0 3px var(--ver), 0 0 16px #b83a2e; }
+  .badge2 { position: absolute; top: -7px; left: -7px; font-size: 10px; padding: 0 4px; border-radius: 7px; color: var(--paper); z-index: 2; }
+  .pcell.here::after { content: "行"; position: absolute; bottom: -8px; right: -8px; width: 22px; height: 22px; border-radius: 11px; z-index: 3;
+    background: var(--ver); color: var(--paper); font-size: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px var(--paper); }
+  .ap { font-size: 18px; color: var(--indigo); font-weight: 700; }
+  .combo { padding: 6px 8px; border-radius: 8px; margin: 6px 0; font-size: 13px; line-height: 1.5; }
+  .combo.mine { background: #5f7d6a22; border-left: 4px solid var(--jade); }
+  .combo.foe { background: #b83a2e1a; border-left: 4px solid var(--ver); }
+  .combo.off { opacity: .5; text-decoration: line-through; }
+  .twin { display: flex; gap: 16px; align-items: flex-start; }
+  .brow { font-size: 13px; padding: 3px 0; } .brow.dim { opacity: .45; }
+  .side .tray .tile { width: 44px; height: 44px; font-size: 24px; }
+  .rules p { font-size: 13px; margin: 3px 0; }
+</style></head><body>
+<div class="topbar"><h2>墨途远征 · 第一幕「墨林」</h2><span class="muted">排版 C3：拾字组词</span><span class="grow"></span>
+  <span class="muted">气血 <b id="hpn"></b></span><div class="hp"><i id="hpbar"></i></div>
+  <span class="ap">墨 <span id="ap"></span></span><span class="stat">❖ <span id="gold"></span></span>
+  <button class="btn" onclick="reset()">重新开始</button></div>
+<div class="layout">
+  <div class="main">
+    <div class="panel"><h3>地图 · 走到字上可以拾取</h3><div class="plate-grid" id="plate"></div>
+      <div class="legend" style="margin-top:10px">
+        <span><span class="tile sm" style="background:#6f4a24;color:#f3e3c4">热</span>散落的字（可拾）</span>
+        <span><span class="tile sm" style="background:#6f4a24;color:#f3e3c4;box-shadow:0 0 0 2px #e0a0c0">火</span>正和敌字成词</span>
+        <span><span class="tile sm" style="background:#6f4a24;color:#f3e3c4;filter:grayscale(.6) brightness(.8)">币</span>被敌人看守（拾不走）</span>
+        <span><span class="tile sm" style="background:linear-gradient(160deg,#f6dc94,#c9a35a)">金</span>目标字（踏上即得）</span>
+        <span><span class="tile sm" style="background:var(--plum);color:var(--paper)">甲</span>敌</span>
+        <span><span class="tile sm" style="background:#000;color:var(--gold)">铸</span>首领</span>
+        <span><span class="tile sm" style="background:#a06a8640;box-shadow:none"></span>野径：可能伏击</span>
+      </div></div>
+    <div class="panel"><h3>排版台 · 用字匣里的字自由组词</h3>
+      <div class="twin"><div class="plate-grid" id="board"></div><div style="flex:1"><div id="buff"></div></div></div></div>
+    <div class="panel rules"><h3>规则速览</h3>
+      <p>· <b>字是收集品</b>：散落的字走上去可以选择拾取；目标字踏上即得；打赢敌人，敌字也归你。都放进右侧「字匣」。</p>
+      <p>· <b>排版台</b>：把字匣里的字摆上 6×6 的排版台，横读、竖读成词，按词所属的系统累计 buff 点数。三字以上的词算 2 点，含交汇字的词再 +1。排版随时可以免费调整，新词首次入谱时回 1 墨。</p>
+      <p>· <b>遭遇联动</b>：开战时，敌字和地图上它周围的字横竖成词，词的第一个字决定归属。归敌的词可以用排版台的「防反」抵消。</p>
+      <p>· <b>看守</b>：敌人还没被打败时，它上下左右的字都被看守着，拾不走（标「守」）。打败它之后才能拾取。首领身边的字到幕终都拿不到。</p>
+      <p>· 每走一步耗 1 墨，墨尽后每步扣 4 气血。必须走到终点打赢首领「铸」才算过幕。</p></div>
+  </div>
+  <div class="side">
+    <div class="panel"><h3>字匣</h3><div class="tray" id="tray"></div>
+      <p class="muted">选一枚，再点排版台的格子放下。点排版台上的字可以收回。带「可成词」标记的字放上去能立刻成词。</p></div>
+    <div class="panel" id="ev"></div>
+    <div class="panel"><h3>行路记录</h3><ul id="log" class="wlist"></ul><button class="btn" onclick="reset()">重来</button></div>
+  </div>
+</div>
+<script src="plate_collect.js"></script>
+</body></html>
