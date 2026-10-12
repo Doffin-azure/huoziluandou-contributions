@@ -1,0 +1,82 @@
+/* 远征大地图 UI 原型：共用宣纸活字风格 */
+:root {
+  --paper: #efe6d2; --paper-warm: #e7d9b8; --paper-dark: #d8c8a2; --shade: #c8b68d;
+  --ink: #221f1a; --ink-soft: #4a4438; --ink-faint: #7c7360;
+  --ver: #b83a2e; --ver-dk: #8c2a20; --gold: #c9a35a; --gold-dk: #9a7838;
+  --wood: #a9773f; --wood-lt: #c99c60; --wood-dk: #6f4a24;
+  --jade: #5f7d6a; --indigo: #3c4a6b; --plum: #7a4a63;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; color: var(--ink);
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+  background: radial-gradient(ellipse at 30% 20%, #f4ecda 0%, var(--paper) 45%, var(--paper-dark) 100%);
+}
+a { color: var(--ver-dk); }
+.topbar {
+  display: flex; align-items: center; gap: 18px; padding: 10px 18px;
+  background: rgba(216, 200, 162, .55); border-bottom: 2px solid var(--shade);
+}
+.topbar h2 { margin: 0; font-size: 22px; letter-spacing: 2px; }
+.topbar .muted { color: var(--ink-faint); font-size: 13px; }
+.topbar .grow { flex: 1; }
+.hp { width: 150px; height: 12px; border-radius: 6px; background: #0002; overflow: hidden; }
+.hp > i { display: block; height: 100%; width: 78%; background: #a63c34; }
+.stat { font-size: 18px; color: var(--gold-dk); font-weight: 700; }
+.btn {
+  padding: 7px 14px; border-radius: 8px; border: 2px solid var(--ink-soft); background: var(--paper-warm);
+  font: inherit; color: var(--ink); cursor: pointer;
+}
+.btn.primary { background: var(--ver); border-color: var(--ver-dk); color: var(--paper); }
+.btn:hover { filter: brightness(1.06); }
+.layout { display: flex; gap: 18px; padding: 18px; }
+.main { flex: 1; min-width: 0; }
+.side { width: 320px; flex-shrink: 0; }
+.panel {
+  background: rgba(239, 230, 210, .92); border: 2px solid var(--shade); border-radius: 12px;
+  padding: 14px 16px; box-shadow: 0 4px 14px #3a2a1426; margin-bottom: 14px;
+}
+.panel h3 { margin: 0 0 8px; font-size: 17px; color: var(--ver-dk); letter-spacing: 1px; }
+.panel p, .panel li { font-size: 14px; line-height: 1.6; margin: 4px 0; }
+.muted { color: var(--ink-faint); }
+.tile {
+  width: 56px; height: 56px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 30px; color: var(--ink); user-select: none; position: relative;
+  background: linear-gradient(160deg, var(--wood-lt), var(--wood) 60%, #94652f);
+  box-shadow: inset 0 2px 0 #fff4, inset 0 -3px 0 #0003, 0 3px 6px #3a2a1440;
+}
+.tile.sm { width: 34px; height: 34px; font-size: 19px; border-radius: 6px; }
+.seal {
+  display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;
+  width: 22px; height: 22px; font-size: 13px; color: var(--paper); background: var(--ver);
+}
+.seal.battle { background: var(--ink-soft); } .seal.elite { background: var(--plum); }
+.seal.shop { background: var(--gold-dk); } .seal.event { background: var(--indigo); }
+.seal.rest { background: var(--jade); } .seal.boss { background: var(--ver); }
+.chip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin: 2px; border: 1px solid var(--shade); background: var(--paper-warm); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 4px; }
+.note {
+  margin: 0 18px 18px; padding: 10px 14px; border-left: 4px solid var(--gold); background: #fff6;
+  font-size: 13px; color: var(--ink-soft); line-height: 1.7;
+}
+.word { color: var(--ver-dk); font-weight: 700; }
+/* 自由版面（排版方向原型共用） */
+.plate-grid { display: grid; gap: 6px; padding: 14px; width: max-content; border-radius: 14px;
+  background: linear-gradient(160deg, #5a4630, #3d2f20); box-shadow: inset 0 3px 10px #0008, 0 6px 16px #3a2a1450; }
+.pcell { width: 60px; height: 60px; border-radius: 9px; border: 2px dashed #c9a35a66; display: flex;
+  align-items: center; justify-content: center; cursor: pointer; position: relative; }
+.pcell:hover { border-color: var(--gold); }
+.pcell .tile { width: 56px; height: 56px; }
+.pcell.inword .tile { box-shadow: inset 0 0 0 3px var(--gold), 0 3px 6px #0005; }
+.pcell.cross .tile::after { content: "交"; position: absolute; top: -8px; right: -8px; font-size: 11px;
+  background: var(--ver); color: var(--paper); border-radius: 8px; padding: 1px 4px; }
+.pcell .mark { font-size: 20px; color: #c9a35a77; }
+.tray { display: flex; flex-wrap: wrap; gap: 8px; min-height: 60px; }
+.tray .tile { cursor: pointer; } .tray .tile.sel { outline: 3px solid var(--ver); transform: translateY(-4px); }
+.tray .tile.can::before { content: "可成词"; position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; white-space: nowrap; background: var(--gold); color: var(--paper); border-radius: 6px; padding: 0 4px; }
+.wlist { padding: 0; margin: 0; } .wlist li { list-style: none; padding: 5px 0; border-bottom: 1px dashed var(--shade); font-size: 14px; }
+.sysdot { display: inline-block; width: 10px; height: 10px; border-radius: 5px; margin-right: 4px; }
+.flash { animation: flash .6s ease; }
+@keyframes flash { 0% { transform: scale(1.15); } 100% { transform: scale(1); } }
