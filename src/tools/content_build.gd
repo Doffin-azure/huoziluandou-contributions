@@ -32,6 +32,15 @@ static func handler_note(handler: String, amount: int, status: String, args: Dic
 		"ability_guard_inject": return "下次敌方塞字减少 %d 个" % amount
 		"damage": return "造成 %d 点伤害" % amount
 		"overdo": return "造成 %d 伤，并重演本场之前所有【过分】的伤害" % amount
+		"replay_word": return "把上一个词用过的字放回盘面"
+		"manual_draw_next": return "下回合补字 -%d，但可从字袋定向选字（随机落地）" % amount
+		"ability_warm_heart": return "本场：热度 +1=回 1 血，-1=扣 1 血"
+		"guard_halve": return "本回合受伤减半（向上取整再 -1）"
+		"ability_strong_heart": return "本场：每回合回已触发心力层数的血"
+		"collect_own": return "选盘面牌回袋，每枚回 1 血"
+		"cold_heart": return "本回合伤害翻倍；2 回合不能获得防御"
+		"cleanse_status": return "清除自身全部负面状态"
+		"return_enemy": return "移除字盘上一枚敌方实体字"
 		"damage_all": return "对所有敌人造成 %d 点伤害" % amount
 		"draw_random": return "随机补 %d 字" % amount
 		"draw_penalty_next": return "下一次正常补字 -%d" % amount
@@ -192,7 +201,7 @@ static func word_effects(word: String) -> Array:
 		"停电": return [e("blackout", 0, -1, "", "彩蛋：停电，屏幕变黑；拖动连出【开灯】才能恢复", {})]
 		"充电过热": return [e("charge_overheat", 8, -1, "", "获得 8 储能 + 8 热度；本战此后每次出字后立即补满盘面", {"energy": 8, "heat": 8}, -1, "persistent")]
 		"重铸": return [e("recast_board", 0, -1, "", "把盘面上已有的字全部重新替换（己方字回袋重抽，敌方/临时字清除）", {})]
-		"再铸": return [e("recast_copy", 0, -1, "", "从弃字堆选一张，把它的临时复制放进指定空格（原牌留在弃字堆）", {})]
+		"再铸": return [e("recast_three", 0, -1, "", "选择 3 个盘面字，替换成随机字（随机字不一定在你的牌组里，且为临时复制品）", {})]
 		"反转": return [e("reverse_line", 0, -1, "", "选择一整行或一整列，倒转其 4 格（含空格与完整叠层）", {})]
 		"合流": return [e("merge_flow", 0, -1, "", "揭示字袋 1 枚 + 弃字堆指定 1 枚，按任选顺序放入两个相邻空格；无相邻空格则不移动", {})]
 		"急停": return [e("hard_stop", 0, -1, "", "清空热度并移除本回合溢热生成的灼热【热】（字袋/弃字堆/盘面），立即结束出字阶段", {})]

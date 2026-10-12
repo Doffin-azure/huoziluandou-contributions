@@ -53,6 +53,38 @@ static func _replay_last_attack(b: BattleState) -> Array:
 		msgs.append("连击：重演【%s】" % b.last_attack_word.word)
 	return msgs
 
+
+## 回放：把上一个词用过的字放回盘面（原格优先，被占则找空格）。
+static func _replay_word(b: BattleState) -> Array:
+	if b.last_played_consumed.is_empty():
+		return ["回放：此前没有可回放的词"]
+	var placed := 0
+	for item in b.last_played_consumed:
+		var inst: CharInstance = item["inst"]
+		var pos: Vector2i = item["pos"]
+		if b.board.get_xy(pos) != null:
+			var empties: Array = b.board.empty_indices()
+			if empties.is_empty():
+				break
+			pos = empties[0]
+		b.discard.erase(inst)
+		b.consumed_this_turn.erase(inst)
+		inst.owner = CharInstance.Owner.PLAYER
+		b.board.set_xy(pos, inst)
+		placed += 1
+	return ["回放：将上一个词用过的 %d 枚字放回盘面" % placed]
+
+
+## 放回：移除字盘上一枚敌方实体字，将其退回（不造成伤害、不触发污染）。
+static func _return_enemy(b: BattleState, ctx: Dictionary) -> Array:
+	var pos: Vector2i = EffectUtil.tile(ctx)
+	var inst: CharInstance = b.board.get_xy(pos)
+	if inst == null or not inst.is_enemy_owned():
+		return ["放回：请选择一枚敌方实体字"]
+	b.temp_chars.erase(inst)
+	b.board.set_xy(pos, null)
+	return ["放回：将敌方【%s】退回" % inst.glyph()]
+
 static func _recover_consumed(b: BattleState, ctx: Dictionary) -> Array:
 	if b.consumed_this_turn.is_empty():
 		return ["回收：本回合没有消耗过实体字"]
@@ -159,6 +191,18 @@ static func _gild_glyph(b: BattleState, ctx: Dictionary) -> Array:
 	if n == 0:
 		return ["精金：字袋中没有【%s】" % g]
 	return ["精金：【%s】×%d 被永久镀金（每次参与多字词 +1 金币）" % [g, n]]
+
+
+## 精铸：把盘面一枚己方实体字固定（本场不消耗、可反复使用；不可移动/换字）。
+static func _pin_glyph(b: BattleState, ctx: Dictionary) -> Array:
+	var pos: Vector2i = EffectUtil.tile(ctx)
+	var inst: CharInstance = b.board.get_xy(pos)
+	if inst == null or not inst.is_player_owned() or inst.temporary:
+		return ["精铸：请选择一枚己方实体字"]
+	if inst.pinned:
+		return ["精铸：【%s】已经固定" % inst.glyph()]
+	inst.pinned = true
+	return ["精铸：将【%s】固定（本场可反复使用，不可移动/换字）" % inst.glyph()]
 
 static func _precision_place(b: BattleState, ctx: Dictionary, eff: EffectData) -> Array:
 	var cost: int = eff.amount
@@ -275,6 +319,8 @@ static func _move_cell(b: BattleState, ctx: Dictionary) -> Array:
 	var inst: CharInstance = b.board.get_xy(a)
 	if inst == null:
 		return ["收放：请选择要移动的字"]
+	if inst.pinned:
+		return ["收放：固定的字不可移动"]
 	if b.board.get_xy(c) != null:
 		return ["收放：目标格已被占用"]
 	b.board.clear_xy(a)
@@ -330,6 +376,49 @@ static func _recast_copy(b: BattleState, ctx: Dictionary) -> Array:
 	b.board.set_xy(tile, copy)
 	return ["再铸：将【%s】的临时复制放入指定空格（原牌留在弃字堆）" % src.glyph()]
 
+
+## 收心：将所选盘面己方牌放回抽字袋，每选 1 枚回复 1 生命（可 0 张）。
+static func _collect_own(b: BattleState, ctx: Dictionary) -> Array:
+	var cells: Array = ctx.get("target", {}).get("cells", [])
+	var n := 0
+	for cell in cells:
+		var pos: Vector2i = cell
+		var inst: CharInstance = b.board.get_xy(pos)
+		if inst == null or not inst.is_player_owned() or inst.temporary or inst.pinned:
+			continue
+		b.board.set_xy(pos, null)
+		b.bag.append(inst)
+		n += 1
+	if n > 0:
+		b.player.heal(n)
+	return ["收心：将 %d 枚字放回抽字袋，回复 %d 生命" % [n, n]]
+
+
+## 再铸：将所选 3 个盘面字替换为随机临时字（随机字不一定在玩家牌组里）。
+static func _recast_three(b: BattleState, ctx: Dictionary) -> Array:
+	var cells: Array = ctx.get("target", {}).get("cells", [])
+	if cells.size() < 3:
+		return ["再铸：请选择 3 个盘面字"]
+	var pool: Array = []
+	for c in Database.characters.values():
+		if not c.is_pollution and not c.pending_design and not c.tags.has("enemy"):
+			pool.append(c)
+	if pool.is_empty():
+		return ["再铸：无可用随机字"]
+	var replaced := 0
+	for cell in cells:
+		var pos: Vector2i = cell
+		if b.board.get_xy(pos) == null:
+			continue
+		var cd: CharacterData = pool[b.rng.randi_range(0, pool.size() - 1)]
+		var copy := CharInstance.new(cd)
+		copy.owner = CharInstance.Owner.PLAYER
+		copy.temporary = true
+		b.temp_chars.append(copy)
+		b.board.set_xy(pos, copy)
+		replaced += 1
+	return ["再铸：将 %d 枚字替换为随机临时字" % replaced]
+
 static func _repeat_last(b: BattleState, ctx: Dictionary) -> Array:
 	if b.last_played_glyphs.is_empty():
 		return ["再：此前没有可重复的字"]
@@ -357,6 +446,10 @@ static func _reverse_line(b: BattleState, ctx: Dictionary) -> Array:
 		var y: int = int(t["row"])
 		if y < 0 or y >= n:
 			return ["反转：无效行"]
+		for x0 in n:
+			var c0 := b.board.get_cell(x0, y)
+			if c0 != null and c0.pinned:
+				return ["反转：该行有固定字，不可移动"]
 		for x in n / 2:
 			var a := Vector2i(x, y)
 			var c := Vector2i(n - 1 - x, y)
@@ -369,6 +462,10 @@ static func _reverse_line(b: BattleState, ctx: Dictionary) -> Array:
 		var x2: int = int(t["col"])
 		if x2 < 0 or x2 >= n:
 			return ["反转：无效列"]
+		for y0 in n:
+			var c3 := b.board.get_cell(x2, y0)
+			if c3 != null and c3.pinned:
+				return ["反转：该列有固定字，不可移动"]
 		for y2 in n / 2:
 			var a2 := Vector2i(x2, y2)
 			var c2 := Vector2i(x2, n - 1 - y2)
@@ -403,7 +500,7 @@ static func _merge_flow(b: BattleState, ctx: Dictionary) -> Array:
 	return ["合流：将【%s】【%s】放入相邻空格" % [bag_card.glyph(), disc_card.glyph()]]
 
 static func _hard_stop(b: BattleState) -> Array:
-	b.player.heat = 0
+	b.clear_heat()
 	var removed := b.remove_scorch_in_circulation()
 	b.end_turn_requested = true
 	return ["急停：清空热度，移除 %d 枚未打出的灼热【热】；立即结束出字阶段" % removed]
@@ -414,7 +511,7 @@ static func _repeat_word(b: BattleState) -> Array:
 
 static func _suspend(b: BattleState) -> Array:
 	var h: int = b.player.heat
-	b.player.heat = 0
+	b.clear_heat()
 	b.player.add_persistent_block(h * 2)
 	b.end_turn_requested = true
 	return ["停息：清零 %d 热度，获得 %d 持久盾；立即结束出字阶段" % [h, h * 2]]

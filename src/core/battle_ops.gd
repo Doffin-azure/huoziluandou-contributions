@@ -167,18 +167,22 @@ static func battle_card_counts(b: BattleState) -> Dictionary:
 
 static func apply_gravity(b: BattleState) -> void:
 	for x in b.board.size:
+		# 固定的字不动（当作障碍）；其余字向下压缩
 		var column: Array = []
 		for y in b.board.size:
 			var c := b.board.get_cell(x, y)
-			if c != null:
+			if c != null and not c.pinned:
 				column.append(c)
-		var y2 := b.board.size - 1
-		for i in range(column.size() - 1, -1, -1):
-			b.board.set_cell(x, y2, column[i])
-			y2 -= 1
-		while y2 >= 0:
-			b.board.set_cell(x, y2, null)
-			y2 -= 1
+		var idx := column.size() - 1
+		for y in range(b.board.size - 1, -1, -1):
+			var c2 := b.board.get_cell(x, y)
+			if c2 != null and c2.pinned:
+				continue
+			if idx >= 0:
+				b.board.set_cell(x, y, column[idx])
+				idx -= 1
+			else:
+				b.board.set_cell(x, y, null)
 
 
 ## 横向重力：每行向左压缩（字靠左对齐）。
@@ -187,15 +191,18 @@ static func apply_gravity_left(b: BattleState) -> void:
 		var row: Array = []
 		for x in b.board.size:
 			var c := b.board.get_cell(x, y)
-			if c != null:
+			if c != null and not c.pinned:
 				row.append(c)
-		var x2 := 0
-		for i in row.size():
-			b.board.set_cell(x2, y, row[i])
-			x2 += 1
-		while x2 < b.board.size:
-			b.board.set_cell(x2, y, null)
-			x2 += 1
+		var idx := 0
+		for x in b.board.size:
+			var c2 := b.board.get_cell(x, y)
+			if c2 != null and c2.pinned:
+				continue
+			if idx < row.size():
+				b.board.set_cell(x, y, row[idx])
+				idx += 1
+			else:
+				b.board.set_cell(x, y, null)
 
 
 ## 横向重力：每行向右压缩（字靠右对齐）。
@@ -204,15 +211,18 @@ static func apply_gravity_right(b: BattleState) -> void:
 		var row: Array = []
 		for x in b.board.size:
 			var c := b.board.get_cell(x, y)
-			if c != null:
+			if c != null and not c.pinned:
 				row.append(c)
-		var x2 := b.board.size - 1
-		for i in range(row.size() - 1, -1, -1):
-			b.board.set_cell(x2, y, row[i])
-			x2 -= 1
-		while x2 >= 0:
-			b.board.set_cell(x2, y, null)
-			x2 -= 1
+		var idx := row.size() - 1
+		for x in range(b.board.size - 1, -1, -1):
+			var c2 := b.board.get_cell(x, y)
+			if c2 != null and c2.pinned:
+				continue
+			if idx >= 0:
+				b.board.set_cell(x, y, row[idx])
+				idx -= 1
+			else:
+				b.board.set_cell(x, y, null)
 
 static func apply_gravity_count(b: BattleState) -> int:
 	# 记录移动前的列高度，计算真实移动的实体数
@@ -233,6 +243,10 @@ static func apply_gravity_count(b: BattleState) -> int:
 	return moved
 
 static func rotate_2x2(b: BattleState, top_left: Vector2i) -> void:
+	for off in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]:
+		var c0 := b.board.get_xy(top_left + off)
+		if c0 != null and c0.pinned:
+			return  # 固定字不可移动
 	var ta := b.board.get_xy(top_left)
 	var tb := b.board.get_xy(top_left + Vector2i(1, 0))
 	var tc := b.board.get_xy(top_left + Vector2i(1, 1))
@@ -247,6 +261,10 @@ static func shift_row(b: BattleState, row: int, dir: int) -> void:
 	var n: int = b.board.size
 	if row < 0 or row >= n or dir == 0:
 		return
+	for x0 in n:
+		var c0 := b.board.get_cell(x0, row)
+		if c0 != null and c0.pinned:
+			return  # 固定字不可移动
 	var line: Array = []
 	for x in n:
 		line.append(b.board.get_xy(Vector2i(x, row)))
@@ -256,6 +274,11 @@ static func shift_row(b: BattleState, row: int, dir: int) -> void:
 
 ## 3×3 区域旋转：dir = -1 逆时针（左转）/ +1 顺时针（右转）。
 static func rotate_3x3(b: BattleState, anchor: Vector2i, dir: int) -> void:
+	for dy0 in 3:
+		for dx0 in 3:
+			var c0 := b.board.get_xy(anchor + Vector2i(dx0, dy0))
+			if c0 != null and c0.pinned:
+				return  # 固定字不可移动
 	var region: Array = []
 	for dy in 3:
 		for dx in 3:
@@ -335,7 +358,7 @@ static func converge_to(b: BattleState, anchor: Vector2i) -> int:
 			if p == anchor:
 				continue
 			var inst: CharInstance = b.board.get_xy(p)
-			if inst != null:
+			if inst != null and not inst.pinned:
 				items.append({"p": p, "inst": inst})
 	var moved := 0
 	for it in items:

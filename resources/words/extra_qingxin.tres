@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_i3k7b"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_w3lvn"]
+
+[sub_resource type="Resource" id="Resource_k28u2"]
+script = ExtResource("1_i3k7b")
+handler = "cleanse_status"
+note = "清除自身全部负面状态"
+
+[resource]
+script = ExtResource("2_w3lvn")
+id = "extra_qingxin"
+word = "清心"
+glyphs = Array[String](["清", "心"])
+description = "清除自身全部负面状态"
+effects = Array[ExtResource("1_i3k7b")]([SubResource("Resource_k28u2")])
+group = "流转"
+design_stage = "设计负责人新增"
+effect_summary = "清除自身全部负面状态"
+effect_handler_id = "cleanse_status"
+priority = "流转"
+implemented = true

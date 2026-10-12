@@ -38,6 +38,10 @@ func build(root: Control) -> void:
 	start.pressed.connect(_on_start)
 	btns.add_child(start)
 
+	var custom := Ink.button("自定义构筑")
+	custom.pressed.connect(func(): goto("res://src/screens/custom_deck_screen.gd"))
+	btns.add_child(custom)
+
 	var library := Ink.button("字库图鉴")
 	library.pressed.connect(_on_library)
 	btns.add_child(library)

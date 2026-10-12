@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_2ypxa"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_0wco8"]
+
+[sub_resource type="Resource" id="Resource_n044w"]
+script = ExtResource("1_2ypxa")
+handler = "replay_word"
+note = "把上一个词用过的字放回盘面"
+
+[resource]
+script = ExtResource("2_0wco8")
+id = "extra_huifang"
+word = "回放"
+glyphs = Array[String](["回", "放"])
+description = "把上一个词用过的字放回盘面（原格优先，被占则找空格）"
+effects = Array[ExtResource("1_2ypxa")]([SubResource("Resource_n044w")])
+group = "流转"
+design_stage = "设计负责人新增"
+effect_summary = "把上一个词用过的字放回盘面（原格优先，被占则找空格）"
+effect_handler_id = "replay_word"
+priority = "流转"
+implemented = true

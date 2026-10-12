@@ -22,6 +22,7 @@ var attack_words_this_turn: int = 0
 var drawn_this_turn: int = 0
 var consumed_this_turn: Array = []
 var next_draw_penalty: int = 0
+var manual_draw_pending: int = 0   ## 精心：本回合待玩家从字袋定向选字的枚数
 var base_draw_penalty: int = 0
 var last_attack_word: WordData = null
 var last_attack_glyphs: Array = []
@@ -42,6 +43,9 @@ var bounty_paid: bool = false
 var bounty_reward: int = 0
 var words_played_all: Array = []
 var last_played_glyphs: Array = []   ## 上一个出字的字形序列（供【再】重复）
+var last_played_word: WordData = null  ## 上一个打出的词（供【回放】）
+var last_played_effects: Array = []
+var last_played_consumed: Array = []   ## 上一个词用过的字+原格 [{inst, pos}]（供【回放】放回盘面）
 var blackout_requested: bool = false   ## 停电彩蛋：请求黑屏
 var end_turn_requested: bool = false    ## 急停：请求立即结束出字阶段
 var repeat_armed: bool = false          ## 重复：本回合第一次多字词是否可重演
@@ -148,7 +152,36 @@ func remove_from_battle_glyph(glyph: String) -> CharInstance:
 
 ## 本场还在循环中的牌（字袋 + 弃字堆）的字形计数，供炼化选牌。
 
+## 热心：热度变化时同步生命（每 +1 回 1 血，每 -1 扣 1 血）。
+func _warm_heart_sync(old_heat: int) -> void:
+	if not has_ability("warm_heart"):
+		return
+	var delta: int = player.heat - old_heat
+	if delta == 0:
+		return
+	if delta > 0:
+		player.heal(delta)
+		_log("热心：热度 +%d，回复 %d 生命" % [delta, delta])
+	else:
+		var real := player.take_damage(-delta)
+		_log("热心：热度 %d，失去 %d 生命" % [delta, real])
+
+
+## 统一清空热度（含热心）。
+func clear_heat() -> void:
+	var old := player.heat
+	player.heat = 0
+	_warm_heart_sync(old)
+
+
 func add_heat(amount: int) -> int:
+	var old_heat := player.heat
+	var ret := _add_heat_inner(amount)
+	_warm_heart_sync(old_heat)
+	return ret
+
+
+func _add_heat_inner(amount: int) -> int:
 	# 过冷：下一次获得的热度改为持久盾，且不生成过热污染
 	if amount > 0 and has_ability("next_heat_to_block"):
 		var mult := ability_value("next_heat_to_block", 2)
@@ -267,6 +300,8 @@ func deal_damage(target: Combatant, amount: int, is_attack: bool = true) -> int:
 		if sb > 0:
 			dmg += sb
 			abilities.erase("next_serial_bonus")
+		if player.turn_damage_double:
+			dmg *= 2  # 冷心：本回合伤害翻倍
 		if has_ability("split_mind") and not target.is_player:
 			target = player   # 精分：自己的攻击也打自己
 	var real := target.take_damage(dmg)
@@ -561,6 +596,13 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 	last_shift_dir = 0
 	_apply_next_word_flags(word)
 	last_played_glyphs = glyphs.duplicate()
+	if word != null:
+		last_played_word = word
+		last_played_effects = effects.duplicate()
+		last_played_consumed.clear()
+		for i in path.size():
+			if i < path_insts.size():
+				last_played_consumed.append({"inst": path_insts[i], "pos": path[i]})
 	return result
 
 
@@ -608,6 +650,10 @@ func _consume_path(path: Array) -> Array:
 	for pos in path:
 		var inst: CharInstance = board.get_xy(pos)
 		if inst == null:
+			continue
+		if inst.pinned:
+			# 精铸：固定字不消耗，留在原格可反复使用
+			out.append({"inst": inst, "kind": "pinned"})
 			continue
 		if inst.temporary_uses > 0:
 			inst.temporary_uses -= 1
@@ -719,9 +765,19 @@ func begin_player_turn(draw: bool = true) -> void:
 	reserved_cells.clear()
 	player.clear_block()
 	player.turn_damage_reduction = 0
+	player.turn_damage_halve = false
+	player.turn_damage_double = false
+	if player.no_block_turns > 0:
+		player.no_block_turns -= 1
+		if player.no_block_turns == 0:
+			_log("冷心：恢复获得防御")
 	player.block_broken = false
 	if has_ability("armor_plating"):
 		player.add_block(1)
+	# 强心：每回合回复已触发的心力层数
+	if has_ability("strong_heart") and player.heart_power_triggered > 0:
+		player.heal(player.heart_power_triggered)
+		_log("强心：回复 %d 生命（已触发心力 %d 层）" % [player.heart_power_triggered, player.heart_power_triggered])
 	player.temp_funds = 0
 	words_played_this_turn.clear()
 	attack_words_this_turn = 0
@@ -748,7 +804,12 @@ func begin_player_turn(draw: bool = true) -> void:
 		next_draw_penalty = 0
 		if vigor > 0:
 			_log("精力：本回合基础补字 +%d" % vigor)
-		draw_to_board(amount)
+		if has_ability("manual_draw"):
+			abilities.erase("manual_draw")
+			manual_draw_pending = amount
+			_log("精心：本回合补 %d 枚，改为从字袋定向选字（随机落地）" % amount)
+		else:
+			draw_to_board(amount)
 	abilities.erase("split_mind")
 	abilities.erase("profit_share")
 	abilities.erase("inject_bounty")
@@ -1048,6 +1109,31 @@ func resolve_formation() -> void:
 
 func draw_to_board(count: int) -> int:
 	return BattleOps.draw_to_board(self, count)
+
+
+## 精心：把玩家从字袋定向选中的字形，随机放入盘面空格。
+func place_manual_draw(glyphs: Array) -> int:
+	manual_draw_pending = 0
+	var placed := 0
+	for g in glyphs:
+		var found: CharInstance = null
+		for i in range(bag.size() - 1, -1, -1):
+			if bag[i].glyph() == str(g):
+				found = bag[i]
+				bag.remove_at(i)
+				break
+		if found == null:
+			continue
+		var empties: Array = board.empty_indices()
+		if empties.is_empty():
+			bag.append(found)
+			break
+		var pos: Vector2i = empties[rng.randi_range(0, empties.size() - 1)]
+		found.owner = CharInstance.Owner.PLAYER
+		board.set_xy(pos, found)
+		placed += 1
+	_log("精心：定向放入 %d 枚字（随机落地）" % placed)
+	return placed
 
 func _draw_one() -> bool:
 	return BattleOps._draw_one(self)

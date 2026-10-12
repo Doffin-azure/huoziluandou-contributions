@@ -19,6 +19,8 @@ var temporary: bool = false
 var fusion: Array[String] = []
 ## 镀金（精金）：永久；参与有效多字词时 +1 金币
 var gilded: bool = false
+## 精铸（固定）：本场钉在盘面原格，参与组词后不消耗、可反复使用；不可移动/换字
+var pinned: bool = false
 var statuses: Dictionary = {}
 var upgrade_level: int = 0
 
@@ -87,6 +89,7 @@ func clone() -> CharInstance:
 	c.temporary = temporary
 	c.fusion = fusion.duplicate()
 	c.gilded = gilded
+	c.pinned = pinned
 	c.statuses = statuses.duplicate(true)
 	c.upgrade_level = upgrade_level
 	return c

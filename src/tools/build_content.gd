@@ -29,7 +29,7 @@ const CUT_GLYPHS := ["纯", "攻", "剑", "雷", "毒", "愈", "却"]
 const CUT_WORDS := ["纯化", "纯金", "纯利", "精纯", "强力反击", "冷却"]
 
 ## 特殊交互（WordData.interaction）
-const INTERACTIONS := {"转化": "reveal_pick_board", "强化": "choose_glyph_empower", "炼化": "choose_battle_card_remove", "化合": "choose_fuse_pair", "精炼": "choose_same_pair", "精金": "choose_glyph_gild", "精铸": "choose_discard_place", "再铸": "choose_discard_place", "反转": "choose_line", "合流": "choose_merge_flow"}
+const INTERACTIONS := {"转化": "reveal_pick_board", "强化": "choose_glyph_empower", "炼化": "choose_battle_card_remove", "化合": "choose_fuse_pair", "精炼": "choose_same_pair", "精金": "choose_glyph_gild", "再铸": "choose_three_tiles", "反转": "choose_line", "合流": "choose_merge_flow"}
 ## 界面分组覆盖（设计负责人重定义后，不再归入原总账分组）
 const GROUP_OVERRIDES := {"转化": "空间", "分化": "空间", "停电": "彩蛋"}
 
@@ -419,10 +419,10 @@ func _build_extra_words() -> void:
 		ContentBuild.e("gild_glyph", 0, -1, "", "选择一枚己方字永久镀金", {})),
 		"%s/words/extra_jinjin.tres" % RES)
 
-	# 精铸：精准制造
-	_save(_extra("extra_jingzhu", "精铸", ["精", "铸"], "流转", "choose_discard_place",
-		"支付 3 金币，从弃字堆选一枚己方实体字，直接放进指定空格",
-		ContentBuild.e("precision_place", 3, -1, "", "支付 3 金币，把弃字堆中的一枚字放进指定空格", {})),
+	# 精铸：固定一枚盘面字（本场可反复使用，不可移动/换字）
+	_save(_extra_list("extra_jingzhu", "精铸", ["精", "铸"], "空间", "",
+		"选择盘面一枚己方实体字将其固定：本场不再回抽字袋/弃字堆，可反复使用；但固定后不可移动、不可换字",
+		[ContentBuild.e("pin_glyph", 0, EffectDataS.Target.BOARD_TILE, "", "选一枚盘面己方字固定（本场不消耗，不可移动/换字）", {})]),
 		"%s/words/extra_jingzhu.tres" % RES)
 
 	# 精分：彩蛋
@@ -615,6 +615,69 @@ func _build_extra_words() -> void:
 		[ContentBuild.e("overdo", 6, EffectDataS.Target.ENEMY, "", "造成 6 伤，并重演本场之前所有【过分】的伤害", {})]),
 		"%s/words/extra_guofen.tres" % RES)
 	print("  · 新增词：过分（过系）")
+
+	# 放回 / 回放（流转）
+	_save(_extra_list("extra_fanghui", "放回", ["放", "回"], "流转", "choose_discard_place",
+		"从弃字堆定向挑一枚己方实体字，放入盘面指定空格",
+		[ContentBuild.e("precision_place", 0, -1, "", "从弃字堆选一枚己方字放进指定空格", {})]),
+		"%s/words/extra_fanghui.tres" % RES)
+	_save(_extra_list("extra_huifang", "回放", ["回", "放"], "流转", "",
+		"把上一个词用过的字放回盘面（原格优先，被占则找空格）",
+		[ContentBuild.e("replay_word", 0, -1, "", "把上一个词用过的字放回盘面", {})]),
+		"%s/words/extra_huifang.tres" % RES)
+	print("  · 新增词：放回/回放（流转）")
+
+	# 精心（抽字控制）
+	_save(_extra_list("extra_jingxin", "精心", ["精", "心"], "流转", "",
+		"下回合补字数 -1，但补的字可从字袋定向挑选（随机落地）",
+		[ContentBuild.e("manual_draw_next", 1, -1, "", "下回合补字 -1，但可从字袋定向选字（随机落地）", {})]),
+		"%s/words/extra_jingxin.tres" % RES)
+	print("  · 新增词：精心")
+
+	# 心系补全（设计负责人）
+	_save(_extra_list("extra_rexin", "热心", ["热", "心"], "热暴", "",
+		"本场能力：每获得 1 热度回复 1 生命，每失去 1 热度扃 1 生命",
+		[ContentBuild.e("ability_warm_heart", 1, -1, "", "本场：热度 +1=回 1 血，-1=扣 1 血", {}, -1, "persistent")]),
+		"%s/words/extra_rexin.tres" % RES)
+	_save(_extra_list("extra_fangxin", "放心", ["放", "心"], "防反", "",
+		"本回合受到的伤害减半（向上取整，再 -1）",
+		[ContentBuild.e("guard_halve", 0, -1, "", "本回合受伤减半（向上取整再 -1）", {})]),
+		"%s/words/extra_fangxin.tres" % RES)
+	_save(_extra_list("extra_qiangxin", "强心", ["强", "心"], "防反", "",
+		"本场能力：每回合回复「已触发的心力层数」点生命（本场累计）",
+		[ContentBuild.e("ability_strong_heart", 1, -1, "", "本场：每回合回已触发心力层数的血", {}, -1, "persistent")]),
+		"%s/words/extra_qiangxin.tres" % RES)
+	_save(_extra_list("extra_shouxin", "收心", ["收", "心"], "流转", "choose_own_tiles",
+		"选择任意数量盘面己方牌放回抽字袋，每选 1 枚回复 1 生命",
+		[ContentBuild.e("collect_own", 0, -1, "", "选盘面牌回袋，每枚回 1 血", {})]),
+		"%s/words/extra_shouxin.tres" % RES)
+	_save(_extra_list("extra_huixin", "回心", ["回", "心"], "流转", "",
+		"回复 1 生命，并随机补 3 字",
+		[ContentBuild.e("heal", 1, -1, "", "回复 1 生命", {}),
+			ContentBuild.e("draw_random", 3, -1, "", "随机补 3 字", {})]),
+		"%s/words/extra_huixin.tres" % RES)
+	_save(_extra_list("extra_fenxin", "分心", ["分", "心"], "流转", "",
+		"补 1 字，对敌造成 1 伤，获得 1 持久盾，回复 1 生命",
+		[ContentBuild.e("draw_random", 1, -1, "", "补 1 字", {}),
+			ContentBuild.e("damage", 1, EffectDataS.Target.ENEMY, "", "造成 1 伤", {}),
+			ContentBuild.e("block_persist", 1, -1, "", "获得 1 持久盾", {}),
+			ContentBuild.e("heal", 1, -1, "", "回复 1 生命", {})]),
+		"%s/words/extra_fenxin.tres" % RES)
+	print("  · 新增词：热心/放心/强心/收心/回心/分心")
+
+	# 冷心（高风险爆发）
+	_save(_extra_list("extra_lengxin", "冷心", ["冷", "心"], "热暴", "",
+		"本回合伤害翻倍；接下来 2 回合不能获得防御（格挡/持久盾无效）",
+		[ContentBuild.e("cold_heart", 0, -1, "", "本回合伤害翻倍；2 回合不能获得防御", {})]),
+		"%s/words/extra_lengxin.tres" % RES)
+	print("  · 新增词：冷心")
+
+	# 清心（清除负面状态）
+	_save(_extra_list("extra_qingxin", "清心", ["清", "心"], "流转", "",
+		"清除自身全部负面状态",
+		[ContentBuild.e("cleanse_status", 0, -1, "", "清除自身全部负面状态", {})]),
+		"%s/words/extra_qingxin.tres" % RES)
+	print("  · 新增词：清心")
 
 func _extra(id: String, word: String, glyphs: Array, group: String, interaction: String, desc: String, effect: EffectData) -> WordData:
 	var w: WordData = WordDataS.new()

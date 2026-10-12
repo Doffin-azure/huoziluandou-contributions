@@ -23,6 +23,14 @@ var temp_funds: int = 0            ## 本回合临时支付额度
 var permanent_damage_reduction: int = 0
 ## 御：本回合每次受伤减免（临时，回合结束清零）
 var turn_damage_reduction: int = 0
+## 放心：本回合受到伤害减半（临时，回合结束清零）
+var turn_damage_halve: bool = false
+## 强心：本场累计「已触发的心力层数」
+var heart_power_triggered: int = 0
+## 冷心：本回合造成的伤害翻倍（临时）
+var turn_damage_double: bool = false
+## 冷心：剩余多少回合不能获得防御（格挡/持久盾无效）
+var no_block_turns: int = 0
 ## 甲：本回合格挡是否被击穿（用于护甲碎裂判定）
 var block_broken: bool = false
 ## 心力层数（玩家专属）：抵挡致命伤害，每层可挡一次
@@ -58,9 +66,13 @@ func take_damage(amount: int) -> int:
 		var persisted: int = min(persistent_block, dmg)
 		persistent_block -= persisted
 		dmg -= persisted
+	# 放心：本回合受伤减半（向上取整，再减 1）
+	if is_player and turn_damage_halve and dmg > 0:
+		dmg = max(0, int(ceil(dmg / 2.0)) - 1)
 	# 心力：抵挡一次致命伤害（本次伤害不生效，保留当前生命）
 	if is_player and dmg > 0 and hp - dmg <= 0 and heart_power > 0:
 		heart_power -= 1
+		heart_power_triggered += 1
 		dmg = 0
 	hp = max(0, hp - dmg)
 	if dmg > 0:
@@ -73,10 +85,14 @@ func heal(amount: int) -> void:
 
 
 func add_block(amount: int) -> void:
+	if no_block_turns > 0:
+		return   # 冷心：不能获得防御
 	block = max(0, block + amount)
 
 
 func add_persistent_block(amount: int) -> void:
+	if no_block_turns > 0:
+		return   # 冷心：不能获得防御
 	persistent_block = max(0, persistent_block + amount)
 
 

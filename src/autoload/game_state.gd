@@ -21,30 +21,39 @@ var reinvest_gold: int = 0
 
 var rng := RandomNumberGenerator.new()
 
+## 自定义起始字袋（字形字符串列表，如 ["火","火","电"]）；非空时 start_new_run 优先用它。
+## 调试入口与未来「自定义模式」共用这一处。
+var custom_deck: Array = []
+
 
 func _ready() -> void:
 	rules = Database.rules
 	rng.randomize()
 
 
-func start_new_run(starter_id: String = "v03") -> void:
+func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> void:
 	if Database.rules == null:
 		Database.reload()
 	rules = Database.rules
 	deck.clear()
-	var starter: StarterDeckData = Database.starter_decks.get(starter_id)
-	if starter == null and not Database.starter_decks.is_empty():
-		starter = Database.starter_decks.values()[0]
-	if starter != null:
-		for entry in starter.entries:
-			add_character(entry.character, entry.count)
-		player_max_hp = rules.player_max_hp
-		player_hp = player_max_hp
-		gold = rules.starting_gold
+	player_max_hp = rules.player_max_hp
+	player_hp = player_max_hp
+	gold = rules.starting_gold
+	if not custom_glyphs.is_empty():
+		# 自定义模式 / 调试：按给定字形列表建袋
+		custom_deck = custom_glyphs.duplicate()
+		for g in custom_glyphs:
+			var cd: CharacterData = Database.get_character_by_glyph(str(g))
+			if cd != null:
+				add_character(cd, 1)
 	else:
-		player_max_hp = rules.player_max_hp
-		player_hp = player_max_hp
-		gold = rules.starting_gold
+		custom_deck.clear()
+		var starter: StarterDeckData = Database.starter_decks.get(starter_id)
+		if starter == null and not Database.starter_decks.is_empty():
+			starter = Database.starter_decks.values()[0]
+		if starter != null:
+			for entry in starter.entries:
+				add_character(entry.character, entry.count)
 	act_index = 1
 	node_index = 1
 	fork_choice = -1
