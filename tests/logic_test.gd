@@ -786,16 +786,18 @@ func _test_buyback() -> void:
 
 
 func _test_gravity_always() -> void:
-	print("[重力] 本战每次出字后全盘下落")
+	print("[重力] 每次出字后 + 每回合开局下落")
 	var b := _battle()
 	_place(b, 0, 0, "重")
 	_place(b, 1, 0, "力")
+	_place(b, 2, 0, "防")
 	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
 	_ok(b.has_ability("gravity_always"), "重力：已启用持续下落")
-	_place(b, 0, 0, "洗")
-	_place(b, 3, 3, "击")
-	b.try_play([Vector2i(3, 3)])
-	_ok(b.board.get_cell(0, 3) != null, "后续出字后，列顶字块被重力压到底行")
+	_ok(b.board.get_cell(2, 3) != null and b.board.get_cell(2, 0) == null, "出字后下落（【防】落底）")
+	_add_enemy(b, 200)
+	_place(b, 3, 0, "洗")
+	b.end_player_turn()
+	_ok(b.board.get_cell(3, 3) != null and b.board.get_cell(3, 0) == null, "回合开局抽完牌后下落（【洗】落底）")
 
 
 func _test_transform_board() -> void:

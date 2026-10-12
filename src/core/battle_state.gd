@@ -554,7 +554,7 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 		if first2 != null and first2.data != null:
 			EventBus.character_played.emit(first2.data)
 
-	# 重力（持续能力）：每次有效出字后自动全盘向下重力
+	# 重力（持续能力）：每次有效出字后自动全盘向下重力（含打出「重力」当次）
 	if has_ability("gravity_always"):
 		apply_gravity()
 		_log("重力：全盘下落")
@@ -834,6 +834,10 @@ func begin_player_turn(draw: bool = true) -> void:
 			_log("精心：本回合补 %d 枚，改为从字袋定向选字（随机落地）" % amount)
 		else:
 			draw_to_board(amount)
+		# 重力（持续能力）：回合开局抽完牌后也全盘下落
+		if has_ability("gravity_always"):
+			apply_gravity()
+			_log("重力：回合开局下落")
 	abilities.erase("split_mind")
 	abilities.erase("profit_share")
 	abilities.erase("inject_bounty")
