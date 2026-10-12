@@ -756,11 +756,6 @@ func _apply_next_word_flags(word: WordData) -> void:
 		_log("急速：补 %d 字" % n)
 		abilities.erase("next_rapid")
 		abilities.erase("next_rapid_heat")
-	if ability_value("next_double_draw") > 0:
-		var n2 := draw_to_board(ability_value("next_double_draw"))
-		add_heat(n2)
-		_log("超速：补 %d 字" % n2)
-		abilities.erase("next_double_draw")
 	if ability_value("next_compound") > 0:
 		_log("复合：保留临时层（原型：已在消耗时处理）")
 		abilities.erase("next_compound")

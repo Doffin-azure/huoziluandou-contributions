@@ -15,7 +15,7 @@
 - **局内循环**：3 幕 × 8 节点 = 24 节点，含普通战 / 事件 / 商店 / 岔路（精英或事件）/ 休整 / Boss，12～15 场战斗。
 - **两套可切换视觉风格**：`宣纸活字`（传统）与 `墨芯`（大模型 / 科技）；令牌驱动，运行时切换。
 - **可复现**：战斗随机数固定种子；特效/台词使用独立 `visual_rng`，不消耗战斗 RNG。
-- **质量保障**：`tests/logic_test.tscn` **238 条断言**；另有内容导出、字网图谱、棋盘组词概率三套工具。
+- **质量保障**：`tests/logic_test.tscn` **241 条断言**；另有内容导出、字网图谱、棋盘组词概率三套工具。
 
 ---
 
@@ -99,7 +99,7 @@ assets/fonts/  随仓库字体
 
 | 工具 | 命令 | 用途 |
 |---|---|---|
-| 逻辑测试 | `<godot> --headless --path . res://tests/logic_test.tscn` | 238 条规则断言 |
+| 逻辑测试 | `<godot> --headless --path . res://tests/logic_test.tscn` | 241 条规则断言 |
 | 内容生成 | `<godot> --headless --path . --script res://src/tools/build_content.gd` | 从表格重建 `.tres` |
 | 词效表 | `<godot> --headless --path . res://src/tools/dump_words.tscn` | 导出 154 词效果表 |
 | 字表 | `<godot> --headless --path . res://src/tools/dump_chars.tscn` | 导出 65 字表（含出/入度） |
@@ -134,7 +134,7 @@ assets/fonts/  随仓库字体
 
 ## 协作约定
 
-- 提交前请跑一遍逻辑测试，保持 **238/238**。
+- 提交前请跑一遍逻辑测试，保持 **241/241**。
 - 改内容优先改 `.tres`；批量改内容改 `data/import/` + `src/tools/content_build.gd` 后重生成。
 - 换行统一 LF（见 `.gitattributes`）；二进制资源（字体 / PNG）已在属性中标注。
 - **不要提交** `.godot/`（编辑器缓存，已在 `.gitignore`）；首次打开工程会自动重建。

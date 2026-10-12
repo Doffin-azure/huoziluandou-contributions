@@ -69,7 +69,15 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			src.heal(amount)
 			return ["回复 %d 点生命" % amount]
 		"draw_random":
-			var n := b.draw_to_board(amount)
+			# 超速：本回合下一次补字翻倍（额外最多 4），每额外 1 字升温 1
+			var bonus := 0
+			if b.ability_value("next_double_draw") > 0:
+				bonus = mini(amount, b.ability_value("next_double_draw"))
+				b.abilities.erase("next_double_draw")
+			var n := b.draw_to_board(amount + bonus)
+			if bonus > 0:
+				b.add_heat(bonus)
+				return ["随机补 %d 字（超速 +%d，热度 +%d）" % [n, bonus, bonus]]
 			return ["随机补 %d 字" % n]
 		"draw_penalty_next":
 			b.next_draw_penalty += amount

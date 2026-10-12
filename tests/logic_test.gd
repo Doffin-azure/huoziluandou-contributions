@@ -25,6 +25,7 @@ func _run() -> void:
 	_test_lengxin()
 	_test_qingxin()
 	_test_chaozai()
+	_test_chaosu()
 	_test_pollution_rush()
 	_test_heat_overflow()
 	_test_merge_duplicates()
@@ -499,6 +500,23 @@ func _test_chaozai() -> void:
 	b.try_play([Vector2i(2, 0), Vector2i(3, 0)])
 	_ok(100 - e.hp == 16, "超载：击破 8 伤 ×2 = 16（实际 %d）" % (100 - e.hp))
 	_ok(b.player.status_stacks("next_extra") == 0, "超载：层数已消耗")
+
+
+func _test_chaosu() -> void:
+	print("[超速] 下一次补字翻倍")
+	var b := _battle()
+	for i in 10:
+		b.bag.append(CharInstance.new(Database.get_character_by_glyph("击")))
+	_place(b, 0, 0, "超")
+	_place(b, 1, 0, "速")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b.ability_value("next_double_draw") > 0, "超速：设定翻倍标记")
+	_place(b, 0, 1, "回")
+	_place(b, 1, 1, "流")
+	b.player.heat = 0
+	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
+	_ok(b.board.fill_count() == 8, "超速：回流补 4 → 8 字（盘面 %d）" % b.board.fill_count())
+	_ok(b.player.heat == 4, "超速：额外 4 字升 4 热（热度 %d）" % b.player.heat)
 
 
 func _test_pollution_rush() -> void:
