@@ -33,7 +33,7 @@ func build(root: Control) -> void:
 	start.custom_minimum_size.y = 64
 	start.add_theme_font_size_override("font_size", 24)
 	_menu.add_child(start)
-	for entries in [[["字库图鉴", _on_library], ["字网图谱", _on_graph]], [["设置", _open_settings], ["离开", _quit]]]:
+	for entries in [[["自定义构筑", _on_custom], ["字库图鉴", _on_library]], [["字网图谱", _on_graph], ["设置", _open_settings]], [["离开", _quit]]]:
 		var row := Ink.hbox(12)
 		for entry in entries:
 			row.add_child(_button(entry[0], entry[1]))
@@ -122,6 +122,10 @@ func _open_settings() -> void:
 	if _starting or _modal_count > 0:
 		return
 	_mount_overlay(SettingsOverlay.new())
+
+
+func _on_custom() -> void:
+	goto("res://src/screens/custom_deck_screen.gd")
 
 
 func _on_library() -> void:
