@@ -39,6 +39,7 @@ var _recast_three_cells: Array = []
 var _collect_own_active := false     ## 收心：正在选盘面牌回袋
 var _collect_own_cells: Array = []
 var _compound_picker_active := false ## 复合：正在选保留的临时字
+var _manual_draw_picks: Array = []   ## 精心：已选的定向字
 var _current_word: WordData
 var _transform_uid := -1
 var _fuse_stage := 0
@@ -998,7 +999,9 @@ func _on_discard_chosen(index: int) -> void:
 	_pending_path = []
 	if path.is_empty():
 		return
-	_on_commit(path, {"discard_index": index})
+	if index < 0 or index >= battle.consumed_this_turn.size():
+		return
+	_on_commit(path, {"discard_uid": battle.consumed_this_turn[index].uid})
 
 
 func _on_end_turn() -> void:
@@ -1020,7 +1023,56 @@ func _on_end_turn() -> void:
 		_bubble.set_text("你的回合", "新字已落盘，继续连词。", SpeechBubble.State.IDLE)
 		_bubble.set_context(_selection_context([]))
 		_effects.number("回合 %d" % battle.turn, _effects.point_of(_board_view), Palette.INK_SOFT)
+	# 精心：本回合补字改由玩家从字袋定向选择（随机落地）
+	if battle.manual_draw_pending > 0:
+		_start_manual_draw()
+		_set_busy(false)
+		return
 	_set_busy(false)
+	_check_battle_over()
+
+
+func _start_manual_draw() -> void:
+	_manual_draw_picks = []
+	_show_manual_draw_pick(1)
+
+
+func _show_manual_draw_pick(n: int) -> void:
+	var total: int = battle.manual_draw_pending
+	if n > total:
+		_finish_manual_draw()
+		return
+	var counts: Dictionary = {}
+	for inst in battle.bag:
+		var g: String = inst.glyph()
+		counts[g] = int(counts.get(g, 0)) + 1
+	var glyphs: Array = counts.keys()
+	if glyphs.is_empty():
+		_finish_manual_draw()
+		return
+	var options: Array = []
+	for g in glyphs:
+		options.append({"text": "【%s】×%d" % [g, counts[g]]})
+	options.append({"text": "（剩下随机补）"})
+	var ov := ChoiceOverlay.new()
+	ov.setup({"title": "精心：从字袋选第 %d/%d 枚（随机落地）" % [n, total], "options": options})
+	ov.chose.connect(_on_manual_draw_chosen.bind(glyphs, n))
+	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_mount_overlay(ov)
+
+
+func _on_manual_draw_chosen(index: int, glyphs: Array, n: int) -> void:
+	if index < 0 or index >= glyphs.size():
+		_finish_manual_draw()
+		return
+	_manual_draw_picks.append(glyphs[index])
+	_show_manual_draw_pick(n + 1)
+
+
+func _finish_manual_draw() -> void:
+	battle.place_manual_draw(_manual_draw_picks)
+	_manual_draw_picks = []
+	_refresh_all()
 	_check_battle_over()
 
 
