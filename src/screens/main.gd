@@ -7,6 +7,9 @@ extends Control
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	var study := StudyStage.new()
+	add_child(study)
+	Router.study_stage = study
 	Router.host = self
 	var glyphs := _deck_from_cmdline()
 	if not glyphs.is_empty():
@@ -90,3 +93,7 @@ func _load_deck_file(path: String) -> Array:
 			return _parse_deck_spec(str(data2["deck"]))
 		return []
 	return _parse_deck_spec(trimmed.replace("\n", ","))
+
+
+func _exit_tree() -> void:
+	Router.study_stage = null

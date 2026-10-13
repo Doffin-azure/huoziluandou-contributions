@@ -13,6 +13,7 @@ var drag_release_play: bool = false
 
 ## 视觉风格："paper"（宣纸活字）或 "neon"（墨芯·大模型）。
 var visual_style: String = "paper"
+var reduced_motion: bool = false
 
 var _cfg := ConfigFile.new()
 
@@ -21,6 +22,7 @@ func _ready() -> void:
 	if _cfg.load(PATH) == OK:
 		drag_release_play = bool(_cfg.get_value("input", "drag_release_play", drag_release_play))
 		visual_style = str(_cfg.get_value("visual", "style", visual_style))
+		reduced_motion = bool(_cfg.get_value("visual", "reduced_motion", false))
 
 
 func set_drag_release_play(value: bool) -> void:
@@ -42,4 +44,11 @@ func set_visual_style(style_id: String) -> void:
 func _save() -> void:
 	_cfg.set_value("input", "drag_release_play", drag_release_play)
 	_cfg.set_value("visual", "style", visual_style)
+	_cfg.set_value("visual", "reduced_motion", reduced_motion)
 	_cfg.save(PATH)
+
+
+func set_reduced_motion(value: bool) -> void:
+	reduced_motion = value
+	_save()
+	changed.emit()

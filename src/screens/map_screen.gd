@@ -18,8 +18,14 @@ func build(root: Control) -> void:
 		act = ActData.new()
 
 	var main := Ink.vbox(0)
-	main.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.add_child(main)
+	if is_instance_valid(Router.study_stage) and Router.study_stage.visible:
+		var frame := Ink.margin(64)
+		frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		root.add_child(frame)
+		frame.add_child(main)
+	else:
+		main.set_anchors_preset(Control.PRESET_FULL_RECT)
+		root.add_child(main)
 
 	main.add_child(_build_header())
 

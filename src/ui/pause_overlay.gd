@@ -1,50 +1,114 @@
 extends Control
 class_name PauseOverlay
-## 暂停 / 中途退出菜单。ESC 或「菜单」按钮呼出。
+## 唯一的游戏菜单：常用入口集中于此，设置关闭后回到菜单。
+var _main_layer: Control
+var _panel: PanelContainer
+var _padding: MarginContainer
+var _column: VBoxContainer
+var _heading: Label
+var _buttons: Array[Button] = []
+var _settings: SettingsOverlay
+var _ui_scale := 0.0
+
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_main_layer = Control.new()
+	_main_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_main_layer)
 	var dim := ColorRect.new()
 	dim.color = Color(0.04, 0.04, 0.06, 0.72)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(dim)
-
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
-	var panel := Ink.panel("PanelCard")
-	panel.custom_minimum_size = Vector2(340, 0)
-	center.add_child(panel)
-	var pad := Ink.margin(22)
-	panel.add_child(pad)
-	var col := Ink.vbox(10)
-	pad.add_child(col)
-
-	col.add_child(Ink.h2("菜单"))
-	col.add_child(Ink.hline())
-
-	var resume := Ink.button("继续", true)
-	resume.pressed.connect(_close)
-	col.add_child(resume)
-
-	var settings := Ink.button("设置")
-	settings.pressed.connect(func():
-		var ov := SettingsOverlay.new()
-		ov.set_anchors_preset(Control.PRESET_FULL_RECT)
-		add_child(ov))
-	col.add_child(settings)
-
-	var abandon := Ink.button("放弃本局（返回标题）")
-	abandon.pressed.connect(func():
-		Router.goto("res://src/screens/title_screen.gd"))
-	col.add_child(abandon)
-
-	var quit := Ink.button("退出游戏")
+	_main_layer.add_child(dim)
+	_panel = Ink.panel("PanelCard")
+	_main_layer.add_child(_panel)
+	var sheet: StyleBox = _panel.get_theme_stylebox("panel").duplicate()
+	sheet.set_content_margin_all(0)
+	_panel.add_theme_stylebox_override("panel", sheet)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_panel.add_child(scroll)
+	_padding = Ink.margin(16)
+	_padding.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(_padding)
+	_column = Ink.vbox(6)
+	_padding.add_child(_column)
+	_heading = Ink.h2("菜单")
+	_column.add_child(_heading)
+	_column.add_child(Ink.hline())
+	_column.add_child(_button("继续", _close, true))
+	var host: Control = Router.current
+	var tools := Ink.hbox(10)
+	if host != null and host.has_method("_open_deck"):
+		tools.add_child(_button("字袋", _open_tool.bind("_open_deck")))
+	if host != null and host.has_method("_toggle_log"):
+		tools.add_child(_button("战报", _open_tool.bind("_toggle_log")))
+	if tools.get_child_count() > 0:
+		_column.add_child(tools)
+	else:
+		tools.free()
+	_column.add_child(_button("设置", _open_settings))
+	_column.add_child(_button("放弃本局（返回主界面）", func(): Router.goto("res://src/screens/title_screen.gd")))
+	var quit := _button("退出游戏", func(): get_tree().quit())
 	quit.theme_type_variation = "DangerButton"
-	quit.pressed.connect(func(): get_tree().quit())
-	col.add_child(quit)
+	_column.add_child(quit)
+	resized.connect(_layout)
+	_column.minimum_size_changed.connect(_layout.call_deferred)
+	_layout.call_deferred()
+
+
+func _button(text: String, action: Callable, primary := false) -> Button:
+	var button := Ink.button(text, primary)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.pressed.connect(action)
+	_buttons.append(button)
+	return button
+
+
+func _layout() -> void:
+	if _panel == null or size.x < 1:
+		return
+	var factor := clampf(size.y / maxf(1, DisplayServer.window_get_size().y), 1.0, 1.85)
+	if not is_equal_approx(factor, _ui_scale):
+		_ui_scale = factor
+		for button in _buttons:
+			button.custom_minimum_size.y = 48 * factor
+			button.add_theme_font_size_override("font_size", int(minf(34, 20 * factor)))
+		_heading.add_theme_font_size_override("font_size", int(minf(44, 28 * factor)))
+		_column.add_theme_constant_override("separation", int(6 * factor))
+		for edge in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
+			_padding.add_theme_constant_override(edge, int(16 * factor))
+	var width := minf(360 * factor, size.x - 32 * factor)
+	var height := minf(_column.get_combined_minimum_size().y + 32 * factor, size.y - 24 * factor)
+	_panel.size = Vector2(width, height)
+	_panel.position = (size - _panel.size) * 0.5
+
+
+func _open_tool(method: String) -> void:
+	var host: Control = Router.current
+	_close()
+	if host != null and host.has_method(method):
+		host.call(method)
+
+
+func _open_settings() -> void:
+	if is_instance_valid(_settings):
+		return
+	_main_layer.hide()
+	_settings = SettingsOverlay.new()
+	add_child(_settings)
+	_settings.tree_exited.connect(func():
+		_settings = null
+		if is_inside_tree():
+			_main_layer.show())
 
 
 func _close() -> void:
 	queue_free()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("cancel_selection"):
+		_close()
+		get_viewport().set_input_as_handled()

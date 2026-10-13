@@ -23,10 +23,18 @@ func _unhandled_input(event: InputEvent) -> void:
 func open() -> void:
 	if _instance != null and is_instance_valid(_instance):
 		return
+	var current: Control = Router.current
+	if current != null:
+		var modal_count: Variant = current.get("_modal_count")
+		if current.get("_busy") == true or (modal_count != null and int(modal_count) > 0):
+			return
 	_instance = PauseOverlay.new()
 	_instance.set_anchors_preset(Control.PRESET_FULL_RECT)
 	var host = Router.current
 	if host == null:
 		host = get_tree().root
-	host.add_child(_instance)
+	if host.has_method("_mount_overlay"):
+		host.call("_mount_overlay", _instance)
+	else:
+		host.add_child(_instance)
 	get_viewport().set_input_as_handled()

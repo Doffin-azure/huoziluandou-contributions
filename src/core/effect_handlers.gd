@@ -147,7 +147,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			if enemy.block > 0:
 				var mult: int = int(eff.args.get("mult", 2))
 				var absorbed: int = min(enemy.block, dmg3 * mult)
-				enemy.block -= absorbed
+				enemy.remove_block(absorbed)
 				var leftover: int = int(ceil((dmg3 * mult - absorbed) / float(mult)))
 				if enemy.block <= 0:
 					broke = true
@@ -163,7 +163,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"remove_enemy_block":
 			if enemy != null:
 				var removed := enemy.block
-				enemy.block = 0
+				enemy.remove_block(removed)
 				return ["移除敌方 %d 点护盾" % removed]
 			return []
 		"conditional_draw_after_attack":
