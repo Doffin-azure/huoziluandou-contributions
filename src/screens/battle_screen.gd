@@ -33,6 +33,12 @@ var _selection_actions: HBoxContainer
 var _effects: BattleEffects
 var _target_index := 0
 var _pending_path: Array = []
+var _ready_action: Dictionary = {}   ## 待发动：已选好路径+目标，点「发动」才执行
+var _recast_three_active := false    ## 再铸：正在选 3 个盘面字
+var _recast_three_cells: Array = []
+var _collect_own_active := false     ## 收心：正在选盘面牌回袋
+var _collect_own_cells: Array = []
+var _compound_picker_active := false ## 复合：正在选保留的临时字
 var _current_word: WordData
 var _transform_uid := -1
 var _fuse_stage := 0
@@ -236,7 +242,7 @@ func _build_left() -> Control:
 	_confirm_btn.mouse_exited.connect(func(): _confirm_ink.set_shader_parameter("hovered", false))
 	_confirm_btn.button_down.connect(func(): _confirm_ink.set_shader_parameter("pressed", true))
 	_confirm_btn.button_up.connect(func(): _confirm_ink.set_shader_parameter("pressed", false))
-	_confirm_btn.pressed.connect(func(): _on_commit(_board_view.path.duplicate()))
+	_confirm_btn.pressed.connect(_on_primary)
 	_selection_actions.add_child(_confirm_btn)
 	_clear_btn = Ink.button("清除")
 	var clear_style := StyleBoxFlat.new()
@@ -247,7 +253,7 @@ func _build_left() -> Control:
 	_clear_btn.add_theme_stylebox_override("normal", clear_style)
 	_clear_btn.add_theme_stylebox_override("disabled", clear_style)
 	_clear_btn.custom_minimum_size = Vector2(72, 56)
-	_clear_btn.pressed.connect(func(): _board_view.clear_selection())
+	_clear_btn.pressed.connect(_on_clear_cancel)
 	_selection_actions.add_child(_clear_btn)
 	col.add_child(_selection_actions)
 	return col
@@ -460,10 +466,57 @@ func _on_enemy_clicked(index: int) -> void:
 	_bubble.set_context(_selection_context(_board_view.path))
 
 
-func _on_commit(path: Array, target: Dictionary = {}) -> void:
-	if _finished or _busy or (_modal_count > 0 and target.is_empty()):
+func _on_primary() -> void:
+	if _finished or _busy:
+		return
+	if _collect_own_active:
+		var cp := _pending_path
+		_collect_own_active = false
+		var cells := _collect_own_cells.duplicate()
+		_collect_own_cells = []
+		_board_view.end_pick()
+		_on_commit(cp, {"cells": cells})
+		return
+	if not _ready_action.is_empty():
+		var a := _ready_action
+		_ready_action = {}
+		_board_view.end_pick()
+		_on_commit(a.path, a.target)
 		return
 	if _board_view.pick_mode != "":
+		return
+	# 合击·结阵：点「发动」时才把登记的词一起结算
+	if battle.formation_mode and not battle.formation_queue.is_empty():
+		battle.resolve_formation()
+		_board_view.clear_selection()
+		_refresh_all()
+		if _handle_effect_requests():
+			return
+		_check_battle_over()
+		return
+	_on_commit(_board_view.path.duplicate())
+
+
+## 选好路径+目标后进入「待发动」：不立即结算，可继续点别处改选，或点「发动」执行。
+func _fill_ready(path: Array, target: Dictionary) -> void:
+	_pending_path = []
+	_ready_action = {"path": path, "target": target}
+	_update_input()
+
+
+func _on_clear_cancel() -> void:
+	if _collect_own_active or _recast_three_active or not _ready_action.is_empty() or _board_view.pick_mode != "":
+		_on_pick_cancelled()
+		_board_view.end_pick()
+		_update_input()
+		return
+	_board_view.clear_selection()
+
+
+func _on_commit(path: Array, target: Dictionary = {}) -> void:
+	if _finished or _compound_picker_active or _busy or (_modal_count > 0 and target.is_empty()):
+		return
+	if _board_view.pick_mode != "" and _ready_action.is_empty():
 		return
 	if target.is_empty() and _current_word != null and not _current_word.interaction.is_empty():
 		match _current_word.interaction:
@@ -494,6 +547,14 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 			"choose_merge_flow":
 				_run_merge_flow(path)
 				return
+			"choose_three_tiles":
+				_run_recast_three(path)
+				return
+			"choose_own_tiles":
+				_run_collect_own(path)
+				return
+	if _choose_compound_copy(path, target):
+		return
 	var play_target := target.duplicate()
 	var glyphs_before := battle.board.glyphs_of(path)
 	var word_before: WordData = Database.get_word_by_glyphs(glyphs_before) if glyphs_before.size() >= 2 else null
@@ -518,8 +579,24 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 		_on_log("✗ " + str(result.reason))
 		_bubble.set_error(str(result.reason))
 		return
+	# 合击·结阵：本词只登记，不结算（点「发动」后一起结算）
+	if result.get("queued", false):
+		_ready_action = {}
+		_board_view.end_pick()
+		_board_view.clear_selection()
+		_refresh_all(true)
+		var queued_text := ""
+		for g in result.glyphs:
+			queued_text += str(g)
+		_bubble.set_text("结阵登记：《%s》" % queued_text, "点「发动」与本回合其他词一起结算。", SpeechBubble.State.PREVIEW)
+		return
 	_set_busy(true)
+	_ready_action = {}
+	_board_view.end_pick()
 	_board_view.release_selected(path)
+	# 停息/停电等即时请求：在演出前即刻结算，保证逻辑与输入时机、动画开关无关
+	if _handle_effect_requests():
+		return
 	if not await _wait_step(0.11 if not Settings.reduced_motion else 0.01):
 		return
 	var aim: Control = _player_panel
@@ -547,14 +624,21 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 
 	if result.zero_effect:
 		_on_log("（该字/词没有效果，仅消耗）")
+	if _handle_effect_requests():
+		return
+	_check_battle_over()
+
+
+## 处理「停息/停电」等需要立即结算的请求。返回 true 表示应中断后续演出/检查。
+func _handle_effect_requests() -> bool:
 	if battle.blackout_requested:
 		battle.blackout_requested = false
 		_show_blackout()
 	if battle.end_turn_requested:
 		battle.end_turn_requested = false
 		_on_end_turn()
-		return
-	_check_battle_over()
+		return true
+	return false
 
 
 func _show_blackout() -> void:
@@ -580,6 +664,37 @@ func _request_target(target_kind: int) -> void:
 
 
 func _on_tile_picked(pos: Vector2i) -> void:
+	if _collect_own_active:
+		if battle.board.get_xy(pos) == null:
+			return
+		if _collect_own_cells.has(pos):
+			_collect_own_cells.erase(pos)   # 再点已选格 = 取消该格
+		else:
+			_collect_own_cells.append(pos)
+		_on_log("收心：已选 %d 枚（再点可取消），点「发动」结束" % _collect_own_cells.size())
+		_update_input()
+		return
+	if _recast_three_active:
+		var rc: CharInstance = battle.board.get_xy(pos)
+		if rc == null:
+			_on_log("再铸：请选有字的格子（%d/3）" % _recast_three_cells.size())
+			return
+		if _recast_three_cells.has(pos):
+			_recast_three_cells.erase(pos)   # 再点已选格 = 取消该格
+			_on_log("再铸：已选 %d/3" % _recast_three_cells.size())
+			return
+		_recast_three_cells.append(pos)
+		if _recast_three_cells.size() >= 3:
+			var rp := _pending_path
+			_recast_three_active = false
+			var cells := _recast_three_cells.duplicate()
+			_recast_three_cells = []
+			_board_view.end_pick()
+			_fill_ready(rp, {"cells": cells})
+		else:
+			_on_log("再铸：已选 %d/3（再点可取消）" % _recast_three_cells.size())
+			_update_input()
+		return
 	if _merge_active:
 		if _merge_cell1 == Vector2i(-1, -1):
 			_merge_cell1 = pos
@@ -593,14 +708,14 @@ func _on_tile_picked(pos: Vector2i) -> void:
 		var mp := _pending_path
 		_pending_path = []
 		_merge_active = false
-		_on_commit(mp, {"cell1": _merge_cell1, "cell2": pos, "merge_bag_uid": _merge_bag_uid, "merge_discard_uid": _merge_discard_uid})
+		_fill_ready(mp, {"cell1": _merge_cell1, "cell2": pos, "merge_bag_uid": _merge_bag_uid, "merge_discard_uid": _merge_discard_uid})
 		return
 	if _pending_place_uid >= 0:
 		var pp := _pending_path
 		_pending_path = []
 		var uidp := _pending_place_uid
 		_pending_place_uid = -1
-		_on_commit(pp, {"tile": pos, "place_uid": uidp})
+		_fill_ready(pp, {"tile": pos, "place_uid": uidp})
 		return
 	if _fuse_stage == 1:
 		_fuse_first = pos
@@ -623,7 +738,7 @@ func _on_tile_picked(pos: Vector2i) -> void:
 		var fp := _pending_path
 		_pending_path = []
 		_fuse_stage = 0
-		_on_commit(fp, {"tile": _fuse_first, "tile2": pos})
+		_fill_ready(fp, {"tile": _fuse_first, "tile2": pos})
 		return
 	var path := _pending_path
 	_pending_path = []
@@ -634,7 +749,7 @@ func _on_tile_picked(pos: Vector2i) -> void:
 		t["transform_uid"] = _transform_uid
 		t["chosen_uid"] = _transform_uid
 	_transform_uid = -1
-	_on_commit(path, t)
+	_fill_ready(path, t)
 
 
 func _run_pair(path: Array, mode: String) -> void:
@@ -679,6 +794,11 @@ func _on_pick_cancelled() -> void:
 	_pending_place_uid = -1
 	_merge_active = false
 	_merge_cell1 = Vector2i(-1, -1)
+	_ready_action = {}
+	_recast_three_active = false
+	_recast_three_cells = []
+	_collect_own_active = false
+	_collect_own_cells = []
 
 
 func _run_line_pick(path: Array) -> void:
@@ -706,6 +826,54 @@ func _on_line_chosen(index: int) -> void:
 	else:
 		t["col"] = index - 4
 	_on_commit(p, t)
+
+
+## 复合（next_compound）：让玩家选定要保留为临时字的盘面字，选定前不结算。
+func _choose_compound_copy(path: Array, target: Dictionary) -> bool:
+	if target.has("compound_uid") or not battle.has_ability("next_compound") or not battle.board.valid_path(path):
+		return false
+	var word := Database.get_word_by_glyphs(battle.board.glyphs_of(path))
+	if word == null or word.length() < 3:
+		return false
+	var cards: Array = []
+	var options: Array = []
+	for pos in path:
+		var inst: CharInstance = battle.board.get_xy(pos)
+		if inst != null and not inst.pinned and inst.temporary_uses == 0:
+			cards.append(inst)
+			options.append({"text": "保留【%s】" % "".join(inst.glyph_list())})
+	if cards.is_empty():
+		return false
+	_compound_picker_active = true
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": "复合：选择保留的临时字", "options": options})
+	overlay.chose.connect(func(index):
+		_compound_picker_active = false
+		if index >= 0 and index < cards.size():
+			var chosen := target.duplicate()
+			chosen["compound_uid"] = cards[index].uid
+			_on_commit(path, chosen))
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_mount_overlay(overlay)
+	return true
+
+
+func _run_recast_three(path: Array) -> void:
+	_pending_path = path
+	_recast_three_active = true
+	_recast_three_cells = []
+	_board_view.begin_pick("any", true)
+	_on_log("再铸：选择 3 个盘面字（再点可取消）")
+	_update_input()
+
+
+func _run_collect_own(path: Array) -> void:
+	_pending_path = path
+	_collect_own_active = true
+	_collect_own_cells = []
+	_board_view.begin_pick("any", true)
+	_on_log("收心：点选盘面字放回字袋（可 0 张，再点取消），点「发动」结束")
+	_update_input()
 
 
 func _run_merge_flow(path: Array) -> void:
@@ -1044,10 +1212,21 @@ func _layout() -> void:
 func _update_input() -> void:
 	var locked := _busy or _finished or _modal_count > 0
 	_board_view.set_interactable(not locked, false)
-	_confirm_btn.disabled = locked or _board_view.path.is_empty() or not _board_view.pick_mode.is_empty()
+	if _collect_own_active:
+		_confirm_btn.text = "发动（收心 %d）" % _collect_own_cells.size()
+		_confirm_btn.disabled = locked
+	elif not _ready_action.is_empty():
+		_confirm_btn.text = "发动"
+		_confirm_btn.disabled = locked
+	elif _board_view.pick_mode != "":
+		_confirm_btn.text = "发动"
+		_confirm_btn.disabled = true
+	else:
+		_confirm_btn.text = "出字"
+		_confirm_btn.disabled = locked or _board_view.path.is_empty()
 	if _confirm_ink != null:
 		_confirm_ink.set_shader_parameter("disabled", _confirm_btn.disabled)
-	_clear_btn.disabled = locked or _board_view.path.is_empty()
+	_clear_btn.disabled = locked or (_board_view.path.is_empty() and _ready_action.is_empty() and not _recast_three_active and not _collect_own_active and _board_view.pick_mode == "")
 	_end_btn.disabled = locked
 	_menu_btn.disabled = locked
 

@@ -9,6 +9,7 @@ var board: BoardState
 var tiles: Array = []
 var path: Array = []
 var pick_mode := ""
+var pick_multi := false   ## true=多选：选完不自动退出选区模式（由调用方 end_pick）
 var _dragging := false
 var _drag_moved := false
 var _interactable := true
@@ -149,7 +150,8 @@ func _on_tile_pressed(pos: Vector2i) -> void:
 		return
 	if not pick_mode.is_empty():
 		if _valid_pick(pos):
-			end_pick()
+			if not pick_multi:
+				end_pick()
 			tile_picked.emit(pos)
 		return
 	if board.get_xy(pos) == null:
@@ -162,7 +164,7 @@ func _on_tile_pressed(pos: Vector2i) -> void:
 		# 点击撤销该字及其后续路径；拖动回退仍由 _extend_path 保留经过的字。
 		path = path.slice(0, path.find(pos))
 		_cancelled_drag_cell = pos
-	elif path.is_empty() or board.is_adjacent(path[-1], pos):
+	elif board.can_extend_path(path, pos):
 		path.append(pos)
 	else:
 		path = [pos]
@@ -182,7 +184,7 @@ func _extend_path(pos: Vector2i) -> void:
 			path = path.slice(0, i + 1)
 			_drag_moved = true
 			_sync_selection()
-	elif path.is_empty() or board.is_adjacent(path[-1], pos):
+	elif board.can_extend_path(path, pos):
 		path.append(pos)
 		_drag_moved = true
 		_sync_selection()
@@ -273,14 +275,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 
-func begin_pick(mode: String) -> void:
+func begin_pick(mode: String, multi := false) -> void:
 	pick_mode = mode
+	pick_multi = multi
 	clear_selection()
 	_apply_pick_highlight()
 
 
 func end_pick() -> void:
 	pick_mode = ""
+	pick_multi = false
 	for tile in tiles:
 		tile.set_dimmed(not _interactable and _dim_locked)
 		tile.set_selected(false)
