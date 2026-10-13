@@ -314,7 +314,8 @@ func _spawn_temp_dian() -> void:
 
 func earn_gold(amount: int) -> int:
 	var allowed: int = amount
-	if gold_earned + amount > rules.gold_cap_per_battle:
+	# gold_cap_per_battle <= 0 表示本场金币收入不限
+	if rules.gold_cap_per_battle > 0 and gold_earned + amount > rules.gold_cap_per_battle:
 		allowed = max(0, rules.gold_cap_per_battle - gold_earned)
 	gold_earned += allowed
 	GameState.add_gold(allowed)
@@ -1376,14 +1377,14 @@ func cleanse_board() -> int:
 func cleanse_scorch() -> int:
 	return BattleOps.cleanse_scorch(self)
 
-func spawn_word_neighbors(center: Vector2i, max_count: int = 4) -> Array:
-	return BattleOps.spawn_word_neighbors(self, center, max_count)
+func spawn_word_neighbors(center: Vector2i, max_count: int = 4, center_glyph: String = "") -> Array:
+	return BattleOps.spawn_word_neighbors(self, center, max_count, center_glyph)
 
 func create_temp_glyph(glyph: String) -> CharInstance:
 	return BattleOps.create_temp_glyph(self, glyph)
 
-func _pick_word_glyph_for(cell: Vector2i, center: Vector2i) -> String:
-	return BattleOps._pick_word_glyph_for(self, cell, center)
+func _pick_word_glyph_for(cell: Vector2i, center: Vector2i, center_glyph: String = "") -> String:
+	return BattleOps._pick_word_glyph_for(self, cell, center, center_glyph)
 
 func _spawn_pool_pick() -> String:
 	return BattleOps._spawn_pool_pick(self)

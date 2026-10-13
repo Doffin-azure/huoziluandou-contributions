@@ -2,13 +2,14 @@ extends Control
 ## 词效回归：实体守恒、回合/跨战边界、结阵联动和实际 HUD 多阶段交互。
 
 ## 固定数量防止脚本异常中断某个测试函数后得到假通过。
-const EXPECTED_CHECKS := 86
+const EXPECTED_CHECKS := 88
 var checks: Array = []
 
 func _ready() -> void:
 	_run_controls()
 	_run_logic()
 	_run_baojinbi()
+	_run_fenhua()
 	_run_boundaries()
 	_run_final_boundaries()
 	await _run_ui()
@@ -102,6 +103,33 @@ func _run_baojinbi() -> void:
 	var hp1: int = e.hp
 	b.deal_damage(e, 1, true)
 	_check("baojinbi_through_block", e.hp == hp1 and GameState.gold == gold1 + 1, "50 格挡下受击 HP %d→%d、金币 %d→%d（预期 HP 不变、金币 +1）" % [hp1, e.hp, gold1, GameState.gold])
+	# 金币收入已开放上限（gold_cap_per_battle = 0）：反复受击可越过旧上限 18
+	var b2 := _battle()
+	var e2: Combatant = b2.enemies[0]
+	e2.add_status("gold_burst", 1)
+	var gold_before: int = GameState.gold
+	for i in 25:
+		b2.deal_damage(e2, 1, true)
+	_check("baojinbi_no_gold_cap", GameState.gold == gold_before + 25, "25 次受击金币 %d→%d（旧上限 18 已开放）" % [gold_before, GameState.gold])
+
+
+func _run_fenhua() -> void:
+	# 分化：生长出的临时字必须能与「刚被删掉的那个字」组成合法词
+	var b := _battle()
+	_place(b, Vector2i(1, 1), "击")
+	_place(b, Vector2i(0, 3), "分")
+	_place(b, Vector2i(1, 3), "化")
+	b.try_play([Vector2i(0, 3), Vector2i(1, 3)], {"tile": Vector2i(1, 1)})
+	var grown: Array = []
+	for c in b.board.cells:
+		if c != null and c.temporary:
+			grown.append(c.glyph())
+	var all_match: bool = not grown.is_empty()
+	for g in grown:
+		var ga := str(g)
+		if Database.get_word_by_glyphs_string(ga + "击") == null and Database.get_word_by_glyphs_string("击" + ga) == null:
+			all_match = false
+	_check("fenhua_grown_words", all_match, "删除【击】后生长 %s（应全部能与【击】组词）" % ", ".join(grown))
 
 
 func _run_logic() -> void:

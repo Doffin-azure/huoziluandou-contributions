@@ -195,11 +195,11 @@ static func install() -> void:
 		if b != null: b.rules.plays_per_turn = Database.rules.plays_per_turn
 		_refresh()
 		return ["每回合出字 = %d" % Database.rules.plays_per_turn])
-	register("goldcap", "设置每战金币收入上限", func(a):
+	register("goldcap", "设置每战金币收入上限（0 = 不限）", func(a):
 		Database.rules.gold_cap_per_battle = maxi(0, _int(a, 0, Database.rules.gold_cap_per_battle))
 		var b := _battle()
 		if b != null: b.rules.gold_cap_per_battle = Database.rules.gold_cap_per_battle
-		return ["金币上限 = %d" % Database.rules.gold_cap_per_battle])
+		return ["金币上限 = %s" % ("不限" if Database.rules.gold_cap_per_battle <= 0 else str(Database.rules.gold_cap_per_battle))])
 
 	# ---- B. 盘面 ----
 	register("board", "打印字盘（0 基坐标）", func(_a): return _print_board())

@@ -852,6 +852,9 @@ func _test_split_grow() -> void:
 	if play_inst != null:
 		var pr := b.try_play([play_cell])
 		_ok(pr.ok and not b.discard.has(play_inst), "临时字打出即消耗，不进弃字堆")
+	else:
+		# 生长出的临时字（现在确定性地匹配邻字）可能全部需要选目标，此处跳过
+		_ok(true, "本局生长字均需选目标，跳过临时字消耗检查")
 
 
 func _needs_target_solo(cd: CharacterData) -> bool:

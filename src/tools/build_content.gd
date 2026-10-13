@@ -916,4 +916,5 @@ func _build_rules() -> void:
 	r.starting_gold = 6
 	r.plays_per_turn = 0   # V0.2：无固定出字次数上限
 	r.heat_capacity = 10
+	r.gold_cap_per_battle = 0   # 开放：战内金币收入不设上限
 	_save(r, "%s/rules/default_rules.tres" % RES)

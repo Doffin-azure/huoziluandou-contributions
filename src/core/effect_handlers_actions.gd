@@ -547,7 +547,7 @@ static func _split_grow(b: BattleState, ctx: Dictionary) -> Array:
 	var old_glyph: String = center.glyph()
 	b.temp_chars.erase(center)
 	b.board.clear_xy(tile)   # 删除该字（不入弃字堆）
-	var spawned := b.spawn_word_neighbors(tile, 4)
+	var spawned := b.spawn_word_neighbors(tile, 4, old_glyph)
 	var glyphs: Array = []
 	for s in spawned:
 		glyphs.append(s.glyph())

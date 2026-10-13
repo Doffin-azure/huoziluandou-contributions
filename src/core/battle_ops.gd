@@ -413,7 +413,7 @@ static func cleanse_scorch(b: BattleState) -> int:
 			n += 1
 	return n
 
-static func spawn_word_neighbors(b: BattleState, center: Vector2i, max_count: int = 4) -> Array:
+static func spawn_word_neighbors(b: BattleState, center: Vector2i, max_count: int = 4, center_glyph: String = "") -> Array:
 	var out: Array = []
 	for dir in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
 		if out.size() >= max_count:
@@ -423,7 +423,7 @@ static func spawn_word_neighbors(b: BattleState, center: Vector2i, max_count: in
 			continue
 		if b.board.get_xy(cell) != null:
 			continue
-		var glyph := _pick_word_glyph_for(b, cell, center)
+		var glyph := _pick_word_glyph_for(b, cell, center, center_glyph)
 		if glyph.is_empty():
 			continue
 		var cd: CharacterData = Database.get_character_by_glyph(glyph)
@@ -451,10 +451,12 @@ static func create_temp_glyph(b: BattleState, glyph: String) -> CharInstance:
 	return inst
 
 
-## 为格 cell 选一个能与它周围（除 center）已有字组成合法词的字。
-
-static func _pick_word_glyph_for(b: BattleState, cell: Vector2i, center: Vector2i) -> String:
+## 为格 cell 选一个能与它相邻的字（含刚被删除的 center_glyph）组成合法词的字。
+## 找不到就返回 ""（该方向不生长），不再退化成无关字。
+static func _pick_word_glyph_for(b: BattleState, cell: Vector2i, center: Vector2i, center_glyph: String = "") -> String:
 	var neighbor_glyphs: Array = []
+	if not center_glyph.is_empty():
+		neighbor_glyphs.append(center_glyph)   # 被删掉的字仍与每个生长格相邻
 	for off in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
 		var n: Vector2i = cell + off
 		if n == center or not b.board.in_bounds(n.x, n.y):
@@ -462,20 +464,21 @@ static func _pick_word_glyph_for(b: BattleState, cell: Vector2i, center: Vector2
 		var c: CharInstance = b.board.get_xy(n)
 		if c != null:
 			neighbor_glyphs.append(c.glyph())
-	if not neighbor_glyphs.is_empty():
-		var candidates: Array = []
-		for w in Database.words.values():
-			if not w.implemented or w.length() != 2:
-				continue
-			var ga: String = w.glyphs[0]
-			var gb: String = w.glyphs[1]
-			if neighbor_glyphs.has(ga):
-				candidates.append(gb)
-			if neighbor_glyphs.has(gb):
-				candidates.append(ga)
-		if not candidates.is_empty():
-			return candidates[b.rng.randi_range(0, candidates.size() - 1)]
-	return _spawn_pool_pick(b)
+	if neighbor_glyphs.is_empty():
+		return ""
+	var candidates: Array = []
+	for w in Database.words.values():
+		if not w.implemented or w.length() != 2:
+			continue
+		var ga: String = w.glyphs[0]
+		var gb: String = w.glyphs[1]
+		if neighbor_glyphs.has(ga):
+			candidates.append(gb)
+		if neighbor_glyphs.has(gb):
+			candidates.append(ga)
+	if candidates.is_empty():
+		return ""
+	return candidates[b.rng.randi_range(0, candidates.size() - 1)]
 
 
 ## 炼化：把一枚指定字的牌从本场循环移出（字袋/弃字堆/盘面）。战后自然回归。
