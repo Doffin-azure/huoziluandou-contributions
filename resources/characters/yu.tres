@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_nmmnu"]
 script = ExtResource("2_v68qj")
+kind = 29
 handler = "guard_reduce"
 amount = 1
 note = "本回合每次受伤 -1"

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_u5rvb"]
 script = ExtResource("1_d2e0w")
+kind = 29
 handler = "precision_place"
 note = "从弃字堆选一枚己方字放进指定空格"
 

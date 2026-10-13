@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_wcmrk"]
 script = ExtResource("1_8s2xt")
+kind = 29
 handler = "heat_to_bonus"
 amount = 2
 args = {

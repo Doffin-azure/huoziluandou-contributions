@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_5mug4"]
 script = ExtResource("1_ebdfu")
+kind = 6
 handler = "apply_status_enemy"
 amount = 2
 status_id = "vulnerable"

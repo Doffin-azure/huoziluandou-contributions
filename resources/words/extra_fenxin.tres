@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_unv1q"]
 script = ExtResource("1_j2xil")
+kind = 4
 handler = "draw_random"
 amount = 1
 note = "补 1 字"
@@ -17,12 +18,14 @@ note = "造成 1 伤"
 
 [sub_resource type="Resource" id="Resource_65b8n"]
 script = ExtResource("1_j2xil")
+kind = 12
 handler = "block_persist"
 amount = 1
 note = "获得 1 持久盾"
 
 [sub_resource type="Resource" id="Resource_ncb6r"]
 script = ExtResource("1_j2xil")
+kind = 3
 handler = "heal"
 amount = 1
 note = "回复 1 生命"

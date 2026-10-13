@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_7huuj"]
 script = ExtResource("1_dhn60")
+kind = 29
 handler = "equity_interest"
 amount = 1
 note = "持有≥2股权时，支付 1 股权获得 2 金币并补 1 字"

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_s7ocg"]
 script = ExtResource("1_5yhj1")
+kind = 29
 handler = "energy_to_bonus"
 amount = 2
 args = {

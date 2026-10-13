@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_hwl50"]
 script = ExtResource("1_b251f")
+kind = 29
 handler = "swap_cells"
 note = "交换选中的两个格子"
 

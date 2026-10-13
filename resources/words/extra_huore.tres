@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_c114j"]
 script = ExtResource("1_4san3")
+kind = 28
 handler = "heat_pollution_damage"
 timing = "persistent"
 note = "本场持续：污染【热】造成 5 伤"

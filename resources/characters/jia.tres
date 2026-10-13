@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_hqxuf"]
 script = ExtResource("2_vug4r")
+kind = 29
 handler = "ability_armor_plating"
 amount = 1
 note = "每回合获得 1 点格挡，格挡被击穿则碎裂"

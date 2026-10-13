@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_2nnpm"]
 script = ExtResource("1_yejd0")
+kind = 15
 handler = "temp_funds"
 amount = 3
 note = "获得 3 点临时资金（本回合有效）"

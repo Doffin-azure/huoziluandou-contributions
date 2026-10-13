@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_ewn5e"]
 script = ExtResource("1_3k3vu")
+kind = 29
 handler = "wash_heat"
 note = "洗回污染【热】并冷却 2 点"
 

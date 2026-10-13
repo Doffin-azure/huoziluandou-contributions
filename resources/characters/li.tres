@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_dqa48"]
 script = ExtResource("2_gy4ue")
+kind = 6
 handler = "apply_status_self"
 amount = 1
 status_id = "strength"

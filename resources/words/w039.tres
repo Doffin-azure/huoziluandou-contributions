@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_0acvr"]
 script = ExtResource("1_u63m2")
+kind = 28
 handler = "ability_energy_idle"
 amount = 1
 timing = "persistent"

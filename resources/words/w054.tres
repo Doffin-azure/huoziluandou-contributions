@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_s04lg"]
 script = ExtResource("1_bsxaf")
+kind = 29
 handler = "ability_double_draw_next"
 amount = 4
 timing = "next_word"

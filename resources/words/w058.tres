@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_2p0iq"]
 script = ExtResource("1_wr1jx")
+kind = 29
 handler = "suspend"
 note = "立即结束出字阶段：清零全部热度，每 1 热度换 2 持久盾；敌人正常行动"
 

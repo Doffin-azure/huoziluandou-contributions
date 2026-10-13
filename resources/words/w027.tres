@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_12llc"]
 script = ExtResource("1_0a57h")
+kind = 28
 handler = "serial"
 amount = 6
 timing = "persistent"

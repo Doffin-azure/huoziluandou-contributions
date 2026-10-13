@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_kcw1v"]
 script = ExtResource("1_vmu6e")
+kind = 29
 handler = "reveal_place"
 amount = 3
 target = 7

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_d0yaq"]
 script = ExtResource("1_rfrx1")
+kind = 29
 handler = "cremate"
 note = "【火化】原地变成【骨灰】两个字"
 

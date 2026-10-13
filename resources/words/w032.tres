@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_cs2ke"]
 script = ExtResource("1_ttija")
+kind = 29
 handler = "recover_consumed"
 amount = 1
 target = 8

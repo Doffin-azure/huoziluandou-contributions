@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_3mmba"]
 script = ExtResource("1_7uojo")
+kind = 5
 handler = "gold"
 amount = 3
 note = "获得 3 金币"

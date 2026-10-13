@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_a8ska"]
 script = ExtResource("1_eajmc")
+kind = 2
 handler = "block_temp"
 amount = 10
 note = "获得 10 点临时格挡"

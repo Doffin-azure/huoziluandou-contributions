@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_6nl3b"]
 script = ExtResource("1_lifr1")
+kind = 28
 handler = "blastproof"
 timing = "persistent"
 note = "本场持续：被爆破/爆炸摧毁的己方实体字改为回字袋，每救回 1 枚 +1 持久盾"

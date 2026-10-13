@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_vtbip"]
 script = ExtResource("1_2ama1")
+kind = 29
 handler = "refund_energy_half"
 note = "恢复最近一次储能花费的一半"
 

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_nuctf"]
 script = ExtResource("2_3rqi2")
+kind = 2
 handler = "block_temp"
 amount = 4
 note = "获得 4 点临时格挡"

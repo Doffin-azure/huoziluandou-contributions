@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_uex3e"]
 script = ExtResource("1_el7xw")
+kind = 29
 handler = "profit_share"
 note = "本回合剩余时间，每当实际获得金币就额外获得等量储能"
 

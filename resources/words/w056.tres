@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_wp0xb"]
 script = ExtResource("1_7du2w")
+kind = 29
 handler = "hard_stop"
 note = "清空热度并移除本回合溢热生成的灼热【热】（字袋/弃字堆/盘面），立即结束出字阶段"
 

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_27cmk"]
 script = ExtResource("1_esmk1")
+kind = 28
 handler = "ceasefire"
 amount = 1
 timing = "persistent"

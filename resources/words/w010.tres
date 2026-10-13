@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_0c2b6"]
 script = ExtResource("1_wveyi")
+kind = 29
 handler = "remove_enemy_block"
 note = "移除敌人全部护盾"
 

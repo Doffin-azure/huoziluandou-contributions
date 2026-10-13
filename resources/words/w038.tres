@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_k7a1n"]
 script = ExtResource("1_ongao")
+kind = 29
 handler = "ability_compound_next"
 amount = 1
 timing = "next_word"

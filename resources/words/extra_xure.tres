@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_pvt36"]
 script = ExtResource("1_56hnv")
+kind = 28
 handler = "ability_heat_to_energy"
 amount = 1
 timing = "persistent"

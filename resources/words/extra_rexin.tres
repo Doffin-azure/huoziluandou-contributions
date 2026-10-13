@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_ttioh"]
 script = ExtResource("1_fgvc8")
+kind = 28
 handler = "ability_warm_heart"
 amount = 1
 timing = "persistent"

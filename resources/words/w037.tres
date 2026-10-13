@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_jl7yg"]
 script = ExtResource("1_a2idd")
+kind = 29
 handler = "clear_flow"
 amount = 2
 note = "净化全部灼热并补 2 字"

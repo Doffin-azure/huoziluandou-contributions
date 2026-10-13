@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_hpehb"]
 script = ExtResource("1_2lwff")
+kind = 29
 handler = "heat_to_energy_damage"
 note = "热度转储能并造成 5 伤"
 

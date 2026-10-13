@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_3rtv4"]
 script = ExtResource("1_opd3r")
+kind = 28
 handler = "repeat_word"
 timing = "persistent"
 note = "开启后每回合第一次有效多字词再执行一次其即时效果（不重复消耗字；需支付的照常再付）"

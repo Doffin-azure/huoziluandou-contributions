@@ -5,12 +5,14 @@
 
 [sub_resource type="Resource" id="Resource_3vwd8"]
 script = ExtResource("1_yfyxs")
+kind = 4
 handler = "draw_random"
 amount = 6
 note = "随机补 6 字"
 
 [sub_resource type="Resource" id="Resource_h0dk6"]
 script = ExtResource("1_yfyxs")
+kind = 14
 handler = "heat"
 amount = 3
 note = "热度 +3"

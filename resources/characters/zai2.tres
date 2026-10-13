@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_wxfgf"]
 script = ExtResource("2_3chmg")
+kind = 29
 handler = "repeat_last"
 note = "单字：重复上一个词/字的最后一个字（临时）"
 

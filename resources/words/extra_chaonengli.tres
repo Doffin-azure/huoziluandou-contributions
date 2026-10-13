@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_264hq"]
 script = ExtResource("1_8a7b0")
+kind = 29
 handler = "double_next_ability"
 note = "下一次持续能力触发结算两遍"
 

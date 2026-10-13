@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_t21ee"]
 script = ExtResource("1_1loh7")
+kind = 28
 handler = "repeat_zero"
 amount = 1
 timing = "persistent"

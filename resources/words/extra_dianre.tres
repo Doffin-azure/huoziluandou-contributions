@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_776ay"]
 script = ExtResource("1_8ecmq")
+kind = 29
 handler = "energy_to_heat_block"
 note = "储能转热度与临挡"
 

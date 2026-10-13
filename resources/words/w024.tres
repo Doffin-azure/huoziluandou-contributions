@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_33ir2"]
 script = ExtResource("1_pg3bq")
+kind = 6
 handler = "apply_status_self"
 amount = 1
 target = 3

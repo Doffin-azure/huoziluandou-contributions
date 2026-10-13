@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_otnp3"]
 script = ExtResource("1_881xh")
+kind = 28
 handler = "ability_heart_power"
 amount = 1
 timing = "persistent"

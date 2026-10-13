@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_16f16"]
 script = ExtResource("1_c3oxc")
+kind = 14
 handler = "heat"
 amount = 3
 note = "热度 +3"

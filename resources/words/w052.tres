@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_kfbcs"]
 script = ExtResource("1_ilhaj")
+kind = 28
 handler = "ability_accel"
 amount = 1
 timing = "persistent"

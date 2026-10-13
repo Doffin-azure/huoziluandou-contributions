@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_cxarw"]
 script = ExtResource("1_406ai")
+kind = 28
 handler = "joint_funding"
 timing = "persistent"
 note = "本场持续：支付金币发动词效时可用 2 储能抵 1 金币，允许混合支付"

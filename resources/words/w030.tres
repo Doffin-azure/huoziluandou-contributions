@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_5f3pe"]
 script = ExtResource("1_a8t6f")
+kind = 29
 handler = "cleanse_all"
 target = 4
 note = "清除当前字盘的全部污染（所有权不变）"

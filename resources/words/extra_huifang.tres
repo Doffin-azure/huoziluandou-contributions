@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_n044w"]
 script = ExtResource("1_2ypxa")
+kind = 29
 handler = "replay_word"
 note = "把上一个词用过的字放回盘面"
 

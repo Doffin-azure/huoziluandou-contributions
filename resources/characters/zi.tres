@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_7seq2"]
 script = ExtResource("2_kkpoa")
+kind = 15
 handler = "temp_funds"
 amount = 2
 note = "获得 2 点临时资金（本回合有效）"

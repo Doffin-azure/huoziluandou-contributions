@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_kkapf"]
 script = ExtResource("1_xax0j")
+kind = 28
 handler = "ability_shared_attack"
 timing = "persistent"
 note = "进入结阵：之后打出的词只登记不结算，点「发动」一起结算；多词可共享同一枚【击】"

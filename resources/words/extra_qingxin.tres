@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_k28u2"]
 script = ExtResource("1_i3k7b")
+kind = 29
 handler = "cleanse_status"
 note = "清除自身全部负面状态"
 

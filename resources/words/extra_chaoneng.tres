@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_y2ojm"]
 script = ExtResource("1_jlku5")
+kind = 29
 handler = "next_copy_layer"
 note = "下一条 3+ 字词可耗储能保留临时复制层"
 

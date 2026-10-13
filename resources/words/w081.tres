@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_xys43"]
 script = ExtResource("1_ky8al")
+kind = 29
 handler = "split_grow"
 amount = 4
 target = 5

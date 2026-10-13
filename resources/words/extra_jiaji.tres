@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_xfh6o"]
 script = ExtResource("1_43mjm")
+kind = 29
 handler = "next_draw_bonus_two"
 note = "立即补 2 字"
 

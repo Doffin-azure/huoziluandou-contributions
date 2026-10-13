@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_hlmvq"]
 script = ExtResource("1_05qhn")
+kind = 29
 handler = "invest_equity"
 amount = 3
 note = "支付 3 金币锁定为 3 股权（战后返还本金）"

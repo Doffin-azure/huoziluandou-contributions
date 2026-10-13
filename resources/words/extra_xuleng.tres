@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_1hpf7"]
 script = ExtResource("1_uvybw")
+kind = 29
 handler = "overheat_shield"
 note = "下次过热抵消 4 点污染【热】"
 

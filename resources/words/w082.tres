@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_a07se"]
 script = ExtResource("1_ptene")
+kind = 29
 handler = "reverse_line"
 note = "选择一整行或一整列，倒转其 4 格（含空格与完整叠层）"
 

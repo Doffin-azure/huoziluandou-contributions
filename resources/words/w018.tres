@@ -11,6 +11,7 @@ note = "造成 7 点伤害"
 
 [sub_resource type="Resource" id="Resource_nnscn"]
 script = ExtResource("1_nbyuk")
+kind = 29
 handler = "conditional_draw_after_attack"
 amount = 1
 note = "若此前已有即时攻击则补 1 字"

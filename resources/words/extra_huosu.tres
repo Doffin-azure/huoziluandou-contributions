@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_cdeoa"]
 script = ExtResource("1_j1kt3")
+kind = 29
 handler = "fill_board_heat"
 note = "补至 12 字，每枚 +1 热度"
 

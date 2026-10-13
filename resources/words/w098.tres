@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_l68ma"]
 script = ExtResource("1_hg2yq")
+kind = 29
 handler = "bounty"
 amount = 12
 args = {

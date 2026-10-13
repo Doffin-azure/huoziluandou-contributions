@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_rfo7s"]
 script = ExtResource("1_mcg5x")
+kind = 28
 handler = "ability_electric_material"
 amount = 1
 timing = "persistent"

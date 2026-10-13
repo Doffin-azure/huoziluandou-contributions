@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_ei0d6"]
 script = ExtResource("1_qpch0")
+kind = 29
 handler = "merge_flow"
 note = "揭示字袋 1 枚 + 弃字堆指定 1 枚，按任选顺序放入两个相邻空格；无相邻空格则不移动"
 

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_2cj64"]
 script = ExtResource("1_phxv3")
+kind = 28
 handler = "ability_heat_overload_bonus"
 amount = 2
 timing = "persistent"

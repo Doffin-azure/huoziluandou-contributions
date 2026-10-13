@@ -5,11 +5,13 @@
 
 [sub_resource type="Resource" id="Resource_8hxs8"]
 script = ExtResource("1_bmehk")
+kind = 29
 handler = "fill_board_full"
 note = "补满盘面"
 
 [sub_resource type="Resource" id="Resource_8we71"]
 script = ExtResource("1_bmehk")
+kind = 29
 handler = "draw_penalty_next"
 amount = 3
 note = "下回合基础补字 -3"

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_msxct"]
 script = ExtResource("2_h8bgm")
+kind = 4
 handler = "draw_random"
 amount = 1
 note = "随机补 1 字"

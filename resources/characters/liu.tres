@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_0t5hy"]
 script = ExtResource("2_dfgo7")
+kind = 29
 handler = "draw_bonus_next"
 amount = 1
 note = "下回合多抽 1 字"

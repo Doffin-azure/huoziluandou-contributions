@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_sy16x"]
 script = ExtResource("1_e7p4b")
+kind = 28
 handler = "charge_overheat"
 amount = 8
 timing = "persistent"

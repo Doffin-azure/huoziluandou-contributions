@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_l6vwr"]
 script = ExtResource("1_ajhl3")
+kind = 29
 handler = "rotate_3x3"
 target = 12
 args = {

@@ -5,11 +5,13 @@
 
 [sub_resource type="Resource" id="Resource_tfdi2"]
 script = ExtResource("1_rnmvs")
+kind = 29
 handler = "place_two"
 note = "把揭示的 2 枚字放进指定空格"
 
 [sub_resource type="Resource" id="Resource_sr67q"]
 script = ExtResource("1_rnmvs")
+kind = 14
 handler = "heat"
 amount = 2
 note = "热度 +2"

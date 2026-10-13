@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_ki2mc"]
 script = ExtResource("1_qrn63")
+kind = 29
 handler = "move_cell"
 note = "把选中字移动到空格"
 

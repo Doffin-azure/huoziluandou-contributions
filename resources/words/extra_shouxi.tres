@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_q07qu"]
 script = ExtResource("1_1vnd3")
+kind = 29
 handler = "gold_to_shield"
 note = "本回合花金币附等额持久盾"
 

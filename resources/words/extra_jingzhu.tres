@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_q1qmw"]
 script = ExtResource("1_01v2a")
+kind = 29
 handler = "pin_glyph"
 target = 5
 note = "选一枚盘面己方字固定（本场不消耗，不可移动/换字）"

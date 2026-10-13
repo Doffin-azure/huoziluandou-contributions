@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_lwif2"]
 script = ExtResource("1_yyxw3")
+kind = 28
 handler = "ability_electric_overload"
 amount = 3
 timing = "persistent"

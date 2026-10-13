@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_5fy26"]
 script = ExtResource("1_6hf2p")
+kind = 29
 handler = "recast_board"
 note = "把盘面上已有的字全部重新替换（己方字回袋重抽，敌方/临时字清除）"
 

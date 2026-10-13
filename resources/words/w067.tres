@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_ncwbr"]
 script = ExtResource("1_8jerj")
+kind = 29
 handler = "mint"
 amount = 2
 args = {

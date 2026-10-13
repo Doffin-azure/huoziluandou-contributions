@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_nv5vy"]
 script = ExtResource("1_52uec")
+kind = 29
 handler = "ability_rapid_next"
 amount = 4
 timing = "next_word"

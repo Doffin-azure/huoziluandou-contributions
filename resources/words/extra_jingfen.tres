@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_1opfn"]
 script = ExtResource("1_63vin")
+kind = 29
 handler = "split_mind"
 note = "本回合敌我攻击都打向自己"
 

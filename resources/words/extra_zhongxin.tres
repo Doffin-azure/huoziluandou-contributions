@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_v5sq7"]
 script = ExtResource("1_1nf8e")
+kind = 29
 handler = "converge"
 target = 5
 note = "选择一个字，让所有字向它聚拢（冲突优先左上）"

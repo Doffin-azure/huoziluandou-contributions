@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_yeyi2"]
 script = ExtResource("1_cq7qh")
+kind = 29
 handler = "heat_to_energy"
 amount = 1
 note = "当前热度转为等量储能"

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_5ux56"]
 script = ExtResource("1_r2dx4")
+kind = 28
 handler = "ability_prevent_interference"
 amount = 1
 timing = "persistent"

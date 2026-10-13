@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_2q1jf"]
 script = ExtResource("1_kkh5b")
+kind = 29
 handler = "guard_halve"
 note = "本回合受伤减半（向上取整再 -1）"
 

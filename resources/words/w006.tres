@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_vx737"]
 script = ExtResource("1_6ephk")
+kind = 29
 handler = "counter"
 amount = 3
 timing = "delayed"

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_sqf2g"]
 script = ExtResource("1_pm3hd")
+kind = 29
 handler = "recast_three"
 note = "选择 3 个盘面字，替换成随机字（随机字不一定在你的牌组里，且为临时复制品）"
 

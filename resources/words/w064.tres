@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_li72k"]
 script = ExtResource("1_wrb01")
+kind = 28
 handler = "ability_reload"
 amount = 3
 timing = "persistent"

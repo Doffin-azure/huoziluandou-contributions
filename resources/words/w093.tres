@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_hfm88"]
 script = ExtResource("1_j0o82")
+kind = 6
 handler = "ignite"
 amount = 3
 note = "敌方接下来 2 次行动各受 3+施放时热度 伤"

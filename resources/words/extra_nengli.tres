@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_vfdx4"]
 script = ExtResource("1_86ovu")
+kind = 28
 handler = "ability_longword_draw"
 amount = 1
 timing = "persistent"

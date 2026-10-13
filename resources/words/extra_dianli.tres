@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_hmbsi"]
 script = ExtResource("1_2p4sq")
+kind = 28
 handler = "instant_power"
 timing = "persistent"
 note = "本场持续：位移后可耗 1 储能再位移"

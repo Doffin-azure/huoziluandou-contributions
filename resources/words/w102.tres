@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_8bwe8"]
 script = ExtResource("1_lis86")
+kind = 28
 handler = "permanent_gold_growth"
 amount = 20
 timing = "persistent"

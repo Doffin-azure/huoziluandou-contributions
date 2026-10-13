@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_qgig3"]
 script = ExtResource("1_he806")
+kind = 28
 handler = "vigor"
 timing = "persistent"
 note = "本回合每打出一种不同的多字词，下回合基础补字 +1"

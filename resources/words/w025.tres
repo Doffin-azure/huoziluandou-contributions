@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_pgd2w"]
 script = ExtResource("1_6ab26")
+kind = 29
 handler = "merge_duplicates"
 target = 5
 note = "汇聚同字：保留 1 实体并获得同数量临时层，其余回字袋"

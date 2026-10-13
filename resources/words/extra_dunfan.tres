@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_mbs2i"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_wgveo"]
+
+[sub_resource type="Resource" id="Resource_rxvfb"]
+script = ExtResource("1_mbs2i")
+kind = 12
+handler = "block_persist"
+amount = 3
+note = "获得 3 点持久盾"
+
+[sub_resource type="Resource" id="Resource_nf4uk"]
+script = ExtResource("1_mbs2i")
+kind = 29
+handler = "counter"
+amount = 1
+note = "预留 1 层反击"
+
+[resource]
+script = ExtResource("2_wgveo")
+id = "extra_dunfan"
+word = "盾反"
+glyphs = Array[String](["盾", "反"])
+description = "获得 3 点持久盾，并预留 1 层反击（敌人行动结束后把剩余临挡转为反击伤害，每层 +3）"
+effects = Array[ExtResource("1_mbs2i")]([SubResource("Resource_rxvfb"), SubResource("Resource_nf4uk")])
+group = "防反"
+design_stage = "设计负责人新增"
+effect_summary = "获得 3 点持久盾，并预留 1 层反击（敌人行动结束后把剩余临挡转为反击伤害，每层 +3）"
+effect_handler_id = "block_persist"
+priority = "防反"
+implemented = true

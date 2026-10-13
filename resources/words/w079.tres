@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_ov1qd"]
 script = ExtResource("1_4ryaa")
+kind = 29
 handler = "transform_board"
 amount = 5
 target = 5

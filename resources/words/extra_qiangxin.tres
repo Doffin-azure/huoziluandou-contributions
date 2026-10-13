@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_6k637"]
 script = ExtResource("1_kyqwd")
+kind = 28
 handler = "ability_strong_heart"
 amount = 1
 timing = "persistent"

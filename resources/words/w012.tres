@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_ey02x"]
 script = ExtResource("1_q7spo")
+kind = 28
 handler = "fireproof"
 timing = "persistent"
 note = "本场持续：自己打出的灼热【热】不再扣血（仍占字袋、不被自动净化）"

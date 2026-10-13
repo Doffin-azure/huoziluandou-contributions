@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_jkksc"]
 script = ExtResource("1_6uk0k")
+kind = 29
 handler = "conditional_draw_half_hp"
 amount = 4
 args = {

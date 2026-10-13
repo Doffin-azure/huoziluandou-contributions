@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_jjmtu"]
 script = ExtResource("1_34uer")
+kind = 29
 handler = "gild_glyph"
 note = "选择一枚己方字永久镀金"
 

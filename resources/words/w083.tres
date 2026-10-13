@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_am4gl"]
 script = ExtResource("1_736ac")
+kind = 29
 handler = "refine_layer"
 note = "选择两个相同的己方字，本场它们一直重合（一格可重复使用，另一张回字袋）"
 

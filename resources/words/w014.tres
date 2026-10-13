@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_g5tkx"]
 script = ExtResource("1_xdwrd")
+kind = 28
 handler = "permanent_damage_reduction"
 amount = 1
 timing = "persistent"

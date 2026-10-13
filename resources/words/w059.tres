@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_wl48l"]
 script = ExtResource("1_u7ex4")
+kind = 14
 handler = "heat_cleanse"
 amount = 2
 note = "热度 -2 并清除灼热污染"

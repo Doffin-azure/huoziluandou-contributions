@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_hhwdf"]
 script = ExtResource("1_tsnra")
+kind = 29
 handler = "reshuffle_line"
 note = "选一行/列：洗回实体字并原位随机补字"
 

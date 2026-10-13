@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_oxbtk"]
 script = ExtResource("1_sfytd")
+kind = 29
 handler = "empower_glyph"
 note = "选择字袋中一个字；本场它被打出时（单字或成词）额外触发其单字效果"
 

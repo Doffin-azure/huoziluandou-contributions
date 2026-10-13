@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_efi0h"]
 script = ExtResource("1_sobpq")
+kind = 6
 handler = "apply_status_self"
 amount = 2
 target = 3

@@ -5,11 +5,13 @@
 
 [sub_resource type="Resource" id="Resource_bgoee"]
 script = ExtResource("1_af56l")
+kind = 14
 handler = "heat_clear"
 note = "清空当前热度"
 
 [sub_resource type="Resource" id="Resource_qyl8s"]
 script = ExtResource("1_af56l")
+kind = 29
 handler = "draw_penalty_next"
 amount = 1
 note = "下一次正常补字 -1"

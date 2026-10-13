@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_sr8fu"]
 script = ExtResource("1_hkiid")
+kind = 2
 handler = "joint_force"
 amount = 6
 args = {

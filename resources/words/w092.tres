@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_iul0c"]
 script = ExtResource("1_thr7m")
+kind = 29
 handler = "blackout"
 note = "彩蛋：停电，屏幕变黑；拖动连出【开灯】才能恢复"
 

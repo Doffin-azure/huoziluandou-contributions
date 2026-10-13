@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_y1ot1"]
 script = ExtResource("2_iqhaq")
+kind = 29
 handler = "gravity"
 target = 4
 note = "字盘按列向下重力"

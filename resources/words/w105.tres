@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_1wpfh"]
 script = ExtResource("1_ptjr8")
+kind = 28
 handler = "ability_gravity_always"
 amount = 1
 timing = "persistent"

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_xvhsv"]
 script = ExtResource("1_6odbf")
+kind = 29
 handler = "rotate_2x2"
 target = 6
 note = "顺时转旋转所选 2×2 区域"

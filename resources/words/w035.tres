@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_h4fyu"]
 script = ExtResource("1_jdpdk")
+kind = 28
 handler = "ability_flow"
 amount = 2
 timing = "persistent"

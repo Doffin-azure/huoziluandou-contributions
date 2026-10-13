@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_rqp5k"]
 script = ExtResource("1_1x1mo")
+kind = 29
 handler = "collect_own"
 note = "选盘面牌回袋，每枚回 1 血"
 

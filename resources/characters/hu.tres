@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_st6cv"]
 script = ExtResource("2_8ehla")
+kind = 29
 handler = "ability_guard_inject"
 amount = 1
 note = "下次敌方塞字减少 1 个"

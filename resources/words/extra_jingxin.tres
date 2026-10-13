@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_g65dy"]
 script = ExtResource("1_4gk7u")
+kind = 29
 handler = "manual_draw_next"
 amount = 1
 note = "下回合补字 -1，但可从字袋定向选字（随机落地）"

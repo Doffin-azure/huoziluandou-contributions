@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_1farn"]
 script = ExtResource("1_1dakw")
+kind = 29
 handler = "replay_last_attack"
 note = "重演上一个即时攻击词的效果"
 

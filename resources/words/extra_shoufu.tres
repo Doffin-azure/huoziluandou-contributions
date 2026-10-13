@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_qnd43"]
 script = ExtResource("1_le2ug")
+kind = 29
 handler = "recover_two"
 note = "从弃字堆放回最多 2 枚到相邻空格"
 

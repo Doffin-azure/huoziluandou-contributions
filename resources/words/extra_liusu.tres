@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_m4ui3"]
 script = ExtResource("1_ac012")
+kind = 29
 handler = "flow_row"
 target = 11
 note = "选定一行：本回合该行腾出的空格立即补字"

@@ -5,12 +5,14 @@
 
 [sub_resource type="Resource" id="Resource_76eld"]
 script = ExtResource("1_fa3lp")
+kind = 3
 handler = "heal"
 amount = 1
 note = "回复 1 生命"
 
 [sub_resource type="Resource" id="Resource_78cf4"]
 script = ExtResource("1_fa3lp")
+kind = 4
 handler = "draw_random"
 amount = 3
 note = "随机补 3 字"

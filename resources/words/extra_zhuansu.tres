@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_37i83"]
 script = ExtResource("1_padbu")
+kind = 29
 handler = "rotate_repeat"
 target = 6
 note = "选择 2×2，点「发动」每次旋转一次（最多 3 次）"

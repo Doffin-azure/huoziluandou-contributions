@@ -5,12 +5,14 @@
 
 [sub_resource type="Resource" id="Resource_b2b5t"]
 script = ExtResource("1_jifyf")
+kind = 12
 handler = "block_persist"
 amount = 12
 note = "获得 12 点持久盾"
 
 [sub_resource type="Resource" id="Resource_xs07m"]
 script = ExtResource("1_jifyf")
+kind = 29
 handler = "draw_penalty_next"
 amount = 1
 note = "下一次正常补字 -1"

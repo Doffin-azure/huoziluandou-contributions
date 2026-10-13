@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_lsssm"]
 script = ExtResource("1_am6pw")
+kind = 29
 handler = "heat_to_persist_block"
 note = "消耗全部热度，每点 +2 持久盾"
 

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_sxjq3"]
 script = ExtResource("1_g1cmm")
+kind = 29
 handler = "buyback"
 amount = 3
 target = 8

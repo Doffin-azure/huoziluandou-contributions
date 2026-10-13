@@ -679,6 +679,14 @@ func _build_extra_words() -> void:
 		"%s/words/extra_qingxin.tres" % RES)
 	print("  · 新增词：清心")
 
+	# 盾反（防反：先立盾再反击）
+	_save(_extra_list("extra_dunfan", "盾反", ["盾", "反"], "防反", "",
+		"获得 3 点持久盾，并预留 1 层反击（敌人行动结束后把剩余临挡转为反击伤害，每层 +3）",
+		[ContentBuild.e("block_persist", 3, -1, "", "获得 3 点持久盾", {}),
+			ContentBuild.e("counter", 1, -1, "", "预留 1 层反击", {})]),
+		"%s/words/extra_dunfan.tres" % RES)
+	print("  · 新增词：盾反")
+
 func _extra(id: String, word: String, glyphs: Array, group: String, interaction: String, desc: String, effect: EffectData) -> WordData:
 	var w: WordData = WordDataS.new()
 	w.id = id

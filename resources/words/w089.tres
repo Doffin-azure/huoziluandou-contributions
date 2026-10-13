@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_e8g3u"]
 script = ExtResource("1_hqx54")
+kind = 29
 handler = "flow_energy_or_draw"
 amount = 2
 note = "本回合已补字则储能 +2，否则补 2 字"

@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_oyxn5"]
 script = ExtResource("1_u72ic")
+kind = 13
 handler = "energy"
 amount = 3
 note = "获得 3 点储能"

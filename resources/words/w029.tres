@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_owaf3"]
 script = ExtResource("1_ovu5g")
+kind = 4
 handler = "draw_random"
 amount = 4
 note = "随机补 4 字"

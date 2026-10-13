@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_orp7b"]
 script = ExtResource("1_68ugk")
+kind = 29
 handler = "inject_bounty"
 note = "本回合敌人注入污染字获得金币"
 

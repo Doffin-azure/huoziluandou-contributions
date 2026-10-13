@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_o2my8"]
 script = ExtResource("1_b366h")
+kind = 12
 handler = "alloy"
 amount = 6
 args = {

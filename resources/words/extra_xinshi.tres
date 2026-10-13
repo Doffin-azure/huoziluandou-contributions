@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_obaxg"]
 script = ExtResource("1_gtuon")
+kind = 6
 handler = "apply_status_enemy"
 amount = 4
 status_id = "heart_corrosion"
