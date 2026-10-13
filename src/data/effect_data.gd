@@ -75,6 +75,34 @@ enum Target {
 @export_multiline var note: String = ""
 
 
+## handler 驱动的效果以 handler 为准，不能把旧资源的默认 DAMAGE 当作攻击。
+func semantic_kind() -> int:
+	if handler.is_empty():
+		return kind
+	match handler:
+		"damage", "overdo", "gravity_damage", "shield_smash", "break_shield_damage", \
+		"energy_discharge", "heat_burst", "destroy_2x2", "clear_board", \
+		"heat_to_damage_flow", "spend_gold_damage", "electric_strike", "fire_power", \
+		"energy_to_heat_damage", "cold_snap":
+			return Kind.DAMAGE
+		"damage_all": return Kind.DAMAGE_ALL
+		"block_temp", "joint_force": return Kind.BLOCK
+		"block_persist", "alloy": return Kind.PERSISTENT_BLOCK
+		"heal": return Kind.HEAL
+		"draw_random": return Kind.DRAW_CHARS
+		"gold": return Kind.GAIN_GOLD
+		"energy", "energy_around_tail": return Kind.ENERGY
+		"heat", "heat_clear", "heat_cleanse": return Kind.HEAT
+		"temp_funds": return Kind.TEMP_FUNDS
+		"apply_status_self", "apply_status_enemy", "ignite": return Kind.APPLY_STATUS
+		_:
+			return Kind.ABILITY if timing == "persistent" else Kind.SPECIAL
+
+
+func is_attack() -> bool:
+	return semantic_kind() in [Kind.DAMAGE, Kind.DAMAGE_ALL]
+
+
 func describe() -> String:
 	if not note.is_empty():
 		return note

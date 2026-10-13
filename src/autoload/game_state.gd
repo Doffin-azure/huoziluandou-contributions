@@ -17,7 +17,18 @@ var visited: Dictionary = {}   ## "act:node" -> true
 # --- V0.2 跨战永久能力 ---
 var permanent_damage_reduction: int = 0
 var gold_growth_percent: int = 0
-var reinvest_gold: int = 0
+var battle_sequence: int = 0
+var _reinvestments: Array = []
+var reinvest_gold: int:
+	get:
+		var total := 0
+		for investment in _reinvestments:
+			total += int(investment.amount)
+		return total
+	set(value):
+		_reinvestments.clear()
+		if value > 0:
+			_reinvestments.append({"amount": value, "due_battle": battle_sequence + 1})
 
 var rng := RandomNumberGenerator.new()
 
@@ -61,6 +72,7 @@ func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> voi
 	permanent_damage_reduction = 0
 	gold_growth_percent = 0
 	reinvest_gold = 0
+	battle_sequence = 0
 	EventBus.run_started.emit()
 	EventBus.deck_changed.emit()
 	EventBus.gold_changed.emit(gold)
@@ -91,10 +103,21 @@ func settle_victory_economy() -> void:
 		var bonus: int = int(floor(gold * gold_growth_percent / 100.0))
 		if bonus > 0:
 			add_gold(bonus)
-	if reinvest_gold > 0:
-		var back: int = reinvest_gold * 2
+	var pending: Array = []
+	var back := 0
+	for investment in _reinvestments:
+		if int(investment.due_battle) <= battle_sequence:
+			back += int(investment.amount) * 2
+		else:
+			pending.append(investment)
+	_reinvestments = pending
+	if back > 0:
 		add_gold(back)
-		reinvest_gold = 0
+
+
+func lock_reinvestment(amount: int) -> void:
+	if amount > 0:
+		_reinvestments.append({"amount": amount, "due_battle": battle_sequence + 1})
 
 
 func remove_by_uid(uid: int) -> bool:

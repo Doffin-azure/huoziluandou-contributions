@@ -260,6 +260,7 @@ func _start_battle(n: MapNodeData) -> void:
 		"seed": seed * 997 + GameState.act_index * 100 + GameState.node_index,
 		"deck": _deck_cfg(), "enemies": ids,
 		"hp": GameState.player_hp, "gold": GameState.gold,
+		"persistent_run": true,
 	})
 	phase = "battle"
 	_log("战斗：%s（%s）" % [n.title, str(ids)])
@@ -277,6 +278,9 @@ func _end_battle() -> void:
 	GameState.player_hp = b.player.hp
 	if b.is_victory():
 		GameState.add_captured(b.captured_chars)
+		if b.player.equity > 0:
+			GameState.add_gold(b.player.equity)
+		GameState.settle_victory_economy()
 		_log("胜利：HP %d/%d，金 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold])
 		if node != null and node.type == MapNodeData.Type.BOSS:
 			GameState.player_hp = GameState.player_max_hp

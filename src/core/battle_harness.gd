@@ -52,13 +52,18 @@ func reset(cfg: Dictionary = {}) -> void:
 		if ed != null:
 			enemies.append(ed)
 
+	var persistent_run := bool(cfg.get("persistent_run", false))
+	if persistent_run:
+		deck = GameState.make_battle_deck()
 	battle = BattleState.new(rules)
-	GameState.player_max_hp = rules.player_max_hp
-	GameState.player_hp = rules.player_max_hp
+	if not persistent_run:
+		GameState.player_max_hp = rules.player_max_hp
+		GameState.player_hp = rules.player_max_hp
 	GameState.gold = int(cfg.get("gold", rules.starting_gold))
-	GameState.permanent_damage_reduction = 0
-	GameState.gold_growth_percent = 0
-	GameState.reinvest_gold = 0
+	if not persistent_run:
+		GameState.permanent_damage_reduction = 0
+		GameState.gold_growth_percent = 0
+		GameState.reinvest_gold = 0
 	battle.start(deck, enemies, seed)
 	if cfg.has("gold"):
 		GameState.gold = int(cfg["gold"])
@@ -263,6 +268,12 @@ func _dfs(cell: Vector2i, node: Dictionary, path: Dictionary, res: Array, seen: 
 	for n in battle.board.neighbors(cell):
 		if not path.has(n):
 			_dfs(n, nn, path, res, seen, cap)
+	if battle.board.diagonal_steps_allowed > 0:
+		var selected: Array = path.keys()
+		for offset in [Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1)]:
+			var next: Vector2i = cell + offset
+			if battle.board.can_extend_path(selected, next):
+				_dfs(next, nn, path, res, seen, cap)
 	path.erase(cell)
 
 
@@ -297,6 +308,9 @@ func apply(action: Dictionary) -> Dictionary:
 		word_plays += 1
 	else:
 		single_plays += 1
+	if battle.end_turn_requested:
+		battle.end_turn_requested = false
+		battle.end_player_turn()
 	return {"ok": true, "word": (result.word.word if result.word != null else ""),
 		"messages": result.messages.duplicate(), "turn": battle.turn}
 

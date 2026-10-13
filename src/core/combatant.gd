@@ -8,6 +8,7 @@ var hp: int = 10
 var block: int = 0                 ## 临时格挡，敌方行动后清除
 var persistent_block: int = 0      ## 持久盾，跨回合保留
 var statuses: Dictionary = {}      ## status_id -> stacks
+var status_data: Dictionary = {}   ## 状态的目标独立数据（如灼烧伤害快照）
 var is_player: bool = false
 var enemy_data: EnemyData = null
 var move_index: int = 0

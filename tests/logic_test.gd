@@ -77,7 +77,7 @@ func _run() -> void:
 	_test_chaozhong()
 	_test_heart_series()
 	print("\n[logic_test] PASS=%d FAIL=%d" % [_pass, _fail])
-	get_tree().quit()
+	get_tree().quit(1 if _fail > 0 else 0)
 
 
 func _ok(cond: bool, label: String) -> void:

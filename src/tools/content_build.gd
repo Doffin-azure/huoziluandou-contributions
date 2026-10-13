@@ -17,6 +17,8 @@ static func e(handler: String, amount := 0, target := -1, status := "", note := 
 	e.pre_consume = pre_consume
 	if kind >= 0:
 		e.kind = kind
+	else:
+		e.kind = e.semantic_kind()
 	e.note = note if not note.is_empty() else handler_note(handler, amount, status, args)
 	return e
 

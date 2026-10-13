@@ -4,6 +4,7 @@ class_name BoardState
 
 var size: int = 4
 var cells: Array = []   ## Array[CharInstance | null]，长度 size*size
+var diagonal_steps_allowed: int = 0
 
 
 func _init(p_size: int = 4) -> void:
@@ -90,13 +91,25 @@ func is_adjacent(a: Vector2i, b: Vector2i) -> bool:
 func valid_path(path: Array) -> bool:
 	if path.is_empty():
 		return true
+	var visited := {}
+	var diagonals := 0
 	for i in path.size():
 		var v: Vector2i = path[i]
-		if not in_bounds(v.x, v.y) or get_xy(v) == null:
+		if visited.has(v) or not in_bounds(v.x, v.y) or get_xy(v) == null:
 			return false
+		visited[v] = true
 		if i > 0 and not is_adjacent(path[i - 1], v):
-			return false
+			var delta: Vector2i = v - path[i - 1]
+			if absi(delta.x) != 1 or absi(delta.y) != 1:
+				return false
+			diagonals += 1
+			if diagonals > diagonal_steps_allowed:
+				return false
 	return true
+
+
+func can_extend_path(path: Array, pos: Vector2i) -> bool:
+	return valid_path(path + [pos])
 
 
 func glyphs_of(path: Array) -> Array:

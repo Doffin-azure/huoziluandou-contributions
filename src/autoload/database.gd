@@ -42,9 +42,13 @@ func reload() -> void:
 	warnings.clear()
 
 	for res in _load_dir(CHAR_DIR, "CharacterData"):
+		for effect in res.solo_effects:
+			effect.kind = effect.semantic_kind()
 		characters[res.id] = res
 		char_by_glyph[res.glyph] = res
 	for res in _load_dir(WORD_DIR, "WordData"):
+		for effect in res.effects:
+			effect.kind = effect.semantic_kind()
 		words[res.id] = res
 		words_by_glyphs[res.glyph_string()] = res
 	for res in _load_dir(STATUS_DIR, "StatusData"):

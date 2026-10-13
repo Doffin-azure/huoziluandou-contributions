@@ -15,13 +15,13 @@ const CREMATE_FLAVOR := [
 static func _merge_duplicates(b: BattleState, ctx: Dictionary) -> Array:
 	var anchor: Vector2i = EffectUtil.tile(ctx)
 	var inst: CharInstance = b.board.get_xy(anchor)
-	if inst == null:
+	if inst == null or inst.pinned or not inst.is_player_owned():
 		return ["重合：目标格没有字"]
 	var glyph := inst.glyph()
 	var tiles: Array = []
 	for i in b.board.cells.size():
 		var c: CharInstance = b.board.cells[i]
-		if c != null and c.glyph() == glyph and c.is_player_owned():
+		if c != null and not c.pinned and c.glyph_list() == inst.glyph_list() and c.is_player_owned():
 			tiles.append(b.board.to_xy(i))
 	if tiles.size() < 2:
 		return ["重合：没有重复的己方【%s】" % glyph]
@@ -44,11 +44,12 @@ static func _replay_last_attack(b: BattleState) -> Array:
 		return ["连击：此前没有可重演的即时攻击"]
 	var msgs: Array = []
 	for e in b.last_attack_effects:
-		if e.handler == "replay_last_attack":
+		if e.handler == "replay_last_attack" or e.timing == "persistent":
 			continue  # 禁止递归
 		var sub := {"battle": b, "source": b.player, "glyphs": b.last_attack_glyphs,
-			"target": {"target_index": b.last_attack_target}, "target_index": b.last_attack_target}
-		msgs.append_array(EffectHandlers.run(e.handler, e, sub))
+			"target": b.last_attack_target_data, "target_index": b.last_attack_target,
+			"path": b.last_attack_path, "word": b.last_attack_word, "consumed": []}
+		msgs.append_array(EffectResolver.resolve_all([e], sub))
 	if msgs.is_empty():
 		msgs.append("连击：重演【%s】" % b.last_attack_word.word)
 	return msgs
@@ -61,6 +62,10 @@ static func _replay_word(b: BattleState) -> Array:
 	var placed := 0
 	for item in b.last_played_consumed:
 		var inst: CharInstance = item["inst"]
+		if item.get("kind", "real") in ["layer", "pinned"] or inst.pinned or b.board.cells.has(inst):
+			continue
+		if inst.temporary or not inst.is_player_owned() or not (b.discard.has(inst) or b.bag.has(inst)):
+			continue
 		var pos: Vector2i = item["pos"]
 		if b.board.get_xy(pos) != null:
 			var empties: Array = b.board.empty_indices()
@@ -68,6 +73,7 @@ static func _replay_word(b: BattleState) -> Array:
 				break
 			pos = empties[0]
 		b.discard.erase(inst)
+		b.bag.erase(inst)
 		b.consumed_this_turn.erase(inst)
 		inst.owner = CharInstance.Owner.PLAYER
 		b.board.set_xy(pos, inst)
@@ -86,12 +92,10 @@ static func _return_enemy(b: BattleState, ctx: Dictionary) -> Array:
 	return ["放回：将敌方【%s】退回" % inst.glyph()]
 
 static func _recover_consumed(b: BattleState, ctx: Dictionary) -> Array:
-	if b.consumed_this_turn.is_empty():
-		return ["回收：本回合没有消耗过实体字"]
-	var idx: int = int(ctx.get("target", {}).get("discard_index", b.consumed_this_turn.size() - 1))
-	idx = clampi(idx, 0, b.consumed_this_turn.size() - 1)
-	var inst: CharInstance = b.consumed_this_turn[idx]
-	b.consumed_this_turn.remove_at(idx)
+	var inst := b.recoverable_card(ctx.get("target", {}))
+	if inst == null:
+		return ["回收：所选字已不在本回合可回收的弃字堆中"]
+	b.take_from_discard_by_uid(inst.uid)
 	b.bag.append(inst)   # 放回抽字袋顶（原型：袋顶=数组尾）
 	return ["回收：把【%s】放回抽字袋顶" % inst.glyph()]
 
@@ -128,7 +132,7 @@ static func _empower_glyph(b: BattleState, ctx: Dictionary) -> Array:
 static func _refine_remove(b: BattleState, ctx: Dictionary, eff: EffectData) -> Array:
 	var heat_down: int = int(eff.args.get("heat", 3))
 	var gold_up: int = int(eff.args.get("gold", 4))
-	b.player.add_heat(-heat_down)
+	b.add_heat(-heat_down)
 	EffectUtil.add_gold(b, gold_up)
 	var msgs: Array = ["炼化：热度 -%d，获得 %d 金币" % [heat_down, gold_up]]
 	var g: String = str(ctx.get("target", {}).get("remove_glyph", ""))
@@ -237,7 +241,7 @@ static func _reshuffle_line(b: BattleState, ctx: Dictionary) -> Array:
 	var returned: Array = []
 	for p in positions:
 		var inst: CharInstance = b.board.get_xy(p)
-		if inst != null and inst.is_player_owned() and not inst.temporary:
+		if inst != null and not inst.pinned and inst.is_player_owned() and not inst.temporary:
 			returned.append(inst)
 			b.board.clear_xy(p)
 	for inst2 in returned:
@@ -246,12 +250,15 @@ static func _reshuffle_line(b: BattleState, ctx: Dictionary) -> Array:
 		b._shuffle(b.bag)
 	var filled := 0
 	for p2 in positions:
+		if filled >= returned.size():
+			break
 		if b.board.get_xy(p2) != null:
 			continue
 		if b.bag.is_empty():
 			break
 		b.board.set_xy(p2, b.bag.pop_back())
 		filled += 1
+	b.record_draw(filled)
 	return ["急流：洗回 %d 枚，原格补入 %d 枚" % [returned.size(), filled]]
 
 
@@ -270,7 +277,11 @@ static func _place_two(b: BattleState, ctx: Dictionary) -> Array:
 		inst.owner = CharInstance.Owner.PLAYER
 		b.board.set_xy(cells[i], inst)
 		placed += 1
+	for inst in reveal:
+		if not b.board.cells.has(inst):
+			b.bag.append(inst)
 	b.pending_reveal = []
+	b.record_draw(placed)
 	return ["火急：补入 %d 字（热度 +2）" % placed]
 
 
@@ -298,7 +309,7 @@ static func _recover_to_bag(b: BattleState, ctx: Dictionary) -> Array:
 	var t: Dictionary = ctx.get("target", {})
 	var tile: Vector2i = t.get("tile", Vector2i(-1, -1))
 	var inst: CharInstance = b.board.get_xy(tile)
-	if inst == null or not inst.is_player_owned():
+	if inst == null or inst.pinned or not inst.is_player_owned() or inst.temporary:
 		return ["收回：请选择一枚己方实体字"]
 	b.board.clear_xy(tile)
 	b.bag.append(inst)
@@ -345,12 +356,15 @@ static func _charge_overheat(b: BattleState, eff: EffectData) -> Array:
 	return ["充电过热：获得 %d 储能 + %d 热度；此后每次出字立即补位" % [en, ht]]
 
 static func _recast_board(b: BattleState) -> Array:
-	var count := b.board.fill_count()
+	var count := 0
+	for inst in b.board.cells:
+		if inst != null and not inst.pinned:
+			count += 1
 	if count == 0:
 		return ["重铸：盘面没有字"]
 	for i in b.board.cells.size():
 		var c: CharInstance = b.board.cells[i]
-		if c == null:
+		if c == null or c.pinned:
 			continue
 		if c.temporary or not c.is_player_owned():
 			b.temp_chars.erase(c)
@@ -397,8 +411,14 @@ static func _collect_own(b: BattleState, ctx: Dictionary) -> Array:
 ## 再铸：将所选 3 个盘面字替换为随机临时字（随机字不一定在玩家牌组里）。
 static func _recast_three(b: BattleState, ctx: Dictionary) -> Array:
 	var cells: Array = ctx.get("target", {}).get("cells", [])
-	if cells.size() < 3:
+	if cells.size() != 3:
 		return ["再铸：请选择 3 个盘面字"]
+	var selected := {}
+	for cell in cells:
+		var inst := b.board.get_xy(cell)
+		if inst == null or inst.pinned or selected.has(cell):
+			return ["再铸：请选择三个不同的非固定字"]
+		selected[cell] = true
 	var pool: Array = []
 	for c in Database.characters.values():
 		if not c.is_pollution and not c.pending_design and not c.tags.has("enemy"):
@@ -497,6 +517,7 @@ static func _merge_flow(b: BattleState, ctx: Dictionary) -> Array:
 	b.return_pending_reveal()
 	b.board.set_xy(c1, bag_card)
 	b.board.set_xy(c2, disc_card)
+	b.record_draw(2)
 	return ["合流：将【%s】【%s】放入相邻空格" % [bag_card.glyph(), disc_card.glyph()]]
 
 static func _hard_stop(b: BattleState) -> Array:
@@ -521,6 +542,8 @@ static func _split_grow(b: BattleState, ctx: Dictionary) -> Array:
 	var center: CharInstance = b.board.get_xy(tile)
 	if center == null:
 		return ["分化：请选择一个盘面字"]
+	if center.pinned:
+		return ["分化：固定字不可删除或换字"]
 	var old_glyph: String = center.glyph()
 	b.temp_chars.erase(center)
 	b.board.clear_xy(tile)   # 删除该字（不入弃字堆）
@@ -537,6 +560,9 @@ static func _transform_board(b: BattleState, ctx: Dictionary) -> Array:
 	if b.board.get_xy(tile) == null:
 		b.return_pending_reveal()
 		return ["转化：请选择一个盘面字"]
+	if b.board.get_xy(tile).pinned:
+		b.return_pending_reveal()
+		return ["转化：固定字不可换字"]
 	var uid: int = int(ctx.get("target", {}).get("transform_uid", -1))
 	var chosen: CharInstance = b.take_revealed(uid)
 	if chosen == null:
@@ -568,8 +594,9 @@ static func _replace_self(b: BattleState, ctx: Dictionary) -> Array:
 		b.bag = b.discard.duplicate()
 		b.discard.clear()
 		b._shuffle(b.bag)
-	var inst: CharInstance = b.bag.pop_back()
-	b.board.set_xy(tile, inst)
+	var inst: CharInstance = b.draw_one_to(tile)
+	if inst == null:
+		return ["回：字袋为空，无法换字"]
 	return ["回：原位换成【%s】" % inst.glyph()]
 
 static func _reveal_place(b: BattleState, ctx: Dictionary, cost: int) -> Array:
@@ -584,6 +611,7 @@ static func _reveal_place(b: BattleState, ctx: Dictionary, cost: int) -> Array:
 		b.bag = b.discard.duplicate()
 		b.discard.clear()
 		b._shuffle(b.bag)
-	var inst: CharInstance = b.bag.pop_back()
-	b.board.set_xy(tile, inst)
+	var inst: CharInstance = b.draw_one_to(tile)
+	if inst == null:
+		return ["投放：字袋为空"]
 	return ["投放：支付 %d 金币，落下【%s】" % [cost, inst.glyph()]]

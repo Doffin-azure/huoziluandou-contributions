@@ -12,8 +12,7 @@ static func draw_to_board(b: BattleState, count: int) -> int:
 			break
 		if _draw_one(b):
 			drawn += 1
-	b.drawn_this_turn += drawn
-	return drawn
+	return b.record_draw(drawn, count)
 
 static func _draw_one(b: BattleState) -> bool:
 	if b.bag.is_empty():
@@ -47,6 +46,7 @@ static func draw_one_to(b: BattleState, pos: Vector2i) -> CharInstance:
 		return null
 	var inst: CharInstance = b.bag.pop_back()
 	b.board.set_xy(pos, inst)
+	b.record_draw(1)
 	return inst
 
 
@@ -145,6 +145,7 @@ static func take_from_discard_by_uid(b: BattleState, uid: int) -> CharInstance:
 		var inst: CharInstance = b.discard[i]
 		if inst.uid == uid:
 			b.discard.remove_at(i)
+			b.consumed_this_turn.erase(inst)
 			return inst
 	return null
 
@@ -300,6 +301,10 @@ static func rotate_3x3(b: BattleState, anchor: Vector2i, dir: int) -> void:
 static func swap_cells(b: BattleState, a: Vector2i, c: Vector2i) -> void:
 	var ta: CharInstance = b.board.get_xy(a)
 	var tc: CharInstance = b.board.get_xy(c)
+	if not b.board.in_bounds(a.x, a.y) or not b.board.in_bounds(c.x, c.y):
+		return
+	if (ta != null and ta.pinned) or (tc != null and tc.pinned):
+		return
 	b.board.set_xy(a, tc)
 	b.board.set_xy(c, ta)
 
@@ -494,6 +499,8 @@ static func fuse_cards(b: BattleState, p1: Vector2i, p2: Vector2i) -> Dictionary
 		return {"ok": false, "msg": "化合：需要两张盘面上的牌"}
 	if not c1.is_player_owned() or not c2.is_player_owned():
 		return {"ok": false, "msg": "化合：只能融合己方牌"}
+	if c1.pinned or c2.pinned:
+		return {"ok": false, "msg": "化合：固定字不可融合"}
 	if not b.board.is_adjacent(p1, p2):
 		return {"ok": false, "msg": "化合：两张牌必须相邻"}
 	var seq: Array[String] = []
@@ -523,6 +530,8 @@ static func refine_pair(b: BattleState, p1: Vector2i, p2: Vector2i) -> Dictionar
 		return {"ok": false, "msg": "精炼：需要两个盘面上的不同格子"}
 	if not c1.is_player_owned() or not c2.is_player_owned():
 		return {"ok": false, "msg": "精炼：只能作用于己方字"}
+	if c1.pinned or c2.pinned:
+		return {"ok": false, "msg": "精炼：固定字不可合并"}
 	if c1.glyph() != c2.glyph():
 		return {"ok": false, "msg": "精炼：两个字必须相同"}
 	c1.temporary_uses += 1
