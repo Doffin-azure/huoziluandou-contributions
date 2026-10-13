@@ -478,6 +478,19 @@ func _on_primary() -> void:
 		_board_view.end_pick()
 		_on_commit(cp, {"cells": cells})
 		return
+	# 转速：继续旋转（最多 3 次）；转满自动结束，也可点「清除」提前停下
+	if _ready_action.get("repeat_rotate", false):
+		battle.do_repeat_rotate()
+		if battle.repeat_rotate_count >= 3:
+			battle.end_repeat_rotate()
+			_ready_action = {}
+			_on_log("转速：已转满 3 次，结束")
+		else:
+			_ready_action = {"repeat_rotate": true, "path": [], "target": {}}
+		_refresh_all(true)
+		_update_input()
+		_check_battle_over()
+		return
 	if not _ready_action.is_empty():
 		var a := _ready_action
 		_ready_action = {}
@@ -626,6 +639,12 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 	if result.zero_effect:
 		_on_log("（该字/词没有效果，仅消耗）")
 	if _handle_effect_requests():
+		return
+	# 转速：本词结算后保留「发动」，可继续旋转同一处（最多 3 次）；点「清除」即停下。
+	if battle.repeat_rotate_tile.x >= 0 and battle.repeat_rotate_count < 3:
+		_ready_action = {"repeat_rotate": true, "path": [], "target": {}}
+		_update_input()
+		_check_battle_over()
 		return
 	_check_battle_over()
 
@@ -800,6 +819,8 @@ func _on_pick_cancelled() -> void:
 	_recast_three_cells = []
 	_collect_own_active = false
 	_collect_own_cells = []
+	if battle.repeat_rotate_tile.x >= 0:
+		battle.end_repeat_rotate()   # 转速：点「清除」= 提前停下
 
 
 func _run_line_pick(path: Array) -> void:
@@ -1268,7 +1289,10 @@ func _update_input() -> void:
 		_confirm_btn.text = "发动（收心 %d）" % _collect_own_cells.size()
 		_confirm_btn.disabled = locked
 	elif not _ready_action.is_empty():
-		_confirm_btn.text = "发动"
+		if _ready_action.get("repeat_rotate", false):
+			_confirm_btn.text = "发动（转速 %d/3）" % battle.repeat_rotate_count
+		else:
+			_confirm_btn.text = "发动"
 		_confirm_btn.disabled = locked
 	elif _board_view.pick_mode != "":
 		_confirm_btn.text = "发动"
