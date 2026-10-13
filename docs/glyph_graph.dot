@@ -1,5 +1,8 @@
 digraph glyph_network {
   rankdir=LR; node [shape=circle, fontname="Noto Serif SC"];
+  "爆";
+  "金";
+  "币";
   "超";
   "能";
   "力";
@@ -25,7 +28,6 @@ digraph glyph_network {
   "流";
   "精";
   "铸";
-  "金";
   "转";
   "开";
   "灯";
@@ -43,18 +45,18 @@ digraph glyph_network {
   "护";
   "甲";
   "破";
-  "爆";
   "载";
   "购";
   "洗";
   "充";
   "停";
-  "币";
   "资";
   "投";
   "利";
   "炼";
   "再";
+  "爆" -> "金" [label="1"];
+  "金" -> "币" [label="2"];
   "超" -> "能" [label="2"];
   "能" -> "力" [label="2"];
   "超" -> "重" [label="1"];
@@ -174,7 +176,6 @@ digraph glyph_network {
   "爆" -> "破" [label="1"];
   "爆" -> "冷" [label="1"];
   "重" -> "载" [label="1"];
-  "金" -> "币" [label="1"];
   "合" -> "金" [label="1"];
   "铸" -> "币" [label="1"];
   "资" -> "金" [label="1"];

@@ -105,7 +105,7 @@ assets/fonts/  随仓库字体
 | 词效回归 | `<godot> --headless --path . res://tests/word_effect_regression.tscn` | 81 条实体守恒、词效联动、回合/跨战与交互检查 |
 | 战斗界面 | `<godot> --headless --path . res://tests/battle_ui_test.tscn` | 86 条纸面/墨芯界面与输入检查 |
 | 内容生成 | `<godot> --headless --path . --script res://src/tools/build_content.gd` | 从表格重建 `.tres` |
-| 词效表 | `<godot> --headless --path . res://src/tools/dump_words.tscn` | 导出 155 词效果表 |
+| 词效表 | `<godot> --headless --path . res://src/tools/dump_words.tscn` | 导出 156 词效果表 |
 | 字表 | `<godot> --headless --path . res://src/tools/dump_chars.tscn` | 导出 65 字表（含出/入度） |
 | 字网图谱 | `<godot> --headless --path . res://src/tools/glyph_graph.tscn` | 度数表 + Graphviz + Mermaid |
 | 字网 SVG | `<godot> --headless --path . res://src/tools/glyph_network_svg.tscn` | 力导向网络图（SVG） |

@@ -388,6 +388,10 @@ func deal_damage(target: Combatant, amount: int, is_attack: bool = true) -> int:
 	var real := target.take_damage(dmg)
 	if not target.is_player:
 		damage_dealt_this_turn += real
+		# 爆金：敌方每受到一次「攻击」获得 1 金币（被格挡/护甲吸收也算，故不看 real）
+		if is_attack and target.status_stacks("gold_burst") > 0:
+			earn_gold(1)
+			_log("爆金：%s 受击，获得 1 金币" % target.display_name)
 		_check_bounty()
 	return real
 

@@ -83,7 +83,7 @@ func semantic_kind() -> int:
 		"damage", "overdo", "gravity_damage", "shield_smash", "break_shield_damage", \
 		"energy_discharge", "heat_burst", "destroy_2x2", "clear_board", \
 		"heat_to_damage_flow", "spend_gold_damage", "electric_strike", "fire_power", \
-		"energy_to_heat_damage", "cold_snap":
+		"energy_to_heat_damage", "cold_snap", "damage_multi":
 			return Kind.DAMAGE
 		"damage_all": return Kind.DAMAGE_ALL
 		"block_temp", "joint_force": return Kind.BLOCK

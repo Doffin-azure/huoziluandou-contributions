@@ -134,6 +134,8 @@ func _build_statuses() -> void:
 		 "desc": "接下来 2 次敌方行动各受到一次灼烧伤害。"},
 		{"id": "heart_corrosion", "name": "心蚀", "glyph": "蚀", "kind": 1, "color": "8a4a63", "decay": 0,
 		 "desc": "每回合损失等量层数的生命（不衰减）。"},
+		{"id": "gold_burst", "name": "爆金", "glyph": "币", "kind": 1, "color": "b8912e", "decay": 0,
+		 "desc": "每受到一次攻击，攻击者获得 1 金币（被护甲/格挡吸收也算）。"},
 	]
 	for d in defs:
 		var s: StatusData = StatusDataS.new()
@@ -686,6 +688,14 @@ func _build_extra_words() -> void:
 			ContentBuild.e("counter", 1, -1, "", "预留 1 层反击", {})]),
 		"%s/words/extra_dunfan.tres" % RES)
 	print("  · 新增词：盾反")
+
+	# 爆金币（5 段伤害 + 爆金印记）
+	_save(_extra_list("extra_baojinbi", "爆金币", ["爆", "金", "币"], "经济", "",
+		"造成 5 段 1 点伤害，并使目标获得【爆金】：此后每受到一次攻击你获得 1 金币（被护甲/格挡吸收也算）",
+		[ContentBuild.e("apply_status_enemy", 1, EffectDataS.Target.ENEMY, "gold_burst", "使目标获得【爆金】"),
+			ContentBuild.e("damage_multi", 1, EffectDataS.Target.ENEMY, "", "5 段 1 点伤害", {"hits": 5})]),
+		"%s/words/extra_baojinbi.tres" % RES)
+	print("  · 新增词：爆金币")
 
 func _extra(id: String, word: String, glyphs: Array, group: String, interaction: String, desc: String, effect: EffectData) -> WordData:
 	var w: WordData = WordDataS.new()

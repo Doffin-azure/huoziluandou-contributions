@@ -27,6 +27,18 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 				out.append_array(EffectUtil.damage(b, e, amount))
 			b.end_attack_sequence()
 			return out
+		"damage_multi":
+			# 多段攻击：每段 amount 点，段数由 args.hits 指定（共享一次攻击加成序列）
+			var hits: int = max(1, int(eff.args.get("hits", 1)))
+			var multi_out: Array = []
+			b.begin_attack_sequence()
+			for i in hits:
+				if enemy == null or not enemy.is_alive():
+					break
+				multi_out.append_array(EffectUtil.damage(b, enemy, amount))
+			b.end_attack_sequence()
+			multi_out.append("%d 段 × %d 伤" % [hits, amount])
+			return multi_out
 		"block_temp":
 			src.add_block(amount)
 			return ["获得 %d 点临时格挡" % amount]
@@ -103,11 +115,13 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["清空热度（-%d）" % lost]
 		"apply_status_self":
 			src.add_status(eff.status_id, amount if amount != 0 else 1)
-			return ["获得状态 %s" % eff.status_id]
+			var self_sd: StatusData = Database.get_status(eff.status_id)
+			return ["获得状态【%s】" % (self_sd.name if self_sd != null else eff.status_id)]
 		"apply_status_enemy":
 			if enemy != null:
 				enemy.add_status(eff.status_id, amount if amount != 0 else 1)
-				return ["使敌人获得 %s" % eff.status_id]
+				var foe_sd: StatusData = Database.get_status(eff.status_id)
+				return ["使敌人获得【%s】" % (foe_sd.name if foe_sd != null else eff.status_id)]
 			return []
 		"permanent_damage_reduction":
 			if GameState.permanent_damage_reduction <= 0:

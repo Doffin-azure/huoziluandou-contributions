@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://src/data/status_data.gd" id="1_8lf73"]
+
+[resource]
+script = ExtResource("1_8lf73")
+id = "gold_burst"
+name = "爆金"
+glyph = "币"
+description = "每受到一次攻击，攻击者获得 1 金币（被护甲/格挡吸收也算）。"
+kind = 1
+color = Color(0.72156864, 0.5686275, 0.18039216, 1)

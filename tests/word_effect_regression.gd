@@ -2,12 +2,13 @@ extends Control
 ## 词效回归：实体守恒、回合/跨战边界、结阵联动和实际 HUD 多阶段交互。
 
 ## 固定数量防止脚本异常中断某个测试函数后得到假通过。
-const EXPECTED_CHECKS := 81
+const EXPECTED_CHECKS := 86
 var checks: Array = []
 
 func _ready() -> void:
 	_run_controls()
 	_run_logic()
+	_run_baojinbi()
 	_run_boundaries()
 	_run_final_boundaries()
 	await _run_ui()
@@ -81,6 +82,27 @@ func _occurrences(b: BattleState, inst: CharInstance) -> int:
 			if c == inst:
 				n += 1
 	return n
+
+func _run_baojinbi() -> void:
+	var b := _battle()
+	var e: Combatant = b.enemies[0]
+	_place(b, Vector2i.ZERO, "爆")
+	_place(b, Vector2i(1, 0), "金")
+	_place(b, Vector2i(2, 0), "币")
+	var hp0: int = e.hp
+	var gold0: int = GameState.gold
+	var r := b.try_play([Vector2i.ZERO, Vector2i(1, 0), Vector2i(2, 0)])
+	_check("baojinbi_word", r.ok and r.word != null and r.word.word == "爆金币", "成词=%s" % (r.word.word if r.word != null else "无"))
+	_check("baojinbi_multi_hit", hp0 - e.hp == 5, "5 段 1 伤后掉血=%d，预期 5" % (hp0 - e.hp))
+	_check("baojinbi_status", e.status_stacks("gold_burst") == 1, "爆金层=%d，预期 1" % e.status_stacks("gold_burst"))
+	_check("baojinbi_gold_per_hit", GameState.gold == gold0 + 5, "本词 5 段金币 %d→%d，预期 +5" % [gold0, GameState.gold])
+	# 敌方有护甲/格挡时，攻击被吸收也照样给钱
+	var gold1: int = GameState.gold
+	e.add_block(50)
+	var hp1: int = e.hp
+	b.deal_damage(e, 1, true)
+	_check("baojinbi_through_block", e.hp == hp1 and GameState.gold == gold1 + 1, "50 格挡下受击 HP %d→%d、金币 %d→%d（预期 HP 不变、金币 +1）" % [hp1, e.hp, gold1, GameState.gold])
+
 
 func _run_logic() -> void:
 	var b := _battle()
