@@ -4,6 +4,7 @@ extends Node
 var host: Control = null
 var current: Control = null
 var current_path: String = ""
+var study_stage: StudyStage
 
 
 func goto(screen_path: String, params: Dictionary = {}) -> void:
@@ -20,6 +21,8 @@ func goto(screen_path: String, params: Dictionary = {}) -> void:
 	screen.set_anchors_preset(Control.PRESET_FULL_RECT)
 	if screen.has_method("setup"):
 		screen.call("setup", params)
+	if is_instance_valid(study_stage):
+		study_stage.set_screen(screen_path)
 	host.add_child(screen)
 	current = screen
 	current_path = screen_path

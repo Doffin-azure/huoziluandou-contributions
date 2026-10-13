@@ -1,49 +1,78 @@
 extends Control
 class_name StatBar
-## 圆角血条 / 护盾条。
+## 前景立即收缩，旧血量用一道延迟追上的残影表达。
 
 var value := 0
 var max_value := 1
 var bar_color := Palette.HP
-var bg_color := Color(0.15, 0.12, 0.1, 0.85)
+var bg_color := Palette.PANEL_DARK
 var label_text := ""
 var show_text := true
 var font_size := 15
-
-
-func setup_bar(v: int, m: int, c: Color, label := "") -> void:
-	value = v
-	max_value = max(1, m)
-	bar_color = c
-	if label.is_empty():
-		label_text = "%d / %d" % [value, max_value]
-	else:
-		label_text = label
-	queue_redraw()
+var _ratio := 0.0
+var _trail := 0.0
+var _initialized := false
+var _front_tween: Tween
+var _trail_tween: Tween
 
 
 func _ready() -> void:
-	custom_minimum_size.y = 22
+	custom_minimum_size.y = 24
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func setup_bar(v: int, m: int, c: Color, label := "", animate := true) -> void:
+	var changed := v != value or m != max_value
+	value = v
+	max_value = maxi(1, m)
+	bar_color = c
+	label_text = "%d / %d" % [value, max_value] if label.is_empty() else label
+	var target := clampf(float(value) / max_value, 0.0, 1.0)
+	if not _initialized or not is_inside_tree() or not animate or Settings.reduced_motion:
+		_stop_tweens()
+		_ratio = target
+		_trail = target
+	elif changed:
+		_stop_tweens()
+		_trail = maxf(_trail, _ratio)
+		_front_tween = create_tween()
+		_front_tween.tween_method(_set_ratio, _ratio, target, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		_trail_tween = create_tween()
+		_trail_tween.tween_interval(0.10)
+		_trail_tween.tween_method(_set_trail, _trail, target, 0.30).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_initialized = true
+	queue_redraw()
+
+
+func _stop_tweens() -> void:
+	if _front_tween != null:
+		_front_tween.kill()
+	if _trail_tween != null:
+		_trail_tween.kill()
+
+
+func _set_ratio(v: float) -> void:
+	_ratio = v
+	queue_redraw()
+
+
+func _set_trail(v: float) -> void:
+	_trail = v
 	queue_redraw()
 
 
 func _draw() -> void:
-	var h := size.y
-	var r := h * 0.5
-	var bg := StyleBoxFlat.new()
-	bg.bg_color = bg_color
-	bg.set_corner_radius_all(int(r))
-	draw_style_box(bg, Rect2(Vector2.ZERO, size))
-
-	var ratio: float = clampf(float(value) / float(max_value), 0.0, 1.0)
-	if ratio > 0.0:
-		var fg := StyleBoxFlat.new()
-		fg.bg_color = bar_color
-		fg.set_corner_radius_all(int(r))
-		draw_style_box(fg, Rect2(Vector2.ZERO, Vector2(max(h, size.x * ratio), h)))
-
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = bg_color
+	sb.set_corner_radius_all(3)
+	draw_style_box(sb, Rect2(Vector2.ZERO, size))
+	if _trail > _ratio:
+		sb.bg_color = Palette.GOLD.darkened(0.15)
+		draw_style_box(sb, Rect2(Vector2.ZERO, Vector2(size.x * _trail, size.y)))
+	if _ratio > 0.0:
+		sb.bg_color = bar_color
+		draw_style_box(sb, Rect2(Vector2.ZERO, Vector2(size.x * _ratio, size.y)))
 	if show_text:
 		var font: Font = Ink.serif
-		var ascent := font.get_ascent(font_size)
-		var pos := Vector2(0, (h + ascent) * 0.5 - 2)
-		draw_string(font, pos, label_text, HORIZONTAL_ALIGNMENT_CENTER, size.x, font_size, Palette.PAPER)
+		var baseline := (size.y + font.get_ascent(font_size) - font.get_descent(font_size)) * 0.5
+		draw_string(font, Vector2(0, baseline), label_text, HORIZONTAL_ALIGNMENT_CENTER, size.x, font_size, Palette.PAPER)

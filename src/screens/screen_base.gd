@@ -12,7 +12,17 @@ func setup(p: Dictionary) -> void:
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(Ink.paper_layer())
+	var world_backed := is_instance_valid(Router.study_stage) and Router.study_stage.visible
+	var path: String = get_script().resource_path
+	if not world_backed or (not path.contains("title_screen") and not path.contains("battle_screen")):
+		var paper := Ink.paper_layer()
+		if world_backed:
+			var material := ShaderMaterial.new()
+			material.shader = load("res://src/shaders/study_sheet.gdshader")
+			material.set_shader_parameter("paper_color", Palette.PAPER)
+			material.set_shader_parameter("margin", Vector2(0.045, 0.075) if path.contains("map_screen") else Vector2(0.010, 0.008))
+			paper.material = material
+		add_child(paper)
 	content = Control.new()
 	content.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(content)

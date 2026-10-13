@@ -44,7 +44,7 @@ void fragment() {
 	vec2 b = tile_size * 0.5 - vec2(corner_radius);
 	float dist = length(max(abs(p) - b, 0.0)) + min(max(abs(p).x - b.x, abs(p).y - b.y), 0.0) - corner_radius;
 	float bevel = smoothstep(-10.0, 0.0, dist);
-	col = mix(col, edge_tint, (1.0 - bevel) * 0.55);
+	col = mix(col, edge_tint, bevel * 0.48);
 	col += (hash(uv * 480.0) - 0.5) * 0.05 * grain_strength;
 	COLOR = vec4(col, mask * alpha);
 }

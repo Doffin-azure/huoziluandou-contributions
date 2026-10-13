@@ -1,5 +1,6 @@
 extends RefCounted
 class_name BattleState
+signal enemy_acting(enemy: Combatant, move: EnemyMoveData)
 ## 单场战斗的完整逻辑状态（V0.2）。
 ## UI 只读取它并渲染；EffectHandlers 通过它公开的方法改状态。
 
@@ -617,6 +618,7 @@ func _enemy_act(e: Combatant) -> void:
 	if ed == null or ed.moves.is_empty():
 		return
 	var mv: EnemyMoveData = ed.moves[e.move_index % ed.moves.size()]
+	enemy_acting.emit(e, mv)
 	e.move_index += 1
 	var immune := has_ability("ceasefire") and damage_dealt_this_turn <= 0
 	var split := has_ability("split_mind")

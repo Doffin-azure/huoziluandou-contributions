@@ -174,3 +174,9 @@ func _populate_words() -> void:
 func _close() -> void:
 	closed.emit()
 	queue_free()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("cancel_selection"):
+		_close()
+		get_viewport().set_input_as_handled()

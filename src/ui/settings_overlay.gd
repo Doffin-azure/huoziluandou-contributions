@@ -57,7 +57,17 @@ func _build() -> void:
 	row.add_child(toggle)
 
 	col.add_child(Ink.hline())
-	col.add_child(Ink.label("选择确认后可用「清除」或 ESC 取消。", "Muted"))
+	col.add_child(Ink.label("再次点击选中字可撤销；「清除」或 ESC 可清空选择。", "Muted"))
+	var motion_row := Ink.hbox(12)
+	motion_row.add_child(Ink.label("减少动效", "Subheading"))
+	motion_row.add_child(Ink.expander())
+	var motion := Ink.button("开" if Settings.reduced_motion else "关")
+	motion.custom_minimum_size = Vector2(96, 48)
+	motion.pressed.connect(func():
+		Settings.set_reduced_motion(not Settings.reduced_motion)
+		motion.text = "开" if Settings.reduced_motion else "关")
+	motion_row.add_child(motion)
+	col.add_child(motion_row)
 
 	var close := Ink.button("关闭", true)
 	close.pressed.connect(func():
@@ -97,3 +107,10 @@ func _set_style(style_id: String) -> void:
 		Router.goto(path)
 	else:
 		_build_style_buttons()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("cancel_selection"):
+		closed.emit()
+		queue_free()
+		get_viewport().set_input_as_handled()
