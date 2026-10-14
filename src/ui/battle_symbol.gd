@@ -27,7 +27,10 @@ const SPECS := {
 	"strength": ["sword", "plus"], "poison": ["drop", "cross"], "burn": ["flame", "clock"],
 	"vulnerable": ["shield", "crack"], "next_extra": ["cards", "loop"], "next_double": ["sword", "double"],
 	"next_bonus": ["sword", "up"], "heart_corrosion": ["heart", "crack"], "gold_burst": ["coin", "sword"],
-	"more": ["more", ""], "unknown": ["star", ""]
+	"more": ["more", ""], "unknown": ["star", ""],
+	"hit": ["sword", ""], "fracture": ["shield", "crack"], "blast": ["star", "flame"], "frost": ["snow", ""],
+	"move_left": ["arrow_left", ""], "move_right": ["arrow", ""], "return": ["loop", ""], "rotate": ["grid", "loop"],
+	"cleanse": ["drop", "plus"], "lantern": ["lantern", ""], "unlock": ["shield", "arrow"]
 }
 var symbol := "unknown":
 	set(value):
@@ -142,6 +145,13 @@ func _base(kind: String) -> void:
 		"arrow":
 			_line([[4, 16], [27, 16]])
 			_line([[18, 7], [27, 16], [18, 25]])
+		"arrow_left":
+			_line([[28, 16], [5, 16]])
+			_line([[14, 7], [5, 16], [14, 25]])
+		"lantern":
+			_shape([[9, 7], [23, 7], [27, 16], [23, 25], [9, 25], [5, 16]])
+			_line([[10, 3], [22, 3]])
+			_line([[16, 25], [16, 30]])
 		"chart":
 			_line([[5, 4], [5, 27], [28, 27]])
 			_line([[9, 21], [15, 16], [19, 18], [26, 8]])

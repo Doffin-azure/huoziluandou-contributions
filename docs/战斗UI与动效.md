@@ -13,7 +13,7 @@
 ## 表现时序
 
 - 选字抬起约 80 ms；无效词轻抖，保留原路径并给出原因。
-- 有效出字释放约 110 ms，词语沿短弧线投向真正目标约 200 ms。
+- 有效出字释放约 110 ms，各字的图形符号沿短弧线投向真正目标约 200 ms。
 - 每个实际结果间隔约 160 ms；敌人行动前蓄势约 120 ms。伤害、格挡、拆盾与治疗按顺序反馈，多段攻击逐击显示。
 - 血条前景收缩约 120 ms；伤害残影延迟 100 ms 再用 300 ms 追上。击败后留出 350 ms，再进入奖励或失败界面。
 - 补字淡入和小幅落位，已有字按实体 UID 从原位置移动，约 180 ms。不同规则结果不靠解析战报字符串猜测。
@@ -42,6 +42,16 @@
 
 新增回归：`tests/battle_presentation_regression.tscn`。使用 `--capture` 导出实际桌面、手机、区域选择和 Buff 图标截图及 `shots/battle-audio-preview.wav` 试听；同样只生成在已忽略的 shots 中。
 
+## 按字义区分出字表现
+
+`GlyphVfxProfile` 覆盖现有 61 个字，以可复用的字系、符号和运动轨迹配置表现。火是上升火星、热是蒸汽、爆是径向冲击；电是折线电弧、蓄是向心聚能；冷是冰晶，防御是盾形与碎片，心是回复十字。重、左、右分别落下或横移；回与转使用回环和旋转，金币使用铜钱轮廓。组合词保留各字的符号，落点按照实际效果选择资源、气血、护盾、敌人或所选字盘区域。
+
+`BattleState.play_resolving` 在每次正常出字与结阵各词结算前报告字、效果和目标。战斗页把符号投送与真实反馈排入同一队列，伤害终点跟随实际受击对象；全格挡显示防御粒子，治疗与资源变动使用各自图标，不给非攻击字伪造敌方伤害。区域旋转与重力仍使用已有字块移动、桌面震动和音效，增加局部轨迹。
+
+`GlyphEffect` 使用原生矢量图标与程序绘制粒子，通常约 420 ms，最多同时 10 个效果，每个最多 22 粒。粒子随机数只使用独立的字形种子，数值文字位于效果上层；HUD 旁缩小范围并省略重复大图标。减少动效关闭投送与粒子，保留约 180 ms 静态结果图标；切屏释放所有效果。
+
+`tests/glyph_vfx_test.tscn` 检查全部字形映射、真实出字的预览目标与落点、区域回转、全格挡、急停解锁、随机数隔离、数量上限和退出清理。`--capture` 逐帧保存实际游戏到 `shots/glyph-vfx-frames/`，另保存十二类表现的实际渲染对照 `shots/glyph-vfx-gallery.png`，便于制作动图检查。Godot 4.7.2 原生渲染 48 项通过，原 UI 69 项与 presentation 83 项通过。
+
 ## 结构与验证
 
 `Combatant.feedback` 报告已结算的生命和护盾结果，`BattleState.enemy_acting` 报告敌人行动顺序。战斗屏仅在自己的操作结算期间收集事件。规则仍同步结算，输入在短表现队列期间锁定。视图长期复用，切屏时取消等待并断开绑定，所有瞬态节点和 Tween 随战斗场景释放。
@@ -54,6 +64,8 @@
 <godot> --headless --path . res://tests/logic_test.tscn
 <godot> --headless --path . res://tests/battle_ui_test.tscn
 <godot> --headless --path . res://tests/battle_presentation_regression.tscn
+<godot> --headless --path . res://tests/glyph_vfx_test.tscn
+<godot> --path . --resolution 1280x720 --fixed-fps 30 res://tests/glyph_vfx_test.tscn -- --capture
 <godot> --path . --resolution 1280x720 --fixed-fps 30 res://tests/battle_presentation_regression.tscn -- --capture
 ```
 

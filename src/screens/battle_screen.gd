@@ -63,6 +63,7 @@ var _merge_cell1 := Vector2i(-1, -1)
 var _finished := false
 var _busy := false
 var _collecting := false
+var _active_fx_profile: Dictionary = {}
 var _modal_count := 0
 var _compact := false
 var _events: Array[Dictionary] = []
@@ -132,6 +133,7 @@ func build(root: Control) -> void:
 	add_child(_audio)
 	EventBus.log_message.connect(_on_log)
 	battle.enemy_acting.connect(_on_enemy_acting)
+	battle.play_resolving.connect(_on_play_resolving)
 	_watch_combatant(battle.player)
 	_refresh_all()
 	for line in battle.log:
@@ -155,6 +157,8 @@ func _exit_tree() -> void:
 			watch[0].feedback.disconnect(watch[1])
 	_feedback_watches.clear()
 	_events.clear()
+	if battle != null and battle.play_resolving.is_connected(_on_play_resolving):
+		battle.play_resolving.disconnect(_on_play_resolving)
 
 
 func _bind_table_print() -> void:
@@ -513,7 +517,9 @@ func _on_primary() -> void:
 		return
 	# 转速：继续旋转（最多 3 次）；转满自动结束，也可点「清除」提前停下
 	if _ready_action.get("repeat_rotate", false):
+		var rotating_at := _board_effect_point({"target": {"tile": battle.repeat_rotate_tile}, "effects": [], "path": []}, 2)
 		battle.do_repeat_rotate()
+		_effects.glyph_impact(GlyphVfxProfile.for_glyph("转"), rotating_at, 38)
 		if battle.repeat_rotate_count >= 3:
 			battle.end_repeat_rotate()
 			_ready_action = {}
@@ -536,12 +542,14 @@ func _on_primary() -> void:
 	if battle.formation_mode and not battle.formation_queue.is_empty() and _board_view.path.is_empty():
 		_set_busy(true)
 		var count := battle.formation_queue.size()
-		var before := [battle.player.energy, battle.player.heat, GameState.gold]
+		var before := [battle.player.energy, battle.player.heat, GameState.gold, battle.player.temp_funds, battle.player.equity]
 		_events.clear()
 		_collecting = true
 		battle.resolve_formation()
 		_collecting = false
 		_audio.play_cue("play")
+		if _handle_effect_requests():
+			return
 		if not await _replay_feedback():
 			return
 		_board_view.clear_selection()
@@ -647,7 +655,7 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 	if not play_target.is_empty() or not needs_target:
 		# 规则层索引针对存活列表；HUD 索引针对固定敌人列表。
 		play_target["target_index"] = battle.alive_enemies().find(battle.enemies[_target_index]) if not battle.enemies.is_empty() else 0
-	var old_resources := [battle.player.energy, battle.player.heat, GameState.gold]
+	var old_resources := [battle.player.energy, battle.player.heat, GameState.gold, battle.player.temp_funds, battle.player.equity]
 	_events.clear()
 	_collecting = true
 	var result := battle.try_play(path, play_target)
@@ -683,22 +691,15 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 		return
 	if not await _wait_step(0.11 if not Settings.reduced_motion else 0.01):
 		return
-	var aim: Control = _player_panel
-	for event in _events:
-		if event.kind == "damage" or (event.kind == "shield" and int(event.get("gain", 0)) < 0):
-			aim = _view_for(event.target)
-			break
-	var launch := Vector2.ZERO
-	for cell in path:
-		launch += _effects.point_of(_board_view.tiles[_board_view.board.from_xy(cell)])
-	launch /= maxf(1.0, path.size())
-	_effects.fly_word("".join(result.glyphs), launch, _effects.point_of(aim))
-	if not await _wait_step(0.20 if not Settings.reduced_motion else 0.01):
-		return
 	if not await _replay_feedback():
 		return
 	_board_view.clear_selection()
 	_refresh_all(true)
+	var played_profile := GlyphVfxProfile.for_play(result.glyphs, result.word)
+	if played_profile.board and not result.zero_effect:
+		_effects.glyph_impact(played_profile, _board_effect_point({"target": play_target, "path": path, "effects": result.word.effects if result.word != null else []}), 38)
+	elif played_profile.focus == "ability" and not result.zero_effect:
+		_effects.glyph_impact(played_profile, _effects.point_of(_player_status) + Vector2(0, 34), 20)
 	if _gravity_in_play(result):
 		if not await _wait_step(0.18 if not Settings.reduced_motion else 0.01):
 			return
@@ -732,6 +733,8 @@ func _handle_effect_requests() -> bool:
 		_show_blackout()
 	if battle.end_turn_requested:
 		battle.end_turn_requested = false
+		_effects.glyph_impact(GlyphVfxProfile.for_glyph("停"), _effects.point_of(_board_view), 28)
+		_set_busy(false)
 		_on_end_turn()
 		return true
 	return false
@@ -1247,6 +1250,7 @@ func _on_end_turn() -> void:
 	_set_busy(true)
 	_events.clear()
 	_collecting = true
+	_active_fx_profile = GlyphVfxProfile.for_glyph("污")
 	battle.end_player_turn()
 	_collecting = false
 	if not await _replay_feedback():
@@ -1521,6 +1525,8 @@ func _layout() -> void:
 		widget.set_compact(_compact or _enemy_widgets.size() > 1)
 		widget.custom_minimum_size.y = (150 if not widget._status.entries.is_empty() else 108) * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
 	_board_view._layout()
+	if _effects != null:
+		_effects.set_ui_scale(ui_scale)
 
 
 func _update_input() -> void:
@@ -1587,6 +1593,16 @@ func _selection_context(path: Array) -> String:
 	var target := enemy.display_name if enemy != null and enemy.is_alive() else "无"
 	if _target_kind in [EffectData.Target.BOARD_2X2, EffectData.Target.BOARD_3X3, EffectData.Target.BOARD_TILE, EffectData.Target.BOARD_ROW, EffectData.Target.EMPTY_TILE]:
 		target = "字盘选区"
+	else:
+		var glyphs: Array = []
+		for cell in path:
+			var instance: CharInstance = battle.board.get_xy(cell)
+			if instance != null: glyphs.append(instance.data.glyph)
+		if glyphs.size() == 1 or _current_word != null:
+			var focus: String = GlyphVfxProfile.for_play(glyphs, _current_word).focus
+			var labels := {"shield": "自身护盾", "heal": "自身气血", "heat": "热度", "energy": "储能",
+				"gold": "金币", "temp_funds": "临时资金", "equity": "股权", "board": "字盘", "ability": "自身能力"}
+			target = labels.get(focus, target)
 	var cost := _pollution_cost_text(path).strip_edges()
 	return "目标：%s\n%s" % [target, "污染代价：无" if cost.is_empty() else cost]
 
@@ -1605,11 +1621,77 @@ func _on_feedback(event: Dictionary, target: Combatant) -> void:
 		return
 	var captured := event.duplicate(true)
 	captured["target"] = target
+	captured["profile"] = _active_fx_profile if not _active_fx_profile.is_empty() else GlyphVfxProfile.for_glyph("")
+	# 连续结阵或前置伤害改变存活列表时，图标的终点跟随真实结算对象。
+	if not target.is_player and (event.kind == "damage" or (event.kind == "shield" and int(event.get("gain", 0)) < 0)):
+		for index in range(_events.size() - 1, -1, -1):
+			if _events[index].kind == "cast":
+				if _events[index].get("actual_target", false):
+					break
+				var view: Control = _view_for(target)
+				if view is EnemyView:
+					_events[index].destination = _effects.get_global_transform().affine_inverse() * view.impact_point()
+					_events[index]["actual_target"] = true
+				break
 	_events.append(captured)
+
+
+func _on_play_resolving(play: Dictionary) -> void:
+	if not _collecting:
+		return
+	_active_fx_profile = GlyphVfxProfile.for_play(play.glyphs, play.word, play.effects)
+	var source := Vector2.ZERO
+	for cell in play.path:
+		source += _effects.point_of(_board_view.tiles[battle.board.from_xy(cell)])
+	source /= maxf(1, play.path.size())
+	_events.append({"kind": "cast", "profile": _active_fx_profile, "source": source, "destination": _cast_destination(_active_fx_profile, play),
+		"play": {"path": play.path.duplicate(), "target": play.target.duplicate(), "effects": play.effects}})
+
+
+func _cast_destination(profile: Dictionary, play: Dictionary) -> Vector2:
+	match profile.focus:
+		"enemy":
+			var alive_index := int(play.target.get("target_index", 0))
+			var alive := battle.alive_enemies()
+			if alive_index >= 0 and alive_index < alive.size():
+				var view: Control = _view_for(alive[alive_index])
+				if view is EnemyView:
+					return _effects.get_global_transform().affine_inverse() * view.impact_point()
+		"shield": return _effects.point_of(_player_block)
+		"heal": return _effects.point_of(_player_hp_value)
+		"energy", "heat": return _effects.point_of(_resource_strip.item_for(profile.focus))
+		"gold", "temp_funds", "equity": return _effects.point_of(_gold_strip.item_for(profile.focus))
+		"board": return _board_effect_point(play)
+	return _effects.point_of(_player_status)
+
+
+func _board_effect_point(play: Dictionary, span_override := 0) -> Vector2:
+	var target: Dictionary = play.get("target", {})
+	var cells: Array = []
+	var span := span_override if span_override > 0 else 1
+	for effect in play.get("effects", []):
+		if effect.target == EffectData.Target.BOARD_2X2: span = 2
+		elif effect.target == EffectData.Target.BOARD_3X3: span = 3
+	if target.has("tile"):
+		for y in span:
+			for x in span:
+				var cell: Vector2i = target.tile + Vector2i(x, y)
+				if battle.board.in_bounds(cell.x, cell.y): cells.append(cell)
+	elif target.has("row"):
+		for x in 4: cells.append(Vector2i(x, int(target.row)))
+	else:
+		cells = play.get("path", [])
+	if cells.is_empty():
+		return _effects.point_of(_board_view)
+	var point := Vector2.ZERO
+	for cell in cells:
+		point += _effects.point_of(_board_view.tiles[battle.board.from_xy(cell)])
+	return point / cells.size()
 
 
 func _on_enemy_acting(enemy: Combatant, move: EnemyMoveData) -> void:
 	if _collecting:
+		_active_fx_profile = GlyphVfxProfile.for_glyph("")
 		_events.append({"kind": "enemy_action", "target": enemy, "move": move})
 
 
@@ -1622,6 +1704,14 @@ func _view_for(target: Combatant) -> Control:
 
 func _replay_feedback() -> bool:
 	for event in _events:
+		if event.kind == "cast":
+			var destination: Vector2 = event.destination
+			if not event.get("actual_target", false):
+				destination = _cast_destination(event.profile, event.play)
+			_effects.cast(event.profile, event.source, destination)
+			if not await _wait_step(0.20 if not Settings.reduced_motion else 0.01):
+				return false
+			continue
 		var view := _view_for(event.target)
 		if event.kind == "enemy_action":
 			if view is EnemyView:
@@ -1632,6 +1722,10 @@ func _replay_feedback() -> bool:
 				return false
 			continue
 		var point := _effects.point_of(view)
+		var profile: Dictionary = event.get("profile", GlyphVfxProfile.for_glyph(""))
+		var radius := 16.0 if event.target.is_player else 42.0
+		if event.target.is_player:
+			point = _effects.point_of(_player_block if event.kind == "shield" else _player_hp_value)
 		if view is EnemyView:
 			view.apply_feedback(event)
 			point = _effects.get_global_transform().affine_inverse() * view.impact_point()
@@ -1640,6 +1734,7 @@ func _replay_feedback() -> bool:
 				_show_player_hp(int(event.hp), int(event.max_hp))
 			if event.has("block"):
 				_show_defense(int(event.block), int(event.persistent_block))
+		var number_point := point + Vector2(0, 62 if event.target.is_player else -26)
 		match event.kind:
 			"damage":
 				var loss := int(event.hp_loss)
@@ -1649,21 +1744,22 @@ func _replay_feedback() -> bool:
 					if loss + blocked >= 9:
 						_effects.table_impact(3.5)
 				if loss > 0:
-					_effects.number("−%d" % loss, point + Vector2(0, -26), Palette.VERMILION_DK)
-					_effects.burst(point, false, loss >= 12 or int(event.hp) <= 0)
+					_effects.number("−%d" % loss, number_point, Palette.VERMILION_DK)
+					_effects.glyph_impact(profile, point, radius)
 				if blocked > 0:
-					_effects.number("格挡 %d" % blocked, point + Vector2(0, 14), Palette.BLOCK)
-					_effects.burst(point, true)
+					_effects.number("格挡 %d" % blocked, number_point + Vector2(0, 18), Palette.BLOCK)
+					_effects.glyph_impact(GlyphVfxProfile.feedback(profile, "shield"), point, radius)
 				elif loss == 0:
 					_effects.number("免疫", point, Palette.INK_SOFT)
 			"shield":
 				var gain := int(event.gain)
 				_audio.play_cue("block")
-				_effects.number("护盾 +%d" % gain if gain > 0 else ("破盾" if int(event.block) == 0 else "拆盾 %d" % -gain), point, Palette.BLOCK if gain > 0 else Palette.GOLD_DK)
-				_effects.burst(point, true)
+				_effects.number("护盾 +%d" % gain if gain > 0 else ("破盾" if int(event.block) == 0 else "拆盾 %d" % -gain), point + Vector2(0, 32 if event.target.is_player else 0), Palette.BLOCK if gain > 0 else Palette.GOLD_DK)
+				_effects.glyph_impact(GlyphVfxProfile.feedback(profile, "shield", gain), point, radius)
 			"heal":
 				_audio.play_cue("heal")
-				_effects.number("+%d" % int(event.gain), point, Palette.JADE)
+				_effects.number("+%d" % int(event.gain), number_point, Palette.JADE)
+				_effects.glyph_impact(GlyphVfxProfile.feedback(profile, "heal"), point, radius)
 		if not await _wait_step(0.16 if not Settings.reduced_motion else 0.045):
 			return false
 	_events.clear()
@@ -1679,13 +1775,24 @@ func _wait_step(duration: float) -> bool:
 
 
 func _resource_feedback(before: Array) -> void:
-	var after := [battle.player.energy, battle.player.heat, GameState.gold]
-	var ids := ["energy", "heat", "gold"]
-	for i in 3:
+	var after := [battle.player.energy, battle.player.heat, GameState.gold, battle.player.temp_funds, battle.player.equity]
+	var ids := ["energy", "heat", "gold", "temp_funds", "equity"]
+	var played := _active_fx_profile.duplicate(true)
+	# 等新数值控件完成排版，再在实际图标旁反馈，避免第一帧落在旧位置。
+	await get_tree().process_frame
+	if _exiting:
+		return
+	for i in mini(before.size(), after.size()):
 		var change := int(after[i]) - int(before[i])
 		if change != 0:
-			var strip: ResourceStrip = _gold_strip if i == 2 else _resource_strip
-			_effects.number("%+d" % change, _effects.point_of(strip.item_for(ids[i])) + Vector2(0, 28), Palette.GOLD_DK)
+			var strip: ResourceStrip = _gold_strip if i >= 2 else _resource_strip
+			var point := _effects.point_of(strip.item_for(ids[i])) + Vector2(0, 28)
+			_effects.number("%+d" % change, point, Palette.GOLD_DK)
+			var resource_glyph := "电" if i == 0 else ("冷" if i == 1 and change < 0 else ("火" if i == 1 else ("资" if i == 3 else "金")))
+			var profile := GlyphVfxProfile.for_glyph(resource_glyph)
+			if played.get("family", "") == profile.family:
+				profile = played
+			_effects.glyph_impact(profile, point, 16)
 
 
 func _unhandled_input(event: InputEvent) -> void:

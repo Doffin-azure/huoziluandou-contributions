@@ -4,6 +4,37 @@ class_name BattleEffects
 var _impact_targets: Array = []
 var _impact_strength := 0.0
 var _impact_time := 0.0
+var _ui_scale := 1.0
+const MAX_GLYPH_EFFECTS := 10
+
+
+func set_ui_scale(value: float) -> void:
+	_ui_scale = value
+
+
+func cast(profile: Dictionary, from: Vector2, to: Vector2) -> void:
+	if Settings.reduced_motion:
+		return
+	_spawn_glyph(profile, from, to, "cast", 30.0)
+
+
+func glyph_impact(profile: Dictionary, at: Vector2, radius := 42.0) -> void:
+	_spawn_glyph(profile, at, at, "impact", radius)
+
+
+func _spawn_glyph(profile: Dictionary, from: Vector2, to: Vector2, phase: String, radius: float) -> void:
+	var live := get_children().filter(func(child): return child is GlyphEffect and not child.is_queued_for_deletion())
+	if live.size() >= MAX_GLYPH_EFFECTS:
+		live[0].queue_free()
+	var effect := GlyphEffect.new()
+	effect.profile = profile
+	effect.phase = phase
+	effect.scale = Vector2.ONE * _ui_scale
+	effect.origin = from / _ui_scale
+	effect.destination = to / _ui_scale
+	effect.radius = radius
+	effect.duration = 0.18 if phase == "cast" else 0.42
+	add_child(effect)
 
 
 func setup_impact(hud: Control, stage: Control) -> void:
@@ -76,6 +107,7 @@ func number(text: String, pos: Vector2, color: Color) -> void:
 	label.add_theme_color_override("font_shadow_color", Palette.PAPER)
 	label.add_theme_constant_override("shadow_offset_y", 2)
 	add_child(label)
+	label.z_index = 1
 	label.position = pos - label.get_combined_minimum_size() * 0.5
 	var tw := create_tween().set_parallel(true)
 	if not Settings.reduced_motion:
