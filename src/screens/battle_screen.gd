@@ -1440,7 +1440,7 @@ func _layout() -> void:
 		_player_panel.position = Vector2(margin, top + 12)
 		_player_panel.size = Vector2(column, (96 if not _player_status.entries.is_empty() else 44) * ui_scale)
 		_enemy_panel.position = Vector2(margin, _player_panel.position.y + _player_panel.size.y + 6 * ui_scale)
-		_enemy_panel.size = Vector2(column, top + side + 12 - _enemy_panel.position.y - 8 * ui_scale)
+		_enemy_panel.size = Vector2(column, top + side + 12 - _enemy_panel.position.y)
 		_preview_panel.position = Vector2(right_x, top + 12)
 		_preview_panel.size = Vector2(column, side)
 		_end_btn.position = Vector2(margin, top + side + 22)
@@ -1523,7 +1523,7 @@ func _layout() -> void:
 	for widget in _enemy_widgets:
 		widget.ui_scale = ui_scale
 		widget.set_compact(_compact or _enemy_widgets.size() > 1)
-		widget.custom_minimum_size.y = (150 if not widget._status.entries.is_empty() else 108) * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
+		widget.custom_minimum_size.y = (152 if not widget._status.entries.is_empty() else 108) * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
 	_board_view._layout()
 	if _effects != null:
 		_effects.set_ui_scale(ui_scale)
@@ -1747,18 +1747,18 @@ func _replay_feedback() -> bool:
 					_effects.number("−%d" % loss, number_point, Palette.VERMILION_DK)
 					_effects.glyph_impact(profile, point, radius)
 				if blocked > 0:
-					_effects.number("格挡 %d" % blocked, number_point + Vector2(0, 18), Palette.BLOCK)
+					_effects.number("格挡 %d" % blocked, number_point + Vector2(0, 18), Palette.INK)
 					_effects.glyph_impact(GlyphVfxProfile.feedback(profile, "shield"), point, radius)
 				elif loss == 0:
 					_effects.number("免疫", point, Palette.INK_SOFT)
 			"shield":
 				var gain := int(event.gain)
 				_audio.play_cue("block")
-				_effects.number("护盾 +%d" % gain if gain > 0 else ("破盾" if int(event.block) == 0 else "拆盾 %d" % -gain), point + Vector2(0, 32 if event.target.is_player else 0), Palette.BLOCK if gain > 0 else Palette.GOLD_DK)
+				_effects.number("护盾 +%d" % gain if gain > 0 else ("破盾" if int(event.block) == 0 else "拆盾 %d" % -gain), point + Vector2(0, 32 if event.target.is_player else 0), Palette.INK if gain > 0 else Palette.VERMILION_DK)
 				_effects.glyph_impact(GlyphVfxProfile.feedback(profile, "shield", gain), point, radius)
 			"heal":
 				_audio.play_cue("heal")
-				_effects.number("+%d" % int(event.gain), number_point, Palette.JADE)
+				_effects.number("+%d" % int(event.gain), number_point, Palette.INK)
 				_effects.glyph_impact(GlyphVfxProfile.feedback(profile, "heal"), point, radius)
 		if not await _wait_step(0.16 if not Settings.reduced_motion else 0.045):
 			return false

@@ -39,7 +39,7 @@ func _rebuild() -> void:
 	var shown := mini(entries.size(), capacity if entries.size() <= capacity else maxi(0, capacity - 1))
 	for index in shown:
 		var entry: Dictionary = entries[index]
-		var button := _badge(str(entry.id), cell, entry.color)
+		var button := _badge(str(entry.id), cell, BattleSymbol.color_for(str(entry.id), int(entry.kind) == StatusData.Kind.DEBUFF))
 		button.tooltip_text = "%s · %d 层\n%s" % [entry.name, entry.stacks, entry.description]
 		button.pressed.connect(_show_entry.bind(entry))
 		if int(entry.stacks) > 1:
@@ -80,7 +80,7 @@ func _badge(symbol: String, cell: float, color: Color) -> Button:
 	add_child(button)
 	var icon := BattleSymbol.new()
 	icon.symbol = symbol
-	icon.ink = color.darkened(0.25)
+	icon.ink = color
 	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	icon.offset_left = cell * 0.12
 	icon.offset_top = cell * 0.12

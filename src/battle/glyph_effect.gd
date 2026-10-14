@@ -122,7 +122,7 @@ func _draw() -> void:
 		var c := Color(color, fade * (1 - particle.delay))
 		var s: float = particle.size * (1 - progress * 0.5)
 		if style == "steam":
-			draw_arc(p, s * 2.5, progress * 3, progress * 3 + PI, 12, Color("967f6980") * Color(1, 1, 1, fade), 1.5, true)
+			draw_arc(p, s * 2.5, progress * 3, progress * 3 + PI, 12, Color(color, fade * 0.5), 1.5, true)
 			continue
 		if style in ["charge", "split_charge", "settle"]:
 			draw_circle(p, s * 1.2, c)

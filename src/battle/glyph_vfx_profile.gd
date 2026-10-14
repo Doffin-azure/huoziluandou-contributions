@@ -24,10 +24,6 @@ const GLYPHS := {
 	"载": ["draw", "reload", "cards"], "灰": ["ink", "unknown", "dust"], "骨": ["shield", "armor_plating", "dust"],
 	"碍": ["shield", "no_block", "barrier"]
 }
-const COLORS := {"hit": Color("98392c"), "fire": Color("ba592f"), "electric": Color("557c88"),
-	"ice": Color("83a6ad"), "shield": Color("90733e"), "heal": Color("56866a"),
-	"poison": Color("665568"), "gravity": Color("69523b"), "flow": Color("587579"),
-	"gold": Color("aa823d"), "draw": Color("8c7751"), "ability": Color("a18243"), "clean": Color("709787"), "ink": Color("473e33")}
 const BOARD_HANDLERS := ["gravity", "gravity_left", "gravity_right", "gravity_damage", "rotate_2x2", "rotate_3x3", "rotate_repeat",
 	"shift_row", "swap_cells", "converge", "replace_self", "draw_random", "place_two", "recover_two", "move_cell", "recover_to_bag",
 	"destroy_2x2", "clear_board", "cleanse_adjacent", "cleanse_all", "reshuffle_line"]
@@ -93,7 +89,8 @@ static func for_glyph(glyph: String) -> Dictionary:
 
 
 static func _family(family: String, symbol: String, style: String) -> Dictionary:
-	return {"family": family, "symbol": symbol, "style": style, "color": COLORS[family]}
+	var color := Palette.VERMILION_DK if family in ["hit", "fire", "poison"] else (Palette.GOLD_DK if family == "gold" else Palette.INK)
+	return {"family": family, "symbol": symbol, "style": style, "color": color}
 
 
 static func feedback(profile: Dictionary, kind: String, shield_gain := 0) -> Dictionary:

@@ -60,7 +60,7 @@ func _rebuild() -> void:
 		button.add_child(row)
 		var icon := BattleSymbol.new()
 		icon.symbol = str(entry.id)
-		icon.ink = entry.color
+		icon.ink = BattleSymbol.color_for(str(entry.id))
 		icon.custom_minimum_size = Vector2.ONE * (20 if _dense else 28) * _scale
 		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		if entry.id == "heat":

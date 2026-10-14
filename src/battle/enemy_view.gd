@@ -10,7 +10,7 @@ var _heading: Label
 var _name: Label
 var _hp: StatBar
 var _hp_number: Label
-var _intent: Label
+var _intent: EnemyIntent
 var _block: ResourceStrip
 var _status: StatusStrip
 var _portrait: Control
@@ -33,9 +33,7 @@ func _ready() -> void:
 	_hp_number = Ink.label("", "", Palette.VERMILION_DK)
 	_hp_number.add_theme_font_override("font", Ink.serif)
 	_block = ResourceStrip.new()
-	_intent = Ink.label("", "", Palette.INK)
-	_intent.add_theme_font_override("font", Ink.serif)
-	_intent.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_intent = EnemyIntent.new()
 	_status = StatusStrip.new()
 	_portrait = Control.new()
 	_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -46,6 +44,7 @@ func _ready() -> void:
 		item.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(item)
 	_status.mouse_filter = Control.MOUSE_FILTER_PASS
+	_intent.mouse_filter = Control.MOUSE_FILTER_STOP
 	resized.connect(_layout)
 	gui_input.connect(_on_gui_input)
 	refresh(false)
@@ -86,13 +85,13 @@ func _layout() -> void:
 	_block.position = Vector2(0, 72 * factor if compact else 108)
 	_block.size = Vector2(w, 28 * factor)
 	_block.set_ui_scale(factor, true)
-	var art_side := minf(w + 18, maxf(64, size.y - 186))
+	var art_side := minf(w + 18, maxf(64, size.y - 232))
 	_portrait.visible = not compact
 	_portrait.position = Vector2((w - art_side) * 0.5, 132)
 	_portrait.size = Vector2(art_side, art_side)
-	_intent.position = Vector2(0, 94 * factor if compact else size.y - 48)
-	_intent.size = Vector2(w, 30 * factor)
-	_intent.add_theme_font_size_override("font_size", int(16 * factor) if compact else 21)
+	_intent.position = Vector2(0, 84 * factor if compact else size.y - 90)
+	_intent.size = Vector2(w, 48 * factor)
+	_intent.set_ui_scale(factor)
 	_status.position = Vector2(0, 124 * factor if compact else size.y - 36)
 	_status.size = Vector2(w, 36 * factor)
 	_status.set_ui_scale(factor)
@@ -106,11 +105,13 @@ func _layout() -> void:
 		_hp.size.y = 10 * factor
 		_hp_number.position.y = 42 * factor
 		_hp_number.size.y = 24 * factor
-		_block.position.y = 62 * factor
-		_block.size.y = 18 * factor
-		_intent.position.y = 84 * factor
-		_intent.size.y = 24 * factor
-		_intent.add_theme_font_size_override("font_size", int(14 * factor))
+		var block_width := _block.get_combined_minimum_size().x
+		_block.position = Vector2(w - block_width, 18 * factor)
+		_block.size = Vector2(block_width, 24 * factor)
+		_name.size.x = maxf(1, w - block_width - 8 * factor)
+		_name.clip_text = true
+		_intent.position.y = 60 * factor
+		_intent.size.y = 48 * factor
 		_status.position.y = 112 * factor
 
 
@@ -128,16 +129,16 @@ func refresh(animate := true) -> void:
 	_layout()
 	if not combatant.is_alive():
 		_heading.text = "已击败"
-		_intent.text = ""
+		_intent.set_move(null, combatant)
 		_visual.modulate.a = 0.18
 
 
 func set_intent(move: EnemyMoveData) -> void:
-	_intent.text = move.title + " · " + move.intent_text() if move != null and combatant.is_alive() else ""
+	_intent.set_move(move, combatant)
 
 
 func _show_block(value: int) -> void:
-	_block.set_entries([{"id": "block", "title": "敌方护盾", "value": value, "color": Color("596065"), "description": "当前护盾 %d。" % value}])
+	_block.set_entries([{"id": "block", "title": "敌方护盾", "value": value, "color": Palette.INK, "description": "当前护盾 %d。" % value}])
 
 
 func set_targeted(value: bool) -> void:

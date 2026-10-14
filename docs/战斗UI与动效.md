@@ -28,7 +28,7 @@
 
 ### 图形 HUD 与信息归属
 
-`BattleSymbol` 使用统一刻印线条绘制图形，资源与能力不使用汉字代替图标。火焰与十段刻度表示热度，闪电表示储能，方孔铜钱表示金币，护盾与锁定护盾区分临挡和持久盾。能力使用卡牌、剑、回转、重力、心、雪、链条等轮廓配附记，层数单独放在右上角；名称与解释仅出现在悬停或点击的详情中。
+`BattleSymbol` 使用实心墨印构型，资源与能力不使用汉字代替图标。主形依靠黑白面积、切口、负形和方向区别：火焰带不对称留白，盾由两块实心块组成，铜钱留方孔，字盘是四枚独立方块。火焰与十段刻度表示热度，闪电表示储能，方孔铜钱表示金币，护盾与锁定护盾区分临挡和持久盾。能力附记留在右下角，不加圆形徽章底；层数独立显示，名称与解释在悬停或点击详情中。
 
 气血、护盾、能力聚合在玩家区域。热度和储能居中字盘上方，金币及临时资金、股权作为经济资源集中显示在菜单之前（手机在顶部左侧）。删除战斗时重复的游戏标题、底栏资源长句和金币副本；底栏只留字袋、弃字堆图形计数与电脑快捷键提示。手机的结束回合与字盘下方主操作对齐，左右分开。
 
@@ -50,6 +50,16 @@
 
 `GlyphEffect` 使用原生矢量图标与程序绘制粒子，通常约 420 ms，最多同时 10 个效果，每个最多 22 粒。粒子随机数只使用独立的字形种子，数值文字位于效果上层；HUD 旁缩小范围并省略重复大图标。减少动效关闭投送与粒子，保留约 180 ms 静态结果图标；切屏释放所有效果。
 
+## 三色构型与敌方意图
+
+资源、能力、意图和出字图标统一使用墨黑、朱砂及少量旧金。区别来自形状与运动，撤去按字系区分的蓝、绿、紫配色。图标不增加纹理、排线、花边、阴影或渐变，直接在宣纸和桌面上绘制；粒子仍区分电弧、火星、旋转和重力方向。颜色读取当前 Palette，避免图标与粒子使用不同的墨色。
+
+`EnemyIntent` 将攻击、防御、攻防、多段、增益、减益、塞字、特殊行动转为只读图形与关键数值。多段保留「每次伤害 × 次数」；普通攻击及多段计入力量，攻防行动沿用实际结算的基础伤害。状态及污染说明放在悬停提示或点击详情里，不修改怪物数据。未知特殊行动仅用抽象图形提示，不显示尚未实现的治疗数值。
+
+意图整行提供至少 48 屏幕像素的点击区域，点击不会触发攻击目标选择；演出或菜单期间不再叠加详情，死亡后隐藏。手机把敌方护盾放到名称旁，意图紧跟血量，单个无状态敌人的意图可直接看见；多敌人或额外状态仍通过战况滚动区域查看。
+
+新增 `tests/intent_design_test.tscn` 检查各怪物行动映射、伤害次数与力量、真实点击、菜单锁、死亡清理、三色约束、手机裁切与点击尺寸，Godot 4.7.2 原生渲染 53 项通过。`--capture` 保存构型对照 `shots/ink-symbol-intent-gallery.png`、电脑 `shots/ink-symbol-battle-desktop.png`、手机 `shots/ink-symbol-battle-phone.png` 及意图详情截图，均为原生渲染。原 UI 69 项、表现回归 83 项及出字动效 headless 47 项通过。
+
 `tests/glyph_vfx_test.tscn` 检查全部字形映射、真实出字的预览目标与落点、区域回转、全格挡、急停解锁、随机数隔离、数量上限和退出清理。`--capture` 逐帧保存实际游戏到 `shots/glyph-vfx-frames/`，另保存十二类表现的实际渲染对照 `shots/glyph-vfx-gallery.png`，便于制作动图检查。Godot 4.7.2 原生渲染 48 项通过，原 UI 69 项与 presentation 83 项通过。
 
 ## 结构与验证
@@ -65,6 +75,7 @@
 <godot> --headless --path . res://tests/battle_ui_test.tscn
 <godot> --headless --path . res://tests/battle_presentation_regression.tscn
 <godot> --headless --path . res://tests/glyph_vfx_test.tscn
+<godot> --path . --resolution 1280x720 --fixed-fps 30 res://tests/intent_design_test.tscn -- --capture
 <godot> --path . --resolution 1280x720 --fixed-fps 30 res://tests/glyph_vfx_test.tscn -- --capture
 <godot> --path . --resolution 1280x720 --fixed-fps 30 res://tests/battle_presentation_regression.tscn -- --capture
 ```
