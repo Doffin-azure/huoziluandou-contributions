@@ -8,18 +8,18 @@ script = ExtResource("1_a35a5")
 kind = 13
 handler = "energy_around_tail"
 amount = 1
-note = "基础 +1；词尾电周围每个己方四邻字再 +1 储能"
+note = "获得1储能；词尾【电】的四邻中，每枚未参与本词的己方字再提供1储能。"
 
 [resource]
 script = ExtResource("2_bu5a1")
 id = "w041"
 word = "蓄电"
 glyphs = Array[String](["蓄", "电"])
-description = "按用作词尾的电周围（不含路径且属己方）的四邻字，每个多获1储能；基础+1"
+description = "获得1储能；词尾【电】的四邻中，每枚未参与本词的己方字再提供1储能。"
 effects = Array[ExtResource("1_a35a5")]([SubResource("Resource_bq4dr")])
 group = "蓄放"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "按用作词尾的电周围（不含路径且属己方）的四邻字，每个多获1储能；基础+1"
+effect_summary = "获得1储能；词尾【电】的四邻中，每枚未参与本词的己方字再提供1储能。"
 effect_handler_id = "energy_around_tail"
 p25_implemented = true
 implementation_delta = "—"

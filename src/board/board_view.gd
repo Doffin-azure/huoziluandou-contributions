@@ -10,6 +10,8 @@ var tiles: Array = []
 var path: Array = []
 var pick_mode := ""
 var pick_multi := false   ## true=多选：选完不自动退出选区模式（由调用方 end_pick）
+var pick_selected: Array = []
+var pick_excluded: Array = []
 var _dragging := false
 var _drag_moved := false
 var _interactable := true
@@ -143,6 +145,8 @@ func set_interactable(value: bool, dim := true) -> void:
 		_cancelled_drag_cell = Vector2i(-1, -1)
 	for tile in tiles:
 		tile.set_dimmed(not value and dim)
+	if value and not pick_mode.is_empty():
+		_apply_pick_highlight()
 
 
 func _on_tile_pressed(pos: Vector2i) -> void:
@@ -150,11 +154,14 @@ func _on_tile_pressed(pos: Vector2i) -> void:
 		return
 	if not pick_mode.is_empty():
 		if _valid_pick(pos):
+			if pick_mode == "three":
+				pick_selected.append(pos)
+				_apply_pick_highlight()
 			if not pick_multi:
 				end_pick()
 			tile_picked.emit(pos)
 		return
-	if board.get_xy(pos) == null:
+	if board.get_xy(pos) == null or (board.get_xy(pos).pinned and board.get_xy(pos).pinned_exhausted):
 		return
 	_dragging = true
 	_drag_moved = false
@@ -275,9 +282,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 
-func begin_pick(mode: String, multi := false) -> void:
+func begin_pick(mode: String, multi := false, excluded: Array = []) -> void:
 	pick_mode = mode
 	pick_multi = multi
+	pick_selected = []
+	pick_excluded = excluded.duplicate()
 	clear_selection()
 	_apply_pick_highlight()
 
@@ -285,25 +294,41 @@ func begin_pick(mode: String, multi := false) -> void:
 func end_pick() -> void:
 	pick_mode = ""
 	pick_multi = false
+	pick_selected = []
+	pick_excluded = []
 	for tile in tiles:
 		tile.set_dimmed(not _interactable and _dim_locked)
 		tile.set_selected(false)
 
 
 func _valid_pick(pos: Vector2i) -> bool:
+	if pick_excluded.has(pos):
+		return false
 	var cell: CharInstance = board.get_xy(pos)
 	match pick_mode:
+		"three":
+			if cell == null or cell.pinned or pick_selected.size() >= 3:
+				return false
+			for chosen in pick_selected:
+				var inst := board.get_xy(chosen)
+				if inst != null and inst.uid == cell.uid:
+					return false
+			return true
 		"any": return cell != null
 		"empty": return cell == null
+		"throw_destination": return true # 落点由调用方用 pick_excluded 限定，包含将腾空的施词原格。
 		"enemy": return cell != null and cell.is_enemy_owned()
 		"own": return cell != null and cell.is_player_owned()
 		"2x2": return pos.x >= 0 and pos.y >= 0 and pos.x <= board.size - 2 and pos.y <= board.size - 2
+		"3x3": return pos.x >= 0 and pos.y >= 0 and pos.x <= board.size - 3 and pos.y <= board.size - 3
 	return false
 
 
 func _apply_pick_highlight() -> void:
 	for tile in tiles:
-		tile.set_dimmed(not _valid_pick(tile.grid_pos))
+		var selected := pick_selected.has(tile.grid_pos)
+		tile.set_dimmed(not selected and not _valid_pick(tile.grid_pos))
+		tile.set_selected(selected, pick_selected.find(tile.grid_pos))
 
 
 func _sync_selection() -> void:

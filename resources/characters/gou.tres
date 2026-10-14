@@ -3,11 +3,21 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_80s7a"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_c4moo"]
 
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("2_c4moo")
+kind = 29
+handler = "buy_bag_solo"
+amount = 2
+target = 13
+note = "支付 2 金币，从字袋选择 1 枚己方实体字补入原格，保留原属性；空袋时只弃字，不支付"
+
 [resource]
 script = ExtResource("1_80s7a")
 id = "gou"
 glyph = "购"
 pinyin = "gou"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "支付 2 金币，从字袋选择 1 枚己方实体字补入原格，保留原属性；空袋时只弃字，不支付"
 tags = Array[String](["economy"])
 rarity = 2
+solo_effects = Array[ExtResource("2_c4moo")]([SubResource("Effect")])
+solo_handler = "buy_bag_solo"

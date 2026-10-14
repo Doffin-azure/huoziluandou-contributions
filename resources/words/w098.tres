@@ -11,18 +11,18 @@ amount = 12
 args = {
 "cost": 5
 }
-note = "支付 5 金币悬赏，本回合击杀返 12，否则本金不返"
+note = "支付5点费用；若本回合击败所有敌人，获得12金币，未清场不返还。"
 
 [resource]
 script = ExtResource("2_cdrv2")
 id = "w098"
 word = "重金"
 glyphs = Array[String](["重", "金"])
-description = "付5金币悬赏目标，本回合击杀返12金币，失败本金不返"
+description = "支付5点费用；若本回合击败所有敌人，获得12金币，未清场不返还。"
 effects = Array[ExtResource("1_hg2yq")]([SubResource("Resource_l68ma")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "付5金币悬赏目标，本回合击杀返12金币，失败本金不返"
+effect_summary = "支付5点费用；若本回合击败所有敌人，获得12金币，未清场不返还。"
 effect_handler_id = "bounty"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P3·补全词效"

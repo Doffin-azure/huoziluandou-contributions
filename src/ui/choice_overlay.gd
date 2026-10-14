@@ -6,6 +6,7 @@ class_name ChoiceOverlay
 signal chose(index)
 
 var cfg: Dictionary = {}
+var _chosen := false
 
 
 func setup(p_cfg: Dictionary) -> void:
@@ -60,6 +61,10 @@ func _build() -> void:
 
 
 func _on_choose(index: int) -> void:
+	var options: Array = cfg.get("options", [])
+	if _chosen or index < 0 or index >= options.size() or bool(options[index].get("disabled", false)):
+		return
+	_chosen = true
 	chose.emit(index)
 	var cb = cfg.get("on_choose", null)
 	if cb is Callable and cb.is_valid():

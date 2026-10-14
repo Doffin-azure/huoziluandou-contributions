@@ -8,25 +8,25 @@ script = ExtResource("1_mbs2i")
 kind = 12
 handler = "block_persist"
 amount = 3
-note = "获得 3 点持久盾"
+note = "获得3持久盾。"
 
 [sub_resource type="Resource" id="Resource_nf4uk"]
 script = ExtResource("1_mbs2i")
 kind = 29
 handler = "counter"
 amount = 1
-note = "预留 1 层反击"
+note = "获得1层反击；所有敌人行动后，以剩余临挡+3反击一次，可叠加。"
 
 [resource]
 script = ExtResource("2_wgveo")
 id = "extra_dunfan"
 word = "盾反"
 glyphs = Array[String](["盾", "反"])
-description = "获得 3 点持久盾，并预留 1 层反击（敌人行动结束后把剩余临挡转为反击伤害，每层 +3）"
+description = "获得3持久盾、1层反击。本回合所有敌人行动后，以剩余临时格挡+3反击首个存活敌人一次；反击层数可叠加。"
 effects = Array[ExtResource("1_mbs2i")]([SubResource("Resource_rxvfb"), SubResource("Resource_nf4uk")])
 group = "防反"
 design_stage = "设计负责人新增"
-effect_summary = "获得 3 点持久盾，并预留 1 层反击（敌人行动结束后把剩余临挡转为反击伤害，每层 +3）"
+effect_summary = "获得3持久盾、1层反击。本回合所有敌人行动后，以剩余临时格挡+3反击首个存活敌人一次；反击层数可叠加。"
 effect_handler_id = "block_persist"
 priority = "防反"
 implemented = true

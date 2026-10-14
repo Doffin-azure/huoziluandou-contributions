@@ -11,18 +11,18 @@ amount = 3
 args = {
 "per": 3
 }
-note = "消耗全部股权：每点 +3 金币并补 1 字"
+note = "消耗全部股权，每点获得3金币并随机补1字。"
 
 [resource]
 script = ExtResource("2_7smfk")
 id = "w074"
 word = "炼金"
 glyphs = Array[String](["炼", "金"])
-description = "消耗股权兑现大额金钱并按股权数量补字的候选"
+description = "消耗全部股权，每点获得3金币并随机补1字。"
 effects = Array[ExtResource("1_xmsag")]([SubResource("Resource_nndbv")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "消耗股权兑现大额金钱并按股权数量补字的候选"
+effect_summary = "消耗全部股权，每点获得3金币并随机补1字。"
 effect_handler_id = "alchemy"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P3·补全词效"

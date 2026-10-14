@@ -7,18 +7,18 @@
 script = ExtResource("1_03n57")
 kind = 29
 handler = "cold_heart"
-note = "本回合伤害翻倍；2 回合不能获得防御"
+note = "本回合攻击伤害翻倍；本回合及下一回合不能获得新临时格挡或持久盾，已有护盾仍能吸收伤害。"
 
 [resource]
 script = ExtResource("2_mf376")
 id = "extra_lengxin"
 word = "冷心"
 glyphs = Array[String](["冷", "心"])
-description = "本回合伤害翻倍；接下来 2 回合不能获得防御（格挡/持久盾无效）"
+description = "本回合攻击伤害翻倍；本回合及下一回合不能获得新临时格挡或持久盾，已有护盾仍能吸收伤害。"
 effects = Array[ExtResource("1_03n57")]([SubResource("Resource_x0piu")])
 group = "热暴"
 design_stage = "设计负责人新增"
-effect_summary = "本回合伤害翻倍；接下来 2 回合不能获得防御（格挡/持久盾无效）"
+effect_summary = "本回合攻击伤害翻倍；本回合及下一回合不能获得新临时格挡或持久盾，已有护盾仍能吸收伤害。"
 effect_handler_id = "cold_heart"
 priority = "热暴"
 implemented = true

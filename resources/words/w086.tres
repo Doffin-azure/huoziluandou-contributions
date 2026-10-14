@@ -12,18 +12,18 @@ args = {
 "gold": 4,
 "heat": 3
 }
-note = "热度 -3、获得 4 金币，并指定一张牌在本场战斗移出循环"
+note = "热度-3、获得4金币；选择一种字形，从本场循环移出其中1枚实体，战后回归。同字形有多枚时，优先从字袋、弃字堆、盘面依次寻找。"
 
 [resource]
 script = ExtResource("2_t0xm2")
 id = "w086"
 word = "炼化"
 glyphs = Array[String](["炼", "化"])
-description = "P23初稿：消耗持久盾换金币或热度"
+description = "热度-3、获得4金币；选择一种字形，从本场循环移出其中1枚实体，战后回归。同字形有多枚时，优先从字袋、弃字堆、盘面依次寻找。"
 effects = Array[ExtResource("1_22f67")]([SubResource("Resource_3sppp")])
 group = "淬炼"
 design_stage = "P23初稿；未完成分组复审"
-effect_summary = "P23初稿：消耗持久盾换金币或热度"
+effect_summary = "热度-3、获得4金币；选择一种字形，从本场循环移出其中1枚实体，战后回归。同字形有多枚时，优先从字袋、弃字堆、盘面依次寻找。"
 effect_handler_id = "refine_remove"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P4·待复审"

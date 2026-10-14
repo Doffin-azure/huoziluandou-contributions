@@ -9,18 +9,18 @@ kind = 28
 handler = "permanent_gold_growth"
 amount = 20
 timing = "persistent"
-note = "首次打出后，本局每场胜利使现有金币额外增长 20%"
+note = "首次打出后，本局每场胜利使现有金币额外增长20%，向下取整；重复施放不叠加。"
 
 [resource]
 script = ExtResource("2_t3ol5")
 id = "w102"
 word = "复利投资"
 glyphs = Array[String](["复", "利", "投", "资"])
-description = "第一次打出后本局每场胜利，使现有金币额外增长20%向下取整"
+description = "首次打出后，本局每场胜利使现有金币额外增长20%，向下取整；重复施放不叠加。"
 effects = Array[ExtResource("1_lis86")]([SubResource("Resource_8bwe8")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "第一次打出后本局每场胜利，使现有金币额外增长20%向下取整"
+effect_summary = "首次打出后，本局每场胜利使现有金币额外增长20%，向下取整；重复施放不叠加。"
 effect_handler_id = "permanent_gold_growth"
 timing = "persistent"
 p25_implemented = true

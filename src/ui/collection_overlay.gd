@@ -165,7 +165,7 @@ func _populate_words() -> void:
 		var meta := Ink.label("[%s] %s%s" % [w.group, w.priority, "　P25已接入" if w.p25_implemented else ""], "Muted")
 		meta.add_theme_font_size_override("font_size", 12)
 		inner.add_child(meta)
-		var d := Ink.caption(w.effect_summary if not w.effect_summary.is_empty() else w.description)
+		var d := Ink.caption(w.describe())
 		d.add_theme_font_size_override("font_size", 13)
 		inner.add_child(d)
 		_word_grid.add_child(holder)

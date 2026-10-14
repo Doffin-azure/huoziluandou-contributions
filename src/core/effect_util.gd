@@ -32,14 +32,20 @@ static func available(b: BattleState) -> int:
 	return avail
 
 
-## 先花临时资金，再（合资）用 2 储能抵 1 金币，最后花金币。成功返回 true。
+static func discounted_cost(b: BattleState, cost: int) -> int:
+	return maxi(0, cost - b.ability_value("payment_discount_once")) if cost >= 0 else cost
+
+## 先兑现币的费用优惠，再花临时资金、合资储能和金币。失败时保留优惠。
 
 static func pay(b: BattleState, cost: int) -> bool:
-	if cost < 0 or available(b) < cost:
+	var due := discounted_cost(b, cost)
+	if cost < 0 or available(b) < due:
 		return false
-	var from_temp: int = mini(b.player.temp_funds, cost)
+	if cost > 0 and b.has_ability("payment_discount_once"):
+		b.abilities.erase("payment_discount_once")
+	var from_temp: int = mini(b.player.temp_funds, due)
 	b.player.temp_funds -= from_temp
-	var remain: int = cost - from_temp
+	var remain: int = due - from_temp
 	var gold_spent := 0
 	if remain > 0 and b.has_ability("joint_funding"):
 		var sub: int = mini(int(b.player.energy / 2), remain)

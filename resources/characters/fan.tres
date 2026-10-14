@@ -5,16 +5,17 @@
 
 [sub_resource type="Resource" id="Resource_hi5ot"]
 script = ExtResource("2_adepm")
-handler = "damage"
-amount = 2
-note = "占位：造成 2 伤害（用户未确认）"
+kind = 29
+handler = "retaliate_once"
+amount = 6
+note = "本回合下一次受到敌方攻击后，对攻击者反击 6 伤；整次行动结束后仅一次，完全格挡也触发"
 
 [resource]
 script = ExtResource("1_bgfyw")
 id = "fan"
 glyph = "反"
 pinyin = "fan"
-description = "占位：造成 2 伤害（用户未确认）"
+description = "本回合下一次受到敌方攻击后，对攻击者反击 6 伤；整次行动结束后仅一次，完全格挡也触发"
 tags = Array[String](["defense", "attack"])
 solo_effects = Array[ExtResource("2_adepm")]([SubResource("Resource_hi5ot")])
-solo_handler = "damage"
+solo_handler = "retaliate_once"

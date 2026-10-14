@@ -7,5 +7,5 @@ script = ExtResource("1_ciwqw")
 id = "next_extra"
 name = "超载"
 glyph = "载"
-description = "下一次多字词的即时效果额外执行一次。"
+description = "下一次多字词的即时效果额外执行一次，不重复消耗材料；费用再付，跨回合保留。"
 color = Color(0.6901961, 0.32156864, 0.18039216, 1)

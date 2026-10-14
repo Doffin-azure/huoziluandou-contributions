@@ -11,18 +11,18 @@ amount = 6
 args = {
 "energy": 2
 }
-note = "获得 6 临挡与 2 储能"
+note = "获得6临时格挡和2储能。"
 
 [resource]
 script = ExtResource("2_re4ks")
 id = "w021"
 word = "合力"
 glyphs = Array[String](["合", "力"])
-description = "防御/储能的混合结算词"
+description = "获得6临时格挡和2储能。"
 effects = Array[ExtResource("1_hkiid")]([SubResource("Resource_sr8fu")])
 group = "连携"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "防御/储能的混合结算词"
+effect_summary = "获得6临时格挡和2储能。"
 effect_handler_id = "joint_force"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P3·补全词效"

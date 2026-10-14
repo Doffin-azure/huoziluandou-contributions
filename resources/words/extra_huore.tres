@@ -8,18 +8,18 @@ script = ExtResource("1_4san3")
 kind = 28
 handler = "heat_pollution_damage"
 timing = "persistent"
-note = "本场持续：污染【热】造成 5 伤"
+note = "本场每因溢热实际新增1枚灼热【热】，对敌造成5点非攻击伤害；抽到、移动旧热字不触发。"
 
 [resource]
 script = ExtResource("2_028xc")
 id = "extra_huore"
 word = "火热"
 glyphs = Array[String](["火", "热"])
-description = "本场持续：每出现一枚污染【热】，就对敌人造成一次 5 点伤害"
+description = "本场每因溢热实际新增1枚灼热【热】，对敌造成5点非攻击伤害；抽到、移动旧热字不触发。"
 effects = Array[ExtResource("1_4san3")]([SubResource("Resource_c114j")])
 group = "蓄放"
 design_stage = "设计负责人新增"
-effect_summary = "本场持续：每出现一枚污染【热】，就对敌人造成一次 5 点伤害"
+effect_summary = "本场每因溢热实际新增1枚灼热【热】，对敌造成5点非攻击伤害；抽到、移动旧热字不触发。"
 effect_handler_id = "heat_pollution_damage"
 priority = "蓄放"
 implemented = true

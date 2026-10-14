@@ -9,18 +9,18 @@ kind = 28
 handler = "ability_electric_overload"
 amount = 3
 timing = "persistent"
-note = "本战每次溢热：生成灼热热字、储能 +1、对敌 3 伤"
+note = "本场每因溢热实际新增1枚灼热【热】，获得1储能并对敌造成3点非攻击伤害。"
 
 [resource]
 script = ExtResource("2_brlan")
 id = "w103"
 word = "电流过载"
 glyphs = Array[String](["电", "流", "过", "载"])
-description = "本战持续能力：每溢出1热，生成自污染热字同时+1储能并对敌3伤"
+description = "本场每因溢热实际新增1枚灼热【热】，获得1储能并对敌造成3点非攻击伤害。"
 effects = Array[ExtResource("1_yyxw3")]([SubResource("Resource_lwif2")])
 group = "热暴"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "本战持续能力：每溢出1热，生成自污染热字同时+1储能并对敌3伤"
+effect_summary = "本场每因溢热实际新增1枚灼热【热】，获得1储能并对敌造成3点非攻击伤害。"
 effect_handler_id = "ability_electric_overload"
 timing = "persistent"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"

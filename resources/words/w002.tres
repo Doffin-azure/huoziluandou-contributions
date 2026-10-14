@@ -9,18 +9,18 @@ kind = 28
 handler = "ability_prevent_interference"
 amount = 1
 timing = "persistent"
-note = "本场持续：抵消下一次敌人对字盘的干扰（注入/塞字）"
+note = "获得一次抵消敌方注入字的机会：下次注入整批取消。本场保留至触发。"
 
 [resource]
 script = ExtResource("2_eaeo3")
 id = "w002"
 word = "防护"
 glyphs = Array[String](["防", "护"])
-description = "抵消下一次敌人对字盘的干扰；不是再加大量格挡"
+description = "获得一次抵消敌方注入字的机会：下次注入整批取消。本场保留至触发。"
 effects = Array[ExtResource("1_r2dx4")]([SubResource("Resource_5ux56")])
 group = "防反"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "抵消下一次敌人对字盘的干扰；不是再加大量格挡"
+effect_summary = "获得一次抵消敌方注入字的机会：下次注入整批取消。本场保留至触发。"
 effect_handler_id = "ability_prevent_interference"
 timing = "persistent"
 p25_implemented = true

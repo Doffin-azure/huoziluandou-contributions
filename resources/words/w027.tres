@@ -8,24 +8,25 @@ script = ExtResource("1_0a57h")
 kind = 28
 handler = "serial"
 amount = 6
+target = 0
 timing = "persistent"
-args = {
-"bonus": 6
-}
-note = "本战每打出 3 种不同多字词，下一次攻击 +6 伤"
+note = "本场每累计 3 次有效多字词（允许重复），下一次攻击每段 +6；待兑现奖励可叠加并跨回合保留，含启用当次"
+args = {"bonus": 6}
 
 [resource]
 script = ExtResource("2_yt187")
 id = "w027"
 word = "连载"
 glyphs = Array[String](["连", "载"])
-description = "跨回合以不同词积累连载，达到3次强化下一个多字攻击的思路"
+description = "本场每累计 3 次有效多字词（允许重复），下一次攻击每段 +6；待兑现奖励可叠加并跨回合保留，含启用当次"
 effects = Array[ExtResource("1_0a57h")]([SubResource("Resource_12llc")])
 group = "连携"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "跨回合以不同词积累连载，达到3次强化下一个多字攻击的思路"
+effect_summary = "本场每累计 3 次有效多字词（允许重复），下一次攻击每段 +6；待兑现奖励可叠加并跨回合保留，含启用当次"
 effect_handler_id = "serial"
 timing = "persistent"
-implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+implementation_delta = "已按 2026-10-14 确认方案更新"
 priority = "P3·补全词效"
 implemented = true
+requires_target = 0
+interaction = ""

@@ -7,18 +7,18 @@
 script = ExtResource("1_7e4wk")
 handler = "energy_discharge"
 amount = 4
-note = "清空全部储能，每点造成一段 4 伤电击"
+note = "消耗全部储能，每点造成一段4点基础伤害；目标死亡后，余下段数转向下一名存活敌人。"
 
 [resource]
 script = ExtResource("2_pl00a")
 id = "w044"
 word = "放电"
 glyphs = Array[String](["放", "电"])
-description = "清空全部储能，每点储能执行一段4伤电击"
+description = "消耗全部储能，每点造成一段4点基础伤害；目标死亡后，余下段数转向下一名存活敌人。"
 effects = Array[ExtResource("1_7e4wk")]([SubResource("Resource_m230e")])
 group = "蓄放"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "清空全部储能，每点储能执行一段4伤电击"
+effect_summary = "消耗全部储能，每点造成一段4点基础伤害；目标死亡后，余下段数转向下一名存活敌人。"
 effect_handler_id = "energy_discharge"
 p25_implemented = true
 implementation_delta = "—"

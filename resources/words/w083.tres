@@ -7,20 +7,26 @@
 script = ExtResource("1_736ac")
 kind = 29
 handler = "refine_layer"
-note = "选择两个相同的己方字，本场它们一直重合（一格可重复使用，另一张回字袋）"
+amount = 0
+target = 0
+timing = "immediate"
+note = "选择两枚相同的己方原实体：第一枚本场每次重新入盘恢复 2 次额外使用（当次也获得），第二枚回袋；移动不刷新"
+args = {}
 
 [resource]
 script = ExtResource("2_sy3p4")
 id = "w083"
 word = "精炼"
 glyphs = Array[String](["精", "炼"])
-description = "P23初稿：标记己方字，首次参与长词时重复部分附效"
+description = "选择两枚相同的己方原实体：第一枚本场每次重新入盘恢复 2 次额外使用（当次也获得），第二枚回袋；移动不刷新"
 effects = Array[ExtResource("1_736ac")]([SubResource("Resource_am4gl")])
 group = "淬炼"
 design_stage = "P23初稿；未完成分组复审"
-effect_summary = "P23初稿：标记己方字，首次参与长词时重复部分附效"
+effect_summary = "选择两枚相同的己方原实体：第一枚本场每次重新入盘恢复 2 次额外使用（当次也获得），第二枚回袋；移动不刷新"
 effect_handler_id = "refine_layer"
-implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+implementation_delta = "已按 2026-10-14 确认方案更新"
 priority = "P4·待复审"
 implemented = true
 interaction = "choose_same_pair"
+requires_target = 0
+timing = "immediate"

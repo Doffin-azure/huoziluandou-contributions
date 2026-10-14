@@ -3,11 +3,21 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_evceo"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_gtken"]
 
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("2_gtken")
+kind = 29
+handler = "recast_neighbor"
+amount = 0
+target = 5
+note = "选择原格四邻的一枚非固定己方实体字，将原实体放回字袋，原格随机换入另一枚实体字；排除目标及本次打出的字，无替换字则保留目标"
+
 [resource]
 script = ExtResource("1_evceo")
 id = "zhu"
 glyph = "铸"
 pinyin = "zhu"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "选择原格四邻的一枚非固定己方实体字，将原实体放回字袋，原格随机换入另一枚实体字；排除目标及本次打出的字，无替换字则保留目标"
 tags = Array[String](["economy"])
 rarity = 2
+solo_effects = Array[ExtResource("2_gtken")]([SubResource("Effect")])
+solo_handler = "recast_neighbor"

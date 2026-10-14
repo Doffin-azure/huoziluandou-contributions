@@ -6,24 +6,28 @@
 [sub_resource type="Resource" id="Resource_efi0h"]
 script = ExtResource("1_sobpq")
 kind = 6
-handler = "apply_status_self"
-amount = 2
+handler = "strength_growing"
+amount = 1
 target = 3
-status_id = "next_bonus"
-note = "获得状态【加强】×2"
+timing = "immediate"
+note = "本场第 N 次成功打出加强，获得 N 层力量（依次 +1、+2、+3……），力量持续本场；效果重演不增加出词次数"
+args = {}
 
 [resource]
 script = ExtResource("2_04spt")
 id = "w023"
 word = "加强"
 glyphs = Array[String](["加", "强"])
-description = "下一次攻击每段+2为草案"
+description = "本场第 N 次成功打出加强，获得 N 层力量（依次 +1、+2、+3……），力量持续本场；效果重演不增加出词次数"
 effects = Array[ExtResource("1_sobpq")]([SubResource("Resource_efi0h")])
 group = "连携"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "下一次攻击每段+2为草案"
-effect_handler_id = "apply_status_self"
+effect_summary = "本场第 N 次成功打出加强，获得 N 层力量（依次 +1、+2、+3……），力量持续本场；效果重演不增加出词次数"
+effect_handler_id = "strength_growing"
 p25_implemented = true
-implementation_delta = "—"
+implementation_delta = "已按 2026-10-14 确认方案更新"
 priority = "P2·已试运行"
 implemented = true
+requires_target = 0
+interaction = ""
+timing = "immediate"

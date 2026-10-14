@@ -7,5 +7,5 @@ script = ExtResource("1_usqey")
 id = "next_double"
 name = "超强"
 glyph = "倍"
-description = "下一次造成伤害的攻击翻倍。"
+description = "下一次攻击的各段基础伤害与力量、热力加成翻倍；蓄力、连载、过火追加伤害不随之翻倍。即使被护盾完全挡住也消耗；跨回合保留。"
 color = Color(0.47843137, 0.23137255, 0.23137255, 1)

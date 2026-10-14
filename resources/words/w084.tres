@@ -7,18 +7,18 @@
 script = ExtResource("1_sfytd")
 kind = 29
 handler = "empower_glyph"
-note = "选择字袋中一个字；本场它被打出时（单字或成词）额外触发其单字效果"
+note = "选择一种字形；本场该字形单独打出或参与成词时，额外触发其单字效果。同字形的不同实体都生效。"
 
 [resource]
 script = ExtResource("2_m8ihu")
 id = "w084"
 word = "强化"
 glyphs = Array[String](["强", "化"])
-description = "P23初稿：跨回合给参与字刻痕并奖励补字"
+description = "选择一种字形；本场该字形单独打出或参与成词时，额外触发其单字效果。同字形的不同实体都生效。"
 effects = Array[ExtResource("1_sfytd")]([SubResource("Resource_oxbtk")])
 group = "淬炼"
 design_stage = "P23初稿；未完成分组复审"
-effect_summary = "P23初稿：跨回合给参与字刻痕并奖励补字"
+effect_summary = "选择一种字形；本场该字形单独打出或参与成词时，额外触发其单字效果。同字形的不同实体都生效。"
 effect_handler_id = "empower_glyph"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P4·待复审"

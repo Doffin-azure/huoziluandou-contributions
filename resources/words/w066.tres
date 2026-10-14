@@ -11,18 +11,18 @@ amount = 6
 args = {
 "gold": 2
 }
-note = "获得 6 持久盾与 2 金币"
+note = "获得6持久盾和2金币。"
 
 [resource]
 script = ExtResource("2_iv3d3")
 id = "w066"
 word = "合金"
 glyphs = Array[String](["合", "金"])
-description = "经济/护盾复合词，方向偏获得持久盾"
+description = "获得6持久盾和2金币。"
 effects = Array[ExtResource("1_b366h")]([SubResource("Resource_o2my8")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "经济/护盾复合词，方向偏获得持久盾"
+effect_summary = "获得6持久盾和2金币。"
 effect_handler_id = "alloy"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P3·补全词效"

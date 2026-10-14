@@ -12,6 +12,112 @@ const CREMATE_FLAVOR := [
 	"亡者安息。",
 ]
 
+## 预览不取牌、不洗牌、不支付。所有多阶段选择确认后再统一结算。
+static func deploy_candidates(b: BattleState) -> Array:
+	var out: Array = []
+	for i in range(b.bag.size() - 1, -1, -1):
+		var inst: CharInstance = b.bag[i]
+		if inst.is_player_owned() and not inst.temporary:
+			out.append(inst)
+			if out.size() == 3:
+				break
+	return out
+
+static func discard_candidate(b: BattleState, target: Dictionary) -> CharInstance:
+	var uid := int(target.get("place_uid", target.get("discard_uid", -1)))
+	for inst in b.discard:
+		if inst.uid == uid and inst.is_player_owned() and not inst.temporary:
+			return inst
+	return null
+
+static func validate_word_target(b: BattleState, handler: String, path: Array, target: Dictionary) -> String:
+	if handler in ["reveal_place", "buyback"]:
+		var candidates := deploy_candidates(b) if handler == "reveal_place" else b.discard.filter(func(c): return c.is_player_owned() and not c.temporary)
+		if candidates.is_empty():
+			return ""
+		var name := "投放" if handler == "reveal_place" else "回购"
+		var chosen: CharInstance = null
+		if handler == "buyback":
+			chosen = discard_candidate(b, target)
+		else:
+			for inst in candidates:
+				if inst.uid == int(target.get("bag_uid", -1)):
+					chosen = inst
+		if chosen == null:
+			return "%s：请选择有效的原实体" % name
+		var pos: Vector2i = target.get("tile", Vector2i(-1, -1))
+		if not b.board.in_bounds(pos.x, pos.y):
+			return "%s：请选择棋盘内的落点" % name
+		var occupied := b.board.get_xy(pos)
+		if occupied != null and (not path.has(pos) or occupied.pinned or occupied.temporary_uses > 0):
+			return "%s：落点没有可用空格" % name
+		if EffectUtil.available(b) < EffectUtil.discounted_cost(b, 2):
+			return "%s：支付额不足（需 2）" % name
+	elif handler == "divert":
+		var cells: Array = target.get("cells", [])
+		if cells.size() > 2:
+			return "分流：至多选择两枚杂字"
+		var seen := {}
+		for pos in cells:
+			var inst := b.board.get_xy(pos)
+			if path.has(pos) or not BattleState.is_refinable_junk(inst) or seen.has(inst.uid):
+				return "分流：请选择施词以外的不同杂字"
+			seen[inst.uid] = true
+	elif handler == "refine_layer":
+		var a: Vector2i = target.get("tile", Vector2i(-1, -1))
+		var c: Vector2i = target.get("tile2", Vector2i(-1, -1))
+		var first := b.board.get_xy(a)
+		var second := b.board.get_xy(c)
+		if a == c or path.has(a) or path.has(c) or first == null or second == null:
+			return "精炼：请选择施词以外的两个不同实体"
+		if not first.is_player_owned() or not second.is_player_owned() or first.temporary or second.temporary or first.pinned or second.pinned or first.glyph_list() != second.glyph_list():
+			return "精炼：需要两枚字形相同、非固定的己方原实体"
+	return ""
+
+static func scatter_word_copy(b: BattleState, glyphs: Array) -> void:
+	var spaces := b.board.empty_indices()
+	b._shuffle(spaces)
+	var count := 0
+	for glyph in glyphs:
+		if spaces.is_empty():
+			break
+		var data := Database.get_character_by_glyph(str(glyph))
+		if data == null:
+			continue
+		var copy := CharInstance.new(data)
+		copy.temporary = true
+		b.board.set_xy(spaces.pop_back(), copy)
+		b.temp_chars.append(copy)
+		count += 1
+	b._log("反复：将【%s】的 %d 枚临时字分别放入随机空格" % ["".join(glyphs), count])
+
+static func _divert_junk(b: BattleState, ctx: Dictionary) -> Array:
+	var count := 0
+	for pos in (ctx.get("target", {}) as Dictionary).get("cells", []):
+		var inst := b.board.get_xy(pos)
+		if count >= 2 or not BattleState.is_refinable_junk(inst):
+			continue
+		b.board.clear_xy(pos)
+		b.temp_chars.erase(inst)
+		count += 1
+	return ["分流：移除 %d 枚杂字" % count]
+
+static func _buyback(b: BattleState, ctx: Dictionary) -> Array:
+	var target: Dictionary = ctx.get("target", {})
+	var inst := discard_candidate(b, target)
+	var pos: Vector2i = target.get("tile", Vector2i(-1, -1))
+	if inst == null or not b.board.in_bounds(pos.x, pos.y) or b.board.get_xy(pos) != null:
+		return ["回购：没有可放入的弃字或空格，未支付"]
+	var due := EffectUtil.discounted_cost(b, 2)
+	if EffectUtil.available(b) < due:
+		return ["回购：支付额不足"]
+	b.take_from_discard_by_uid(inst.uid)
+	b.place_from_pool(pos, inst)
+	inst.temporary_uses += 1
+	EffectUtil.pay(b, 2)
+	b.record_draw(1)
+	return ["回购：实际支付%d，原实体【%s】补入指定格，额外使用+1" % [due, inst.glyph()]]
+
 static func _merge_duplicates(b: BattleState, ctx: Dictionary) -> Array:
 	var anchor: Vector2i = EffectUtil.tile(ctx)
 	var inst: CharInstance = b.board.get_xy(anchor)
@@ -76,7 +182,7 @@ static func _replay_word(b: BattleState) -> Array:
 		b.bag.erase(inst)
 		b.consumed_this_turn.erase(inst)
 		inst.owner = CharInstance.Owner.PLAYER
-		b.board.set_xy(pos, inst)
+		b.place_from_pool(pos, inst)
 		placed += 1
 	return ["回放：将上一个词用过的 %d 枚字放回盘面" % placed]
 
@@ -99,15 +205,195 @@ static func _recover_consumed(b: BattleState, ctx: Dictionary) -> Array:
 	b.bag.append(inst)   # 放回抽字袋顶（原型：袋顶=数组尾）
 	return ["回收：把【%s】放回抽字袋顶" % inst.glyph()]
 
-static func _cleanse_adjacent(b: BattleState, ctx: Dictionary) -> Array:
-	var tile: Vector2i = EffectUtil.tile(ctx)
-	var n := 0
-	for pos in [tile] + b.board.neighbors(tile):
-		var c: CharInstance = b.board.get_xy(pos)
-		if c != null and not c.pollutions.is_empty():
-			c.clear_pollutions()
-			n += 1
-	return ["清：净化 %d 处污染（所有权不变）" % n]
+## 重回只恢复本词之前的消耗；移动原实体，保持最近的一枚在袋顶。
+static func _recover_recent(b: BattleState, ctx: Dictionary, limit: int) -> Array:
+	var excluded := {}
+	for item in ctx.get("consumed", []):
+		excluded[item.inst.uid] = true
+	var chosen: Array = []
+	var seen := {}
+	var candidates := b.recoverable_consumed()
+	for i in range(candidates.size() - 1, -1, -1):
+		var inst: CharInstance = candidates[i]
+		if excluded.has(inst.uid) or seen.has(inst.uid):
+			continue
+		seen[inst.uid] = true
+		chosen.append(inst)
+		if chosen.size() >= limit:
+			break
+	for i in range(chosen.size() - 1, -1, -1):
+		var inst: CharInstance = chosen[i]
+		b.take_from_discard_by_uid(inst.uid)
+		b.bag.append(inst)
+	return ["重回：把此前最近消耗的 %d 枚己方实体字放回字袋顶" % chosen.size()]
+
+## 分/铸/炼共用四邻选择；强化触发时自动挑选仍在盘面上的合法邻字。
+static func _solo_neighbor_action(b: BattleState, ctx: Dictionary, handler: String) -> Array:
+	var name: String = {"split_neighbor": "分", "recast_neighbor": "铸", "refine_junk_neighbor": "炼"}[handler]
+	var path: Array = ctx.get("path", [])
+	if path.is_empty():
+		return ["%s：没有相邻目标" % name]
+	var origin: Vector2i = path[0]
+	var candidates: Array = []
+	for pos in b.board.neighbors(origin):
+		var inst := b.board.get_xy(pos)
+		if inst == null:
+			continue
+		match handler:
+			"split_neighbor":
+				if inst.is_player_owned():
+					candidates.append(pos)
+			"recast_neighbor":
+				if inst.is_player_owned() and not inst.temporary and not inst.pinned:
+					candidates.append(pos)
+			"refine_junk_neighbor":
+				if BattleState.is_refinable_junk(inst):
+					candidates.append(pos)
+	var chosen: Vector2i = (ctx.get("target", {}) as Dictionary).get("tile", Vector2i(-1, -1))
+	if ctx.get("word") != null and not candidates.has(chosen) and not candidates.is_empty():
+		chosen = candidates[0]
+	if not candidates.has(chosen):
+		return ["%s：四邻没有有效目标，只弃掉本字" % name]
+	var target := b.board.get_xy(chosen)
+	match handler:
+		"split_neighbor":
+			if b.board.get_xy(origin) != null:
+				return ["分：原格未腾空，未生成复制"]
+			var copy := CharInstance.new(target.data)
+			copy.temporary = true
+			copy.word_only = true
+			b.board.set_xy(origin, copy)
+			b.temp_chars.append(copy)
+			return ["分：原格生成临时【%s】，仅供组词，单独打出只弃掉" % copy.glyph()]
+		"recast_neighbor":
+			var excluded: Array = [target]
+			for item in ctx.get("consumed", []):
+				excluded.append(item.inst)
+			var replacement := BattleOps.take_real_replacement(b, excluded)
+			if replacement == null:
+				return ["铸：字袋及弃字堆没有其他可替换的实体，保留目标字"]
+			b.place_from_pool(chosen, replacement)
+			b.bag.append(target)
+			b._shuffle(b.bag)
+			b.record_draw(1, 1, excluded)
+			return ["铸：将原实体【%s】放回字袋，原格换为【%s】" % [target.glyph(), replacement.glyph()]]
+		"refine_junk_neighbor":
+			b.board.clear_xy(chosen)
+			b.temp_chars.erase(target)
+			var earned := b.earn_gold(1)
+			b.add_heat(1)
+			return ["炼：移除杂字【%s】，获得 %d 金币、热度 +1" % [target.glyph(), earned]]
+	return []
+
+## 精/购移动选定原实体；候选预览不改变字袋，只有确认成功才记补字或支付。
+static func _solo_bag_draw(b: BattleState, ctx: Dictionary, handler: String) -> Array:
+	var name := "精" if handler == "precision_draw" else "购"
+	var path: Array = ctx.get("path", [])
+	var consumed: Array = ctx.get("consumed", [])
+	if path.is_empty() or consumed.is_empty() or b.board.get_xy(path[0]) != null:
+		return ["%s：原格未腾空，未补字" % name]
+	var source: CharInstance = consumed[0].inst
+	# 强化融合牌时按附带字的效果查候选，而非主字的 solo_handler。
+	var candidates := b.solo_bag_candidates(source, handler)
+	var chosen_uid := int((ctx.get("target", {}) as Dictionary).get("bag_uid", -1))
+	var chosen: CharInstance = null
+	for inst in candidates:
+		if inst.uid == chosen_uid:
+			chosen = inst
+			break
+	if chosen == null and ctx.get("word") != null and not candidates.is_empty():
+		chosen = candidates[0] # 强化附效自动选择；无目标的普通单字不偷选另一张牌。
+	if chosen == null:
+		return ["%s：字袋没有可选实体，只弃掉本字" % name]
+	var due := EffectUtil.discounted_cost(b, 2) if handler == "buy_bag_solo" else 0
+	if handler == "buy_bag_solo" and EffectUtil.available(b) < due:
+		return ["购：支付额不足，未补字"]
+	var index := b.bag.find(chosen)
+	b.bag.remove_at(index)
+	b.place_from_pool(path[0], chosen) # 先占住落点，支付触发电能时不会占用它。
+	if handler == "buy_bag_solo" and not EffectUtil.pay(b, 2):
+		b.board.clear_xy(path[0])
+		b.bag.insert(index, chosen)
+		return ["购：支付失败，保留字袋实体"]
+	var excluded: Array = consumed.map(func(item): return item.inst)
+	b.record_draw(1, 1, excluded)
+	var selection_note := "二选一，" if candidates.size() >= 2 else "只有一枚候选，"
+	return ["%s：%s在原格补入【%s】" % [name, "支付 %d，" % due if handler == "buy_bag_solo" else selection_note, "".join(chosen.glyph_list())]]
+
+static func _cleanse_adjacent(b: BattleState, ctx: Dictionary, all_tags := false) -> Array:
+	var name := "洗" if all_tags else "清"
+	var path: Array = ctx.get("path", [])
+	if path.is_empty():
+		return ["%s：没有相邻目标" % name]
+	var neighbors := b.board.neighbors(path[0])
+	var target: Dictionary = ctx.get("target", {})
+	var chosen: Vector2i = target.get("tile", Vector2i(-1, -1))
+	# 强化触发单字时，以参与字的原格为中心自动选一枚邻字。
+	if ctx.get("word") != null and (not neighbors.has(chosen) or b.board.get_xy(chosen) == null or b.board.get_xy(chosen).pollutions.is_empty()):
+		chosen = Vector2i(-1, -1)
+		for pos in neighbors:
+			var candidate := b.board.get_xy(pos)
+			if candidate != null and not candidate.pollutions.is_empty():
+				chosen = pos
+				break
+	var inst := b.board.get_xy(chosen)
+	if not neighbors.has(chosen) or inst == null or inst.pollutions.is_empty():
+		return ["%s：四邻没有可净化的污染" % name]
+	var n := inst.pollutions.size() if all_tags else 1
+	if all_tags:
+		inst.clear_pollutions()
+	else:
+		inst.pollutions.remove_at(0)
+	return ["%s：清除【%s】的 %d 个污染标签（保留原字与归属）" % [name, inst.glyph(), n]]
+
+static func _move_neighbor(b: BattleState, ctx: Dictionary) -> Array:
+	var path: Array = ctx.get("path", [])
+	if path.is_empty() or b.board.get_xy(path[0]) != null:
+		return ["转：原格未腾空，未移动"]
+	var origin: Vector2i = path[0]
+	var chosen: Vector2i = (ctx.get("target", {}) as Dictionary).get("tile", Vector2i(-1, -1))
+	var inst := b.board.get_xy(chosen)
+	if ctx.get("word") != null and (not b.board.is_adjacent(origin, chosen) or inst == null or inst.pinned):
+		for pos in b.board.neighbors(origin):
+			var candidate := b.board.get_xy(pos)
+			if candidate != null and not candidate.pinned:
+				chosen = pos
+				inst = candidate
+				break
+	if inst == null or inst.pinned or not b.board.is_adjacent(origin, chosen):
+		return ["转：四邻没有可移动的字"]
+	b.board.set_xy(chosen, null)
+	b.board.set_xy(origin, inst)
+	return ["转：把相邻【%s】移入原格" % "".join(inst.glyph_list())]
+
+static func _throw_neighbor(b: BattleState, ctx: Dictionary) -> Array:
+	var path: Array = ctx.get("path", [])
+	var t: Dictionary = (ctx.get("target", {}) as Dictionary).duplicate()
+	# 强化投作为成词附加效果时，自动选择一枚剩余邻字与空格。
+	if not path.is_empty() and ctx.get("word") != null:
+		var from: Vector2i = t.get("tile", Vector2i(-1, -1))
+		var to: Vector2i = t.get("tile2", Vector2i(-1, -1))
+		var selected := b.board.get_xy(from)
+		if selected == null or selected.pinned or not b.board.is_adjacent(path[0], from) or not b.board.in_bounds(to.x, to.y) or b.board.get_xy(to) != null:
+			var empties := b.board.empty_indices()
+			for pos in b.board.neighbors(path[0]):
+				var candidate := b.board.get_xy(pos)
+				if candidate != null and not candidate.pinned and not empties.is_empty():
+					t = {"tile": pos, "tile2": empties[0]}
+					break
+	if path.is_empty() or not t.has("tile") or not t.has("tile2"):
+		return ["投：没有可用目标或空格，未移动"]
+	var inst := b.board.get_xy(t.tile)
+	if inst == null or inst.pinned or not b.board.is_adjacent(path[0], t.tile) or b.board.get_xy(t.tile2) != null:
+		return ["投：目标或空格已改变，未移动、未支付"]
+	if t.has("throw_uid") and inst.uid != int(t.throw_uid):
+		return ["投：目标实体已改变，未移动、未支付"]
+	var due := EffectUtil.discounted_cost(b, 1)
+	if not EffectUtil.pay(b, 1):
+		return ["投：支付额不足，未移动"]
+	b.board.set_xy(t.tile, null)
+	b.board.set_xy(t.tile2, inst)
+	return ["投：支付 %d，将【%s】投到空格" % [due, "".join(inst.glyph_list())]]
 
 static func _capture_glyph(b: BattleState, ctx: Dictionary, cost: int) -> Array:
 	var tile: Vector2i = ctx.get("target", {}).get("enemy_glyph", EffectUtil.tile(ctx))
@@ -206,23 +492,24 @@ static func _pin_glyph(b: BattleState, ctx: Dictionary) -> Array:
 	if inst.pinned:
 		return ["精铸：【%s】已经固定" % inst.glyph()]
 	inst.pinned = true
-	return ["精铸：将【%s】固定（本场可反复使用，不可移动/换字）" % inst.glyph()]
+	inst.pinned_exhausted = false
+	return ["精铸：将【%s】固定（每回合使用一次，不消耗，不可移动/换字）" % inst.glyph()]
 
 static func _precision_place(b: BattleState, ctx: Dictionary, eff: EffectData) -> Array:
 	var cost: int = eff.amount
 	var tile: Vector2i = EffectUtil.tile(ctx)
 	if b.board.get_xy(tile) != null:
-		return ["精铸：目标格已被占用"]
-	if EffectUtil.available(b) < cost:
-		return ["精铸：支付额不足（需 %d）" % cost]
+		return ["放回：目标格已被占用"]
+	if EffectUtil.available(b) < EffectUtil.discounted_cost(b, cost):
+		return ["放回：支付额不足（需 %d）" % cost]
 	var uid: int = int(ctx.get("target", {}).get("place_uid", -1))
 	var inst: CharInstance = b.take_from_discard_by_uid(uid)
 	if inst == null:
-		return ["精铸：请选择弃字堆中的一枚己方字"]
+		return ["放回：请选择弃字堆中的一枚己方字"]
 	EffectUtil.pay(b, cost)
 	inst.owner = CharInstance.Owner.PLAYER
-	b.board.set_xy(tile, inst)
-	return ["精铸：支付 %d，将【%s】放入指定空格" % [cost, inst.glyph()]]
+	b.place_from_pool(tile, inst)
+	return ["放回：支付 %d，将【%s】放入指定空格" % [cost, inst.glyph()]]
 
 ## 急流：选一行/列，将己方实体字洗回字袋，再向原位置随机补入相同数量。
 static func _reshuffle_line(b: BattleState, ctx: Dictionary) -> Array:
@@ -256,7 +543,7 @@ static func _reshuffle_line(b: BattleState, ctx: Dictionary) -> Array:
 			continue
 		if b.bag.is_empty():
 			break
-		b.board.set_xy(p2, b.bag.pop_back())
+		b.place_from_pool(p2, b.bag.pop_back())
 		filled += 1
 	b.record_draw(filled)
 	return ["急流：洗回 %d 枚，原格补入 %d 枚" % [returned.size(), filled]]
@@ -275,7 +562,7 @@ static func _place_two(b: BattleState, ctx: Dictionary) -> Array:
 		if b.board.get_xy(cells[i]) != null:
 			continue
 		inst.owner = CharInstance.Owner.PLAYER
-		b.board.set_xy(cells[i], inst)
+		b.place_from_pool(cells[i], inst)
 		placed += 1
 	for inst in reveal:
 		if not b.board.cells.has(inst):
@@ -299,7 +586,7 @@ static func _recover_two(b: BattleState, ctx: Dictionary) -> Array:
 		if inst == null:
 			continue
 		inst.owner = CharInstance.Owner.PLAYER
-		b.board.set_xy(cell, inst)
+		b.place_from_pool(cell, inst)
 		placed += 1
 	return ["收复：从弃字堆放回 %d 枚" % placed]
 
@@ -317,7 +604,7 @@ static func _recover_to_bag(b: BattleState, ctx: Dictionary) -> Array:
 	var di: CharInstance = b.take_from_discard_by_uid(uid)
 	if di != null:
 		di.owner = CharInstance.Owner.PLAYER
-		b.board.set_xy(tile, di)
+		b.place_from_pool(tile, di)
 		return ["收回：【%s】回袋顶，从弃字堆放入【%s】" % [inst.glyph(), di.glyph()]]
 	return ["收回：【%s】回袋顶" % inst.glyph()]
 
@@ -409,16 +696,41 @@ static func _collect_own(b: BattleState, ctx: Dictionary) -> Array:
 
 
 ## 再铸：将所选 3 个盘面字替换为随机临时字（随机字不一定在玩家牌组里）。
-static func _recast_three(b: BattleState, ctx: Dictionary) -> Array:
-	var cells: Array = ctx.get("target", {}).get("cells", [])
+static func valid_recast_targets(b: BattleState, cells: Array, excluded: Array = []) -> bool:
 	if cells.size() != 3:
-		return ["再铸：请选择 3 个盘面字"]
+		return false
 	var selected := {}
 	for cell in cells:
 		var inst := b.board.get_xy(cell)
-		if inst == null or inst.pinned or selected.has(cell):
-			return ["再铸：请选择三个不同的非固定字"]
-		selected[cell] = true
+		if inst == null or inst.pinned or excluded.has(cell) or selected.has(inst.uid):
+			return false
+		selected[inst.uid] = true
+	return true
+
+static func valid_suspend_targets(b: BattleState, instances: Array) -> bool:
+	if instances.size() != 3:
+		return false
+	var seen := {}
+	for inst in instances:
+		if not inst is CharInstance or inst.pinned or not b.board.cells.has(inst) or seen.has(inst.uid):
+			return false
+		seen[inst.uid] = true
+	return true
+
+static func _suspend_three(b: BattleState, ctx: Dictionary) -> Array:
+	var instances: Array = ctx.get("suspend_targets", [])
+	if not valid_suspend_targets(b, instances):
+		return ["重连：所选实体已离开棋盘或被固定，请重新选择"]
+	for inst in instances:
+		var index: int = b.board.cells.find(inst)
+		b.reconnect_pending.append({"inst": inst, "pos": b.board.to_xy(index), "return_turn": b.turn + 1})
+		b.board.cells[index] = null
+	return ["重连：三个原实体暂时移出，下回合优先原格返回（满盘时等待空位）"]
+
+static func _recast_three(b: BattleState, ctx: Dictionary) -> Array:
+	var cells: Array = ctx.get("target", {}).get("cells", [])
+	if not valid_recast_targets(b, cells):
+		return ["再铸：请选择三个不同的非固定字"]
 	var pool: Array = []
 	for c in Database.characters.values():
 		if not c.is_pollution and not c.pending_design and not c.tags.has("enemy"):
@@ -443,6 +755,8 @@ static func _repeat_last(b: BattleState, ctx: Dictionary) -> Array:
 	if b.last_played_glyphs.is_empty():
 		return ["再：此前没有可重复的字"]
 	var g: String = str(b.last_played_glyphs[b.last_played_glyphs.size() - 1])
+	if g == "再":
+		return ["再：不能复制【再】本身，仅腾位"]
 	var copy: CharInstance = b.create_temp_glyph(g)
 	if copy == null:
 		return ["再：无法重复【%s】" % g]
@@ -515,8 +829,8 @@ static func _merge_flow(b: BattleState, ctx: Dictionary) -> Array:
 		b.return_pending_reveal()
 		return ["合流：选择无效"]
 	b.return_pending_reveal()
-	b.board.set_xy(c1, bag_card)
-	b.board.set_xy(c2, disc_card)
+	b.place_from_pool(c1, bag_card)
+	b.place_from_pool(c2, disc_card)
 	b.record_draw(2)
 	return ["合流：将【%s】【%s】放入相邻空格" % [bag_card.glyph(), disc_card.glyph()]]
 
@@ -528,7 +842,7 @@ static func _hard_stop(b: BattleState) -> Array:
 
 static func _repeat_word(b: BattleState) -> Array:
 	b.enable_ability("repeat", 1)
-	return ["重复：开启，每回合第一次多字词将再执行一次"]
+	return ["重复：本场从下回合起，每回合首次多字词的即时效果额外结算一次，费用再付"]
 
 static func _suspend(b: BattleState) -> Array:
 	var h: int = b.player.heat
@@ -577,7 +891,7 @@ static func _transform_board(b: BattleState, ctx: Dictionary) -> Array:
 			b.temp_chars.erase(old)
 	var old_glyph: String = old.glyph() if old != null else "空"
 	chosen.owner = CharInstance.Owner.PLAYER
-	b.board.set_xy(tile, chosen)
+	b.place_from_pool(tile, chosen)
 	return ["转化：将【%s】定向改为【%s】" % [old_glyph, chosen.glyph()]]
 
 static func _replace_self(b: BattleState, ctx: Dictionary) -> Array:
@@ -603,15 +917,19 @@ static func _reveal_place(b: BattleState, ctx: Dictionary, cost: int) -> Array:
 	var tile: Vector2i = EffectUtil.tile(ctx)
 	if b.board.get_xy(tile) != null:
 		return ["投放：目标格已被占用"]
-	if b.bag.is_empty() and b.discard.is_empty():
-		return ["投放：字袋为空"]
-	if not EffectUtil.pay(b, cost):
-		return ["投放：支付额不足（需 %d）" % cost]
-	if b.bag.is_empty():
-		b.bag = b.discard.duplicate()
-		b.discard.clear()
-		b._shuffle(b.bag)
-	var inst: CharInstance = b.draw_one_to(tile)
-	if inst == null:
-		return ["投放：字袋为空"]
-	return ["投放：支付 %d 金币，落下【%s】" % [cost, inst.glyph()]]
+	var chosen: CharInstance = null
+	var uid := int((ctx.get("target", {}) as Dictionary).get("bag_uid", -1))
+	for inst in deploy_candidates(b):
+		if inst.uid == uid:
+			chosen = inst
+	if chosen == null:
+		return ["投放：没有可选实体，未支付"]
+	var due := EffectUtil.discounted_cost(b, cost)
+	if EffectUtil.available(b) < due:
+		return ["投放：支付额不足（需%d）" % due]
+	b.bag.erase(chosen)
+	b.place_from_pool(tile, chosen)
+	chosen.temporary_uses += 1
+	EffectUtil.pay(b, cost)
+	b.record_draw(1)
+	return ["投放：实际支付%d，选定原实体【%s】落盘，额外使用+1" % [due, chosen.glyph()]]

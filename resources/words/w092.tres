@@ -7,18 +7,18 @@
 script = ExtResource("1_thr7m")
 kind = 29
 handler = "blackout"
-note = "彩蛋：停电，屏幕变黑；拖动连出【开灯】才能恢复"
+note = "彩蛋：屏幕变黑；连出【开灯】恢复照明。"
 
 [resource]
 script = ExtResource("2_jks3o")
 id = "w092"
 word = "停电"
 glyphs = Array[String](["停", "电"])
-description = "早期阻挡敌塞字与防护重叠；倾向重做/删除"
+description = "彩蛋：屏幕变黑；连出【开灯】恢复照明。"
 effects = Array[ExtResource("1_thr7m")]([SubResource("Resource_iul0c")])
 group = "彩蛋"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "早期阻挡敌塞字与防护重叠；倾向重做/删除"
+effect_summary = "彩蛋：屏幕变黑；连出【开灯】恢复照明。"
 effect_handler_id = "blackout"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P3·补全词效"

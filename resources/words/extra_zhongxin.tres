@@ -8,18 +8,18 @@ script = ExtResource("1_1nf8e")
 kind = 29
 handler = "converge"
 target = 5
-note = "选择一个字，让所有字向它聚拢（冲突优先左上）"
+note = "选择一个字作为锚点，其余未固定字逐轮聚拢至稳定（冲突优先左上）"
 
 [resource]
 script = ExtResource("2_awj4m")
 id = "extra_zhongxin"
 word = "重心"
 glyphs = Array[String](["重", "心"])
-description = "选择一个字，让所有字向它聚拢（冲突优先左上）"
+description = "选择一个字作为锚点，其余未固定字逐轮聚拢至稳定（冲突优先左上）"
 effects = Array[ExtResource("1_1nf8e")]([SubResource("Resource_v5sq7")])
 group = "空间"
 design_stage = "设计负责人新增"
-effect_summary = "选择一个字，让所有字向它聚拢（冲突优先左上）"
+effect_summary = "选择一个字作为锚点，其余未固定字逐轮聚拢至稳定（冲突优先左上）"
 effect_handler_id = "converge"
 requires_target = 5
 priority = "空间"

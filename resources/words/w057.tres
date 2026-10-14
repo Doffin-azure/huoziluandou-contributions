@@ -9,18 +9,18 @@ kind = 28
 handler = "ceasefire"
 amount = 1
 timing = "persistent"
-note = "本回合未造成敌伤则免疫敌方攻击"
+note = "本回合没有使敌人实际掉血时，免疫敌方攻击；出过攻击词但未使敌人掉血也可生效。"
 
 [resource]
 script = ExtResource("2_evhyi")
 id = "w057"
 word = "停火"
 glyphs = Array[String](["停", "火"])
-description = "本回合从头到尾没有造成敌伤才免疫敌方攻击的候选方向"
+description = "本回合没有使敌人实际掉血时，免疫敌方攻击；出过攻击词但未使敌人掉血也可生效。"
 effects = Array[ExtResource("1_esmk1")]([SubResource("Resource_27cmk")])
 group = "热暴"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "本回合从头到尾没有造成敌伤才免疫敌方攻击的候选方向"
+effect_summary = "本回合没有使敌人实际掉血时，免疫敌方攻击；出过攻击词但未使敌人掉血也可生效。"
 effect_handler_id = "ceasefire"
 timing = "persistent"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"

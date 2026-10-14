@@ -9,18 +9,18 @@ kind = 28
 handler = "ability_flow"
 amount = 2
 timing = "persistent"
-note = "本回合每打出 2 种不同多字词补 2 字"
+note = "本回合每累计打出2种不同的多字词，补2字；含启用本词，同一种词只计一次。"
 
 [resource]
 script = ExtResource("2_rpfc0")
 id = "w035"
 word = "流转"
 glyphs = Array[String](["流", "转"])
-description = "持续能力：每回合打出2种不同多字词后补2字"
+description = "本回合每累计打出2种不同的多字词，补2字；含启用本词，同一种词只计一次。"
 effects = Array[ExtResource("1_jdpdk")]([SubResource("Resource_h4fyu")])
 group = "流转"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "持续能力：每回合打出2种不同多字词后补2字"
+effect_summary = "本回合每累计打出2种不同的多字词，补2字；含启用本词，同一种词只计一次。"
 effect_handler_id = "ability_flow"
 timing = "persistent"
 p25_implemented = true

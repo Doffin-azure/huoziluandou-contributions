@@ -8,18 +8,18 @@ script = ExtResource("1_05qhn")
 kind = 29
 handler = "invest_equity"
 amount = 3
-note = "支付 3 金币锁定为 3 股权（战后返还本金）"
+note = "支付3点费用，获得3股权；战后返还未消耗股权对应的金币。"
 
 [resource]
 script = ExtResource("2_21vlh")
 id = "w071"
 word = "投资"
 glyphs = Array[String](["投", "资"])
-description = "持续能力：可将经济词获得金币转成锁定股权；战后未耗尽本金返还"
+description = "支付3点费用，获得3股权；战后返还未消耗股权对应的金币。"
 effects = Array[ExtResource("1_05qhn")]([SubResource("Resource_hlmvq")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "持续能力：可将经济词获得金币转成锁定股权；战后未耗尽本金返还"
+effect_summary = "支付3点费用，获得3股权；战后返还未消耗股权对应的金币。"
 effect_handler_id = "invest_equity"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P1·重点机制"

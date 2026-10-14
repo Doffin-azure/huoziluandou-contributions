@@ -3,11 +3,20 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_qs8ub"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_ye3ls"]
 
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("2_ye3ls")
+kind = 29
+handler = "profit_if_earned"
+amount = 2
+note = "若本回合此前已获得过金币，再获得 2 金币；否则无收益"
+
 [resource]
 script = ExtResource("1_qs8ub")
 id = "li2"
 glyph = "利"
 pinyin = "li"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "若本回合此前已获得过金币，再获得 2 金币；否则无收益"
 tags = Array[String](["economy"])
+solo_effects = Array[ExtResource("2_ye3ls")]([SubResource("Effect")])
+solo_handler = "profit_if_earned"
 rarity = 2

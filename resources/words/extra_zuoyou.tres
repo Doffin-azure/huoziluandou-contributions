@@ -7,18 +7,18 @@
 script = ExtResource("1_b251f")
 kind = 29
 handler = "swap_cells"
-note = "交换选中的两个格子"
+note = "选择同一行任意两个格子交换，允许空格；固定字不可移动。"
 
 [resource]
 script = ExtResource("2_5a2iv")
 id = "extra_zuoyou"
 word = "左右"
 glyphs = Array[String](["左", "右"])
-description = "选择同一行里的任意两个格子，交换它们的位置"
+description = "选择同一行任意两个格子交换，允许空格；固定字不可移动。"
 effects = Array[ExtResource("1_b251f")]([SubResource("Resource_hwl50")])
 group = "空间"
 design_stage = "设计负责人新增"
-effect_summary = "选择同一行里的任意两个格子，交换它们的位置"
+effect_summary = "选择同一行任意两个格子交换，允许空格；固定字不可移动。"
 effect_handler_id = "swap_cells"
 priority = "空间"
 implemented = true

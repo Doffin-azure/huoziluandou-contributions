@@ -8,18 +8,18 @@ script = ExtResource("1_cq7qh")
 kind = 29
 handler = "heat_to_energy"
 amount = 1
-note = "当前热度转为等量储能"
+note = "清空当前热度，获得等量储能。"
 
 [resource]
 script = ExtResource("2_n8jdq")
 id = "w047"
 word = "热能"
 glyphs = Array[String](["热", "能"])
-description = "把当前热度转为储能"
+description = "清空当前热度，获得等量储能。"
 effects = Array[ExtResource("1_cq7qh")]([SubResource("Resource_yeyi2")])
 group = "蓄放"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "把当前热度转为储能"
+effect_summary = "清空当前热度，获得等量储能。"
 effect_handler_id = "heat_to_energy"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P3·补全词效"

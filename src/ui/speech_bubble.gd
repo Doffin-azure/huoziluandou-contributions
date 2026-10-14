@@ -116,7 +116,7 @@ func set_result(word: WordData, glyphs: Array, messages: Array) -> void:
 		if not lines.has(str(m)):
 			lines.append(str(m))
 	if lines.is_empty():
-		lines.append(word.effect_summary if word != null and not word.effect_summary.is_empty() else "没有效果，仅消耗字块")
+		lines.append(word.describe() if word != null else "没有效果，仅消耗字块")
 	set_text(head, "\n".join(lines), State.RESULT)
 
 

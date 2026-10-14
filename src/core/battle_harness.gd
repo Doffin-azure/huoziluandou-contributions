@@ -114,11 +114,16 @@ func observe() -> Dictionary:
 		"board": board_rows,
 		"bag": b.bag.size(),
 		"discard": b.discard.size(),
+		"reconnect_pending": b.reconnect_pending.map(func(item): return {
+			"card": _cell_dict(item.inst), "pos": _xy_out(item.pos), "return_turn": item.return_turn}),
 		"player": {
 			"hp": b.player.hp, "max_hp": b.player.max_hp,
 			"block": b.player.block, "persistent_block": b.player.persistent_block,
 			"energy": b.player.energy, "heat": b.player.heat, "heat_capacity": b.player.heat_capacity,
+			"turn_strength": b.player.turn_strength, "next_damage_reduction": b.player.next_damage_reduction,
 			"gold": GameState.gold, "temp_funds": b.player.temp_funds, "equity": b.player.equity,
+			"gold_earned_this_turn": b.gold_earned_this_turn,
+			"temporary_heat_capacity": b.temporary_heat_capacity,
 			"statuses": b.player.statuses.duplicate(),
 		},
 		"enemies": enemies,
@@ -130,19 +135,24 @@ func _cell_dict(inst: CharInstance) -> Variant:
 	if inst == null:
 		return null
 	return {
+		"uid": inst.uid,
 		"glyph": inst.glyph(),
 		"owner": inst.owner,
 		"temporary": inst.temporary,
+		"word_only": inst.word_only,
 		"fused": inst.fusion.duplicate(),
 		"pollutions": inst.pollutions.duplicate(),
 		"temp_uses": inst.temporary_uses,
 		"gilded": inst.gilded,
+		"refined": inst.refined,
+		"pinned": inst.pinned,
+		"pinned_exhausted": inst.pinned_exhausted,
 	}
 
 
 # ---------------------------------------------------------------- 合法动作
 ## 返回形如：
-##  {"type":"play","path":[[x,y]...], "word":"击破"|null, "needs":"none|tile|2x2|empty|enemy|discard|glyph|line|fuse|same|merge"}
+##  {"type":"play","path":[[x,y]...], "word":"击破"|null, "needs":"none|tile|2x2|empty|enemy|discard|glyph|line|fuse|same|merge|three|throw|bag"}
 ##  {"type":"end_turn"}
 func legal_actions(limit := 60) -> Array:
 	var out: Array = []
@@ -151,11 +161,14 @@ func legal_actions(limit := 60) -> Array:
 		if out.size() >= limit:
 			break
 		var w: WordData = f["word"]
+		var needs := _needs_of(w)
+		if needs in ["three", "same_pair"] and _auto_target(needs, f["path"]).is_empty():
+			continue
 		out.append({
 			"type": "play",
 			"path": _path_out(f["path"]),
 			"word": w.word,
-			"needs": _needs_of(w),
+			"needs": needs,
 			"score": _score_word(w),
 		})
 	# 单字
@@ -163,14 +176,31 @@ func legal_actions(limit := 60) -> Array:
 		if out.size() >= limit:
 			break
 		var inst: CharInstance = battle.board.cells[i]
-		if inst == null:
+		if inst == null or (inst.pinned and inst.pinned_exhausted):
 			continue
 		var solo := 0
-		if inst.data != null:
+		var pos := battle.board.to_xy(i)
+		var needs := "none"
+		if inst.data != null and not inst.word_only:
 			for e in inst.data.solo_effects:
 				solo += absi(e.amount)
-		out.append({"type": "play", "path": [_xy_out(battle.board.to_xy(i))], "word": null,
-			"needs": "none", "score": solo})
+			if battle._solo_requires_target(inst.data, [pos]) == EffectData.Target.BOARD_TILE:
+				needs = "throw" if inst.data.solo_handler == "throw_neighbor" else "tile"
+			elif battle._solo_requires_target(inst.data, [pos]) == EffectData.Target.BAG_GLYPH:
+				needs = "bag"
+		if needs == "bag" and inst.data.solo_handler == "buy_bag_solo" and EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, 2):
+			continue
+		if needs == "throw" and (EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, 1) or _auto_target(needs, [pos]).is_empty()):
+			continue
+		var action := {"type": "play", "path": [_xy_out(pos)], "word": null,
+			"needs": needs, "score": solo}
+		if needs == "bag":
+			action["bag_choices"] = battle.solo_bag_candidates(inst).map(func(card): return {
+				"card": _cell_dict(card), "target": {"bag_uid": card.uid, "bag_source_uid": inst.uid}})
+		out.append(action)
+		if inst.data != null and not inst.word_only and inst.data.solo_handler == "solo_release" and inst.glyph_list().size() == 1 and battle.player.energy >= 1 and out.size() < limit:
+			out.append({"type": "play", "path": [_xy_out(pos)], "word": null,
+				"needs": "none", "score": 8, "target": {"release_energy": true}})
 	out.append({"type": "end_turn"})
 	return out
 
@@ -202,10 +232,14 @@ static func _to_xy(v) -> Vector2i:
 func _needs_of(w: WordData) -> String:
 	if not w.interaction.is_empty():
 		match w.interaction:
+			"choose_bag_deploy": return "deploy"
+			"choose_buyback": return "buyback"
+			"choose_junk_tiles": return "junk"
+			"choose_same_pair": return "same_pair"
 			"reveal_pick_board": return "tile"
 			"choose_glyph_empower", "choose_glyph_gild": return "glyph"
 			"choose_battle_card_remove": return "battle_card"
-			"choose_fuse_pair", "choose_same_pair", "choose_any_pair": return "pair"
+			"choose_fuse_pair", "choose_any_pair": return "pair"
 			"choose_row_pair": return "row_pair"
 			"choose_place_two": return "place_two"
 			"choose_recover_two": return "recover_two"
@@ -214,6 +248,7 @@ func _needs_of(w: WordData) -> String:
 			"choose_discard_place": return "discard"
 			"choose_line": return "line"
 			"choose_merge_flow": return "merge"
+			"choose_three_tiles": return "three"
 	match w.requires_target:
 		EffectData.Target.BOARD_TILE: return "tile"
 		EffectData.Target.BOARD_2X2: return "2x2"
@@ -250,30 +285,30 @@ func _dfs(cell: Vector2i, node: Dictionary, path: Dictionary, res: Array, seen: 
 	if res.size() >= cap:
 		return
 	var inst: CharInstance = battle.board.get_xy(cell)
-	if inst == null:
+	if inst == null or (inst.pinned and inst.pinned_exhausted):
 		return
-	var g: String = inst.glyph()
-	if not node.has(g):
-		return
-	var nn: Dictionary = node[g]
+	var glyphs := inst.glyph_list()
+	var sequences: Array = [glyphs]
+	if glyphs.has("过"):
+		sequences.append(glyphs.filter(func(g): return g != "过"))
 	path[cell] = true
-	if nn.has("#"):
-		var wid: String = nn["#"]
-		if not seen.has(wid):
-			seen[wid] = true
-			var p: Array = []
-			for k in path.keys():
-				p.append(k)
-			res.append({"word": Database.words[wid], "path": p})
-	for n in battle.board.neighbors(cell):
-		if not path.has(n):
-			_dfs(n, nn, path, res, seen, cap)
-	if battle.board.diagonal_steps_allowed > 0:
-		var selected: Array = path.keys()
-		for offset in [Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1)]:
-			var next: Vector2i = cell + offset
-			if battle.board.can_extend_path(selected, next):
-				_dfs(next, nn, path, res, seen, cap)
+	for sequence in sequences:
+		var nn: Dictionary = node
+		var matches := true
+		for glyph in sequence:
+			if not nn.has(glyph):
+				matches = false
+				break
+			nn = nn[glyph]
+		if not matches:
+			continue
+		if nn.has("#"):
+			var wid: String = nn["#"]
+			if not seen.has(wid):
+				seen[wid] = true
+				res.append({"word": Database.words[wid], "path": path.keys()})
+		for next in battle.board.path_extensions(path.keys()):
+			_dfs(next, nn, path, res, seen, cap)
 	path.erase(cell)
 
 
@@ -299,7 +334,7 @@ func apply(action: Dictionary) -> Dictionary:
 	var target: Dictionary = _norm_target(action.get("target", {}))
 	var needs: String = str(action.get("needs", "none"))
 	if target.is_empty() and needs != "none":
-		target = _auto_target(needs)
+		target = _auto_target(needs, path)
 	var result: Dictionary = battle.try_play(path, target)
 	if not result.ok:
 		invalid_tries += 1
@@ -328,15 +363,74 @@ func _norm_target(d: Dictionary) -> Dictionary:
 	for k in d.keys():
 		if k in ["tile", "tile2", "enemy_glyph", "cell1", "cell2"]:
 			out[k] = _to_xy(d[k])
+		elif k == "cells":
+			out[k] = _norm_path(d[k])
 		else:
 			out[k] = d[k]
 	return out
 
 
 ## 为需要目标的动作自动挑一个合法目标（批量测试用）。
-func _auto_target(needs: String) -> Dictionary:
+func _auto_target(needs: String, path: Array = []) -> Dictionary:
 	var b := battle
+	if needs in ["deploy", "buyback"]:
+		var cards := EffectHandlersActions.deploy_candidates(b) if needs == "deploy" else b.discard.filter(func(c): return c.is_player_owned() and not c.temporary)
+		if cards.is_empty():
+			return {"skip_transfer": true}
+		var spaces := b.board.empty_indices()
+		for pos in path:
+			var inst := b.board.get_xy(pos)
+			if inst != null and not inst.pinned and inst.temporary_uses == 0:
+				spaces.append(pos)
+		if spaces.is_empty():
+			return {}
+		return {"tile": spaces[0], "bag_uid": cards[0].uid} if needs == "deploy" else {"tile": spaces[0], "place_uid": cards[0].uid}
+	if needs == "junk":
+		var cells: Array = []
+		for i in b.board.cells.size():
+			var pos := b.board.to_xy(i)
+			if not path.has(pos) and BattleState.is_refinable_junk(b.board.cells[i]) and cells.size() < 2:
+				cells.append(pos)
+		return {"cells": cells}
+	if needs == "same_pair":
+		for i in b.board.cells.size():
+			var first: CharInstance = b.board.cells[i]
+			if first == null or path.has(b.board.to_xy(i)) or first.pinned or first.temporary or not first.is_player_owned():
+				continue
+			for j in range(i + 1, b.board.cells.size()):
+				var second: CharInstance = b.board.cells[j]
+				if second != null and not path.has(b.board.to_xy(j)) and second.is_player_owned() and not second.pinned and not second.temporary and second.glyph_list() == first.glyph_list():
+					return {"tile": b.board.to_xy(i), "tile2": b.board.to_xy(j)}
+		return {}
+	if needs == "bag" and path.size() == 1:
+		var source := b.board.get_xy(path[0])
+		var candidates := b.solo_bag_candidates(source)
+		return {"bag_uid": candidates[0].uid, "bag_source_uid": source.uid} if not candidates.is_empty() else {}
+	if needs == "tile" and path.size() == 1:
+		var source := b.board.get_xy(path[0])
+		if source != null and source.glyph_list().size() == 1 and source.data.solo_handler in ["cleanse_adjacent", "wash_adjacent", "move_neighbor", "split_neighbor", "recast_neighbor", "refine_junk_neighbor"]:
+			var candidates := b.solo_target_cells(source, path[0])
+			return {"tile": candidates[0]} if not candidates.is_empty() else {}
 	match needs:
+		"throw":
+			if path.size() == 1:
+				var source := b.board.get_xy(path[0])
+				var candidates := b.solo_target_cells(source, path[0])
+				var destinations := b.solo_throw_destinations(source, path[0])
+				if not candidates.is_empty() and not destinations.is_empty():
+					return {"tile": candidates[0], "tile2": destinations[0], "throw_uid": b.board.get_xy(candidates[0]).uid}
+		"three":
+			var cells: Array = []
+			var seen := {}
+			for i in b.board.cells.size():
+				var inst: CharInstance = b.board.cells[i]
+				var pos := b.board.to_xy(i)
+				if inst == null or inst.pinned or path.has(pos) or seen.has(inst.uid):
+					continue
+				seen[inst.uid] = true
+				cells.append(pos)
+				if cells.size() == 3:
+					return {"cells": cells}
 		"tile", "enemy":
 			for i in b.board.cells.size():
 				var inst: CharInstance = b.board.cells[i]

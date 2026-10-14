@@ -3,11 +3,20 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_o0bnc"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_abwmr"]
 
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("2_abwmr")
+kind = 29
+handler = "move_neighbor"
+target = 5
+note = "选择原格四邻的一枚非固定字，移入本字腾出的格子"
+
 [resource]
 script = ExtResource("1_o0bnc")
 id = "zhuan"
 glyph = "转"
 pinyin = "zhuan"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "选择原格四邻的一枚非固定字，移入本字腾出的格子"
 tags = Array[String](["space"])
+solo_effects = Array[ExtResource("2_abwmr")]([SubResource("Effect")])
+solo_handler = "move_neighbor"
 rarity = 1

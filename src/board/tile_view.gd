@@ -149,6 +149,12 @@ func _refresh() -> void:
 		badges.append("金")
 	if instance.temporary:
 		badges.append("临")
+	if instance.word_only:
+		badges.append("词")
+	if instance.refined:
+		badges.append("炼")
+	if instance.pinned:
+		badges.append("歇" if instance.pinned_exhausted else "固")
 	for pid in instance.pollutions:
 		var pd: PollutionData = Database.get_pollution(pid)
 		if pd != null:

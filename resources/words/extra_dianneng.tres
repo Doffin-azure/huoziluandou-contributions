@@ -9,18 +9,18 @@ kind = 28
 handler = "ability_electric_material"
 amount = 1
 timing = "persistent"
-note = "本场持续：每消耗 2 储能生成临时【电】"
+note = "本场每累计消耗2储能，在随机空格生成1枚临时【电】，用后移除；满盘时不生成。"
 
 [resource]
 script = ExtResource("2_6ojuc")
 id = "extra_dianneng"
 word = "电能"
 glyphs = Array[String](["电", "能"])
-description = "本场持续：每累计消耗 2 点储能，就在随机空格生成一枚一次性临时【电】"
+description = "本场每累计消耗2储能，在随机空格生成1枚临时【电】，用后移除；满盘时不生成。"
 effects = Array[ExtResource("1_mcg5x")]([SubResource("Resource_rfo7s")])
 group = "蓄放"
 design_stage = "设计负责人新增"
-effect_summary = "本场持续：每累计消耗 2 点储能，就在随机空格生成一枚一次性临时【电】"
+effect_summary = "本场每累计消耗2储能，在随机空格生成1枚临时【电】，用后移除；满盘时不生成。"
 effect_handler_id = "ability_electric_material"
 priority = "蓄放"
 implemented = true

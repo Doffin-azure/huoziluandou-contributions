@@ -8,18 +8,18 @@ script = ExtResource("1_u7ex4")
 kind = 14
 handler = "heat_cleanse"
 amount = 2
-note = "热度 -2 并清除灼热污染"
+note = "热度-2；清除当前盘面全部灼热标签，字袋、弃字堆不净化。"
 
 [resource]
 script = ExtResource("2_okrv8")
 id = "w059"
 word = "清热"
 glyphs = Array[String](["清", "热"])
-description = "降热并处理灼热污染的方向"
+description = "热度-2；清除当前盘面全部灼热标签，字袋、弃字堆不净化。"
 effects = Array[ExtResource("1_u7ex4")]([SubResource("Resource_wl48l")])
 group = "热暴"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "降热并处理灼热污染的方向"
+effect_summary = "热度-2；清除当前盘面全部灼热标签，字袋、弃字堆不净化。"
 effect_handler_id = "heat_cleanse"
 p25_implemented = true
 implementation_delta = "P25降低热并清全盘污染；后来讨论倾向专门处理灼热字"

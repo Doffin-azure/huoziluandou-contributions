@@ -7,18 +7,18 @@
 script = ExtResource("1_ptene")
 kind = 29
 handler = "reverse_line"
-note = "选择一整行或一整列，倒转其 4 格（含空格与完整叠层）"
+note = "选择一行或一列，倒转其中4格，包含空格和完整叠层；有固定字的行列不可选择。"
 
 [resource]
 script = ExtResource("2_n8q2c")
 id = "w082"
 word = "反转"
 glyphs = Array[String](["反", "转"])
-description = "P23初稿：敌方下一次注入字的归属被反转"
+description = "选择一行或一列，倒转其中4格，包含空格和完整叠层；有固定字的行列不可选择。"
 effects = Array[ExtResource("1_ptene")]([SubResource("Resource_a07se")])
 group = "夺字"
 design_stage = "P23初稿；未完成分组复审"
-effect_summary = "P23初稿：敌方下一次注入字的归属被反转"
+effect_summary = "选择一行或一列，倒转其中4格，包含空格和完整叠层；有固定字的行列不可选择。"
 effect_handler_id = "reverse_line"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P4·待复审"

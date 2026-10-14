@@ -7,18 +7,18 @@
 script = ExtResource("1_3fcgm")
 kind = 29
 handler = "lights_on"
-note = "来电了"
+note = "彩蛋：解除停电，恢复照明。"
 
 [resource]
 script = ExtResource("2_14tle")
 id = "extra_kaideng"
 word = "开灯"
 glyphs = Array[String](["开", "灯"])
-description = "彩蛋词：来电了"
+description = "彩蛋：解除停电，恢复照明。"
 effects = Array[ExtResource("1_3fcgm")]([SubResource("Resource_4tn7a")])
 group = "彩蛋"
 design_stage = "设计负责人新增"
-effect_summary = "彩蛋词：来电了"
+effect_summary = "彩蛋：解除停电，恢复照明。"
 effect_handler_id = "lights_on"
 priority = "彩蛋"
 implemented = true

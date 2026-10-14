@@ -8,18 +8,18 @@ script = ExtResource("1_padbu")
 kind = 29
 handler = "rotate_repeat"
 target = 6
-note = "选择 2×2，点「发动」每次旋转一次（最多 3 次）"
+note = "选一块2×2区域旋转一次；可再发动两次，第二、三次各增加1热度。"
 
 [resource]
 script = ExtResource("2_fk7bg")
 id = "extra_zhuansu"
 word = "转速"
 glyphs = Array[String](["转", "速"])
-description = "选择一块 2×2 区域，点「发动」连续旋转；最多 3 次，第 2、3 次各增加 1 热度"
+description = "选一块2×2区域旋转一次；可再发动两次，第二、三次各增加1热度。"
 effects = Array[ExtResource("1_padbu")]([SubResource("Resource_37i83")])
 group = "空间"
 design_stage = "设计负责人新增"
-effect_summary = "选择一块 2×2 区域，点「发动」连续旋转；最多 3 次，第 2、3 次各增加 1 热度"
+effect_summary = "选一块2×2区域旋转一次；可再发动两次，第二、三次各增加1热度。"
 effect_handler_id = "rotate_repeat"
 requires_target = 6
 priority = "空间"

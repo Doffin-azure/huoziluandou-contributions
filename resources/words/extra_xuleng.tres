@@ -7,18 +7,18 @@
 script = ExtResource("1_uvybw")
 kind = 29
 handler = "overheat_shield"
-note = "下次过热抵消 4 点污染【热】"
+note = "本场下一次溢热时，抵消最多4枚本应生成的灼热【热】；触发后机会消耗，未用满的额度不保留。"
 
 [resource]
 script = ExtResource("2_dxcnc")
 id = "extra_xuleng"
 word = "蓄冷"
 glyphs = Array[String](["蓄", "冷"])
-description = "获得一次性状态：下次过热时抵消最多 4 点污染【热】的溢出量"
+description = "本场下一次溢热时，抵消最多4枚本应生成的灼热【热】；触发后机会消耗，未用满的额度不保留。"
 effects = Array[ExtResource("1_uvybw")]([SubResource("Resource_1hpf7")])
 group = "蓄放"
 design_stage = "设计负责人新增"
-effect_summary = "获得一次性状态：下次过热时抵消最多 4 点污染【热】的溢出量"
+effect_summary = "本场下一次溢热时，抵消最多4枚本应生成的灼热【热】；触发后机会消耗，未用满的额度不保留。"
 effect_handler_id = "overheat_shield"
 priority = "蓄放"
 implemented = true

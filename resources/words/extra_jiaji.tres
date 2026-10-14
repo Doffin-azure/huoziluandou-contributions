@@ -7,18 +7,18 @@
 script = ExtResource("1_43mjm")
 kind = 29
 handler = "next_draw_bonus_two"
-note = "立即补 2 字"
+note = "立即随机补至多2字。"
 
 [resource]
 script = ExtResource("2_co3ui")
 id = "extra_jiaji"
 word = "加急"
 glyphs = Array[String](["加", "急"])
-description = "立即从字袋补入 2 枚字（候选）"
+description = "立即随机补至多2字。"
 effects = Array[ExtResource("1_43mjm")]([SubResource("Resource_xfh6o")])
 group = "流转"
 design_stage = "设计负责人新增"
-effect_summary = "立即从字袋补入 2 枚字（候选）"
+effect_summary = "立即随机补至多2字。"
 effect_handler_id = "next_draw_bonus_two"
 priority = "流转"
 implemented = true

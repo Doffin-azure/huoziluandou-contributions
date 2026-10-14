@@ -8,22 +8,25 @@ script = ExtResource("1_8s2xt")
 kind = 29
 handler = "heat_to_bonus"
 amount = 2
-args = {
-"per": 2
-}
-note = "当前热度转为下一次攻击强化（每点 +2）"
+target = 0
+timing = "immediate"
+note = "消耗全部热度，每点使下一次攻击的每段伤害 +2，跨回合保留至兑现"
+args = {"per": 2}
 
 [resource]
 script = ExtResource("2_78e0p")
 id = "w048"
 word = "热力"
 glyphs = Array[String](["热", "力"])
-description = "把热度转成攻击强化"
+description = "消耗全部热度，每点使下一次攻击的每段伤害 +2，跨回合保留至兑现"
 effects = Array[ExtResource("1_8s2xt")]([SubResource("Resource_wcmrk")])
 group = "蓄放"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "把热度转成攻击强化"
+effect_summary = "消耗全部热度，每点使下一次攻击的每段伤害 +2，跨回合保留至兑现"
 effect_handler_id = "heat_to_bonus"
-implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+implementation_delta = "已按 2026-10-14 确认方案更新"
 priority = "P3·补全词效"
 implemented = true
+requires_target = 0
+interaction = ""
+timing = "immediate"

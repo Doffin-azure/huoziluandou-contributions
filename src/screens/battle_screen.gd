@@ -34,12 +34,21 @@ var _effects: BattleEffects
 var _target_index := 0
 var _pending_path: Array = []
 var _ready_action: Dictionary = {}   ## 待发动：已选好路径+目标，点「发动」才执行
-var _recast_three_active := false    ## 再铸：正在选 3 个盘面字
+var _recast_three_active := false    ## 再铸/重连共用三字选择
 var _recast_three_cells: Array = []
+var _three_tiles_word := ""
 var _collect_own_active := false     ## 收心：正在选盘面牌回袋
 var _collect_own_cells: Array = []
+var _collect_junk := false
+var _word_transfer_target: Dictionary = {}
 var _compound_picker_active := false ## 复合：正在选保留的临时字
+var _solo_release_picker_active := false ## 放：正在选择是否消耗储能
+var _solo_bag_picker_active := false ## 精/购：按原实体选择字袋字。
+var _solo_throw_active := false
+var _solo_throw_from := Vector2i(-1, -1)
+var _solo_throw_uid: int = -1
 var _manual_draw_picks: Array = []   ## 精心：已选的定向字
+var _manual_draw_active := false
 var _current_word: WordData
 var _transform_uid := -1
 var _fuse_stage := 0
@@ -404,12 +413,14 @@ func _on_log(text: String) -> void:
 
 
 # ---------------------------------------------------------------- 独立词效预览
-func _on_selection_changed(path: Array, glyphs: Array, word: WordData) -> void:
+func _on_selection_changed(path: Array, glyphs: Array, word: WordData, preview_target: Dictionary = {}) -> void:
 	if glyphs.is_empty():
 		_current_word = null
 		_bubble.set_idle(_preview_hint())
 		_update_input()
 		return
+	if word == null and glyphs.size() >= 2:
+		word = EffectPreview.word_for(glyphs)
 	var word_changed := _current_word != word
 	_current_word = word
 	var text := ""
@@ -424,22 +435,17 @@ func _on_selection_changed(path: Array, glyphs: Array, word: WordData) -> void:
 		if glyphs.size() >= 2:
 			_bubble.set_text("「%s」" % text, "不成词。调整路径后重试，不消耗字块。", SpeechBubble.State.ERROR)
 		else:
-			var cd: CharacterData = null
 			var inst: CharInstance = battle.board.get_xy(path[0])
-			if inst != null:
-				cd = inst.data
-			_bubble.set_text("「%s」" % text, "单字：%s" % (cd.description if cd != null else ""), SpeechBubble.State.PREVIEW)
+			var solo_description := EffectPreview.solo_text(inst, battle, path, preview_target)
+			_bubble.set_text("「%s」" % text, "单字：%s" % solo_description, SpeechBubble.State.PREVIEW)
 		return
 	if not word.implemented:
 		_bubble.set_text("《%s》" % word.word, "效果待定。", SpeechBubble.State.PREVIEW)
 		return
-	var parts: Array = []
-	for eff in word.effects:
-		parts.append(eff.describe().replace("；", "\n"))
 	var req := ""
-	if word.requires_target != EffectData.Target.NONE:
+	if preview_target.is_empty() and (word.requires_target != EffectData.Target.NONE or not word.interaction.is_empty()):
 		req = "　→ 需选目标"
-	var body_text: String = "\n".join(parts) if not parts.is_empty() else word.effect_summary
+	var body_text := EffectPreview.word_text(word, battle, path, preview_target)
 	_bubble.set_text("《%s》" % word.word, "%s%s" % [body_text, req], SpeechBubble.State.PREVIEW)
 
 
@@ -464,7 +470,11 @@ func _on_enemy_clicked(index: int) -> void:
 		return
 	_target_index = index
 	_refresh_intents()
-	_bubble.set_context(_selection_context(_board_view.path))
+	var path: Array = _ready_action.get("path", _board_view.path)
+	if not path.is_empty():
+		_on_selection_changed(path, battle.board.glyphs_of(path), EffectPreview.word_for(battle.board.glyphs_of(path)), _ready_action.get("target", {}))
+	else:
+		_bubble.set_context(_selection_context(path))
 
 
 func _on_primary() -> void:
@@ -473,6 +483,7 @@ func _on_primary() -> void:
 	if _collect_own_active:
 		var cp := _pending_path
 		_collect_own_active = false
+		_collect_junk = false
 		var cells := _collect_own_cells.duplicate()
 		_collect_own_cells = []
 		_board_view.end_pick()
@@ -515,6 +526,7 @@ func _on_primary() -> void:
 func _fill_ready(path: Array, target: Dictionary) -> void:
 	_pending_path = []
 	_ready_action = {"path": path, "target": target}
+	_on_selection_changed(path, battle.board.glyphs_of(path), EffectPreview.word_for(battle.board.glyphs_of(path)), target)
 	_update_input()
 
 
@@ -528,9 +540,17 @@ func _on_clear_cancel() -> void:
 
 
 func _on_commit(path: Array, target: Dictionary = {}) -> void:
-	if _finished or _compound_picker_active or _busy or (_modal_count > 0 and target.is_empty()):
+	if _finished or _compound_picker_active or _solo_release_picker_active or _solo_bag_picker_active or _busy or (_modal_count > 0 and target.is_empty()):
 		return
 	if _board_view.pick_mode != "" and _ready_action.is_empty():
+		return
+	if _choose_solo_release(path, target):
+		return
+	if _choose_solo_throw(path, target):
+		return
+	if _choose_solo_bag(path, target):
+		return
+	if _choose_word_transfer(path, target):
 		return
 	if target.is_empty() and _current_word != null and not _current_word.interaction.is_empty():
 		match _current_word.interaction:
@@ -562,10 +582,13 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 				_run_merge_flow(path)
 				return
 			"choose_three_tiles":
-				_run_recast_three(path)
+				_run_three_tiles(path, _current_word.word)
 				return
 			"choose_own_tiles":
 				_run_collect_own(path)
+				return
+			"choose_junk_tiles":
+				_run_collect_own(path, true)
 				return
 	if _choose_compound_copy(path, target):
 		return
@@ -575,7 +598,7 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 	var needs_target := word_before != null and word_before.requires_target != EffectData.Target.NONE
 	if glyphs_before.size() == 1 and not path.is_empty():
 		var inst: CharInstance = battle.board.get_xy(path[0])
-		needs_target = inst != null and inst.data != null and battle._solo_requires_target(inst.data) != EffectData.Target.NONE
+		needs_target = inst != null and inst.data != null and battle._solo_requires_target(inst.data, path) != EffectData.Target.NONE
 	if not play_target.is_empty() or not needs_target:
 		# 规则层索引针对存活列表；HUD 索引针对固定敌人列表。
 		play_target["target_index"] = battle.alive_enemies().find(battle.enemies[_target_index]) if not battle.enemies.is_empty() else 0
@@ -656,7 +679,7 @@ func _handle_effect_requests() -> bool:
 		_show_blackout()
 	if battle.end_turn_requested:
 		battle.end_turn_requested = false
-		_on_end_turn()
+		_on_end_turn(true)
 		return true
 	return false
 
@@ -673,46 +696,87 @@ func _request_target(target_kind: int) -> void:
 	match target_kind:
 		EffectData.Target.BOARD_2X2:
 			_board_view.begin_pick("2x2")
+		EffectData.Target.BOARD_3X3:
+			_board_view.begin_pick("3x3")
+		EffectData.Target.BOARD_ROW:
+			_run_line_pick(_pending_path, true)
 		EffectData.Target.EMPTY_TILE:
 			_board_view.begin_pick("empty")
 		EffectData.Target.ENEMY_GLYPH:
 			_board_view.begin_pick("enemy")
 		EffectData.Target.BOARD_TILE:
-			_board_view.begin_pick("any")
+			var inst: CharInstance = battle.board.get_xy(_pending_path[0]) if _pending_path.size() == 1 else null
+			if inst != null and inst.glyph_list().size() == 1 and inst.data.solo_handler in ["cleanse_adjacent", "wash_adjacent", "move_neighbor", "split_neighbor", "recast_neighbor", "refine_junk_neighbor"]:
+				var candidates := battle.solo_target_cells(inst, _pending_path[0])
+				var excluded: Array = []
+				for i in battle.board.cells.size():
+					var pos := battle.board.to_xy(i)
+					if not candidates.has(pos):
+						excluded.append(pos)
+				_board_view.begin_pick("any", false, excluded)
+			else:
+				_board_view.begin_pick("any")
 		EffectData.Target.DISCARD_GLYPH:
 			_choose_discard()
+		EffectData.Target.BAG_GLYPH:
+			_choose_solo_bag(_pending_path, {})
 
 
 func _on_tile_picked(pos: Vector2i) -> void:
+	if not _word_transfer_target.is_empty():
+		var path := _pending_path
+		var chosen := _word_transfer_target.duplicate()
+		_word_transfer_target.clear()
+		chosen["tile"] = pos
+		_fill_ready(path, chosen)
+		return
+	if _solo_throw_active:
+		if _solo_throw_from == Vector2i(-1, -1):
+			_solo_throw_from = pos
+			_solo_throw_uid = battle.board.get_xy(pos).uid
+			var origin := battle.board.get_xy(_pending_path[0])
+			_pick_only("throw_destination", battle.solo_throw_destinations(origin, _pending_path[0]))
+			_on_log("投：选择落点空格（可选本字发动后腾出的原格）")
+		else:
+			var path := _pending_path
+			var chosen := {"tile": _solo_throw_from, "tile2": pos, "throw_uid": _solo_throw_uid}
+			_solo_throw_active = false
+			_solo_throw_from = Vector2i(-1, -1)
+			_solo_throw_uid = -1
+			_fill_ready(path, chosen)
+		return
 	if _collect_own_active:
 		if battle.board.get_xy(pos) == null:
+			return
+		if _collect_junk and (_pending_path.has(pos) or not BattleState.is_refinable_junk(battle.board.get_xy(pos))):
 			return
 		if _collect_own_cells.has(pos):
 			_collect_own_cells.erase(pos)   # 再点已选格 = 取消该格
 		else:
+			if _collect_junk and _collect_own_cells.size() >= 2:
+				return
 			_collect_own_cells.append(pos)
-		_on_log("收心：已选 %d 枚（再点可取消），点「发动」结束" % _collect_own_cells.size())
+		_on_log("%s：已选 %d 枚（再点可取消），点「发动」结束" % ["分流" if _collect_junk else "收心", _collect_own_cells.size()])
 		_update_input()
 		return
 	if _recast_three_active:
 		var rc: CharInstance = battle.board.get_xy(pos)
-		if rc == null:
-			_on_log("再铸：请选有字的格子（%d/3）" % _recast_three_cells.size())
+		if rc == null or rc.pinned or _pending_path.has(pos):
+			_on_log("%s：请选择施词以外的非固定字（%d/3）" % [_three_tiles_word, _recast_three_cells.size()])
 			return
-		if _recast_three_cells.has(pos):
-			_recast_three_cells.erase(pos)   # 再点已选格 = 取消该格
-			_on_log("再铸：已选 %d/3" % _recast_three_cells.size())
-			return
+		for chosen in _recast_three_cells:
+			var inst := battle.board.get_xy(chosen)
+			if inst != null and inst.uid == rc.uid:
+				return
 		_recast_three_cells.append(pos)
 		if _recast_three_cells.size() >= 3:
 			var rp := _pending_path
 			_recast_three_active = false
 			var cells := _recast_three_cells.duplicate()
 			_recast_three_cells = []
-			_board_view.end_pick()
 			_fill_ready(rp, {"cells": cells})
 		else:
-			_on_log("再铸：已选 %d/3（再点可取消）" % _recast_three_cells.size())
+			_on_log("%s：已选 %d/3（点清除可重新选择）" % [_three_tiles_word, _recast_three_cells.size()])
 			_update_input()
 		return
 	if _merge_active:
@@ -740,7 +804,17 @@ func _on_tile_picked(pos: Vector2i) -> void:
 	if _fuse_stage == 1:
 		_fuse_first = pos
 		_fuse_stage = 2
-		_board_view.begin_pick("own")
+		if _pair_mode == "same":
+			var first := battle.board.get_xy(pos)
+			var matches: Array = []
+			for i in battle.board.cells.size():
+				var other: CharInstance = battle.board.cells[i]
+				var cell := battle.board.to_xy(i)
+				if other != null and cell != pos and not _pending_path.has(cell) and other.is_player_owned() and not other.temporary and not other.pinned and other.glyph_list() == first.glyph_list():
+					matches.append(cell)
+			_pick_only("own", matches)
+		else:
+			_board_view.begin_pick("own")
 		_on_log("再选第二张（%s）" % ("与它相邻" if _pair_mode == "fuse" else "与它相同"))
 		return
 	if _fuse_stage == 2:
@@ -750,7 +824,7 @@ func _on_tile_picked(pos: Vector2i) -> void:
 		else:
 			var c1: CharInstance = battle.board.get_xy(_fuse_first)
 			var c2: CharInstance = battle.board.get_xy(pos)
-			ok = c2 != null and pos != _fuse_first and c1 != null and c2.glyph() == c1.glyph()
+			ok = c2 != null and pos != _fuse_first and c1 != null and c2.glyph_list() == c1.glyph_list() and not c1.temporary and not c2.temporary and not c1.pinned and not c2.pinned and not _pending_path.has(pos) and not _pending_path.has(_fuse_first)
 		if not ok:
 			_board_view.begin_pick("own")
 			_on_log("选择不合法，请重选第二张")
@@ -773,6 +847,27 @@ func _on_tile_picked(pos: Vector2i) -> void:
 
 
 func _run_pair(path: Array, mode: String) -> void:
+	if mode == "same":
+		var candidates: Array = []
+		for i in battle.board.cells.size():
+			var first: CharInstance = battle.board.cells[i]
+			var pos := battle.board.to_xy(i)
+			if first == null or path.has(pos) or not first.is_player_owned() or first.temporary or first.pinned:
+				continue
+			for j in battle.board.cells.size():
+				var second: CharInstance = battle.board.cells[j]
+				if i != j and not path.has(battle.board.to_xy(j)) and second != null and second.is_player_owned() and not second.temporary and not second.pinned and first.glyph_list() == second.glyph_list():
+					candidates.append(pos)
+					break
+		if candidates.is_empty():
+			_bubble.set_error("精炼：需要两枚施词以外、字形相同的己方原实体")
+			return
+		_pending_path = path
+		_pair_mode = mode
+		_fuse_stage = 1
+		_pick_only("own", candidates)
+		_on_log("精炼：选择要持续强化的第一枚实体")
+		return
 	_pending_path = path
 	_pair_mode = mode
 	_fuse_stage = 1
@@ -783,14 +878,14 @@ func _run_pair(path: Array, mode: String) -> void:
 func _open_discard_place(path: Array) -> void:
 	var list := battle.discard_instances()
 	if list.is_empty():
-		_on_log("精铸：弃字堆为空")
+		_on_log("放回：弃字堆为空")
 		return
 	_pending_path = path
 	var options: Array = []
 	for d in list:
 		options.append({"text": "【%s】" % d["glyph"]})
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "精铸：选择弃字堆中的一枚己方字", "options": options})
+	overlay.setup({"title": "放回：选择弃字堆中的一枚己方字", "options": options})
 	overlay.chose.connect(_on_discard_place_chosen.bind(list))
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_mount_overlay(overlay)
@@ -802,7 +897,7 @@ func _on_discard_place_chosen(index: int, list: Array) -> void:
 		return
 	_pending_place_uid = int(list[index]["uid"])
 	_board_view.begin_pick("empty")
-	_on_log("精铸：选择放置的空格")
+	_on_log("放回：选择放置的空格")
 
 
 func _on_pick_cancelled() -> void:
@@ -817,38 +912,195 @@ func _on_pick_cancelled() -> void:
 	_ready_action = {}
 	_recast_three_active = false
 	_recast_three_cells = []
+	_three_tiles_word = ""
 	_collect_own_active = false
 	_collect_own_cells = []
+	_collect_junk = false
+	_word_transfer_target.clear()
+	_solo_throw_active = false
+	_solo_throw_from = Vector2i(-1, -1)
+	_solo_throw_uid = -1
 	if battle.repeat_rotate_tile.x >= 0:
 		battle.end_repeat_rotate()   # 转速：点「清除」= 提前停下
 
 
-func _run_line_pick(path: Array) -> void:
+func _run_line_pick(path: Array, rows_only := false) -> void:
 	_pending_path = path
 	var options: Array = []
-	for i in 4:
+	for i in battle.board.size:
 		options.append({"text": "第 %d 行" % (i + 1)})
-	for i in 4:
-		options.append({"text": "第 %d 列" % (i + 1)})
+	if not rows_only:
+		for i in battle.board.size:
+			options.append({"text": "第 %d 列" % (i + 1)})
+	var word_name := _current_word.word if _current_word != null else "目标选择"
 	var ov := ChoiceOverlay.new()
-	ov.setup({"title": "反转：选择一行或一列", "options": options})
-	ov.chose.connect(_on_line_chosen)
+	ov.setup({"title": "%s：选择%s" % [word_name, "一行" if rows_only else "一行或一列"], "options": options})
+	ov.chose.connect(_on_line_chosen.bind(rows_only))
 	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_mount_overlay(ov)
 
 
-func _on_line_chosen(index: int) -> void:
+func _on_line_chosen(index: int, rows_only := false) -> void:
 	var p := _pending_path
 	_pending_path = []
-	if index < 0 or index >= 8:
+	var n := battle.board.size
+	if index < 0 or index >= (n if rows_only else n * 2):
 		return
 	var t: Dictionary = {}
-	if index < 4:
+	if index < n:
 		t["row"] = index
 	else:
-		t["col"] = index - 4
+		t["col"] = index - n
 	_on_commit(p, t)
 
+
+func _pick_only(mode: String, allowed: Array) -> void:
+	var excluded: Array = []
+	for i in battle.board.cells.size():
+		var pos := battle.board.to_xy(i)
+		if not allowed.has(pos):
+			excluded.append(pos)
+	_board_view.begin_pick(mode, false, excluded)
+
+func _choose_solo_throw(path: Array, target: Dictionary) -> bool:
+	if target.has("tile2") or path.size() != 1 or not battle.board.valid_path(path):
+		return false
+	var inst := battle.board.get_xy(path[0])
+	if inst == null or inst.word_only or inst.glyph_list().size() != 1 or inst.data.solo_handler != "throw_neighbor":
+		return false
+	var candidates := battle.solo_target_cells(inst, path[0])
+	if candidates.is_empty():
+		return false
+	var due := EffectUtil.discounted_cost(battle, 1)
+	if EffectUtil.available(battle) < due or battle.solo_throw_destinations(inst, path[0]).is_empty():
+		_bubble.set_error("投：需要可用空格与 %d 金币支付额" % due)
+		return true
+	_pending_path = path
+	_solo_throw_active = true
+	_solo_throw_from = Vector2i(-1, -1)
+	_solo_throw_uid = -1
+	_pick_only("any", candidates)
+	_on_log("投：选择一枚四邻非固定字，发动时支付 %d" % due)
+	_update_input()
+	return true
+
+## 精/购预览现有字袋实体，选择与取消均不提前改变任何资源。
+func _choose_word_transfer(path: Array, target: Dictionary) -> bool:
+	if not target.is_empty() or not battle.board.valid_path(path):
+		return false
+	var glyphs := battle.board.glyphs_of(path)
+	var word := Database.get_word_by_glyphs(glyphs)
+	if word == null and glyphs.has("过"):
+		word = Database.get_word_by_glyphs(glyphs.filter(func(g): return g != "过"))
+	if word == null or word.word not in ["投放", "回购"]:
+		return false
+	var deploying := word.word == "投放"
+	var cards := EffectHandlersActions.deploy_candidates(battle) if deploying else battle.discard.filter(func(c): return c.is_player_owned() and not c.temporary)
+	if cards.is_empty():
+		_on_commit(path, {"skip_transfer": true})
+		return true
+	if EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, 2):
+		_bubble.set_error("%s：需要 2 金币支付额" % word.word)
+		return true
+	var spaces := battle.board.empty_indices()
+	for pos in path:
+		var inst := battle.board.get_xy(pos)
+		if not inst.pinned and inst.temporary_uses == 0:
+			spaces.append(pos)
+	if spaces.is_empty():
+		_bubble.set_error("%s：没有可用落点" % word.word)
+		return true
+	var options: Array = []
+	for card in cards:
+		options.append({"text": "【%s】 · 额外使用 +1" % "".join(card.glyph_list())})
+	options.append({"text": "取消"})
+	var overlay := ChoiceOverlay.new()
+	_solo_bag_picker_active = true
+	overlay.setup({"title": "%s：选择原实体" % word.word, "body": "选字、选落点后确认时支付 2；保留原实体属性。", "options": options})
+	overlay.chose.connect(func(index):
+		_solo_bag_picker_active = false
+		if index < 0 or index >= cards.size():
+			return
+		_pending_path = path.duplicate()
+		_word_transfer_target = {"bag_uid": cards[index].uid} if deploying else {"place_uid": cards[index].uid}
+		_pick_only("throw_destination", spaces)
+		_on_log("%s：选择落点，再点确认发动" % word.word))
+	_mount_overlay(overlay)
+	return true
+
+func _choose_solo_bag(path: Array, target: Dictionary) -> bool:
+	if target.has("bag_uid") or path.size() != 1 or not battle.board.valid_path(path):
+		return false
+	var source := battle.board.get_xy(path[0])
+	if source == null or source.word_only or source.glyph_list().size() != 1 or source.data.solo_handler not in ["precision_draw", "buy_bag_solo"]:
+		return false
+	var cards := battle.solo_bag_candidates(source)
+	if cards.is_empty():
+		return false
+	var buying := source.data.solo_handler == "buy_bag_solo"
+	var due := EffectUtil.discounted_cost(battle, 2) if buying else 0
+	if buying and EffectUtil.available(battle) < due:
+		_bubble.set_error("购：支付额不足（需要 %d 金币支付额）" % due)
+		return true
+	if not buying and cards.size() == 1:
+		var chosen := target.duplicate()
+		chosen["bag_uid"] = cards[0].uid
+		chosen["bag_source_uid"] = source.uid
+		_on_commit(path, chosen)
+		return true
+	var options: Array = []
+	for card in cards:
+		var traits: Array = []
+		if card.gilded:
+			traits.append("镀金")
+		if card.temporary:
+			traits.append("临时")
+		if not card.pollutions.is_empty():
+			traits.append("有污染")
+		options.append({"text": "【%s】%s" % ["".join(card.glyph_list()), " · " + "、".join(traits) if not traits.is_empty() else ""]})
+	options.append({"text": "取消"})
+	_solo_bag_picker_active = true
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": "购：选择字袋实体" if buying else "精：二选一补入原格", "body": "确认时支付 %d，保留所选字的原属性。" % due if buying else "选一枚补入原格，另一枚留在字袋。", "options": options})
+	overlay.chose.connect(func(index):
+		_solo_bag_picker_active = false
+		if index == cards.size():
+			return
+		if battle.board.get_xy(path[0]) != source:
+			_bubble.set_error("选字：原字已离开所选格，请重新选择")
+			return
+		var chosen := target.duplicate()
+		chosen["bag_uid"] = cards[index].uid
+		chosen["bag_source_uid"] = source.uid
+		_on_commit(path, chosen))
+	_mount_overlay(overlay)
+	return true
+
+## 放有储能时选择释放或普通攻击；选择/取消前保留字块和资源。
+func _choose_solo_release(path: Array, target: Dictionary) -> bool:
+	if target.has("release_energy") or path.size() != 1 or battle.player.energy < 1 or not battle.board.valid_path(path):
+		return false
+	var inst := battle.board.get_xy(path[0])
+	if inst == null or inst.word_only or inst.glyph_list().size() != 1 or inst.data.solo_handler != "solo_release":
+		return false
+	_solo_release_picker_active = true
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": "放：选择攻击方式", "body": "当前储能：%d" % battle.player.energy, "options": [
+		{"text": "消耗 1 储能，造成 8 伤害", "primary": true},
+		{"text": "不消耗储能，造成 2 伤害"},
+		{"text": "取消"}]})
+	overlay.chose.connect(func(index):
+		_solo_release_picker_active = false
+		if index == 2:
+			return
+		if battle.board.get_xy(path[0]) != inst:
+			_bubble.set_error("放：原字已离开所选格，请重新选择")
+			return
+		var chosen := target.duplicate()
+		chosen["release_energy"] = index == 0
+		_on_commit(path, chosen))
+	_mount_overlay(overlay)
+	return true
 
 ## 复合（next_compound）：让玩家选定要保留为临时字的盘面字，选定前不结算。
 func _choose_compound_copy(path: Array, target: Dictionary) -> bool:
@@ -880,21 +1132,38 @@ func _choose_compound_copy(path: Array, target: Dictionary) -> bool:
 	return true
 
 
-func _run_recast_three(path: Array) -> void:
+func _run_three_tiles(path: Array, word_name: String) -> void:
+	var eligible := {}
+	for i in battle.board.cells.size():
+		var inst: CharInstance = battle.board.cells[i]
+		if inst != null and not inst.pinned and not path.has(battle.board.to_xy(i)):
+			eligible[inst.uid] = true
+	if eligible.size() < 3:
+		_bubble.set_error("%s：需要三个施词以外的非固定字" % word_name)
+		return
 	_pending_path = path
 	_recast_three_active = true
 	_recast_three_cells = []
-	_board_view.begin_pick("any", true)
-	_on_log("再铸：选择 3 个盘面字（再点可取消）")
+	_three_tiles_word = word_name
+	_board_view.begin_pick("three", true, path)
+	_on_log("%s：选择三个不同的非固定字，点清除可重新选择" % word_name)
 	_update_input()
 
 
-func _run_collect_own(path: Array) -> void:
+func _run_collect_own(path: Array, junk := false) -> void:
 	_pending_path = path
 	_collect_own_active = true
+	_collect_junk = junk
 	_collect_own_cells = []
-	_board_view.begin_pick("any", true)
-	_on_log("收心：点选盘面字放回字袋（可 0 张，再点取消），点「发动」结束")
+	if junk:
+		var excluded := path.duplicate()
+		for i in battle.board.cells.size():
+			if not BattleState.is_refinable_junk(battle.board.cells[i]):
+				excluded.append(battle.board.to_xy(i))
+		_board_view.begin_pick("any", true, excluded)
+	else:
+		_board_view.begin_pick("any", true)
+	_on_log("分流：选择至多两枚杂字移出，点「发动」确认" if junk else "收心：点选盘面字放回字袋（可 0 张，再点取消），点「发动」结束")
 	_update_input()
 
 
@@ -1025,8 +1294,9 @@ func _on_discard_chosen(index: int) -> void:
 	_on_commit(path, {"discard_uid": battle.consumed_this_turn[index].uid})
 
 
-func _on_end_turn() -> void:
-	if _finished or _busy or _modal_count > 0:
+func _on_end_turn(from_effect: bool = false) -> void:
+	# 强制结束来自正在结算的出字，不应被该出字自身的 busy 状态挡住。
+	if _finished or (_busy and not from_effect) or _modal_count > 0:
 		return
 	if _board_view.pick_mode != "":
 		_board_view.end_pick()
@@ -1054,19 +1324,34 @@ func _on_end_turn() -> void:
 
 
 func _start_manual_draw() -> void:
+	if _manual_draw_active or battle.manual_draw_pending <= 0:
+		return
+	_manual_draw_active = true
 	_manual_draw_picks = []
+	battle.ensure_bag()
 	_show_manual_draw_pick(1)
 
 
-func _show_manual_draw_pick(n: int) -> void:
-	var total: int = battle.manual_draw_pending
-	if n > total:
-		_finish_manual_draw()
-		return
+func _manual_draw_counts() -> Dictionary:
 	var counts: Dictionary = {}
 	for inst in battle.bag:
 		var g: String = inst.glyph()
 		counts[g] = int(counts.get(g, 0)) + 1
+	for g in _manual_draw_picks:
+		var remaining: int = int(counts.get(g, 0)) - 1
+		if remaining > 0:
+			counts[g] = remaining
+		else:
+			counts.erase(g)
+	return counts
+
+
+func _show_manual_draw_pick(n: int) -> void:
+	var total: int = mini(battle.manual_draw_pending, battle.board.free_count())
+	if n > total:
+		_finish_manual_draw()
+		return
+	var counts := _manual_draw_counts()
 	var glyphs: Array = counts.keys()
 	if glyphs.is_empty():
 		_finish_manual_draw()
@@ -1083,14 +1368,22 @@ func _show_manual_draw_pick(n: int) -> void:
 
 
 func _on_manual_draw_chosen(index: int, glyphs: Array, n: int) -> void:
+	if not _manual_draw_active or n != _manual_draw_picks.size() + 1:
+		return
 	if index < 0 or index >= glyphs.size():
 		_finish_manual_draw()
+		return
+	if int(_manual_draw_counts().get(glyphs[index], 0)) <= 0:
+		_show_manual_draw_pick(n)
 		return
 	_manual_draw_picks.append(glyphs[index])
 	_show_manual_draw_pick(n + 1)
 
 
 func _finish_manual_draw() -> void:
+	if not _manual_draw_active:
+		return
+	_manual_draw_active = false
 	battle.place_manual_draw(_manual_draw_picks)
 	_manual_draw_picks = []
 	_refresh_all()
@@ -1285,8 +1578,11 @@ func _layout() -> void:
 func _update_input() -> void:
 	var locked := _busy or _finished or _modal_count > 0
 	_board_view.set_interactable(not locked, false)
-	if _collect_own_active:
-		_confirm_btn.text = "发动（收心 %d）" % _collect_own_cells.size()
+	if _recast_three_active:
+		_confirm_btn.text = "%s（%d/3）" % [_three_tiles_word, _recast_three_cells.size()]
+		_confirm_btn.disabled = true
+	elif _collect_own_active:
+		_confirm_btn.text = "发动（%s %d）" % ["分流" if _collect_junk else "收心", _collect_own_cells.size()]
 		_confirm_btn.disabled = locked
 	elif not _ready_action.is_empty():
 		if _ready_action.get("repeat_rotate", false):
@@ -1340,7 +1636,12 @@ func _selection_context(path: Array) -> String:
 	var enemy: Combatant = battle.enemies[_target_index] if not battle.enemies.is_empty() else null
 	var target := enemy.display_name if enemy != null and enemy.is_alive() else "无"
 	var cost := _pollution_cost_text(path).strip_edges()
-	return "目标：%s\n%s" % [target, "污染代价：无" if cost.is_empty() else cost]
+	var context := "目标：%s\n%s" % [target, "污染代价：无" if cost.is_empty() else cost]
+	if battle.board.gap_steps_allowed > 0:
+		context += "\n超：下次组词可跨一个横／竖空格。"
+	if battle.board.free_word_link:
+		context += "\n流利：下次组词可按字序点击任意位置，无需相邻。"
+	return context
 
 
 func _watch_combatant(combatant: Combatant) -> void:

@@ -7,26 +7,27 @@
 script = ExtResource("1_wrb01")
 kind = 28
 handler = "ability_reload"
-amount = 3
+amount = 4
+target = 0
 timing = "persistent"
-args = {
-"draw_penalty": 1
-}
-note = "本场热容 +3，此后每回合基础补字 -1"
+note = "本场热容 +4，仅下回合基础补字 -1；重复施放叠加热容和下回合惩罚"
+args = {"draw_penalty": 1}
 
 [resource]
 script = ExtResource("2_adism")
 id = "w064"
 word = "重载"
 glyphs = Array[String](["重", "载"])
-description = "本场热容+3，此后每回合基础补字-1"
+description = "本场热容 +4，仅下回合基础补字 -1；重复施放叠加热容和下回合惩罚"
 effects = Array[ExtResource("1_wrb01")]([SubResource("Resource_li72k")])
 group = "热暴"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "本场热容+3，此后每回合基础补字-1"
+effect_summary = "本场热容 +4，仅下回合基础补字 -1；重复施放叠加热容和下回合惩罚"
 effect_handler_id = "ability_reload"
 timing = "persistent"
 p25_implemented = true
-implementation_delta = "P25数值占位，与其他基于热容的能力联动待测"
+implementation_delta = "已按 2026-10-14 确认方案更新"
 priority = "P1·重点机制"
 implemented = true
+requires_target = 0
+interaction = ""

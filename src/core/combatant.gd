@@ -26,6 +26,8 @@ var temp_funds: int = 0            ## 本回合临时支付额度
 var permanent_damage_reduction: int = 0
 ## 御：本回合每次受伤减免（临时，回合结束清零）
 var turn_damage_reduction: int = 0
+var next_damage_reduction: int = 0 ## 御：下一次受击减伤，触发后清空
+var turn_strength: int = 0         ## 强：仅当前回合的伤害加成
 ## 放心：本回合受到伤害减半（临时，回合结束清零）
 var turn_damage_halve: bool = false
 ## 强心：本场累计「已触发的心力层数」
@@ -63,7 +65,8 @@ func take_damage(amount: int) -> int:
 	if statuses.has("vulnerable"):
 		dmg = int(ceil(dmg * 1.5))
 	if is_player:
-		dmg = max(0, dmg - permanent_damage_reduction - turn_damage_reduction)
+		dmg = max(0, dmg - permanent_damage_reduction - turn_damage_reduction - next_damage_reduction)
+		next_damage_reduction = 0
 	var blocked: int = min(block, dmg)
 	block -= blocked
 	dmg -= blocked

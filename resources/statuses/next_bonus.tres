@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_fsd8i")
 id = "next_bonus"
-name = "加强"
+name = "热力强化"
 glyph = "增"
-description = "下一次攻击每段 +2 伤害。"
+description = "每层使下一次攻击每段伤害+1，整次攻击后消耗；跨回合保留。"
 color = Color(0.23529412, 0.2901961, 0.41960785, 1)

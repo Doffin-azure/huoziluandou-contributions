@@ -8,18 +8,18 @@ script = ExtResource("1_406ai")
 kind = 28
 handler = "joint_funding"
 timing = "persistent"
-note = "本场持续：支付金币发动词效时可用 2 储能抵 1 金币，允许混合支付"
+note = "本场支付金币费用时，先用临时资金，再自动用每2储能抵1金币，余款支付金币。不消耗股权。"
 
 [resource]
 script = ExtResource("2_b5x5b")
 id = "w096"
 word = "合资"
 glyphs = Array[String](["合", "资"])
-description = "允许金币、临时资金、股权混合支付的候选"
+description = "本场支付金币费用时，先用临时资金，再自动用每2储能抵1金币，余款支付金币。不消耗股权。"
 effects = Array[ExtResource("1_406ai")]([SubResource("Resource_cxarw")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "允许金币、临时资金、股权混合支付的候选"
+effect_summary = "本场支付金币费用时，先用临时资金，再自动用每2储能抵1金币，余款支付金币。不消耗股权。"
 effect_handler_id = "joint_funding"
 timing = "persistent"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"

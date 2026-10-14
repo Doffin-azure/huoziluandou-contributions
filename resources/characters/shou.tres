@@ -6,17 +6,17 @@
 [sub_resource type="Resource" id="Resource_msxct"]
 script = ExtResource("2_h8bgm")
 kind = 4
-handler = "draw_random"
+handler = "draw_excluding_source"
 amount = 1
-note = "随机补 1 字"
+note = "随机补 1 字，排除本次打出的实体；没有其他可补字时不补"
 
 [resource]
 script = ExtResource("1_sh2cy")
 id = "shou"
 glyph = "收"
 pinyin = "shou"
-description = "随机补 1 字"
+description = "随机补 1 字，排除本次打出的实体；没有其他可补字时不补"
 tags = Array[String](["flow"])
 solo_effects = Array[ExtResource("2_h8bgm")]([SubResource("Resource_msxct")])
-solo_handler = "draw_random"
+solo_handler = "draw_excluding_source"
 rarity = 2
