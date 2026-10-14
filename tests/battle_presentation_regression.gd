@@ -45,6 +45,11 @@ func _fresh(word: String) -> void:
 	var battle: BattleState = _screen.battle
 	battle.abilities.clear()
 	battle.player.statuses.clear()
+	battle.player.heat = 0
+	battle.player.energy = 0
+	battle.player.heat_capacity = 10
+	battle.player.temp_funds = 0
+	battle.player.equity = 0
 	battle.bag.clear()
 	battle.discard.clear()
 	for index in 16:
@@ -105,6 +110,20 @@ func _run() -> void:
 	var battle: BattleState = _screen.battle
 	var board: BoardView = _screen._board_view
 	_fresh("击破")
+	battle.player.heat = 4
+	battle.player.energy = 3
+	battle.enable_ability("longword_draw", 1)
+	battle.enable_ability("counter", 3)
+	_screen._refresh_all()
+	_ok(_screen._resource_strip.entries[0].value == 4 and _screen._resource_strip.entries[1].value == 3 and _screen._resource_strip.get_child(0).text.is_empty(), "资源控件读取真实数值，只使用图形和数字")
+	_ok(_screen._player_status._buttons.all(func(button): return button.text.is_empty() and button.get_child(0) is BattleSymbol), "能力按钮没有汉字标签，使用独立图形符号")
+	var descriptions_available := StatusDisplay.ABILITY_NAMES.keys().all(func(id): return BattleSymbol.SPECS.has(id))
+	_ok(descriptions_available, "词库中的所有已知能力都有对应图形，没有字形回退")
+	_screen._resource_strip.item_for("heat").pressed.emit()
+	await _frames()
+	_ok(_screen._modal_count == 1 and not board._interactable, "点击资源符号可查看热度说明，浮层不穿透战斗")
+	await _choose_card()
+	await _shot("battle-symbol-hud-desktop")
 	await _shot("battle-refined-desktop")
 	_ok(_screen._selection_actions.get_parent() == _screen.content and _screen._selection_actions.position.y >= board.position.y + board.size.y, "主操作放在字盘下方，脱离左侧预览纸")
 	_ok(not _screen._selection_actions.get_global_rect().intersects(_screen._end_btn.get_global_rect()), "出字与结束回合不会重叠")
@@ -300,7 +319,7 @@ func _run() -> void:
 	battle.enable_ability("manual_draw", 1)
 	battle.player.add_status("poison", 2)
 	_screen._refresh_all()
-	_ok(_screen._player_status.entries.any(func(entry): return entry.id == "ability:counter" and entry.stacks == 3), "反击保留正确层数，精心也出现在能力图标中")
+	_ok(_screen._player_status.entries.any(func(entry): return entry.id == "ability:counter" and entry.stacks == 3 and entry.description.contains("+ 9")), "反击层数与详情中的实际伤害加成一致，精心也有能力图标")
 	await _shot("battle-buffs-desktop")
 	_screen._player_status._show_details()
 	await _frames()
@@ -347,14 +366,45 @@ func _run() -> void:
 		_fresh("击破")
 		battle.enable_ability("longword_draw", 1)
 		battle.enable_ability("counter", 2)
+		battle.player.heat = 4
+		battle.player.energy = 3
 		_screen.params["touch_layout"] = true
 		get_window().size = Vector2i(844, 390)
 		await _frames(5)
 		_screen._refresh_all()
 		await _shot("battle-refined-phone")
+		await _shot("battle-symbol-hud-phone")
 		var factor := float(DisplayServer.window_get_size().y) / get_viewport_rect().size.y
 		_ok(_screen._confirm_btn.size.y * factor >= 47.5 and not _screen._selection_actions.get_global_rect().intersects(_screen._end_btn.get_global_rect()), "小手机字盘下方主操作仍有 48 像素，无按钮重叠")
 		_ok(not _screen._player_status.get_global_rect().intersects(_screen._enemy_panel.get_global_rect()) and _screen._player_status.get_global_rect().end.y <= _screen.get_global_rect().end.y, "手机 Buff 区不覆盖敌人信息且在屏幕内")
+		_ok(_screen._player_status.get_parent() == _screen._player_panel and _screen._player_status.get_global_rect().end.y <= _screen._enemy_panel.get_global_rect().position.y, "手机能力紧跟玩家气血与护盾，不散落在底栏")
+		_ok(not _screen._resource_strip.get_global_rect().intersects(board.get_global_rect()) and not _screen._resource_strip.get_global_rect().intersects(_screen._menu_btn.get_global_rect()), "资源符号位于字盘上方，不遮挡字盘或菜单")
+		_screen._player_status._buttons[0].pressed.emit()
+		await _frames()
+		var close_height := 0.0
+		for child in _screen.get_children():
+			if child is ChoiceOverlay:
+				var close: Button = child.find_children("*", "Button", true, false)[0]
+				close_height = close.size.y * factor
+		_ok(close_height >= 47.5 and _screen._modal_count == 1, "手机单项能力详情有 48 像素关闭区域，并保持输入锁")
+		await _shot("battle-symbol-detail-phone")
+		await _choose_card()
+		battle.player.temp_funds = 456
+		battle.player.equity = 78
+		GameState.gold = 1234
+		battle.player.block = 128
+		battle.player.persistent_block = 256
+		_screen._refresh_all()
+		await _frames()
+		_ok(not _screen._gold_strip.get_global_rect().intersects(_screen._resource_strip.get_global_rect()) and not _screen._gold_strip.get_global_rect().intersects(_screen._turn_label.get_global_rect()), "手机同时显示金币、资金和股权，不与回合或热量挤在一起")
+		_ok(not _screen._player_hp_value.get_global_rect().intersects(_screen._player_block.get_global_rect()), "三位数护盾不覆盖手机气血数值")
+		await _shot("battle-symbol-hud-phone-resources")
+		battle.player.temp_funds = 0
+		battle.player.equity = 0
+		battle.player.block = 0
+		battle.player.persistent_block = 0
+		GameState.gold = 6
+		_screen._refresh_all()
 		_screen._open_menu()
 		await _frames()
 		PauseMenu._instance._open_settings()

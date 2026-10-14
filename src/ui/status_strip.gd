@@ -1,6 +1,6 @@
 extends HBoxContainer
 class_name StatusStrip
-## 原生字印图标：层数常驻，悬停或点击显示完整说明；过多时收进同一详情页。
+## 图形能力符号：只常驻图形和层数，名称与说明放进悬停/点击详情。
 var entries: Array = []
 var _ui_scale := 1.0
 var _signature := ""
@@ -39,37 +39,65 @@ func _rebuild() -> void:
 	var shown := mini(entries.size(), capacity if entries.size() <= capacity else maxi(0, capacity - 1))
 	for index in shown:
 		var entry: Dictionary = entries[index]
-		var button := _badge(str(entry.glyph), cell, entry.color)
+		var button := _badge(str(entry.id), cell, entry.color)
 		button.tooltip_text = "%s · %d 层\n%s" % [entry.name, entry.stacks, entry.description]
-		button.pressed.connect(_show_details)
+		button.pressed.connect(_show_entry.bind(entry))
 		if int(entry.stacks) > 1:
+			var badge := Panel.new()
+			badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			var paper := StyleBoxFlat.new()
+			paper.bg_color = Palette.PAPER
+			paper.set_corner_radius_all(int(6 * _ui_scale))
+			badge.add_theme_stylebox_override("panel", paper)
+			badge.size = Vector2(maxf(16, str(entry.stacks).length() * 6 + 6), 16) * _ui_scale
+			badge.position = Vector2(cell - badge.size.x, -1 * _ui_scale)
+			button.add_child(badge)
 			var count := Ink.label(str(entry.stacks), "", Palette.INK)
 			count.add_theme_font_size_override("font_size", int(11 * _ui_scale))
 			count.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			count.position = Vector2(cell * 0.66, cell * 0.51)
-			button.add_child(count)
+			count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			count.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			badge.add_child(count)
 	if entries.size() > shown:
-		var more := _badge("+%d" % (entries.size() - shown), cell, Palette.INK_SOFT)
+		var more := _badge("more", cell, Palette.INK_SOFT)
 		more.tooltip_text = "查看全部状态与能力"
 		more.pressed.connect(_show_details)
 
 
-func _badge(glyph: String, cell: float, color: Color) -> Button:
-	var button := Ink.button(glyph)
+func _badge(symbol: String, cell: float, color: Color) -> Button:
+	var button := Ink.button("")
 	button.custom_minimum_size = Vector2(cell, cell)
 	button.add_theme_font_override("font", Ink.serif)
 	button.add_theme_font_size_override("font_size", int(19 * _ui_scale))
 	button.add_theme_color_override("font_color", color.darkened(0.18))
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(Palette.PAPER, 0.85)
-	style.border_color = Color(Palette.INK_SOFT, 0.45)
-	style.set_border_width_all(1)
+	style.bg_color = Color.TRANSPARENT
+	style.border_color = Color(Palette.INK_SOFT, 0.0)
 	style.set_corner_radius_all(2)
 	style.set_content_margin_all(0)
 	button.add_theme_stylebox_override("normal", style)
 	add_child(button)
+	var icon := BattleSymbol.new()
+	icon.symbol = symbol
+	icon.ink = color.darkened(0.25)
+	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	icon.offset_left = cell * 0.12
+	icon.offset_top = cell * 0.12
+	icon.offset_right = -cell * 0.12
+	icon.offset_bottom = -cell * 0.12
+	button.add_child(icon)
 	_buttons.append(button)
 	return button
+
+
+func _show_entry(entry: Dictionary) -> void:
+	var host: Node = Router.current
+	if host == null or not host.has_method("_mount_overlay") or bool(host.get("_busy")) or int(host.get("_modal_count")) > 0:
+		return
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": "%s · %d 层" % [entry.name, entry.stacks], "body": entry.description, "hud_details": true, "scroll_body": true, "options": [{"text": "返回战斗", "primary": true}]})
+	host._mount_overlay(overlay)
 
 
 func _show_details() -> void:
@@ -80,7 +108,7 @@ func _show_details() -> void:
 	var lines: Array[String] = []
 	for entry in entries:
 		lines.append("【%s】%d 层\n%s" % [entry.name, entry.stacks, entry.description])
-	overlay.setup({"title": "状态与能力", "body": "\n\n".join(lines), "scroll_body": true, "options": [{"text": "返回战斗", "primary": true}]})
+	overlay.setup({"title": "状态与能力", "body": "\n\n".join(lines), "hud_details": true, "scroll_body": true, "options": [{"text": "返回战斗", "primary": true}]})
 	if host != null and host.has_method("_mount_overlay"):
 		host._mount_overlay(overlay)
 	else:

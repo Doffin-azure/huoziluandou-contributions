@@ -69,6 +69,8 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 					description = "每回合获得 1 点格挡；格挡被击穿时碎裂。"
 				elif id == "guard_inject":
 					description = "下次敌方塞字减少 %d 个。" % value
+				elif id == "counter":
+					description = "敌人整次行动结束后，对首个存活敌人造成剩余临挡 + %d 伤害；发动后消耗全部 %d 层。" % [3 * value, value]
 				elif id == "next_energy_bonus" or id == "next_serial_bonus":
 					description = "下一次攻击额外造成 %d 伤害。" % value
 				elif id == "next_draw_bonus" or id == "vigor_next":

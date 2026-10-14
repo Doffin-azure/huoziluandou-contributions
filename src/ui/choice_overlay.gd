@@ -18,6 +18,7 @@ func _ready() -> void:
 
 
 func _build() -> void:
+	var hud_scale := clampf(get_viewport_rect().size.y / maxf(1, DisplayServer.window_get_size().y), 1.0, 1.85) if cfg.get("hud_details", false) else 1.0
 	var dim := ColorRect.new()
 	dim.color = Color(0.07, 0.06, 0.05, 0.66)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -38,10 +39,16 @@ func _build() -> void:
 	pad.add_child(col)
 
 	if not str(cfg.get("title", "")).is_empty():
-		col.add_child(Ink.h2(str(cfg["title"])))
+		var heading := Ink.h2(str(cfg["title"]))
+		if cfg.get("hud_details", false):
+			heading.add_theme_font_size_override("font_size", int(24 * hud_scale))
+			heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		col.add_child(heading)
 	if not str(cfg.get("body", "")).is_empty():
 		var b := Ink.body(str(cfg["body"]))
 		b.custom_minimum_size.x = 380
+		if cfg.get("hud_details", false):
+			b.add_theme_font_size_override("font_size", int(18 * hud_scale))
 		if cfg.get("scroll_body", false):
 			var scroll := ScrollContainer.new()
 			scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -57,6 +64,9 @@ func _build() -> void:
 	for i in options.size():
 		var opt: Dictionary = options[i]
 		var btn := Ink.button(str(opt.get("text", "选项 %d" % (i + 1))), bool(opt.get("primary", false)))
+		if cfg.get("hud_details", false):
+			btn.custom_minimum_size.y = 48 * hud_scale
+			btn.add_theme_font_size_override("font_size", int(20 * hud_scale))
 		if opt.has("disabled"):
 			btn.disabled = bool(opt["disabled"])
 		btn.pressed.connect(_on_choose.bind(i))

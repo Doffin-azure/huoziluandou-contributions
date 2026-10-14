@@ -9,11 +9,13 @@ var _enemy_widgets: Array[EnemyView] = []
 var _player_hp: StatBar
 var _player_hp_caption: Label
 var _player_hp_value: Label
+var _hp_icon: BattleSymbol
 var _menu_btn: Button
-var _player_block: Label
+var _player_block: ResourceStrip
 var _player_status: StatusStrip
-var _resource_label: Label
-var _pile_label: Label
+var _resource_strip: ResourceStrip
+var _gold_strip: ResourceStrip
+var _pile_label: ResourceStrip
 var _turn_label: Label
 var _bubble: SpeechBubble
 var _confirm_btn: Button
@@ -183,9 +185,10 @@ func _build_topbar() -> Control:
 	bar.add_child(title)
 	_turn_label = Ink.label("回合 1", "Stat")
 	bar.add_child(_turn_label)
-	_resource_label = Ink.label("", "Muted")
-	_resource_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	bar.add_child(_resource_label)
+	_resource_strip = ResourceStrip.new()
+	bar.add_child(_resource_strip)
+	_gold_strip = ResourceStrip.new()
+	bar.add_child(_gold_strip)
 	var rule := Ink.hline()
 	rule.name = "Rule"
 	bar.add_child(rule)
@@ -198,6 +201,11 @@ func _build_topbar() -> Control:
 	_player_hp_caption.add_theme_font_override("font", Ink.serif)
 	_player_hp_caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_player_panel.add_child(_player_hp_caption)
+	_player_hp_caption.hide()
+	_hp_icon = BattleSymbol.new()
+	_hp_icon.symbol = "health"
+	_hp_icon.ink = Palette.VERMILION_DK
+	_player_panel.add_child(_hp_icon)
 	_player_hp_value = Ink.label("", "", Palette.VERMILION_DK)
 	_player_hp_value.add_theme_font_override("font", Ink.serif)
 	_player_hp_value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -205,7 +213,7 @@ func _build_topbar() -> Control:
 	_player_hp = StatBar.new()
 	_player_hp.show_text = false
 	_player_panel.add_child(_player_hp)
-	_player_block = Ink.label("", "Muted")
+	_player_block = ResourceStrip.new()
 	_player_panel.add_child(_player_block)
 	_player_status = StatusStrip.new()
 	_player_panel.add_child(_player_status)
@@ -326,7 +334,7 @@ func _build_bottombar() -> Control:
 	bar.add_child(line)
 	_hint = Ink.label("拖动连词 · 回车出字 · ESC 取消", "Muted")
 	bar.add_child(_hint)
-	_pile_label = Ink.label("", "Muted")
+	_pile_label = ResourceStrip.new()
 	bar.add_child(_pile_label)
 	return bar
 
@@ -369,13 +377,17 @@ func _refresh_intents() -> void:
 
 func _refresh_player() -> void:
 	_show_player_hp(battle.player.hp, battle.player.max_hp)
-	_player_block.text = "临挡 %d · 持久盾 %d" % [battle.player.block, battle.player.persistent_block]
-	var resources: Array[String] = ["热度 %d / %d" % [battle.player.heat, battle.player.heat_capacity], "储能 %d" % battle.player.energy, "金币 %d" % GameState.gold]
+	_show_defense(battle.player.block, battle.player.persistent_block)
+	var resources: Array = [
+		{"id": "heat", "title": "热度", "value": battle.player.heat, "capacity": battle.player.heat_capacity, "color": Palette.VERMILION_DK, "description": "当前 %d / %d。火焰旁刻度显示热量；超过热容会产生灼热字。" % [battle.player.heat, battle.player.heat_capacity]},
+		{"id": "energy", "title": "储能", "value": battle.player.energy, "color": Color("52656d"), "description": "当前储能 %d。用于消耗储能的字与词效。" % battle.player.energy}]
+	var wallet: Array = [{"id": "gold", "title": "金币", "value": GameState.gold, "color": Palette.GOLD_DK, "description": "可用金币 %d，本战获得 %d。" % [GameState.gold, battle.gold_earned]}]
 	if battle.player.temp_funds > 0:
-		resources.append("资金 %d" % battle.player.temp_funds)
+		wallet.append({"id": "temp_funds", "title": "临时资金", "value": battle.player.temp_funds, "color": Palette.GOLD_DK, "description": "本回合可使用的临时资金。"})
 	if battle.player.equity > 0:
-		resources.append("股权 %d" % battle.player.equity)
-	_resource_label.text = "    ".join(resources)
+		wallet.append({"id": "equity", "title": "股权", "value": battle.player.equity, "color": Palette.GOLD_DK, "description": "当前累计股权。"})
+	_resource_strip.set_entries(resources)
+	_gold_strip.set_entries(wallet)
 	_player_status.set_entries(StatusDisplay.collect(battle.player, battle))
 
 
@@ -384,11 +396,18 @@ func _show_player_hp(hp: int, max_hp: int) -> void:
 	_player_hp_value.text = "%d / %d" % [hp, max_hp]
 
 
+func _show_defense(block: int, persistent: int) -> void:
+	_player_block.set_entries([
+		{"id": "block", "title": "临时格挡", "value": block, "color": Color("596065"), "description": "当前临挡 %d，敌方行动后清除。" % block},
+		{"id": "persistent_block", "title": "持久盾", "value": persistent, "color": Palette.GOLD_DK, "description": "当前持久盾 %d，跨回合保留。" % persistent}])
+
+
 func _refresh_piles() -> void:
 	if _pile_label == null:
 		return
-	_pile_label.text = "字袋 %d　·　弃字堆 %d　·　盘面 %d　·　本战金币 +%d" % [
-		battle.bag.size(), battle.discard.size(), battle.board.fill_count(), battle.gold_earned]
+	_pile_label.set_entries([
+		{"id": "bag", "title": "字袋", "value": battle.bag.size(), "color": Palette.INK_SOFT, "description": "字袋中剩余 %d 枚字，盘面现有 %d 枚。" % [battle.bag.size(), battle.board.fill_count()]},
+		{"id": "discard", "title": "弃字堆", "value": battle.discard.size(), "color": Palette.INK_SOFT, "description": "弃字堆中有 %d 枚字。" % battle.discard.size()}])
 
 
 func _on_log(text: String) -> void:
@@ -1376,27 +1395,38 @@ func _layout() -> void:
 	_compact = bool(params.get("touch_layout", false)) or DisplayServer.is_touchscreen_available() or w / maxf(1.0, h) >= 1.95 or w < 1100
 	var ui_scale := clampf(h / maxf(1, DisplayServer.window_get_size().y), 1.0, 1.85) if _compact else 1.0
 	var margin := 24.0
-	var top := 88.0 if not _compact else 66.0
-	var footer := maxf(70.0, (70 * ui_scale if _compact and not _player_status.entries.is_empty() else 48 * ui_scale + 22))
+	var top := 88.0 if not _compact else maxf(66.0, 54 * ui_scale)
+	var footer := maxf(70.0, 48 * ui_scale + 22)
 	var action_h := 48.0 * ui_scale
 	var side := minf(h - top - footer - action_h - 22, w * 0.44)
 	var column := (w - side) * 0.5 - margin * 2
 	var board_x := (w - side) * 0.5
 	_topbar.position = Vector2(margin, 12)
 	_topbar.size = Vector2(w - margin * 2, top - 12)
-	_topbar.get_node("Title").visible = not _compact
+	_topbar.get_node("Title").hide()
 	_topbar.get_node("Title").position = Vector2(320, 0)
 	_topbar.get_node("Title").size = Vector2(150, 36)
-	_turn_label.position = Vector2(320 if not _compact else 8, 36 if not _compact else 4)
-	_turn_label.size = Vector2(120, 32)
+	_turn_label.position = Vector2((w - margin * 2) * 0.5 - 60, 48 * ui_scale if not _compact else 4)
+	_turn_label.size = Vector2(120, 24 * ui_scale)
+	_turn_label.show()
+	_turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_turn_label.add_theme_font_size_override("font_size", int(15 * ui_scale))
 	var menu_width := 80 * ui_scale
 	_menu_btn.position = Vector2(_topbar.size.x - menu_width, 0)
 	_menu_btn.size = Vector2(menu_width, 48 * ui_scale)
 	_menu_btn.custom_minimum_size = _menu_btn.size
 	_menu_btn.add_theme_font_size_override("font_size", int(minf(34, 20 * ui_scale)))
-	_resource_label.position = Vector2(490 if not _compact else 160, 18 if not _compact else 4)
-	_resource_label.size = Vector2(_menu_btn.position.x - _resource_label.position.x - 18, 42)
-	_resource_label.add_theme_font_size_override("font_size", int(minf(24, 15 * ui_scale)))
+	_resource_strip.set_ui_scale(ui_scale)
+	_gold_strip.set_ui_scale(ui_scale, _compact and _gold_strip.entries.size() > 1)
+	var resource_width := _resource_strip.get_combined_minimum_size().x
+	_resource_strip.position = Vector2((w - margin * 2 - resource_width) * 0.5, 0)
+	_resource_strip.size = Vector2(resource_width, 48 * ui_scale)
+	var gold_width := _gold_strip.get_combined_minimum_size().x
+	_gold_strip.position = Vector2(_menu_btn.position.x - gold_width - 28, 0) if not _compact else Vector2(0, 0)
+	_gold_strip.size = Vector2(gold_width, 48 * ui_scale)
+	if _compact:
+		_turn_label.position = Vector2(gold_width + 18 * ui_scale, 12 * ui_scale)
+		_turn_label.size = Vector2(minf(90 * ui_scale, _resource_strip.position.x - _turn_label.position.x - 12 * ui_scale), 24 * ui_scale)
 	_topbar.get_node("Rule").position = Vector2(0, top - 14)
 	_topbar.get_node("Rule").size = Vector2(w - margin * 2, 1)
 	_board_view.position = Vector2(board_x, top + 12)
@@ -1404,47 +1434,51 @@ func _layout() -> void:
 	var right_x := board_x + side + margin
 	if _compact:
 		_player_panel.position = Vector2(margin, top + 12)
-		_player_panel.size = Vector2(column, 58 * ui_scale)
+		_player_panel.size = Vector2(column, (96 if not _player_status.entries.is_empty() else 44) * ui_scale)
 		_enemy_panel.position = Vector2(margin, _player_panel.position.y + _player_panel.size.y + 6 * ui_scale)
-		_enemy_panel.size = Vector2(column, top + side - 48 * ui_scale + 12 - _enemy_panel.position.y - 8 * ui_scale)
+		_enemy_panel.size = Vector2(column, top + side + 12 - _enemy_panel.position.y - 8 * ui_scale)
 		_preview_panel.position = Vector2(right_x, top + 12)
 		_preview_panel.size = Vector2(column, side)
-		_end_btn.position = Vector2(margin, top + side - 48 * ui_scale + 12)
+		_end_btn.position = Vector2(margin, top + side + 22)
 		_end_btn.size = Vector2(column, 48 * ui_scale)
 	else:
 		_player_panel.position = Vector2(margin + 8, 12)
-		_player_panel.size = Vector2(280, 76)
+		_player_panel.size = Vector2(460, 76)
 		_enemy_panel.position = Vector2(right_x, top + 12)
 		_enemy_panel.size = Vector2(column, side)
 		_preview_panel.position = Vector2(margin, top + 46)
 		_preview_panel.size = Vector2(column, side - 48)
 		_end_btn.position = Vector2(w - margin - 196, h - 60)
 		_end_btn.size = Vector2(196, 48)
-	_player_hp_caption.position = Vector2.ZERO
-	_player_hp_caption.size = Vector2(110 * ui_scale, 42 * ui_scale)
-	_player_hp_caption.add_theme_font_size_override("font_size", int(minf(28, 17 * ui_scale)))
-	_player_hp_value.position = Vector2(110 * ui_scale, 0)
-	_player_hp_value.size = Vector2(_player_panel.size.x - 110 * ui_scale, 44 * ui_scale)
+	_hp_icon.position = Vector2(0, 9 * ui_scale)
+	_hp_icon.size = Vector2.ONE * 26 * ui_scale
+	_player_hp_value.position = Vector2(36 * ui_scale, 0)
+	_player_hp_value.size = Vector2(185 * ui_scale, 44 * ui_scale)
 	_player_hp_value.add_theme_font_size_override("font_size", int(minf(52, 32 * ui_scale)))
 	_player_hp.position = Vector2(0, 44 * ui_scale)
 	_player_hp.custom_minimum_size.y = 8
-	_player_hp.size = Vector2(_player_panel.size.x, 8 * ui_scale)
-	_player_block.position = Vector2(0, 54 * ui_scale)
-	_player_block.size = Vector2(_player_panel.size.x, 22 * ui_scale)
-	_player_block.add_theme_font_size_override("font_size", int(minf(24, 14 * ui_scale)))
+	_player_hp.size = Vector2(220, 6)
+	_player_block.set_ui_scale(ui_scale, true)
+	_player_block.position = Vector2(0, 52 * ui_scale)
+	_player_block.size = Vector2(_player_block.get_combined_minimum_size().x, 24 * ui_scale)
 	if _compact:
-		_player_hp_caption.size.y = 32 * ui_scale
 		_player_hp_value.size.y = 34 * ui_scale
-		_player_hp_value.add_theme_font_size_override("font_size", int(minf(48, 29 * ui_scale)))
+		_player_hp_value.size.x = 114 * ui_scale
+		_player_hp_value.add_theme_font_size_override("font_size", int(minf(48, 27 * ui_scale)))
+		_hp_icon.size = Vector2.ONE * 22 * ui_scale
+		_hp_icon.position.y = 6 * ui_scale
+		_player_hp_value.position.x = 28 * ui_scale
 		_player_hp.position.y = 34 * ui_scale
-		_player_hp.size.y = 6 * ui_scale
-		_player_block.position.y = 42 * ui_scale
-		_player_block.size.y = 16 * ui_scale
-	var status_parent: Control = _footer if _compact else _player_panel
-	if _player_status.get_parent() != status_parent:
-		_player_status.reparent(status_parent)
-	_player_status.position = Vector2(8, 2) if _compact else Vector2(0, 78)
-	_player_status.size = Vector2(w - 64 if _compact else _player_panel.size.x, (48 if _compact else 36) * ui_scale)
+		_player_hp.size = Vector2(column, 6 * ui_scale)
+		_player_block.position = Vector2(column - _player_block.get_combined_minimum_size().x, 5 * ui_scale)
+		var available := _player_block.position.x - _player_hp_value.position.x - 8 * ui_scale
+		var hp_font := int(minf(48, 27 * ui_scale))
+		while _player_hp_value.get_combined_minimum_size().x > available and hp_font > int(18 * ui_scale):
+			hp_font -= 1
+			_player_hp_value.add_theme_font_size_override("font_size", hp_font)
+		_player_hp_value.size.x = available
+	_player_status.position = Vector2(0, 48 * ui_scale) if _compact else Vector2(254, 14)
+	_player_status.size = Vector2(column if _compact else minf(204, _topbar.position.x + _resource_strip.position.x - _player_panel.position.x - 254 - 16), (48 if _compact else 36) * ui_scale)
 	_player_status.set_ui_scale(ui_scale * (4.0 / 3.0 if _compact else 1.0))
 	_player_status.visible = not _player_status.entries.is_empty()
 	_bubble.set_ui_scale(ui_scale, _compact)
@@ -1467,9 +1501,9 @@ func _layout() -> void:
 	_hint.visible = not _compact
 	_hint.position = Vector2(8, 6)
 	_hint.size = Vector2(w - 260, 22)
-	_pile_label.position = Vector2(8, 30 if not _compact else (49 * ui_scale if not _player_status.entries.is_empty() else 18))
-	_pile_label.size = Vector2(w - 260 if not _compact else w - 64, 24)
-	_pile_label.add_theme_font_size_override("font_size", int(minf(22, 15 * ui_scale)))
+	_pile_label.set_ui_scale(ui_scale, true)
+	_pile_label.position = Vector2(8, 30 if not _compact else 14)
+	_pile_label.size = Vector2(_pile_label.get_combined_minimum_size().x, 24 * ui_scale)
 	_enemy_paper.position = _enemy_panel.position - Vector2(12, 8)
 	_enemy_paper.size = _enemy_panel.size + Vector2(24, 16)
 	if _compact:
@@ -1605,7 +1639,7 @@ func _replay_feedback() -> bool:
 			if event.has("hp"):
 				_show_player_hp(int(event.hp), int(event.max_hp))
 			if event.has("block"):
-				_player_block.text = "临挡 %d · 持久盾 %d" % [event.block, event.persistent_block]
+				_show_defense(int(event.block), int(event.persistent_block))
 		match event.kind:
 			"damage":
 				var loss := int(event.hp_loss)
@@ -1646,14 +1680,12 @@ func _wait_step(duration: float) -> bool:
 
 func _resource_feedback(before: Array) -> void:
 	var after := [battle.player.energy, battle.player.heat, GameState.gold]
-	var names := ["储能", "热度", "金币"]
-	var parts: Array[String] = []
+	var ids := ["energy", "heat", "gold"]
 	for i in 3:
 		var change := int(after[i]) - int(before[i])
 		if change != 0:
-			parts.append("%s %+d" % [names[i], change])
-	if not parts.is_empty():
-		_effects.number(" · ".join(parts), _effects.point_of(_resource_label) + Vector2(0, 28), Palette.GOLD_DK)
+			var strip: ResourceStrip = _gold_strip if i == 2 else _resource_strip
+			_effects.number("%+d" % change, _effects.point_of(strip.item_for(ids[i])) + Vector2(0, 28), Palette.GOLD_DK)
 
 
 func _unhandled_input(event: InputEvent) -> void:
