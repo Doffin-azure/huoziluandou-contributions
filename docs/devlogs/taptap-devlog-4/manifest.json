@@ -1,0 +1,29 @@
+{
+  "status": "local preparation only; not saved to TapTap",
+  "title": "开发日志4｜从组词战斗，到墨途远征",
+  "source_sha256": "6a82a379cbd71b3a68c12bdf8125233fe1aa6698d9d6ed34ab69885bccb649bd",
+  "inline_images": [
+    {
+      "caption": "队友策划案中的4×4字盘",
+      "file": "c3-images/05-original-gdd-board.png"
+    },
+    {
+      "caption": "Godot中的组词战斗",
+      "file": "c3-images/06-existing-huozi-battle.png"
+    },
+    {
+      "caption": "地图玩法的几轮尝试",
+      "file": "c3-images/01-iteration-options.png"
+    },
+    {
+      "caption": "C2铺字成路",
+      "file": "c3-images/02-c2-route.png"
+    },
+    {
+      "caption": "C3探索与排版",
+      "file": "c3-images/04-c3-crosswords-scout.png"
+    }
+  ],
+  "cover": "cover-1200x675.png",
+  "cover_source": "C3 screenshot; map and typesetting regions arranged side by side; not a full-screen screenshot"
+}
