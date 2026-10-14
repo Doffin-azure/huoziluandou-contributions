@@ -16,7 +16,8 @@ const ABILITY_NAMES := {
 	"next_energy_bonus": "蓄力", "gravity_always": "重力", "compound_equity": "复利",
 	"ceasefire": "停火", "serial": "连载", "repeat_zero": "反复", "split_mind": "精分",
 	"vigor": "精力", "vigor_next": "精力待补", "auto_refill": "充电过热", "repeat": "重复",
-	"next_serial_bonus": "连载待发", "next_draw_bonus": "额外补字"
+	"next_serial_bonus": "连载待发", "next_draw_bonus": "额外补字",
+	"warm_heart": "热心", "strong_heart": "强心", "manual_draw": "精心", "shared_attack": "合击"
 }
 
 const LAYERED_ABILITIES := ["guard_inject", "counter", "next_energy_bonus", "next_serial_bonus", "vigor_next", "next_draw_bonus"]
@@ -44,6 +45,12 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 			result.append(entry("permanent_guard", "永久减伤", "防", permanent, "每次受到伤害时减免 %d。" % permanent, Palette.JADE))
 		if unit.turn_damage_reduction > 0:
 			result.append(entry("turn_guard", "御", "御", unit.turn_damage_reduction, "本回合每次受到伤害时减免 %d。" % unit.turn_damage_reduction, Palette.BLOCK))
+		if unit.turn_damage_halve:
+			result.append(entry("guard_halve", "放心", "安", 1, "本回合受伤减半，向上取整后再减 1。", Palette.JADE))
+		if unit.turn_damage_double:
+			result.append(entry("damage_double", "冷心", "倍", 1, "本回合造成的伤害翻倍。", Palette.GOLD))
+		if unit.no_block_turns > 0:
+			result.append(entry("no_block", "禁防", "禁", unit.no_block_turns, "剩余 %d 回合不能获得格挡或持久盾。" % unit.no_block_turns, Palette.PLUM, StatusData.Kind.DEBUFF))
 		var has_heart_ability := battle != null and battle.has_ability("heart_power")
 		if unit.heart_power > 0 or has_heart_ability:
 			var description := "每层可抵挡一次致命伤害。"

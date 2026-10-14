@@ -12,7 +12,7 @@ var _hp: StatBar
 var _hp_number: Label
 var _intent: Label
 var _block: Label
-var _status: Label
+var _status: StatusStrip
 var _portrait: Control
 var _visual: InkSpirit
 var _motion: Tween
@@ -36,7 +36,7 @@ func _ready() -> void:
 	_intent = Ink.label("", "", Palette.INK)
 	_intent.add_theme_font_override("font", Ink.serif)
 	_intent.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_status = Ink.caption("")
+	_status = StatusStrip.new()
 	_portrait = Control.new()
 	_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_visual = InkSpirit.new()
@@ -45,6 +45,7 @@ func _ready() -> void:
 	for item in [_heading, _name, _hp, _hp_number, _block, _portrait, _intent, _status]:
 		item.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(item)
+	_status.mouse_filter = Control.MOUSE_FILTER_PASS
 	resized.connect(_layout)
 	gui_input.connect(_on_gui_input)
 	refresh(false)
@@ -94,9 +95,26 @@ func _layout() -> void:
 	_intent.position = Vector2(0, 94 * factor if compact else size.y - 48)
 	_intent.size = Vector2(w, 30 * factor)
 	_intent.add_theme_font_size_override("font_size", int(16 * factor) if compact else 21)
-	_status.position = Vector2(0, size.y - 22)
-	_status.size = Vector2(w, 22)
-	_status.visible = not compact
+	_status.position = Vector2(0, 124 * factor if compact else size.y - 36)
+	_status.size = Vector2(w, 36 * factor)
+	_status.set_ui_scale(factor)
+	_status.visible = not _status.entries.is_empty()
+	if compact:
+		_heading.size.y = 16 * factor
+		_name.position.y = 18 * factor
+		_name.size.y = 28 * factor
+		_name.add_theme_font_size_override("font_size", int(22 * factor))
+		_hp.position.y = 48 * factor
+		_hp.size.y = 10 * factor
+		_hp_number.position.y = 42 * factor
+		_hp_number.size.y = 24 * factor
+		_block.position.y = 62 * factor
+		_block.size.y = 18 * factor
+		_block.add_theme_font_size_override("font_size", int(14 * factor))
+		_intent.position.y = 84 * factor
+		_intent.size.y = 24 * factor
+		_intent.add_theme_font_size_override("font_size", int(14 * factor))
+		_status.position.y = 112 * factor
 
 
 func refresh(animate := true) -> void:
@@ -109,11 +127,8 @@ func refresh(animate := true) -> void:
 	_hp.setup_bar(combatant.hp, combatant.max_hp, Palette.HP, "", animate)
 	_hp_number.text = "%d / %d" % [combatant.hp, combatant.max_hp]
 	_block.text = "护盾 %d" % (combatant.block + combatant.persistent_block)
-	var tags: Array[String] = []
-	for sid in combatant.statuses:
-		var sd: StatusData = Database.get_status(sid)
-		tags.append("%s %d" % [sd.name if sd != null else sid, combatant.statuses[sid]])
-	_status.text = " · ".join(tags)
+	_status.set_entries(StatusDisplay.collect(combatant))
+	_layout()
 	if not combatant.is_alive():
 		_heading.text = "已击败"
 		_intent.text = ""

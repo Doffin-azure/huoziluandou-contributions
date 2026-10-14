@@ -42,7 +42,15 @@ func _build() -> void:
 	if not str(cfg.get("body", "")).is_empty():
 		var b := Ink.body(str(cfg["body"]))
 		b.custom_minimum_size.x = 380
-		col.add_child(b)
+		if cfg.get("scroll_body", false):
+			var scroll := ScrollContainer.new()
+			scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+			scroll.custom_minimum_size = Vector2(380, minf(320, get_viewport_rect().size.y * 0.4))
+			col.add_child(scroll)
+			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			scroll.add_child(b)
+		else:
+			col.add_child(b)
 	col.add_child(Ink.hline())
 
 	var options: Array = cfg.get("options", [])

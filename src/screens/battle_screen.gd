@@ -11,7 +11,7 @@ var _player_hp_caption: Label
 var _player_hp_value: Label
 var _menu_btn: Button
 var _player_block: Label
-var _player_status: Label
+var _player_status: StatusStrip
 var _resource_label: Label
 var _pile_label: Label
 var _turn_label: Label
@@ -31,6 +31,14 @@ var _footer: Control
 var _hint: Label
 var _selection_actions: HBoxContainer
 var _effects: BattleEffects
+var _audio: BattleAudio
+var _target_kind := -1
+var _target_title := ""
+var _target_effect := ""
+var _last_selection: Array = []
+var _placement_mode := ""
+var _placement_uid := -1
+var _placement_places: Array = []
 var _target_index := 0
 var _pending_path: Array = []
 var _ready_action: Dictionary = {}   ## 待发动：已选好路径+目标，点「发动」才执行
@@ -85,6 +93,7 @@ func build(root: Control) -> void:
 	root.move_child(_player_panel, root.get_child_count() - 1)
 	_preview_panel = _build_left()
 	root.add_child(_preview_panel)
+	_selection_actions.reparent(root)
 	_board_view = _build_center()
 	root.add_child(_board_view)
 	_enemy_panel = ScrollContainer.new()
@@ -116,6 +125,9 @@ func build(root: Control) -> void:
 	_log_overlay.hide()
 	_effects = BattleEffects.new()
 	root.add_child(_effects)
+	_effects.setup_impact(content, Router.study_stage)
+	_audio = BattleAudio.new()
+	add_child(_audio)
 	EventBus.log_message.connect(_on_log)
 	battle.enemy_acting.connect(_on_enemy_acting)
 	_watch_combatant(battle.player)
@@ -195,9 +207,7 @@ func _build_topbar() -> Control:
 	_player_panel.add_child(_player_hp)
 	_player_block = Ink.label("", "Muted")
 	_player_panel.add_child(_player_block)
-	_player_status = Ink.caption("")
-	_player_status.autowrap_mode = TextServer.AUTOWRAP_OFF
-	_player_status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_player_status = StatusStrip.new()
 	_player_panel.add_child(_player_status)
 	content.add_child(_player_panel)
 	return bar
@@ -247,7 +257,7 @@ func _build_left() -> Control:
 	_selection_actions.add_child(_confirm_btn)
 	_clear_btn = Ink.button("清除")
 	var clear_style := StyleBoxFlat.new()
-	clear_style.bg_color = Color(0, 0, 0, 0)
+	clear_style.bg_color = Color(Palette.PAPER, 0.96)
 	clear_style.border_color = Color(Palette.INK_SOFT, 0.65)
 	clear_style.set_border_width_all(1)
 	clear_style.set_content_margin_all(10)
@@ -328,6 +338,7 @@ func _refresh_all(animate_board := false) -> void:
 	_turn_label.text = "回合 %d" % battle.turn
 	_board_view.rebuild(animate_board)
 	_update_input()
+	_layout()
 
 
 func _refresh_enemies() -> void:
@@ -365,14 +376,7 @@ func _refresh_player() -> void:
 	if battle.player.equity > 0:
 		resources.append("股权 %d" % battle.player.equity)
 	_resource_label.text = "    ".join(resources)
-	var states: Array[String] = []
-	for sid in battle.player.statuses:
-		var sd: StatusData = Database.get_status(sid)
-		states.append("%s %d" % [sd.name if sd != null else sid, battle.player.statuses[sid]])
-	if GameState.permanent_damage_reduction > 0:
-		states.append("减伤 %d" % GameState.permanent_damage_reduction)
-	_player_status.text = " · ".join(states)
-	_player_status.tooltip_text = _player_status.text
+	_player_status.set_entries(StatusDisplay.collect(battle.player, battle))
 
 
 func _show_player_hp(hp: int, max_hp: int) -> void:
@@ -405,6 +409,16 @@ func _on_log(text: String) -> void:
 
 # ---------------------------------------------------------------- 独立词效预览
 func _on_selection_changed(path: Array, glyphs: Array, word: WordData) -> void:
+	if not path.is_empty() and _board_view.pick_mode.is_empty() and not _ready_action.is_empty() and not _ready_action.get("repeat_rotate", false):
+		if not battle.pending_reveal.is_empty():
+			battle.return_pending_reveal()
+		_ready_action = {}
+		_pending_path = []
+		_target_kind = -1
+		_board_view.picked_cells = []
+	if path != _last_selection and not path.is_empty() and _audio != null:
+		_audio.play_cue("select")
+	_last_selection = path.duplicate()
 	if glyphs.is_empty():
 		_current_word = null
 		_bubble.set_idle(_preview_hint())
@@ -500,10 +514,22 @@ func _on_primary() -> void:
 	if _board_view.pick_mode != "":
 		return
 	# 合击·结阵：点「发动」时才把登记的词一起结算
-	if battle.formation_mode and not battle.formation_queue.is_empty():
+	if battle.formation_mode and not battle.formation_queue.is_empty() and _board_view.path.is_empty():
+		_set_busy(true)
+		var count := battle.formation_queue.size()
+		var before := [battle.player.energy, battle.player.heat, GameState.gold]
+		_events.clear()
+		_collecting = true
 		battle.resolve_formation()
+		_collecting = false
+		_audio.play_cue("play")
+		if not await _replay_feedback():
+			return
 		_board_view.clear_selection()
-		_refresh_all()
+		_refresh_all(true)
+		_bubble.set_text("结阵发动", "%d 个词已结算。" % count, SpeechBubble.State.RESULT)
+		_resource_feedback(before)
+		_set_busy(false)
 		if _handle_effect_requests():
 			return
 		_check_battle_over()
@@ -513,8 +539,22 @@ func _on_primary() -> void:
 
 ## 选好路径+目标后进入「待发动」：不立即结算，可继续点别处改选，或点「发动」执行。
 func _fill_ready(path: Array, target: Dictionary) -> void:
-	_pending_path = []
+	_pending_path = path.duplicate() if _board_view.pick_reselect else []
 	_ready_action = {"path": path, "target": target}
+	if not _board_view.pick_reselect:
+		_board_view.picked_cells = target.get("cells", []).duplicate()
+		for key in ["tile", "tile2", "cell1", "cell2"]:
+			if target.has(key):
+				_board_view.picked_cells.append(target[key])
+		for place in target.get("places", []):
+			_board_view.picked_cells.append(place[1])
+	if _target_kind >= 0:
+		var tile: Vector2i = target.get("tile", Vector2i(-1, -1))
+		var chosen := "第%d行" % (int(target.row) + 1) if target.has("row") else "第%d行 · 第%d列" % [tile.y + 1, tile.x + 1]
+		_bubble.set_text(_target_title, _target_effect + "\n已选：" + chosen + "\n点字盘改选 · 按发动确认", SpeechBubble.State.PREVIEW)
+		_bubble.set_context(_selection_context(path))
+	else:
+		_pick_prompt(path, "目标已选好 · 按发动确认")
 	_update_input()
 
 
@@ -548,6 +588,15 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 				return
 			"choose_same_pair":
 				_run_pair(path, "same")
+				return
+			"choose_any_pair", "choose_row_pair", "choose_move":
+				_run_pair(path, {"choose_any_pair": "any", "choose_row_pair": "row", "choose_move": "move"}[_current_word.interaction])
+				return
+			"choose_place_two":
+				_run_place_two(path)
+				return
+			"choose_recover_two", "choose_recover_to_bag":
+				_run_recover(path, _current_word.interaction)
 				return
 			"choose_glyph_gild":
 				_open_glyph_picker(path, "gild_glyph", GameState.glyph_counts(), "精金：选择要永久镀金的字")
@@ -606,7 +655,9 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 		return
 	_set_busy(true)
 	_ready_action = {}
+	_target_kind = -1
 	_board_view.end_pick()
+	_audio.play_cue("play")
 	_board_view.release_selected(path)
 	# 停息/停电等即时请求：在演出前即刻结算，保证逻辑与输入时机、动画开关无关
 	if _handle_effect_requests():
@@ -629,6 +680,12 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 		return
 	_board_view.clear_selection()
 	_refresh_all(true)
+	if _gravity_in_play(result):
+		if not await _wait_step(0.18 if not Settings.reduced_motion else 0.01):
+			return
+		_effects.table_impact(7.0)
+		_audio.play_cue("gravity")
+	_hint.text = "拖动连词 · 回车出字 · ESC 取消"
 	_bubble.set_result(result.word, result.glyphs, result.messages)
 	_bubble.set_context(_selection_context([]))
 	_resource_feedback(old_resources)
@@ -669,21 +726,40 @@ func _show_blackout() -> void:
 
 
 func _request_target(target_kind: int) -> void:
-	_on_log("请选择目标")
+	_target_kind = target_kind
+	_target_title = "".join(battle.board.glyphs_of(_pending_path))
+	_target_effect = _current_word.effect_summary if _current_word != null else _bubble._effect_text
+	var instruction := "请选择盘面目标"
 	match target_kind:
 		EffectData.Target.BOARD_2X2:
-			_board_view.begin_pick("2x2")
+			_board_view.begin_pick("2x2", false, true)
+			instruction = "点击 2×2 区域左上格；金色框内四格一起旋转。"
+		EffectData.Target.BOARD_3X3:
+			_board_view.begin_pick("3x3", false, true)
+			instruction = "点击 3×3 区域左上格；金色框内九格一起旋转。"
+		EffectData.Target.BOARD_ROW:
+			_board_view.begin_pick("row", false, true)
+			instruction = "点击任意格，选择它所在的整行。"
 		EffectData.Target.EMPTY_TILE:
-			_board_view.begin_pick("empty")
+			_board_view.begin_pick("empty", false, true)
+			instruction = "请选择空格。"
 		EffectData.Target.ENEMY_GLYPH:
-			_board_view.begin_pick("enemy")
+			_board_view.begin_pick("enemy", false, true)
+			instruction = "请选择敌方字。"
 		EffectData.Target.BOARD_TILE:
-			_board_view.begin_pick("any")
+			_board_view.begin_pick("any", false, true)
 		EffectData.Target.DISCARD_GLYPH:
 			_choose_discard()
+	_bubble.set_text(_target_title, _target_effect + "\n" + instruction, SpeechBubble.State.PREVIEW)
+	_bubble.set_context(_selection_context(_pending_path))
+	_hint.text = instruction
+	_update_input()
 
 
 func _on_tile_picked(pos: Vector2i) -> void:
+	if not _placement_mode.is_empty():
+		_finish_placement_cell(pos)
+		return
 	if _collect_own_active:
 		if battle.board.get_xy(pos) == null:
 			return
@@ -691,6 +767,7 @@ func _on_tile_picked(pos: Vector2i) -> void:
 			_collect_own_cells.erase(pos)   # 再点已选格 = 取消该格
 		else:
 			_collect_own_cells.append(pos)
+		_board_view.picked_cells = _collect_own_cells.duplicate()
 		_on_log("收心：已选 %d 枚（再点可取消），点「发动」结束" % _collect_own_cells.size())
 		_update_input()
 		return
@@ -701,9 +778,11 @@ func _on_tile_picked(pos: Vector2i) -> void:
 			return
 		if _recast_three_cells.has(pos):
 			_recast_three_cells.erase(pos)   # 再点已选格 = 取消该格
+			_board_view.picked_cells = _recast_three_cells.duplicate()
 			_on_log("再铸：已选 %d/3" % _recast_three_cells.size())
 			return
 		_recast_three_cells.append(pos)
+		_board_view.picked_cells = _recast_three_cells.duplicate()
 		if _recast_three_cells.size() >= 3:
 			var rp := _pending_path
 			_recast_three_active = false
@@ -738,33 +817,51 @@ func _on_tile_picked(pos: Vector2i) -> void:
 		_fill_ready(pp, {"tile": pos, "place_uid": uidp})
 		return
 	if _fuse_stage == 1:
+		if _pair_mode == "move":
+			var source: CharInstance = battle.board.get_xy(pos)
+			if source == null or source.pinned or _pending_path.has(pos):
+				_board_view.begin_pick("any")
+				_pick_prompt(_pending_path, "请选择未固定、未参与本词的盘面字。")
+				return
 		_fuse_first = pos
 		_fuse_stage = 2
-		_board_view.begin_pick("own")
-		_on_log("再选第二张（%s）" % ("与它相邻" if _pair_mode == "fuse" else "与它相同"))
+		if _pair_mode == "place_two" and battle.pending_reveal.size() == 1:
+			_fuse_stage = 0
+			_fill_ready(_pending_path, {"cell1": pos})
+			return
+		_board_view.begin_pick("empty" if _pair_mode in ["move", "place_two"] else ("slot" if _pair_mode in ["any", "row"] else "own"))
+		_board_view.picked_cells = [_fuse_first]
+		_pick_prompt(_pending_path, {"fuse": "再选相邻己方字", "same": "再选同字的另一枚", "any": "再选另一个格子", "row": "再选同一行的另一格", "move": "选择移入的空格", "place_two": "选择第二个空格"}[_pair_mode])
 		return
 	if _fuse_stage == 2:
 		var ok := false
 		if _pair_mode == "fuse":
 			ok = battle.board.is_adjacent(_fuse_first, pos)
-		else:
+		elif _pair_mode == "same":
 			var c1: CharInstance = battle.board.get_xy(_fuse_first)
 			var c2: CharInstance = battle.board.get_xy(pos)
 			ok = c2 != null and pos != _fuse_first and c1 != null and c2.glyph() == c1.glyph()
+		elif _pair_mode == "row":
+			ok = pos.y == _fuse_first.y and pos != _fuse_first
+		else:
+			ok = pos != _fuse_first
 		if not ok:
-			_board_view.begin_pick("own")
-			_on_log("选择不合法，请重选第二张")
+			_board_view.begin_pick("empty" if _pair_mode in ["move", "place_two"] else ("slot" if _pair_mode in ["any", "row"] else "own"))
+			_board_view.picked_cells = [_fuse_first]
+			_pick_prompt(_pending_path, "选择不合法，请重选第二格。")
 			return
 		var fp := _pending_path
 		_pending_path = []
 		_fuse_stage = 0
-		_fill_ready(fp, {"tile": _fuse_first, "tile2": pos})
+		_fill_ready(fp, {"cell1": _fuse_first, "cell2": pos} if _pair_mode == "place_two" else {"tile": _fuse_first, "tile2": pos})
 		return
 	var path := _pending_path
 	_pending_path = []
 	if path.is_empty():
 		return
 	var t := {"tile": pos, "enemy_glyph": pos}
+	if _target_kind == EffectData.Target.BOARD_ROW:
+		t["row"] = pos.y
 	if _transform_uid >= 0:
 		t["transform_uid"] = _transform_uid
 		t["chosen_uid"] = _transform_uid
@@ -776,8 +873,96 @@ func _run_pair(path: Array, mode: String) -> void:
 	_pending_path = path
 	_pair_mode = mode
 	_fuse_stage = 1
-	_board_view.begin_pick("own")
-	_on_log("选择第一张己方牌")
+	_board_view.begin_pick("slot" if mode in ["any", "row"] else ("any" if mode == "move" else "own"))
+	_pick_prompt(path, "选择要移动的字" if mode == "move" else ("选择第一个格子" if mode in ["any", "row"] else "选择第一枚己方字"))
+
+
+func _pick_prompt(path: Array, instruction: String) -> void:
+	var glyphs := battle.board.glyphs_of(path)
+	var word := Database.get_word_by_glyphs(glyphs)
+	_bubble.set_text("".join(glyphs), (word.effect_summary + "\n" if word != null else "") + instruction, SpeechBubble.State.PREVIEW)
+	_bubble.set_context(_selection_context(path))
+	_update_input()
+
+
+func _run_place_two(path: Array) -> void:
+	if battle.board.empty_indices().is_empty():
+		_bubble.set_error("火急需要字袋中的字和盘面空格。")
+		return
+	_pending_path = path.duplicate()
+	if battle.reveal_from_bag(mini(2, battle.board.empty_indices().size())).is_empty():
+		_pending_path = []
+		_bubble.set_error("字袋与弃字堆没有可补的字。")
+		return
+	_pair_mode = "place_two"
+	_fuse_stage = 1
+	_board_view.begin_pick("empty")
+	_pick_prompt(path, "选择第一个空格；取消会把揭示的字放回。")
+
+
+func _run_recover(path: Array, mode: String) -> void:
+	if mode == "choose_recover_two" and battle.board.empty_indices().is_empty():
+		_bubble.set_error("收复需要盘面空格。")
+		return
+	_pending_path = path.duplicate()
+	_placement_mode = mode
+	_placement_places = []
+	_choose_placement_card()
+
+
+func _choose_placement_card() -> void:
+	var list := battle.discard_instances().filter(func(entry): return not _placement_places.any(func(place): return place.uid == entry.uid))
+	if list.is_empty():
+		if _placement_places.is_empty():
+			_on_pick_cancelled()
+			_bubble.set_error("弃字堆没有可放回的己方字。")
+		else:
+			_finish_recover()
+		return
+	var options: Array = []
+	for entry in list:
+		options.append({"text": "【%s】" % entry.glyph})
+	options.append({"text": "只放回一枚并确认" if not _placement_places.is_empty() else "取消"})
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": "从弃字堆选字", "options": options})
+	overlay.chose.connect(func(index: int):
+		if index >= list.size():
+			if _placement_places.is_empty():
+				_on_pick_cancelled()
+			else:
+				_finish_recover()
+			return
+		_placement_uid = int(list[index].uid)
+		_board_view.begin_pick("own" if _placement_mode == "choose_recover_to_bag" else "empty")
+		_pick_prompt(_pending_path, "选择回袋的己方实体字" if _placement_mode == "choose_recover_to_bag" else ("选择放回的空格" if _placement_places.is_empty() else "选择与第一格相邻的空格")))
+	_mount_overlay(overlay)
+
+
+func _finish_placement_cell(pos: Vector2i) -> void:
+	if _placement_mode == "choose_recover_to_bag":
+		var inst: CharInstance = battle.board.get_xy(pos)
+		if inst == null or inst.temporary or inst.pinned or _pending_path.has(pos):
+			_board_view.begin_pick("own")
+			_pick_prompt(_pending_path, "请选择未固定、未参与本词的己方实体字。")
+			return
+		_placement_mode = ""
+		_fill_ready(_pending_path, {"tile": pos, "place_uid": _placement_uid})
+		return
+	if not _placement_places.is_empty() and not battle.board.is_adjacent(_placement_places[0].cell, pos):
+		_board_view.begin_pick("empty")
+		_pick_prompt(_pending_path, "第二个空格必须与第一个相邻。")
+		return
+	_placement_places.append({"uid": _placement_uid, "cell": pos})
+	if _placement_places.size() >= 2 or not battle.has_adjacent_empty_pair():
+		_finish_recover()
+	else:
+		_choose_placement_card()
+
+
+func _finish_recover() -> void:
+	_placement_mode = ""
+	_fill_ready(_pending_path, {"places": _placement_places.map(func(place): return [place.uid, place.cell])})
+	_placement_places = []
 
 
 func _open_discard_place(path: Array) -> void:
@@ -819,6 +1004,14 @@ func _on_pick_cancelled() -> void:
 	_recast_three_cells = []
 	_collect_own_active = false
 	_collect_own_cells = []
+	_placement_mode = ""
+	_placement_places = []
+	_placement_uid = -1
+	_target_kind = -1
+	_board_view.end_pick()
+	_board_view.clear_selection()
+	_hint.text = "拖动连词 · 回车出字 · ESC 取消"
+	_update_input()
 	if battle.repeat_rotate_tile.x >= 0:
 		battle.end_repeat_rotate()   # 转速：点「清除」= 提前停下
 
@@ -1028,7 +1221,7 @@ func _on_discard_chosen(index: int) -> void:
 func _on_end_turn() -> void:
 	if _finished or _busy or _modal_count > 0:
 		return
-	if _board_view.pick_mode != "":
+	if _board_view.pick_mode != "" or not _ready_action.is_empty() or not battle.pending_reveal.is_empty():
 		_board_view.end_pick()
 		_on_pick_cancelled()
 	_board_view.clear_selection()
@@ -1184,8 +1377,9 @@ func _layout() -> void:
 	var ui_scale := clampf(h / maxf(1, DisplayServer.window_get_size().y), 1.0, 1.85) if _compact else 1.0
 	var margin := 24.0
 	var top := 88.0 if not _compact else 66.0
-	var footer := maxf(70.0, 48 * ui_scale + 22)
-	var side := minf(h - top - footer - 30, w * 0.44)
+	var footer := maxf(70.0, (70 * ui_scale if _compact and not _player_status.entries.is_empty() else 48 * ui_scale + 22))
+	var action_h := 48.0 * ui_scale
+	var side := minf(h - top - footer - action_h - 22, w * 0.44)
 	var column := (w - side) * 0.5 - margin * 2
 	var board_x := (w - side) * 0.5
 	_topbar.position = Vector2(margin, 12)
@@ -1210,9 +1404,9 @@ func _layout() -> void:
 	var right_x := board_x + side + margin
 	if _compact:
 		_player_panel.position = Vector2(margin, top + 12)
-		_player_panel.size = Vector2(column, 76 * ui_scale)
-		_enemy_panel.position = Vector2(margin, top + 28 + _player_panel.size.y)
-		_enemy_panel.size = Vector2(column, side - _player_panel.size.y - 48 * ui_scale - 16)
+		_player_panel.size = Vector2(column, 58 * ui_scale)
+		_enemy_panel.position = Vector2(margin, _player_panel.position.y + _player_panel.size.y + 6 * ui_scale)
+		_enemy_panel.size = Vector2(column, top + side - 48 * ui_scale + 12 - _enemy_panel.position.y - 8 * ui_scale)
 		_preview_panel.position = Vector2(right_x, top + 12)
 		_preview_panel.size = Vector2(column, side)
 		_end_btn.position = Vector2(margin, top + side - 48 * ui_scale + 12)
@@ -1238,20 +1432,33 @@ func _layout() -> void:
 	_player_block.position = Vector2(0, 54 * ui_scale)
 	_player_block.size = Vector2(_player_panel.size.x, 22 * ui_scale)
 	_player_block.add_theme_font_size_override("font_size", int(minf(24, 14 * ui_scale)))
-	_player_status.position = Vector2(0, 76 * ui_scale)
-	_player_status.size = Vector2(_player_panel.size.x, 26)
-	_player_status.visible = not _player_status.text.is_empty()
-	var action_h := 64.0 * ui_scale if _compact else 60.0
+	if _compact:
+		_player_hp_caption.size.y = 32 * ui_scale
+		_player_hp_value.size.y = 34 * ui_scale
+		_player_hp_value.add_theme_font_size_override("font_size", int(minf(48, 29 * ui_scale)))
+		_player_hp.position.y = 34 * ui_scale
+		_player_hp.size.y = 6 * ui_scale
+		_player_block.position.y = 42 * ui_scale
+		_player_block.size.y = 16 * ui_scale
+	var status_parent: Control = _footer if _compact else _player_panel
+	if _player_status.get_parent() != status_parent:
+		_player_status.reparent(status_parent)
+	_player_status.position = Vector2(8, 2) if _compact else Vector2(0, 78)
+	_player_status.size = Vector2(w - 64 if _compact else _player_panel.size.x, (48 if _compact else 36) * ui_scale)
+	_player_status.set_ui_scale(ui_scale * (4.0 / 3.0 if _compact else 1.0))
+	_player_status.visible = not _player_status.entries.is_empty()
 	_bubble.set_ui_scale(ui_scale, _compact)
 	var paper_pad := 22.0 if _compact else 26.0
 	var paper_height := _preview_panel.size.y
 	_bubble.position = Vector2(paper_pad, paper_pad)
-	_bubble.size = Vector2(column - paper_pad * 2, paper_height - action_h - paper_pad * 3)
-	_selection_actions.position = Vector2(paper_pad, paper_height - action_h - paper_pad)
-	_selection_actions.size = Vector2(column - paper_pad * 2, action_h)
+	_bubble.size = Vector2(column - paper_pad * 2, paper_height - paper_pad * 2)
+	_selection_actions.position = Vector2(board_x + side * 0.12, _board_view.position.y + side + 10)
+	_selection_actions.size = Vector2(side * 0.76, action_h)
+	_confirm_btn.custom_minimum_size.x = 0
+	_clear_btn.custom_minimum_size.x = 64 * ui_scale
 	_confirm_btn.custom_minimum_size.y = action_h
 	_clear_btn.custom_minimum_size.y = action_h
-	_confirm_btn.add_theme_font_size_override("font_size", int((28 if _compact else 36) * ui_scale))
+	_confirm_btn.add_theme_font_size_override("font_size", int(minf(36, 24 * ui_scale)))
 	_clear_btn.add_theme_font_size_override("font_size", int(18 * ui_scale))
 	_end_btn.add_theme_font_size_override("font_size", int(22 * ui_scale))
 	_footer.position = Vector2(margin, h - footer + 10)
@@ -1260,7 +1467,7 @@ func _layout() -> void:
 	_hint.visible = not _compact
 	_hint.position = Vector2(8, 6)
 	_hint.size = Vector2(w - 260, 22)
-	_pile_label.position = Vector2(8, 30 if not _compact else 18)
+	_pile_label.position = Vector2(8, 30 if not _compact else (49 * ui_scale if not _player_status.entries.is_empty() else 18))
 	_pile_label.size = Vector2(w - 260 if not _compact else w - 64, 24)
 	_pile_label.add_theme_font_size_override("font_size", int(minf(22, 15 * ui_scale)))
 	_enemy_paper.position = _enemy_panel.position - Vector2(12, 8)
@@ -1273,12 +1480,12 @@ func _layout() -> void:
 	else:
 		_enemy_paper.tilt = 1.2
 		_enemy_paper._place_sheet()
-	_enemy_panel.position += Vector2(14, 8 if _compact else 16)
-	_enemy_panel.size -= Vector2(28, 16 if _compact else 32)
+	_enemy_panel.position += Vector2(14, 0 if _compact else 16)
+	_enemy_panel.size -= Vector2(28, 0 if _compact else 32)
 	for widget in _enemy_widgets:
 		widget.ui_scale = ui_scale
 		widget.set_compact(_compact or _enemy_widgets.size() > 1)
-		widget.custom_minimum_size.y = 118 * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
+		widget.custom_minimum_size.y = (150 if not widget._status.entries.is_empty() else 108) * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
 	_board_view._layout()
 
 
@@ -1287,6 +1494,9 @@ func _update_input() -> void:
 	_board_view.set_interactable(not locked, false)
 	if _collect_own_active:
 		_confirm_btn.text = "发动（收心 %d）" % _collect_own_cells.size()
+		_confirm_btn.disabled = locked
+	elif battle.formation_mode and not battle.formation_queue.is_empty() and _board_view.path.is_empty():
+		_confirm_btn.text = "发动结阵（%d）" % battle.formation_queue.size()
 		_confirm_btn.disabled = locked
 	elif not _ready_action.is_empty():
 		if _ready_action.get("repeat_rotate", false):
@@ -1305,6 +1515,8 @@ func _update_input() -> void:
 	_clear_btn.disabled = locked or (_board_view.path.is_empty() and _ready_action.is_empty() and not _recast_three_active and not _collect_own_active and _board_view.pick_mode == "")
 	_end_btn.disabled = locked
 	_menu_btn.disabled = locked
+	if _board_view.pick_mode != "":
+		_board_view._apply_pick_highlight()
 
 
 func _set_busy(value: bool) -> void:
@@ -1339,6 +1551,8 @@ func _toggle_log() -> void:
 func _selection_context(path: Array) -> String:
 	var enemy: Combatant = battle.enemies[_target_index] if not battle.enemies.is_empty() else null
 	var target := enemy.display_name if enemy != null and enemy.is_alive() else "无"
+	if _target_kind in [EffectData.Target.BOARD_2X2, EffectData.Target.BOARD_3X3, EffectData.Target.BOARD_TILE, EffectData.Target.BOARD_ROW, EffectData.Target.EMPTY_TILE]:
+		target = "字盘选区"
 	var cost := _pollution_cost_text(path).strip_edges()
 	return "目标：%s\n%s" % [target, "污染代价：无" if cost.is_empty() else cost]
 
@@ -1396,6 +1610,10 @@ func _replay_feedback() -> bool:
 			"damage":
 				var loss := int(event.hp_loss)
 				var blocked := int(event.blocked)
+				if loss > 0 or blocked > 0:
+					_audio.play_cue("hit" if loss > 0 else "block")
+					if loss + blocked >= 9:
+						_effects.table_impact(3.5)
 				if loss > 0:
 					_effects.number("−%d" % loss, point + Vector2(0, -26), Palette.VERMILION_DK)
 					_effects.burst(point, false, loss >= 12 or int(event.hp) <= 0)
@@ -1406,9 +1624,11 @@ func _replay_feedback() -> bool:
 					_effects.number("免疫", point, Palette.INK_SOFT)
 			"shield":
 				var gain := int(event.gain)
+				_audio.play_cue("block")
 				_effects.number("护盾 +%d" % gain if gain > 0 else ("破盾" if int(event.block) == 0 else "拆盾 %d" % -gain), point, Palette.BLOCK if gain > 0 else Palette.GOLD_DK)
 				_effects.burst(point, true)
 			"heal":
+				_audio.play_cue("heal")
 				_effects.number("+%d" % int(event.gain), point, Palette.JADE)
 		if not await _wait_step(0.16 if not Settings.reduced_motion else 0.045):
 			return false
@@ -1437,9 +1657,27 @@ func _resource_feedback(before: Array) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _log_overlay.visible and event.is_action_pressed("cancel_selection"):
+	if not event.is_echo() and event.is_action_pressed("confirm_word") and (not _ready_action.is_empty() or _collect_own_active or (battle.formation_mode and not battle.formation_queue.is_empty())):
+		if not _busy and _modal_count == 0:
+			_on_primary()
+			get_viewport().set_input_as_handled()
+	elif _log_overlay.visible and event.is_action_pressed("cancel_selection"):
 		_toggle_log()
 		get_viewport().set_input_as_handled()
 	elif not event.is_echo() and event.is_action_pressed("end_turn"):
 		_on_end_turn()
 		get_viewport().set_input_as_handled()
+
+
+func _gravity_in_play(result: Dictionary) -> bool:
+	if battle.has_ability("gravity_always"):
+		return true
+	var effects: Array = result.word.effects if result.word != null else []
+	if result.solo:
+		var data := Database.get_character_by_glyph(str(result.glyphs[0]))
+		if data != null:
+			effects = data.solo_effects
+	for effect in effects:
+		if effect.handler in ["gravity", "gravity_left", "gravity_right", "gravity_damage"]:
+			return true
+	return false

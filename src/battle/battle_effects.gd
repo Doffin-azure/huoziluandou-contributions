@@ -1,6 +1,44 @@
 extends Control
 class_name BattleEffects
 ## 所有瞬态节点都由本层拥有，离开战斗会连同 Tween 一起释放。
+var _impact_targets: Array = []
+var _impact_strength := 0.0
+var _impact_time := 0.0
+
+
+func setup_impact(hud: Control, stage: Control) -> void:
+	for target in [hud, stage]:
+		if is_instance_valid(target):
+			_impact_targets.append({"target": weakref(target), "origin": target.position})
+
+
+func table_impact(strength := 6.0) -> void:
+	if Settings.reduced_motion:
+		return
+	_impact_time = 0.0
+	_impact_strength = maxf(_impact_strength, strength)
+
+
+func _process(delta: float) -> void:
+	if _impact_strength == 0.0:
+		return
+	_impact_time += delta
+	var envelope := maxf(0.0, 1.0 - _impact_time / 0.24)
+	var offset := Vector2(sin(_impact_time * 89.0) * 0.28, sin(_impact_time * 72.0)) * _impact_strength * envelope * envelope
+	if Settings.reduced_motion or envelope <= 0.0:
+		_impact_strength = 0.0
+		offset = Vector2.ZERO
+	for entry in _impact_targets:
+		var target: Control = entry.target.get_ref()
+		if is_instance_valid(target):
+			target.position = entry.origin + offset
+
+
+func _exit_tree() -> void:
+	for entry in _impact_targets:
+		var target: Control = entry.target.get_ref()
+		if is_instance_valid(target):
+			target.position = entry.origin
 
 
 func _ready() -> void:

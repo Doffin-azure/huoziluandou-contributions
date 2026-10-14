@@ -83,6 +83,9 @@ func _prop(uv: Vector2, angle := 0.0) -> Node3D:
 	prop.rotation.y = angle
 	add_child(prop)
 	_props.append({"node": prop, "uv": uv})
+	# 陈设退到桌面边缘：只留书、印台和毛笔，减少与操作区竞争的装饰。
+	if uv in [Vector2(0.105, 0.11), Vector2(0.86, 0.088), Vector2(0.43, 0.87)]:
+		prop.hide()
 	return prop
 
 
@@ -249,7 +252,7 @@ func sync_layout() -> void:
 		prop.node.position = stage.table_point(stage.get_global_transform() * (stage.size * prop.uv), TABLE_Y + 0.018)
 	if _canopy != null:
 		var sunlight := Vector3(7.0, -3.4, 4.0).normalized()
-		var shadow_root := stage.table_point(stage.get_global_transform() * (stage.size * Vector2(-0.055, 0.315)), PAPER_Y)
+		var shadow_root := stage.table_point(stage.get_global_transform() * (stage.size * Vector2(-0.08, 0.24)), PAPER_Y)
 		_canopy.position = shadow_root - sunlight * (1.05 / -sunlight.y)
 	for index in range(papers.size() - 1, -1, -1):
 		var entry: Dictionary = papers[index]
