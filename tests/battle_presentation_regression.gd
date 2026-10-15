@@ -115,11 +115,11 @@ func _run() -> void:
 	battle.enable_ability("longword_draw", 1)
 	battle.enable_ability("counter", 3)
 	_screen._refresh_all()
-	_ok(_screen._resource_strip.entries[0].value == 4 and _screen._resource_strip.entries[1].value == 3 and _screen._resource_strip.get_child(0).text.is_empty(), "资源控件读取真实数值，只使用图形和数字")
+	_ok(_screen._player_status.entries.any(func(item): return item.id == "heat" and item.stacks == 4) and _screen._player_status.entries.any(func(item): return item.id == "energy" and item.stacks == 3), "资源并入状态栏，读取真实热度与储能数值")
 	_ok(_screen._player_status._buttons.all(func(button): return button.text.is_empty() and button.get_child(0) is BattleSymbol), "能力按钮没有汉字标签，使用独立图形符号")
 	var descriptions_available := StatusDisplay.ABILITY_NAMES.keys().all(func(id): return BattleSymbol.SPECS.has(id))
 	_ok(descriptions_available, "词库中的所有已知能力都有对应图形，没有字形回退")
-	_screen._resource_strip.item_for("heat").pressed.emit()
+	_screen._player_status.item_for("heat").pressed.emit()
 	await _frames()
 	_ok(_screen._modal_count == 1 and not board._interactable, "点击资源符号可查看热度说明，浮层不穿透战斗")
 	await _choose_card()
@@ -378,7 +378,7 @@ func _run() -> void:
 		_ok(_screen._confirm_btn.size.y * factor >= 47.5 and not _screen._selection_actions.get_global_rect().intersects(_screen._end_btn.get_global_rect()), "小手机字盘下方主操作仍有 48 像素，无按钮重叠")
 		_ok(not _screen._player_status.get_global_rect().intersects(_screen._enemy_panel.get_global_rect()) and _screen._player_status.get_global_rect().end.y <= _screen.get_global_rect().end.y, "手机 Buff 区不覆盖敌人信息且在屏幕内")
 		_ok(_screen._player_status.get_parent() == _screen._player_panel and _screen._player_status.get_global_rect().end.y <= _screen._enemy_panel.get_global_rect().position.y, "手机能力紧跟玩家气血与护盾，不散落在底栏")
-		_ok(not _screen._resource_strip.get_global_rect().intersects(board.get_global_rect()) and not _screen._resource_strip.get_global_rect().intersects(_screen._menu_btn.get_global_rect()), "资源符号位于字盘上方，不遮挡字盘或菜单")
+		_ok(not _screen._player_status.get_global_rect().intersects(board.get_global_rect()) and not _screen._player_status.get_global_rect().intersects(_screen._menu_btn.get_global_rect()), "资源随状态栏靠近气血，不遮挡字盘或菜单")
 		_screen._player_status._buttons[0].pressed.emit()
 		await _frames()
 		var close_height := 0.0
@@ -396,8 +396,8 @@ func _run() -> void:
 		battle.player.persistent_block = 256
 		_screen._refresh_all()
 		await _frames()
-		_ok(not _screen._gold_strip.get_global_rect().intersects(_screen._resource_strip.get_global_rect()) and not _screen._gold_strip.get_global_rect().intersects(_screen._turn_label.get_global_rect()), "手机同时显示金币、资金和股权，不与回合或热量挤在一起")
-		_ok(not _screen._player_hp_value.get_global_rect().intersects(_screen._player_block.get_global_rect()), "三位数护盾不覆盖手机气血数值")
+		_ok(not _screen._gold_strip.get_global_rect().intersects(_screen._player_status.get_global_rect()) and not _screen._gold_strip.get_global_rect().intersects(_screen._turn_label.get_global_rect()), "手机同时显示金币、资金和股权，不与回合或状态挤在一起")
+		_ok(not _screen._player_hp_value.get_global_rect().intersects(_screen._player_status.get_global_rect()), "三位数护盾不覆盖手机气血数值")
 		await _shot("battle-symbol-hud-phone-resources")
 		battle.player.temp_funds = 0
 		battle.player.equity = 0

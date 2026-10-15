@@ -104,7 +104,7 @@ func _run() -> void:
 		_ok(not flights.is_empty() and flights[0].profile.family == families[index], "真实出字 %s 使用自己的符号与表现家族" % names[index])
 		if names[index] == "火" or names[index] == "电":
 			var focus := "heat" if names[index] == "火" else "energy"
-			_ok(flights[0].destination.distance_to(_screen._effects.point_of(_screen._resource_strip.item_for(focus)) / _screen._effects._ui_scale) < 1, "资源字飞向对应资源，不误飞向气血")
+			_ok(flights[0].destination.distance_to(_screen._status_point(focus) / _screen._effects._ui_scale) < 1, "资源字飞向状态栏对应资源，不误飞向气血")
 		await _idle()
 		if names[index] != "击破":
 			_ok(battle.enemies[0].hp == enemy_before, "非攻击字 %s 不伪造敌方受击" % names[index])

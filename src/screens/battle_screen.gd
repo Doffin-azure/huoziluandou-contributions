@@ -11,9 +11,8 @@ var _player_hp_caption: Label
 var _player_hp_value: Label
 var _hp_icon: BattleSymbol
 var _menu_btn: Button
-var _player_block: ResourceStrip
 var _player_status: StatusStrip
-var _resource_strip: ResourceStrip
+var _shown_defense: Dictionary = {}
 var _gold_strip: ResourceStrip
 var _pile_label: ResourceStrip
 var _turn_label: Label
@@ -189,8 +188,6 @@ func _build_topbar() -> Control:
 	bar.add_child(title)
 	_turn_label = Ink.label("回合 1", "Stat")
 	bar.add_child(_turn_label)
-	_resource_strip = ResourceStrip.new()
-	bar.add_child(_resource_strip)
 	_gold_strip = ResourceStrip.new()
 	bar.add_child(_gold_strip)
 	var rule := Ink.hline()
@@ -217,8 +214,6 @@ func _build_topbar() -> Control:
 	_player_hp = StatBar.new()
 	_player_hp.show_text = false
 	_player_panel.add_child(_player_hp)
-	_player_block = ResourceStrip.new()
-	_player_panel.add_child(_player_block)
 	_player_status = StatusStrip.new()
 	_player_panel.add_child(_player_status)
 	content.add_child(_player_panel)
@@ -382,17 +377,12 @@ func _refresh_intents() -> void:
 func _refresh_player() -> void:
 	_show_player_hp(battle.player.hp, battle.player.max_hp)
 	_show_defense(battle.player.block, battle.player.persistent_block)
-	var resources: Array = [
-		{"id": "heat", "title": "热度", "value": battle.player.heat, "capacity": battle.player.heat_capacity, "color": Palette.VERMILION_DK, "description": "当前 %d / %d。火焰旁刻度显示热量；超过热容会产生灼热字。" % [battle.player.heat, battle.player.heat_capacity]},
-		{"id": "energy", "title": "储能", "value": battle.player.energy, "color": Color("52656d"), "description": "当前储能 %d。用于消耗储能的字与词效。" % battle.player.energy}]
 	var wallet: Array = [{"id": "gold", "title": "金币", "value": GameState.gold, "color": Palette.GOLD_DK, "description": "可用金币 %d，本战获得 %d。" % [GameState.gold, battle.gold_earned]}]
 	if battle.player.temp_funds > 0:
 		wallet.append({"id": "temp_funds", "title": "临时资金", "value": battle.player.temp_funds, "color": Palette.GOLD_DK, "description": "本回合可使用的临时资金。"})
 	if battle.player.equity > 0:
 		wallet.append({"id": "equity", "title": "股权", "value": battle.player.equity, "color": Palette.GOLD_DK, "description": "当前累计股权。"})
-	_resource_strip.set_entries(resources)
 	_gold_strip.set_entries(wallet)
-	_player_status.set_entries(StatusDisplay.collect(battle.player, battle))
 
 
 func _show_player_hp(hp: int, max_hp: int) -> void:
@@ -401,9 +391,10 @@ func _show_player_hp(hp: int, max_hp: int) -> void:
 
 
 func _show_defense(block: int, persistent: int) -> void:
-	_player_block.set_entries([
-		{"id": "block", "title": "临时格挡", "value": block, "color": Color("596065"), "description": "当前临挡 %d，敌方行动后清除。" % block},
-		{"id": "persistent_block", "title": "持久盾", "value": persistent, "color": Palette.GOLD_DK, "description": "当前持久盾 %d，跨回合保留。" % persistent}])
+	_shown_defense = {"block": block, "persistent_block": persistent}
+	_player_status.set_entries(StatusDisplay.collect(battle.player, battle, _shown_defense))
+	_player_status.visible = not _player_status.entries.is_empty()
+	_layout()
 
 
 func _refresh_piles() -> void:
@@ -1420,17 +1411,13 @@ func _layout() -> void:
 	_menu_btn.size = Vector2(menu_width, 48 * ui_scale)
 	_menu_btn.custom_minimum_size = _menu_btn.size
 	_menu_btn.add_theme_font_size_override("font_size", int(minf(34, 20 * ui_scale)))
-	_resource_strip.set_ui_scale(ui_scale)
 	_gold_strip.set_ui_scale(ui_scale, _compact and _gold_strip.entries.size() > 1)
-	var resource_width := _resource_strip.get_combined_minimum_size().x
-	_resource_strip.position = Vector2((w - margin * 2 - resource_width) * 0.5, 0)
-	_resource_strip.size = Vector2(resource_width, 48 * ui_scale)
 	var gold_width := _gold_strip.get_combined_minimum_size().x
 	_gold_strip.position = Vector2(_menu_btn.position.x - gold_width - 28, 0) if not _compact else Vector2(0, 0)
 	_gold_strip.size = Vector2(gold_width, 48 * ui_scale)
 	if _compact:
 		_turn_label.position = Vector2(gold_width + 18 * ui_scale, 12 * ui_scale)
-		_turn_label.size = Vector2(minf(90 * ui_scale, _resource_strip.position.x - _turn_label.position.x - 12 * ui_scale), 24 * ui_scale)
+		_turn_label.size = Vector2(minf(90 * ui_scale, _menu_btn.position.x - _turn_label.position.x - 12 * ui_scale), 24 * ui_scale)
 	_topbar.get_node("Rule").position = Vector2(0, top - 14)
 	_topbar.get_node("Rule").size = Vector2(w - margin * 2, 1)
 	_board_view.position = Vector2(board_x, top + 12)
@@ -1462,9 +1449,6 @@ func _layout() -> void:
 	_player_hp.position = Vector2(0, 44 * ui_scale)
 	_player_hp.custom_minimum_size.y = 8
 	_player_hp.size = Vector2(220, 6)
-	_player_block.set_ui_scale(ui_scale, true)
-	_player_block.position = Vector2(0, 52 * ui_scale)
-	_player_block.size = Vector2(_player_block.get_combined_minimum_size().x, 24 * ui_scale)
 	if _compact:
 		_player_hp_value.size.y = 34 * ui_scale
 		_player_hp_value.size.x = 114 * ui_scale
@@ -1474,15 +1458,14 @@ func _layout() -> void:
 		_player_hp_value.position.x = 28 * ui_scale
 		_player_hp.position.y = 34 * ui_scale
 		_player_hp.size = Vector2(column, 6 * ui_scale)
-		_player_block.position = Vector2(column - _player_block.get_combined_minimum_size().x, 5 * ui_scale)
-		var available := _player_block.position.x - _player_hp_value.position.x - 8 * ui_scale
+		var available := column - _player_hp_value.position.x
 		var hp_font := int(minf(48, 27 * ui_scale))
 		while _player_hp_value.get_combined_minimum_size().x > available and hp_font > int(18 * ui_scale):
 			hp_font -= 1
 			_player_hp_value.add_theme_font_size_override("font_size", hp_font)
 		_player_hp_value.size.x = available
 	_player_status.position = Vector2(0, 48 * ui_scale) if _compact else Vector2(254, 14)
-	_player_status.size = Vector2(column if _compact else minf(204, _topbar.position.x + _resource_strip.position.x - _player_panel.position.x - 254 - 16), (48 if _compact else 36) * ui_scale)
+	_player_status.size = Vector2(column if _compact else maxf(36, _topbar.position.x + _gold_strip.position.x - _player_panel.position.x - 254 - 24), (48 if _compact else 36) * ui_scale)
 	_player_status.set_ui_scale(ui_scale * (4.0 / 3.0 if _compact else 1.0))
 	_player_status.visible = not _player_status.entries.is_empty()
 	_bubble.set_ui_scale(ui_scale, _compact)
@@ -1657,12 +1640,16 @@ func _cast_destination(profile: Dictionary, play: Dictionary) -> Vector2:
 				var view: Control = _view_for(alive[alive_index])
 				if view is EnemyView:
 					return _effects.get_global_transform().affine_inverse() * view.impact_point()
-		"shield": return _effects.point_of(_player_block)
+		"shield": return _status_point("block")
 		"heal": return _effects.point_of(_player_hp_value)
-		"energy", "heat": return _effects.point_of(_resource_strip.item_for(profile.focus))
+		"energy", "heat": return _status_point(profile.focus)
 		"gold", "temp_funds", "equity": return _effects.point_of(_gold_strip.item_for(profile.focus))
 		"board": return _board_effect_point(play)
 	return _effects.point_of(_player_status)
+
+
+func _status_point(id: String) -> Vector2:
+	return _effects.get_global_transform().affine_inverse() * _player_status.anchor_for(id)
 
 
 func _board_effect_point(play: Dictionary, span_override := 0) -> Vector2:
@@ -1724,8 +1711,9 @@ func _replay_feedback() -> bool:
 		var point := _effects.point_of(view)
 		var profile: Dictionary = event.get("profile", GlyphVfxProfile.for_glyph(""))
 		var radius := 16.0 if event.target.is_player else 42.0
+		var shield_id := "persistent_block" if event.has("persistent_block") and int(event.persistent_block) != int(_shown_defense.get("persistent_block", 0)) else "block"
 		if event.target.is_player:
-			point = _effects.point_of(_player_block if event.kind == "shield" else _player_hp_value)
+			point = _status_point(shield_id) if event.kind == "shield" else _effects.point_of(_player_hp_value)
 		if view is EnemyView:
 			view.apply_feedback(event)
 			point = _effects.get_global_transform().affine_inverse() * view.impact_point()
@@ -1734,6 +1722,10 @@ func _replay_feedback() -> bool:
 				_show_player_hp(int(event.hp), int(event.max_hp))
 			if event.has("block"):
 				_show_defense(int(event.block), int(event.persistent_block))
+				# HBoxContainer 下一帧完成排版；新出现的盾值要在实际图标旁反馈。
+				await get_tree().process_frame
+				if _exiting: return false
+				if event.kind == "shield" and _player_status._items.has(shield_id): point = _status_point(shield_id)
 		var number_point := point + Vector2(0, 62 if event.target.is_player else -26)
 		match event.kind:
 			"damage":
@@ -1785,8 +1777,7 @@ func _resource_feedback(before: Array) -> void:
 	for i in mini(before.size(), after.size()):
 		var change := int(after[i]) - int(before[i])
 		if change != 0:
-			var strip: ResourceStrip = _gold_strip if i >= 2 else _resource_strip
-			var point := _effects.point_of(strip.item_for(ids[i])) + Vector2(0, 28)
+			var point := (_effects.point_of(_gold_strip.item_for(ids[i])) if i >= 2 else _status_point(ids[i])) + Vector2(0, 28)
 			_effects.number("%+d" % change, point, Palette.GOLD_DK)
 			var resource_glyph := "电" if i == 0 else ("冷" if i == 1 and change < 0 else ("火" if i == 1 else ("资" if i == 3 else "金")))
 			var profile := GlyphVfxProfile.for_glyph(resource_glyph)

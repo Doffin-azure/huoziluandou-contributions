@@ -11,7 +11,6 @@ var _name: Label
 var _hp: StatBar
 var _hp_number: Label
 var _intent: EnemyIntent
-var _block: ResourceStrip
 var _status: StatusStrip
 var _status_rule: ColorRect
 var _portrait: Control
@@ -33,7 +32,6 @@ func _ready() -> void:
 	_hp.show_text = false
 	_hp_number = Ink.label("", "", Palette.VERMILION_DK)
 	_hp_number.add_theme_font_override("font", Ink.serif)
-	_block = ResourceStrip.new()
 	_intent = EnemyIntent.new()
 	_status = StatusStrip.new()
 	_status_rule = Ink.hline()
@@ -42,7 +40,7 @@ func _ready() -> void:
 	_visual = InkSpirit.new()
 	_visual.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_portrait.add_child(_visual)
-	for item in [_heading, _name, _hp, _hp_number, _block, _portrait, _intent, _status_rule, _status]:
+	for item in [_heading, _name, _hp, _hp_number, _portrait, _intent, _status_rule, _status]:
 		item.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(item)
 	_status.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -85,11 +83,6 @@ func _layout() -> void:
 	_hp_number.position = Vector2(w - number_width, _hp.position.y - 8 * factor)
 	_hp_number.size = Vector2(number_width, 32 * factor)
 	_hp_number.add_theme_font_size_override("font_size", int(18 * factor) if compact else 22)
-	_block.set_ui_scale(factor, true)
-	var block_width := _block.get_combined_minimum_size().x
-	_block.position = Vector2(w - block_width, 42)
-	_block.size = Vector2(block_width, 24 * factor)
-	_name.size.x = maxf(1, w - block_width - 8 * factor)
 	_name.clip_text = true
 	var art_top := 196.0
 	var art_side := minf(w + 18, maxf(64, size.y - art_top - (44 if not _status.entries.is_empty() else 18)))
@@ -112,9 +105,6 @@ func _layout() -> void:
 		_hp.size.y = 10 * factor
 		_hp_number.position.y = 24 * factor
 		_hp_number.size.y = 24 * factor
-		_block.position = Vector2(w - block_width, 2 * factor)
-		_block.size = Vector2(block_width, 24 * factor)
-		_name.size.x = maxf(1, w - block_width - 8 * factor)
 		_name.clip_text = true
 		_intent.position.y = 46 * factor
 		_intent.size.y = EnemyIntent.ROW_HEIGHT * factor
@@ -133,7 +123,6 @@ func refresh(animate := true) -> void:
 	_name.text = combatant.display_name
 	_hp.setup_bar(combatant.hp, combatant.max_hp, Palette.HP, "", animate)
 	_hp_number.text = "%d / %d" % [combatant.hp, combatant.max_hp]
-	_show_block(combatant.block + combatant.persistent_block)
 	_status.set_entries(StatusDisplay.collect(combatant))
 	_layout()
 	if not combatant.is_alive():
@@ -144,10 +133,6 @@ func refresh(animate := true) -> void:
 
 func set_intent(move: EnemyMoveData) -> void:
 	_intent.set_move(move, combatant)
-
-
-func _show_block(value: int) -> void:
-	_block.set_entries([{"id": "block", "title": "敌方护盾", "value": value, "color": Palette.INK, "description": "当前护盾 %d。" % value}])
 
 
 func set_targeted(value: bool) -> void:
@@ -164,7 +149,8 @@ func apply_feedback(event: Dictionary) -> void:
 		_hp.setup_bar(int(event.hp), int(event.max_hp), Palette.HP)
 		_hp_number.text = "%d / %d" % [int(event.hp), int(event.max_hp)]
 	if event.has("block"):
-		_show_block(int(event.block) + int(event.persistent_block))
+		_status.set_entries(StatusDisplay.collect(combatant, null, {"block": int(event.block), "persistent_block": int(event.persistent_block)}))
+		_layout()
 	if Settings.reduced_motion:
 		return
 	if _motion != null:

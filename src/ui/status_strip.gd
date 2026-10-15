@@ -5,6 +5,7 @@ var entries: Array = []
 var _ui_scale := 1.0
 var _signature := ""
 var _buttons: Array[Button] = []
+var _items: Dictionary = {}
 
 
 func _ready() -> void:
@@ -36,12 +37,15 @@ func _rebuild() -> void:
 		remove_child(child)
 		child.queue_free()
 	_buttons.clear()
+	_items.clear()
 	var shown := mini(entries.size(), capacity if entries.size() <= capacity else maxi(0, capacity - 1))
 	for index in shown:
 		var entry: Dictionary = entries[index]
 		var button := _badge(str(entry.id), cell, BattleSymbol.color_for(str(entry.id), int(entry.kind) == StatusData.Kind.DEBUFF))
 		button.tooltip_text = "%s · %d %s\n%s" % [entry.name, entry.stacks, entry.get("unit", "层"), entry.description]
 		button.pressed.connect(_show_entry.bind(entry))
+		if entry.has("capacity"):
+			button.get_child(0).level = clampf(float(entry.stacks) / maxf(1, entry.capacity), 0, 1)
 		if int(entry.stacks) > 1 or entry.get("unit", "层") != "层":
 			var badge := Panel.new()
 			badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -49,11 +53,11 @@ func _rebuild() -> void:
 			paper.bg_color = Palette.PAPER
 			paper.set_corner_radius_all(int(6 * _ui_scale))
 			badge.add_theme_stylebox_override("panel", paper)
-			badge.size = Vector2(maxf(16, str(entry.stacks).length() * 6 + 6), 16) * _ui_scale
+			badge.size = Vector2(maxf(18, str(entry.stacks).length() * 7 + 6), 18) * _ui_scale
 			badge.position = Vector2(cell - badge.size.x, -1 * _ui_scale)
 			button.add_child(badge)
 			var count := Ink.label(str(entry.stacks), "", Palette.INK)
-			count.add_theme_font_size_override("font_size", int(11 * _ui_scale))
+			count.add_theme_font_size_override("font_size", int(13 * _ui_scale))
 			count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -88,7 +92,20 @@ func _badge(symbol: String, cell: float, color: Color) -> Button:
 	icon.offset_bottom = -cell * 0.12
 	button.add_child(icon)
 	_buttons.append(button)
+	_items[symbol] = button
 	return button
+
+
+func item_for(id: String) -> Control:
+	return _items.get(id, _items.get("more", self))
+
+
+func anchor_for(id: String) -> Vector2:
+	var item := item_for(id)
+	if item != self:
+		return item.get_global_rect().get_center()
+	# 新增或已经耗尽的状态仍在状态栏起点反馈，不飞到气血或空栏中央。
+	return global_position + Vector2.ONE * 18 * _ui_scale
 
 
 func _show_entry(entry: Dictionary) -> void:
