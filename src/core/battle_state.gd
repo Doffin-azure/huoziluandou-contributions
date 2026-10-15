@@ -48,6 +48,7 @@ var removed_this_battle: Array = []     ## 炼化：本场移出循环的牌
 var bounty_paid: bool = false
 var bounty_reward: int = 0
 var words_played_all: Array = []
+signal play_resolving(play: Dictionary)
 var last_played_glyphs: Array = []   ## 上一个出字的字形序列（供【再】重复）
 var last_played_word: WordData = null  ## 上一个打出的词（供【回放】）
 var last_played_effects: Array = []
@@ -662,6 +663,8 @@ func path_uses_gap(path: Array) -> bool:
 
 ## 普通出词和结阵共用效果、污染、自动能力和快照流程；结阵仅共享消耗记录。
 func _execute_prepared_play(play: Dictionary, shared: Dictionary) -> Dictionary:
+	# 只读表现通知：普通出字与结阵各词都报告自己的字、效果和目标。
+	play_resolving.emit(play)
 	var path: Array = play.path
 	var target: Dictionary = play.target
 	var word: WordData = play.word

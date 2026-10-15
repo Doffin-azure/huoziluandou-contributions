@@ -12,6 +12,10 @@ var pick_mode := ""
 var pick_multi := false   ## true=多选：选完不自动退出选区模式（由调用方 end_pick）
 var pick_selected: Array = []
 var pick_excluded: Array = []
+var pick_reselect := false
+var pick_anchor := Vector2i(-1, -1)
+var _hover_anchor := Vector2i(-1, -1)
+var picked_cells: Array = []
 var _dragging := false
 var _drag_moved := false
 var _interactable := true
@@ -92,7 +96,7 @@ func _layout() -> void:
 
 
 func _process(_delta: float) -> void:
-	if not path.is_empty():
+	if not path.is_empty() or not pick_mode.is_empty() or not picked_cells.is_empty():
 		_path_layer.queue_redraw()
 
 
@@ -154,10 +158,11 @@ func _on_tile_pressed(pos: Vector2i) -> void:
 		return
 	if not pick_mode.is_empty():
 		if _valid_pick(pos):
+			pick_anchor = pos
 			if pick_mode == "three":
 				pick_selected.append(pos)
 				_apply_pick_highlight()
-			if not pick_multi:
+			if not pick_multi and not pick_reselect:
 				end_pick()
 			tile_picked.emit(pos)
 		return
@@ -198,6 +203,8 @@ func _extend_path(pos: Vector2i) -> void:
 
 
 func _on_tile_hovered(pos: Vector2i) -> void:
+	if _interactable and not pick_mode.is_empty():
+		_hover_anchor = pos if _valid_pick(pos) else Vector2i(-1, -1)
 	if _interactable and _dragging and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		_extend_path(pos)
 
@@ -232,6 +239,10 @@ func _finish_drag() -> void:
 func _input(event: InputEvent) -> void:
 	if not _interactable or Debug.is_open():
 		return
+	# 目标选择优先处理取消，避免悬停提示或聚焦控件先吃掉 Esc。
+	if event.is_action_pressed("cancel_selection") and not pick_mode.is_empty() and get_tree().get_nodes_in_group("effect_help_open").is_empty():
+		_unhandled_input(event)
+		return
 	if event is InputEventScreenTouch:
 		if event.pressed and _touch_index < 0:
 			var cell := _cell_at(event.position)
@@ -260,8 +271,12 @@ func _input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 		elif get_global_rect().has_point(event.position):
 			get_viewport().set_input_as_handled()
-	elif event is InputEventMouseMotion and event.device != InputEvent.DEVICE_ID_EMULATION and _dragging:
-		_trace_pointer(event.position)
+	elif event is InputEventMouseMotion and event.device != InputEvent.DEVICE_ID_EMULATION:
+		if not pick_mode.is_empty():
+			var hovered := _cell_at(event.position)
+			_hover_anchor = hovered if hovered.x >= 0 and _valid_pick(hovered) else Vector2i(-1, -1)
+		elif _dragging:
+			_trace_pointer(event.position)
 	elif event is InputEventMouseButton and event.device != InputEvent.DEVICE_ID_EMULATION and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
 		_finish_drag()
 
@@ -282,11 +297,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 
-func begin_pick(mode: String, multi := false, excluded: Array = []) -> void:
+func begin_pick(mode: String, multi := false, excluded: Variant = [], reselect := false) -> void:
 	pick_mode = mode
 	pick_multi = multi
 	pick_selected = []
-	pick_excluded = excluded.duplicate()
+	# 兼容本地的排除格数组和远端的第三参数“可改选”布尔值。
+	pick_excluded = excluded.duplicate() if excluded is Array else []
+	pick_reselect = bool(excluded) if excluded is bool else reselect
+	pick_anchor = Vector2i(-1, -1)
+	_hover_anchor = Vector2i(-1, -1)
+	picked_cells = []
 	clear_selection()
 	_apply_pick_highlight()
 
@@ -296,6 +316,10 @@ func end_pick() -> void:
 	pick_multi = false
 	pick_selected = []
 	pick_excluded = []
+	pick_reselect = false
+	pick_anchor = Vector2i(-1, -1)
+	_hover_anchor = Vector2i(-1, -1)
+	picked_cells = []
 	for tile in tiles:
 		tile.set_dimmed(not _interactable and _dim_locked)
 		tile.set_selected(false)
@@ -321,13 +345,16 @@ func _valid_pick(pos: Vector2i) -> bool:
 		"own": return cell != null and cell.is_player_owned()
 		"2x2": return pos.x >= 0 and pos.y >= 0 and pos.x <= board.size - 2 and pos.y <= board.size - 2
 		"3x3": return pos.x >= 0 and pos.y >= 0 and pos.x <= board.size - 3 and pos.y <= board.size - 3
+		"row": return board.in_bounds(pos.x, pos.y)
+		"slot": return board.in_bounds(pos.x, pos.y)
 	return false
 
 
 func _apply_pick_highlight() -> void:
+	var region: Array = pick_region(pick_anchor) if pick_anchor.x >= 0 else []
 	for tile in tiles:
 		var selected := pick_selected.has(tile.grid_pos)
-		tile.set_dimmed(not selected and not _valid_pick(tile.grid_pos))
+		tile.set_dimmed(not selected and not _valid_pick(tile.grid_pos) and not region.has(tile.grid_pos) and not picked_cells.has(tile.grid_pos))
 		tile.set_selected(selected, pick_selected.find(tile.grid_pos))
 
 
@@ -365,6 +392,13 @@ func _on_sync() -> void:
 
 
 func _draw_path() -> void:
+	for cell in picked_cells:
+		_draw_pick_cell(cell)
+	if not pick_mode.is_empty():
+		var anchor := _hover_anchor if _hover_anchor.x >= 0 else pick_anchor
+		if anchor.x >= 0:
+			_draw_pick_region(anchor)
+		return
 	for i in range(1, path.size()):
 		var previous: TileView = tiles[board.from_xy(path[i - 1])]
 		var current: TileView = tiles[board.from_xy(path[i])]
@@ -382,3 +416,31 @@ func _draw_path() -> void:
 		_path_layer.draw_line(start, tip, Palette.VERMILION, 2.5, true)
 		_path_layer.draw_line(tip, tip - dir.rotated(0.55) * 8, Palette.VERMILION, 2.5, true)
 		_path_layer.draw_line(tip, tip - dir.rotated(-0.55) * 8, Palette.VERMILION, 2.5, true)
+
+
+func pick_region(anchor: Vector2i) -> Array:
+	var cells: Array = []
+	var span := 3 if pick_mode == "3x3" else (2 if pick_mode == "2x2" else 1)
+	for y in range(board.size if pick_mode == "row" else span):
+		for x in range(span):
+			cells.append(Vector2i(y, anchor.y) if pick_mode == "row" else anchor + Vector2i(x, y))
+	return cells
+
+
+func _draw_pick_region(anchor: Vector2i) -> void:
+	for cell in pick_region(anchor):
+		_draw_pick_cell(cell)
+
+
+func _draw_pick_cell(cell: Vector2i) -> void:
+	if not board.in_bounds(cell.x, cell.y):
+		return
+	var tile: TileView = tiles[board.from_xy(cell)]
+	var polygon: PackedVector2Array
+	if _presentation != null and _presentation.has_projection():
+		polygon = _presentation.cell_polygon(board.from_xy(cell))
+	else:
+		polygon = PackedVector2Array([tile.position, tile.position + Vector2(tile.size.x, 0), tile.position + tile.size, tile.position + Vector2(0, tile.size.y)])
+	_path_layer.draw_colored_polygon(polygon, Color(Palette.GOLD, 0.13))
+	polygon.append(polygon[0])
+	_path_layer.draw_polyline(polygon, Palette.GOLD_DK, 2.5, true)

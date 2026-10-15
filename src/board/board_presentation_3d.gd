@@ -57,7 +57,7 @@ func _ready() -> void:
 	if is_instance_valid(Router.study_stage) and Router.study_stage.shared_table_active():
 		_shared_stage = Router.study_stage
 		_wood = _shared_stage.battle_table.wood_material(Color("b19b7e"), Vector3(0.96, 0.18, 0.96), 0.24)
-		var worn_frame := _shared_stage.battle_table.wood_material(Color("f0dfce"), Vector3.ONE, 0.32)
+		var worn_frame := _shared_stage.battle_table.wood_material(Color("d3c1a9"), Vector3.ONE, 0.10)
 		worn_frame.set_shader_parameter("grain_texture", load("res://assets/battle/worn_walnut_albedo.png"))
 		_frame = worn_frame
 		_floor = _shared_stage.battle_table.wood_material(Color("77634c"), Vector3.ONE, 0.10)

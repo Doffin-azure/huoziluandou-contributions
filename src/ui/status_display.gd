@@ -12,6 +12,7 @@ const ABILITY_NAMES := {
 	"instant_power": "电力", "heat_pollution_damage": "火热", "heart_power": "心力",
 	"next_free_word": "流利", "flow": "流转", "next_compound": "复合", "energy_idle": "蓄能",
 	"heat_overload_bonus_armed": "过热", "accel": "加速", "next_rapid": "急速",
+	"heat_overload_bonus": "过热待触发",
 	"next_double_draw": "超速", "next_overfire": "过火", "electric_overload": "电流过载",
 	"fireproof": "防火", "blastproof": "防爆", "joint_funding": "合资", "profit_share": "分利",
 	"next_energy_bonus": "蓄力", "gravity_always": "重力", "compound_equity": "复利",
@@ -22,16 +23,25 @@ const ABILITY_NAMES := {
 	"block_next_turn": "甲", "energy_gain_once": "能", "link_draw_once": "连",
 	"retaliate_once": "反", "energy_next_turn": "蓄", "payment_discount_once": "币",
 	"combine_word_once": "合", "speed_word_once": "速", "energy_refund_once": "复",
-	"solo_gain_once": "加", "next_gap": "超"
+	"solo_gain_once": "加", "next_gap": "超", "manual_draw": "精心", "shared_attack": "合击"
 }
 
 const LAYERED_ABILITIES := ["guard_inject", "counter", "next_energy_bonus", "next_serial_bonus", "vigor_next", "next_draw_bonus", "energy_regen", "force_once", "block_next_turn", "energy_gain_once", "link_draw_once", "retaliate_once", "energy_next_turn", "payment_discount_once", "combine_word_once", "speed_word_once", "energy_refund_once", "solo_gain_once"]
+## 主能力的参数由主能力详情承接，不另占图标。
+const ABILITY_PARAMETERS := ["next_rapid_heat", "next_overfire_per", "heat_overload_bonus_armed"]
 
-static func entry(id: String, name: String, glyph: String, stacks: int, description: String, color: Color, kind := 0) -> Dictionary:
-	return {"id": id, "name": name, "glyph": glyph, "stacks": stacks, "description": description, "color": color, "kind": kind}
+static func entry(id: String, name: String, glyph: String, stacks: int, description: String, color: Color, kind := 0, unit_label := "层") -> Dictionary:
+	return {"id": id, "name": name, "glyph": glyph, "stacks": stacks, "description": description, "color": color, "kind": kind, "unit": unit_label}
 
 static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 	var result: Array = []
+	if unit.is_player:
+		if unit.heat > 0:
+			var heat := entry("heat", "热度", "火", unit.heat, "当前热度 %d / 热容 %d。超过热容会产生灼热字。" % [unit.heat, unit.heat_capacity], Palette.VERMILION_DK, 0, "点")
+			heat["capacity"] = unit.heat_capacity
+			result.append(heat)
+		if unit.energy > 0:
+			result.append(entry("energy", "储能", "电", unit.energy, "当前储能 %d，用于消耗储能的字与词效。" % unit.energy, Palette.INK, 0, "点"))
 	for id in unit.statuses:
 		var stacks := int(unit.statuses[id])
 		if stacks == 0:
@@ -76,10 +86,10 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 				description += "\n本场每打出一颗【心】，获得一层。"
 			result.append(entry("heart_layers", "心力", "心", unit.heart_power, description, Palette.VERMILION))
 		if battle != null:
-			for id in ABILITY_NAMES:
-				if id == "heart_power" or not battle.has_ability(id):
+			for id in battle.abilities:
+				if str(id).begins_with("_") or id in ABILITY_PARAMETERS or id == "heart_power" or not battle.has_ability(id):
 					continue
-				var name: String = ABILITY_NAMES[id]
+				var name: String = ABILITY_NAMES.get(id, "其他能力")
 				var value := battle.ability_value(id)
 				var word := Database.get_word_by_glyphs_string(name)
 				var character := Database.get_character_by_glyph(name) if name.length() == 1 else null
@@ -115,9 +125,13 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 				elif id == "next_gap":
 					description = "本回合下一次成功组词，可横向或纵向跨过一个空格，最多一次；不能跨过有字的格子。"
 				elif id == "next_overfire":
-					description = "本回合下一次攻击按攻击时热度追加伤害，仅整次追加一次。当前%d热度，对应追加%d伤害。" % [unit.heat, unit.heat * battle.ability_value("next_overfire_per", 3)]
+					description = "本回合下一次攻击按攻击时热度 × %d 追加伤害，仅整次追加一次。当前%d热度，对应追加%d伤害。" % [battle.ability_value("next_overfire_per", 3), unit.heat, unit.heat * battle.ability_value("next_overfire_per", 3)]
 				elif id == "next_rapid":
-					description = "本回合下一次多字词消耗材料后、结算词效前补至多%d字，优先急速原格；热度+%d。" % [value, battle.ability_value("next_rapid_heat")]
+					description = "本回合下一次多字词消耗材料后、结算词效前补至多%d字，优先急速原格；升温 %d。" % [value, battle.ability_value("next_rapid_heat")]
+				elif id == "next_double_draw":
+					description = "本回合下一次补字最多额外补%d字，每额外1字升温1；触发后消耗。" % value
+				elif id == "heat_overload_bonus":
+					description = "本回合首次实际新增溢热污染后，下一次多字词额外补%d字。" % value
 				elif id == "strong_heart":
 					description = "本场心力已挡下%d次致命伤。每回合开始回复%d生命。" % [unit.heart_power_triggered, 2 + unit.heart_power_triggered]
 				elif id == "serial":
@@ -125,7 +139,11 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 				elif id == "repeat":
 					description += "\n" + ("本回合首次重演机会可用。" if battle.repeat_armed else "本回合无可用重演机会，下回合恢复。")
 				var layers := maxi(1, value) if id in LAYERED_ABILITIES else 1
-				result.append(entry("ability:" + id, name, name.substr(0, 1), layers, description, Palette.GOLD, 1 if id == "split_mind" else 0))
+				var label_unit := "层"
+				if id in ["vigor_next", "next_draw_bonus", "next_double_draw", "next_rapid"]:
+					layers = value
+					label_unit = "字"
+				result.append(entry("ability:" + id, name, name.substr(0, 1), layers, description, Palette.GOLD, 1 if id == "split_mind" else 0, label_unit))
 			if battle.temporary_heat_capacity > 0:
 				result.append(entry("temporary_heat_capacity", "载", "载", battle.temporary_heat_capacity, "本回合热容额外 +%d，下回合开始撤销；热度保持不变。" % battle.temporary_heat_capacity, Palette.GOLD))
 			if not battle.reconnect_pending.is_empty():
@@ -137,13 +155,26 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 			if battle.base_draw_penalty > 0:
 				result.append(entry("reload", "重载", "载", 1, "本场热容 %d；每回合基础补字减少 %d。" % [unit.heat_capacity, battle.base_draw_penalty], Palette.GOLD))
 			if battle.next_draw_penalty > 0:
-				result.append(entry("draw_penalty", "补字减少", "缓", 1, "下回合基础补字减少 %d。" % battle.next_draw_penalty, Palette.PLUM, StatusData.Kind.DEBUFF))
+				result.append(entry("draw_penalty", "下回合少抽", "缓", battle.next_draw_penalty, "下回合基础补字减少 %d 字；结算后清除。" % battle.next_draw_penalty, Palette.PLUM, StatusData.Kind.DEBUFF, "字"))
+			elif battle.next_draw_penalty < 0:
+				result.append(entry("draw_bonus_next", "下回合多抽", "流", -battle.next_draw_penalty, "下回合基础补字增加 %d 字；结算后清除。" % -battle.next_draw_penalty, Palette.INK, StatusData.Kind.BUFF, "字"))
+			if battle.manual_draw_pending > 0:
+				result.append(entry("manual_draw_pending", "待选补字", "选", battle.manual_draw_pending, "本回合还有 %d 枚补字等待从字袋选择，随机落地。" % battle.manual_draw_pending, Palette.INK, StatusData.Kind.BUFF, "字"))
 			if not battle.empowered_glyphs.is_empty():
 				result.append(entry("empowered", "强化", "强", 1, "本场【%s】单独打出或参与成词时，都额外触发单字效果。" % "、".join(battle.empowered_glyphs.keys()), Palette.GOLD))
 			if battle.bounty_paid:
 				result.append(entry("bounty", "重金", "赏", 1, "本回合击败所有敌人后获得%d金币；尚余%d名敌人。" % [battle.bounty_reward, battle.alive_enemies().size()], Palette.GOLD))
 	result.sort_custom(func(a: Dictionary, b: Dictionary):
-		var priority_a := 0 if int(a.kind) == StatusData.Kind.DEBUFF else 1
-		var priority_b := 0 if int(b.kind) == StatusData.Kind.DEBUFF else 1
+		var priority_a := _priority(a)
+		var priority_b := _priority(b)
 		return str(a.id) < str(b.id) if priority_a == priority_b else priority_a < priority_b)
 	return result
+
+
+static func _priority(item: Dictionary) -> int:
+	var resources := ["heat", "energy"]
+	if item.id in resources: return resources.find(item.id) - 4
+	if int(item.kind) == StatusData.Kind.DEBUFF: return 0
+	if item.id in ["draw_bonus_next", "manual_draw_pending", "ability:vigor_next"]: return 1
+	if str(item.id).begins_with("ability:next_") or item.id == "ability:double_next": return 2
+	return 3

@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-14",
+  "generator": "Built-in imagegen",
+  "style": "Warm monochrome ink vignette with restricted cinnabar accents; alpha preserved",
+  "assets": [
+    {
+      "id": "ink_pool",
+      "file": "ink_pool.png",
+      "prompt": "Use case: illustration-story. Asset type: standalone square 1024x1024 transparent vignette for a Chinese movable-type roguelike event, NOT UI. Scene: a small forgotten ink pool beneath a few quiet forest branches; three wooden movable-type blocks lie partly submerged in dark ink, softened ripples and a low stone rim, one block invitingly exposed. Style: restrained Chinese ink painting with bold composed silhouettes, broad ink washes and generous unpainted space, tactile dry-brush edges, sophisticated game illustration rather than simple icon or ornate engraving. Palette strictly warm near-black ink, pale neutral grey washes and a very small muted cinnabar accent on ONE type block; no green/blue/purple. Subject concentrated in central 75%, sparse atmosphere; very few trees, no decorative border, no flourishes, no hatched micro-detail. View from slightly above, readable at 350px. Transparent outside the painted rocks/pool/branches; no rectangular paper background. No people, no readable characters on blocks, no text, no labels, no calligraphy, no signatures, no logos. Quiet mysterious mood, consistent with warm xuan-paper and wooden movable-type game UI."
+    },
+    {
+      "id": "broken_stele",
+      "file": "broken_stele.png",
+      "prompt": "Use case: illustration-story. Asset type: ONE standalone square transparent event illustration for the Chinese movable-type game. Reference image is STYLE ONLY: match its warm black ink washes, dry brush silhouette edges, restrained tonal palette, carved stone/wood material, and isolated vignette treatment; do not reuse its ink pool or blocks. Scene: one broken ancient stone stele on a quiet deserted path. Only the lower half and a fractured side remain; the old inscription has been completely eroded, with one deep diagonal scar clearly visible. A small fallen corner stone at its base and a few sparse grasses, very faint suggestion of the path. No readable writing or glyphs anywhere. Bold clear main stone silhouette with broad expressive ink washes, one quiet plane catching pale neutral light. No lavish details, no decorative carving, no ornament, no border or frames. Strict warm near-black, pale neutral grey and tiny warm stone undertone only; no saturated colours. Central 75% composition with generous transparent breathing space at top and sides, soft ink wash edges at ground. True transparent backdrop outside the painted vignette; no rectangular paper background. Quiet solemn atmosphere. No people, no labels, no text, no calligraphy, no seals, no signatures. Readable at 350px, consistent with warm xuan paper UI."
+    },
+    {
+      "id": "old_bookshop",
+      "file": "old_bookshop.png",
+      "prompt": "Use case: illustration-story. Asset type: ONE independent square transparent event vignette for a Chinese movable-type game. Reference image is STYLE ONLY: match its warm charcoal ink washes, broad dry-brush edges, sparse quiet composition, tangible carved/worn materials. Scene: abandoned small old Chinese bookshop, represented by a simple worn wooden bookshelf with a few stacks of stitched books, loose torn paper pages on a low counter, an empty bookseller place, and ONE tiny oil lamp almost extinguished. No person. Focus the composition on the counter, books and lamp, with the shelf merely suggesting the room; not a busy interior panorama. Illustration built from clear bold silhouettes and broad expressive ink washes, generous open space above and beside, no dense hatching, no ornate decoration. Strict warm near-black and pale neutral grey, tiny restrained cinnabar ember in the lamp only. Blank book covers and blank papers, NO readable writing or pseudo-calligraphy. True transparent background outside the painted shelf/counter/pages, soft dry brush edges at ground, no rectangular paper backdrop. Central 75% vignette, readable when displayed at 350px. No frame, no border, no calligraphy, no signature, no stamp, no labels, no logos. Quiet intimate abandoned atmosphere, consistent with warm xuan paper and wooden type assets."
+    }
+  ]
+}

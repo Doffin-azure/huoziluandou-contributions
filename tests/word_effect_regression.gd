@@ -2154,9 +2154,8 @@ func _run_ui_word_completion() -> void:
 		_check("ui_recognize_" + text, screen._current_word != null and screen._current_word.word == text and not screen._confirm_btn.disabled, "真实选字可以识别本词，并允许点出字")
 		screen._on_primary()
 		if text == "流速":
-			var picker := _choice(screen, "流速")
-			if picker != null:
-				picker._on_choose(1)
+			screen._board_view._on_tile_pressed(Vector2i(0, 1))
+			screen._on_primary()
 		if text == "重连":
 			for y in range(1, 4):
 				screen._board_view._on_tile_pressed(Vector2i(2, y))
@@ -2398,9 +2397,8 @@ func _cast_ui_flow(screen, row: int) -> void:
 	screen._board_view._on_tile_pressed(Vector2i.ZERO)
 	screen._board_view._on_tile_pressed(Vector2i(1, 0))
 	screen._on_primary()
-	var picker := _choice(screen, "流速")
-	if picker != null:
-		picker._on_choose(row)
+	screen._board_view._on_tile_pressed(Vector2i(0, row))
+	screen._on_primary()
 	await _wait_for_screen_idle(screen)
 
 func _run_ui_flow_stacking() -> void:
@@ -2550,11 +2548,10 @@ func _run_ui_spatial_targets() -> void:
 		screen._board_view._on_tile_pressed(Vector2i.ZERO)
 		screen._board_view._on_tile_pressed(Vector2i(1, 0))
 		screen._on_primary()
-		var overlay := _choice(screen, text)
-		_check("ui_" + text + "_row_picker", overlay != null and overlay.cfg.options.size() == screen.battle.board.size, "真实出字入口弹出本词的选行浮层，只提供棋盘各行")
+		_check("ui_" + text + "_row_picker", screen._board_view.pick_mode == "row" and screen._board_view.pick_reselect, "真实出字入口进入整行选择，可直接点盘面改选")
 		_check("ui_" + text + "_deferred", enemy.hp == hp_before and screen.battle.board.get_cell(0, 0) == first and screen.battle.discard.is_empty(), "选行之前不造成伤害或消耗词字")
-		if overlay != null:
-			overlay._on_choose(3)
+		screen._board_view._on_tile_pressed(Vector2i(0, 3))
+		screen._on_primary()
 		await _wait_for_screen_idle(screen)
 		var dest_x := 3 if text == "左击" else 1
 		_check("ui_" + text + "_complete", hp_before - enemy.hp == 6 and screen.battle.board.get_cell(dest_x, 3) == marker and screen.battle.discard.size() == 2, "选第四行后完成 6 伤、正确方向的循环位移和两字消耗")
@@ -2568,10 +2565,9 @@ func _run_ui_spatial_targets() -> void:
 	screen._board_view._on_tile_pressed(Vector2i.ZERO)
 	screen._board_view._on_tile_pressed(Vector2i(1, 0))
 	screen._on_primary()
-	var overlay := _choice(screen, "流速")
-	_check("ui_flow_speed_picker", overlay != null and screen.battle.flow_speed_rows.is_empty() and screen.battle.discard.is_empty(), "流速打开选行浮层，选择前不消耗施词字")
-	if overlay != null:
-		overlay._on_choose(2)
+	_check("ui_flow_speed_picker", screen._board_view.pick_mode == "row" and screen.battle.flow_speed_rows.is_empty() and screen.battle.discard.is_empty(), "流速进入整行选择，选择前不消耗施词字")
+	screen._board_view._on_tile_pressed(Vector2i(0, 2))
+	screen._on_primary()
 	await _wait_for_screen_idle(screen)
 	_check("ui_flow_speed_complete", screen.battle.flow_speed_rows.get(2, 0) == 2 and screen.battle.discard.size() == 2 and screen._modal_count == 0 and not screen._busy, "流速为所选第三行增加两词，施放自身不扣额度")
 	await _dispose_screen(screen)

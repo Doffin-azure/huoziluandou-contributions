@@ -8,7 +8,7 @@ var _saved_motion := false
 var _saved_release := false
 var _recording := false
 var _recorded := 0
-const GLYPHS := ["击", "破", "回", "流", "防", "御", "加", "速", "充", "电", "火", "爆", "金", "币", "冷", "却"]
+const GLYPHS := ["击", "破", "回", "流", "防", "御", "加", "速", "充", "电", "火", "爆", "金", "币", "冷", "转"]
 
 
 func _ready() -> void:

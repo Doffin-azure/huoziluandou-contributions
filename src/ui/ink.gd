@@ -90,6 +90,18 @@ func _build_theme() -> Theme:
 	# --- 面板 ---
 	t.set_stylebox("panel", "PanelContainer", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2, 0.8))
 	t.set_stylebox("panel", "Panel", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2, 0.8))
+	# 提示框必须完整遮住桌面，不能让墨黑文字落在引擎的默认深底上。
+	var hint := StyleBoxFlat.new()
+	hint.bg_color = Color(Palette.PAPER, 1.0)
+	hint.border_color = Palette.INK_FAINT
+	hint.set_border_width_all(1)
+	hint.set_corner_radius_all(2)
+	hint.set_content_margin_all(14)
+	t.set_stylebox("panel", "TooltipPanel", hint)
+	t.set_color("font_color", "TooltipLabel", Palette.INK)
+	t.set_color("font_shadow_color", "TooltipLabel", Color.TRANSPARENT)
+	t.set_font("font", "TooltipLabel", sans)
+	t.set_font_size("font_size", "TooltipLabel", 18)
 
 	# --- 滚动条 ---
 	t.set_stylebox("scroll", "VScrollBar", _sb(Palette.PAPER_DARK, 6, Color(0, 0, 0, 0), 0))
@@ -273,12 +285,27 @@ func body(text: String) -> Label:
 
 
 func button(text: String, primary := false) -> Button:
-	var b := Button.new()
+	var b := HintButton.new()
 	b.text = text
 	b.theme_type_variation = "PrimaryButton" if primary else ""
 	b.custom_minimum_size = Vector2(0, 42)
 	b.focus_mode = Control.FOCUS_NONE
 	return b
+
+
+func tooltip(text: String) -> Control:
+	# 引擎已在 TooltipPanel 内承载自定义内容，只返回正文，避免双层边框。
+	var description := Label.new()
+	description.theme = theme
+	description.theme_type_variation = "TooltipLabel"
+	description.add_theme_color_override("font_color", Palette.INK)
+	description.add_theme_font_override("font", sans)
+	description.add_theme_font_size_override("font_size", 18)
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description.text = text
+	description.custom_minimum_size.x = minf(360, maxf(160, get_window().size.x - 56))
+	description.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return description
 
 
 func panel(variation := "PanelCard") -> PanelContainer:
