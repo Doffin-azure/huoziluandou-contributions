@@ -28,16 +28,8 @@ const ABILITY_PARAMETERS := ["next_rapid_heat", "next_overfire_per", "heat_overl
 static func entry(id: String, name: String, glyph: String, stacks: int, description: String, color: Color, kind := 0, unit_label := "层") -> Dictionary:
 	return {"id": id, "name": name, "glyph": glyph, "stacks": stacks, "description": description, "color": color, "kind": kind, "unit": unit_label}
 
-static func collect(unit: Combatant, battle: BattleState = null, shown_defense: Dictionary = {}) -> Array:
+static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 	var result: Array = []
-	var block := int(shown_defense.get("block", unit.block))
-	var persistent := int(shown_defense.get("persistent_block", unit.persistent_block))
-	if block > 0:
-		var description := "当前格挡 %d，优先于持久盾抵挡伤害。" % block
-		if unit.is_player: description += "敌方行动后清除。"
-		result.append(entry("block", "临时格挡" if unit.is_player else "护盾", "防", block, description, Palette.INK, 0, "点"))
-	if persistent > 0:
-		result.append(entry("persistent_block", "持久盾", "御", persistent, "当前持久盾 %d，临挡耗尽后抵挡伤害，跨回合保留。" % persistent, Palette.INK, 0, "点"))
 	if unit.is_player:
 		if unit.heat > 0:
 			var heat := entry("heat", "热度", "火", unit.heat, "当前热度 %d / 热容 %d。超过热容会产生灼热字。" % [unit.heat, unit.heat_capacity], Palette.VERMILION_DK, 0, "点")
@@ -131,7 +123,7 @@ static func collect(unit: Combatant, battle: BattleState = null, shown_defense: 
 
 
 static func _priority(item: Dictionary) -> int:
-	var resources := ["block", "persistent_block", "heat", "energy"]
+	var resources := ["heat", "energy"]
 	if item.id in resources: return resources.find(item.id) - 4
 	if int(item.kind) == StatusData.Kind.DEBUFF: return 0
 	if item.id in ["draw_bonus_next", "manual_draw_pending", "ability:vigor_next"]: return 1

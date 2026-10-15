@@ -105,6 +105,8 @@ func _run() -> void:
 		if names[index] == "火" or names[index] == "电":
 			var focus := "heat" if names[index] == "火" else "energy"
 			_ok(flights[0].destination.distance_to(_screen._status_point(focus) / _screen._effects._ui_scale) < 1, "资源字飞向状态栏对应资源，不误飞向气血")
+		elif names[index] == "防":
+			_ok(flights[0].destination.distance_to(_screen._defense_point("block") / _screen._effects._ui_scale) < 1, "防御字飞向血条护盾位置，不落在能力栏")
 		await _idle()
 		if names[index] != "击破":
 			_ok(battle.enemies[0].hp == enemy_before, "非攻击字 %s 不伪造敌方受击" % names[index])

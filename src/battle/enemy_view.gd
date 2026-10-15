@@ -11,6 +11,7 @@ var _name: Label
 var _hp: StatBar
 var _hp_number: Label
 var _intent: EnemyIntent
+var _defense: DefenseDisplay
 var _status: StatusStrip
 var _status_rule: ColorRect
 var _portrait: Control
@@ -33,6 +34,8 @@ func _ready() -> void:
 	_hp_number = Ink.label("", "", Palette.VERMILION_DK)
 	_hp_number.add_theme_font_override("font", Ink.serif)
 	_intent = EnemyIntent.new()
+	_defense = DefenseDisplay.new()
+	_defense.is_player = false
 	_status = StatusStrip.new()
 	_status_rule = Ink.hline()
 	_portrait = Control.new()
@@ -40,10 +43,11 @@ func _ready() -> void:
 	_visual = InkSpirit.new()
 	_visual.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_portrait.add_child(_visual)
-	for item in [_heading, _name, _hp, _hp_number, _portrait, _intent, _status_rule, _status]:
+	for item in [_heading, _name, _hp, _hp_number, _defense, _portrait, _intent, _status_rule, _status]:
 		item.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(item)
 	_status.mouse_filter = Control.MOUSE_FILTER_PASS
+	_defense.mouse_filter = Control.MOUSE_FILTER_PASS
 	_intent.mouse_filter = Control.MOUSE_FILTER_STOP
 	resized.connect(_layout)
 	gui_input.connect(_on_gui_input)
@@ -106,9 +110,15 @@ func _layout() -> void:
 		_hp_number.position.y = 24 * factor
 		_hp_number.size.y = 24 * factor
 		_name.clip_text = true
-		_intent.position.y = 46 * factor
+		_intent.position.y = 48 * factor
 		_intent.size.y = EnemyIntent.ROW_HEIGHT * factor
 		_status.position.y = 116 * factor
+	_defense.set_cell_size((24.0 if compact else 36.0) * factor)
+	var defense_width := _defense.display_width()
+	_defense.position = Vector2(0, _hp.position.y + (_hp.size.y - _defense.cell_size) * 0.5)
+	_defense.size = Vector2(defense_width, _defense.cell_size)
+	_hp.position.x = maxf(0, defense_width - 2 * factor)
+	_hp.size.x -= _hp.position.x
 	_status_rule.visible = _status.visible
 	_status_rule.position = Vector2(0, _status.position.y - 4 * factor)
 	_status_rule.size = Vector2(w, 1)
@@ -123,6 +133,7 @@ func refresh(animate := true) -> void:
 	_name.text = combatant.display_name
 	_hp.setup_bar(combatant.hp, combatant.max_hp, Palette.HP, "", animate)
 	_hp_number.text = "%d / %d" % [combatant.hp, combatant.max_hp]
+	_defense.set_values(combatant.block, combatant.persistent_block)
 	_status.set_entries(StatusDisplay.collect(combatant))
 	_layout()
 	if not combatant.is_alive():
@@ -149,7 +160,7 @@ func apply_feedback(event: Dictionary) -> void:
 		_hp.setup_bar(int(event.hp), int(event.max_hp), Palette.HP)
 		_hp_number.text = "%d / %d" % [int(event.hp), int(event.max_hp)]
 	if event.has("block"):
-		_status.set_entries(StatusDisplay.collect(combatant, null, {"block": int(event.block), "persistent_block": int(event.persistent_block)}))
+		_defense.set_values(int(event.block), int(event.persistent_block))
 		_layout()
 	if Settings.reduced_motion:
 		return

@@ -12,7 +12,7 @@ var _player_hp_value: Label
 var _hp_icon: BattleSymbol
 var _menu_btn: Button
 var _player_status: StatusStrip
-var _shown_defense: Dictionary = {}
+var _player_defense: DefenseDisplay
 var _gold_strip: ResourceStrip
 var _pile_label: ResourceStrip
 var _turn_label: Label
@@ -214,6 +214,9 @@ func _build_topbar() -> Control:
 	_player_hp = StatBar.new()
 	_player_hp.show_text = false
 	_player_panel.add_child(_player_hp)
+	_player_panel.move_child(_player_hp, 0)
+	_player_defense = DefenseDisplay.new()
+	_player_panel.add_child(_player_defense)
 	_player_status = StatusStrip.new()
 	_player_panel.add_child(_player_status)
 	content.add_child(_player_panel)
@@ -376,6 +379,7 @@ func _refresh_intents() -> void:
 
 func _refresh_player() -> void:
 	_show_player_hp(battle.player.hp, battle.player.max_hp)
+	_player_status.set_entries(StatusDisplay.collect(battle.player, battle))
 	_show_defense(battle.player.block, battle.player.persistent_block)
 	var wallet: Array = [{"id": "gold", "title": "金币", "value": GameState.gold, "color": Palette.GOLD_DK, "description": "可用金币 %d，本战获得 %d。" % [GameState.gold, battle.gold_earned]}]
 	if battle.player.temp_funds > 0:
@@ -391,9 +395,7 @@ func _show_player_hp(hp: int, max_hp: int) -> void:
 
 
 func _show_defense(block: int, persistent: int) -> void:
-	_shown_defense = {"block": block, "persistent_block": persistent}
-	_player_status.set_entries(StatusDisplay.collect(battle.player, battle, _shown_defense))
-	_player_status.visible = not _player_status.entries.is_empty()
+	_player_defense.set_values(block, persistent)
 	_layout()
 
 
@@ -1441,31 +1443,29 @@ func _layout() -> void:
 		_preview_panel.size = Vector2(column, side - 48)
 		_end_btn.position = Vector2(w - margin - 196, h - 60)
 		_end_btn.size = Vector2(196, 48)
-	_hp_icon.position = Vector2(0, 9 * ui_scale)
-	_hp_icon.size = Vector2.ONE * 26 * ui_scale
-	_player_hp_value.position = Vector2(36 * ui_scale, 0)
-	_player_hp_value.size = Vector2(185 * ui_scale, 44 * ui_scale)
-	_player_hp_value.add_theme_font_size_override("font_size", int(minf(52, 32 * ui_scale)))
-	_player_hp.position = Vector2(0, 44 * ui_scale)
-	_player_hp.custom_minimum_size.y = 8
-	_player_hp.size = Vector2(220, 6)
-	if _compact:
-		_player_hp_value.size.y = 34 * ui_scale
-		_player_hp_value.size.x = 114 * ui_scale
-		_player_hp_value.add_theme_font_size_override("font_size", int(minf(48, 27 * ui_scale)))
-		_hp_icon.size = Vector2.ONE * 22 * ui_scale
-		_hp_icon.position.y = 6 * ui_scale
-		_player_hp_value.position.x = 28 * ui_scale
-		_player_hp.position.y = 34 * ui_scale
-		_player_hp.size = Vector2(column, 6 * ui_scale)
-		var available := column - _player_hp_value.position.x
-		var hp_font := int(minf(48, 27 * ui_scale))
-		while _player_hp_value.get_combined_minimum_size().x > available and hp_font > int(18 * ui_scale):
-			hp_font -= 1
-			_player_hp_value.add_theme_font_size_override("font_size", hp_font)
-		_player_hp_value.size.x = available
-	_player_status.position = Vector2(0, 48 * ui_scale) if _compact else Vector2(254, 14)
-	_player_status.size = Vector2(column if _compact else maxf(36, _topbar.position.x + _gold_strip.position.x - _player_panel.position.x - 254 - 24), (48 if _compact else 36) * ui_scale)
+	var shield_cell := (48.0 if _compact else 40.0) * ui_scale
+	_player_defense.set_cell_size(shield_cell)
+	var defense_width := _player_defense.display_width()
+	_player_defense.position = Vector2(0, (48 * ui_scale - shield_cell) * 0.5)
+	_player_defense.size = Vector2(defense_width, shield_cell)
+	var hp_x := maxf(0, defense_width - 3 * ui_scale)
+	_player_hp.position = Vector2(hp_x, 8 * ui_scale)
+	_player_hp.custom_minimum_size.y = 0
+	_player_hp.size = Vector2(column - hp_x if _compact else 220, 32 * ui_scale)
+	_hp_icon.position = _player_hp.position + Vector2(8, 6) * ui_scale
+	_hp_icon.size = Vector2.ONE * 20 * ui_scale
+	_hp_icon.ink = Palette.PAPER
+	_player_hp_value.position = Vector2(_player_hp.position.x + 34 * ui_scale, 0)
+	_player_hp_value.size = Vector2(_player_hp.size.x - 42 * ui_scale, 48 * ui_scale)
+	_player_hp_value.add_theme_color_override("font_color", Palette.PAPER)
+	var hp_font := int(27 * ui_scale)
+	_player_hp_value.add_theme_font_size_override("font_size", hp_font)
+	while _player_hp_value.get_combined_minimum_size().x > _player_hp_value.size.x and hp_font > int(18 * ui_scale):
+		hp_font -= 1
+		_player_hp_value.add_theme_font_size_override("font_size", hp_font)
+	var status_x := _player_hp.position.x + _player_hp.size.x + 24
+	_player_status.position = Vector2(0, 48 * ui_scale) if _compact else Vector2(status_x, 6)
+	_player_status.size = Vector2(column if _compact else maxf(36, _topbar.position.x + _gold_strip.position.x - _player_panel.position.x - status_x - 24), (48 if _compact else 36) * ui_scale)
 	_player_status.set_ui_scale(ui_scale * (4.0 / 3.0 if _compact else 1.0))
 	_player_status.visible = not _player_status.entries.is_empty()
 	_bubble.set_ui_scale(ui_scale, _compact)
@@ -1640,7 +1640,7 @@ func _cast_destination(profile: Dictionary, play: Dictionary) -> Vector2:
 				var view: Control = _view_for(alive[alive_index])
 				if view is EnemyView:
 					return _effects.get_global_transform().affine_inverse() * view.impact_point()
-		"shield": return _status_point("block")
+		"shield": return _defense_point("block")
 		"heal": return _effects.point_of(_player_hp_value)
 		"energy", "heat": return _status_point(profile.focus)
 		"gold", "temp_funds", "equity": return _effects.point_of(_gold_strip.item_for(profile.focus))
@@ -1650,6 +1650,11 @@ func _cast_destination(profile: Dictionary, play: Dictionary) -> Vector2:
 
 func _status_point(id: String) -> Vector2:
 	return _effects.get_global_transform().affine_inverse() * _player_status.anchor_for(id)
+
+
+func _defense_point(id: String) -> Vector2:
+	var badge := _player_defense.badge_for(id)
+	return _effects.point_of(badge) if badge.visible else _effects.get_global_transform().affine_inverse() * (_player_hp.global_position + Vector2(0, _player_hp.size.y * 0.5))
 
 
 func _board_effect_point(play: Dictionary, span_override := 0) -> Vector2:
@@ -1711,9 +1716,9 @@ func _replay_feedback() -> bool:
 		var point := _effects.point_of(view)
 		var profile: Dictionary = event.get("profile", GlyphVfxProfile.for_glyph(""))
 		var radius := 16.0 if event.target.is_player else 42.0
-		var shield_id := "persistent_block" if event.has("persistent_block") and int(event.persistent_block) != int(_shown_defense.get("persistent_block", 0)) else "block"
+		var shield_id := "persistent_block" if event.has("persistent_block") and int(event.persistent_block) != _player_defense.persistent_block else "block"
 		if event.target.is_player:
-			point = _status_point(shield_id) if event.kind == "shield" else _effects.point_of(_player_hp_value)
+			point = _defense_point(shield_id) if event.kind == "shield" else _effects.point_of(_player_hp_value)
 		if view is EnemyView:
 			view.apply_feedback(event)
 			point = _effects.get_global_transform().affine_inverse() * view.impact_point()
@@ -1725,7 +1730,7 @@ func _replay_feedback() -> bool:
 				# HBoxContainer 下一帧完成排版；新出现的盾值要在实际图标旁反馈。
 				await get_tree().process_frame
 				if _exiting: return false
-				if event.kind == "shield" and _player_status._items.has(shield_id): point = _status_point(shield_id)
+				if event.kind == "shield" and _player_defense.badge_for(shield_id).visible: point = _defense_point(shield_id)
 		var number_point := point + Vector2(0, 62 if event.target.is_player else -26)
 		match event.kind:
 			"damage":
