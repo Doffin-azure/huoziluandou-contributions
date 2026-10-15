@@ -80,6 +80,7 @@ var _confirm_motion: Tween
 var _confirm_ink: ShaderMaterial
 var _step_timer: Timer
 var _exiting := false
+var _expedition := false   ## 墨途远征的遭遇：战后回远征地图，不走奖励页
 
 
 func build(root: Control) -> void:
@@ -99,6 +100,9 @@ func build(root: Control) -> void:
 	if enemy_datas.is_empty():
 		enemy_datas = [Database.get_enemy("ink_spirit")]
 	battle.start(GameState.make_battle_deck(), enemy_datas, int(params.get("seed", -1)))
+	_expedition = params.get("expedition", false) and GameState.expedition != null
+	if _expedition:
+		GameState.expedition.apply_battle_setup(battle)
 	_topbar = _build_topbar()
 	root.add_child(_topbar)
 	root.move_child(_player_panel, root.get_child_count() - 1)
@@ -1610,9 +1614,17 @@ func _check_battle_over() -> void:
 				GameState.add_gold(battle.player.equity)
 				_on_log("投资本金返还：+%d 金币" % battle.player.equity)
 			GameState.settle_victory_economy()
+		var ex_result := {}
+		if _expedition:
+			ex_result = GameState.expedition.finish_battle(victory)
 		if not await _wait_step(0.35):
 			return
-		if victory:
+		if victory and _expedition and ex_result.get("reward", false):
+			# 战后奖励负责「深度」：按现有字袋三选一（分流：四选一），选中的字进字匣
+			goto("res://src/screens/reward_screen.gd", {"node": node, "expedition": true, "count": ex_result.count})
+		elif victory and _expedition:
+			goto("res://src/screens/expedition_map_screen.gd")
+		elif victory:
 			goto("res://src/screens/reward_screen.gd", {"node": node})
 		else:
 			_show_defeat()
@@ -1631,7 +1643,10 @@ func _show_defeat() -> void:
 
 
 func _on_defeat_choice(index: int) -> void:
-	if index == 0:
+	if index == 0 and _expedition:
+		Expedition.start()
+		goto("res://src/screens/expedition_map_screen.gd")
+	elif index == 0:
 		GameState.start_new_run("v03")
 		goto("res://src/screens/map_screen.gd")
 	else:

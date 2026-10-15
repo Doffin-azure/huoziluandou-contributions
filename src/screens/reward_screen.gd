@@ -3,12 +3,14 @@ extends ScreenBase
 
 var node: MapNodeData
 var _options: Array = []
+var _expedition := false   ## 墨途远征：选中的字进字匣，回远征地图
 
 
 func build(root: Control) -> void:
 	node = params.get("node", null)
+	_expedition = params.get("expedition", false) and GameState.expedition != null
 	var is_boss := node != null and node.type == MapNodeData.Type.BOSS
-	_options = _roll_options(is_boss)
+	_options = _roll_options(is_boss, int(params.get("count", 3)))
 
 	var main := Ink.vbox(0)
 	main.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -49,13 +51,13 @@ func _header(is_boss: bool) -> Control:
 	var row := Ink.hbox(16)
 	pad.add_child(row)
 	row.add_child(Ink.h2("幕末大奖" if is_boss else "战利品"))
-	row.add_child(Ink.label("选择一枚实体字加入字袋，或放弃以换取金币。", "Muted"))
+	row.add_child(Ink.label("选择一枚字（先进字匣，满了进字袋），或放弃以换取金币。" if _expedition else "选择一枚实体字加入字袋，或放弃以换取金币。", "Muted"))
 	row.add_child(Ink.expander())
 	row.add_child(Ink.label("血 %d/%d　❖ %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold], "Muted"))
 	return panel
 
 
-func _roll_options(is_boss: bool) -> Array:
+func _roll_options(is_boss: bool, count := 3) -> Array:
 	var pool: Array = []
 	for c in Database.characters.values():
 		if c.is_pollution or c.pending_design or c.tags.has("enemy") or c.tags.has("彩蛋"):
@@ -71,7 +73,7 @@ func _roll_options(is_boss: bool) -> Array:
 	var out: Array = []
 	var rng := GameState.rng
 	var guard := 0
-	while out.size() < 3 and guard < 200:
+	while out.size() < count and guard < 200:
 		guard += 1
 		var c: CharacterData = pool[rng.randi_range(0, pool.size() - 1)]
 		if out.any(func(x): return x.id == c.id):
@@ -100,6 +102,10 @@ func _words_for(glyph: String) -> Array:
 
 
 func _on_pick(c: CharacterData) -> void:
+	if _expedition:
+		GameState.expedition.receive_reward_glyph(c)
+		goto("res://src/screens/expedition_map_screen.gd")
+		return
 	GameState.add_character(c, 1)
 	GameState.complete_current_node()
 	if GameState.run_complete():
@@ -110,6 +116,9 @@ func _on_pick(c: CharacterData) -> void:
 
 func _on_skip() -> void:
 	GameState.add_gold(8)
+	if _expedition:
+		goto("res://src/screens/expedition_map_screen.gd")
+		return
 	GameState.complete_current_node()
 	if GameState.run_complete():
 		_try_victory()
