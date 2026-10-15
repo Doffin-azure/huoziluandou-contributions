@@ -6,18 +6,12 @@ var _move: EnemyMoveData
 var _unit: Combatant
 var _ui_scale := 1.0
 var _row: HBoxContainer
+const ROW_HEIGHT := 64.0
 
 
 func _ready() -> void:
 	text = ""
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	var blank := StyleBoxEmpty.new()
-	add_theme_stylebox_override("normal", blank)
-	var hover := StyleBoxFlat.new()
-	hover.bg_color = Color(Palette.INK, 0.04)
-	hover.set_corner_radius_all(2)
-	add_theme_stylebox_override("hover", hover)
-	add_theme_stylebox_override("pressed", hover)
 	_row = HBoxContainer.new()
 	_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_row)
@@ -66,6 +60,16 @@ static func describe(move: EnemyMoveData, unit: Combatant) -> Array:
 
 
 func _rebuild() -> void:
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = Color(Palette.PAPER_WARM, 0.65)
+	normal.border_color = Palette.VERMILION_DK if entries.any(func(entry): return entry.negative) else Palette.INK_FAINT
+	normal.border_width_left = 3
+	normal.set_corner_radius_all(2)
+	add_theme_stylebox_override("normal", normal)
+	var hover: StyleBoxFlat = normal.duplicate()
+	hover.bg_color = Palette.PAPER_WARM
+	add_theme_stylebox_override("hover", hover)
+	add_theme_stylebox_override("pressed", hover)
 	for child in _row.get_children():
 		_row.remove_child(child)
 		child.queue_free()
@@ -78,13 +82,13 @@ func _rebuild() -> void:
 		var icon := BattleSymbol.new()
 		icon.symbol = entry.symbol
 		icon.ink = BattleSymbol.color_for(entry.symbol, entry.negative)
-		icon.custom_minimum_size = Vector2.ONE * 32 * _ui_scale
+		icon.custom_minimum_size = Vector2.ONE * 44 * _ui_scale
 		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		group.add_child(icon)
 		var number := Ink.label(entry.value, "", Palette.INK)
 		number.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		number.add_theme_font_override("font", Ink.serif)
-		number.add_theme_font_size_override("font_size", int(20 * _ui_scale))
+		number.add_theme_font_size_override("font_size", int(36 * _ui_scale))
 		number.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		group.add_child(number)
 	_layout.call_deferred()
@@ -97,7 +101,11 @@ func _layout() -> void:
 	var factor := minf(1.0, size.x / maxf(1, wanted.x))
 	_row.scale = Vector2.ONE * factor
 	_row.size = wanted
-	_row.position = Vector2(0, maxf(0, (size.y - wanted.y * factor) * 0.5))
+	_row.position = Vector2(maxf(0, (size.x - wanted.x * factor) * 0.5), maxf(0, (size.y - wanted.y * factor) * 0.5))
+
+
+func _make_custom_tooltip(for_text: String) -> Object:
+	return Ink.tooltip(for_text)
 
 
 func _details() -> String:

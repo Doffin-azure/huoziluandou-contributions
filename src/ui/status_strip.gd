@@ -40,9 +40,9 @@ func _rebuild() -> void:
 	for index in shown:
 		var entry: Dictionary = entries[index]
 		var button := _badge(str(entry.id), cell, BattleSymbol.color_for(str(entry.id), int(entry.kind) == StatusData.Kind.DEBUFF))
-		button.tooltip_text = "%s · %d 层\n%s" % [entry.name, entry.stacks, entry.description]
+		button.tooltip_text = "%s · %d %s\n%s" % [entry.name, entry.stacks, entry.get("unit", "层"), entry.description]
 		button.pressed.connect(_show_entry.bind(entry))
-		if int(entry.stacks) > 1:
+		if int(entry.stacks) > 1 or entry.get("unit", "层") != "层":
 			var badge := Panel.new()
 			badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			var paper := StyleBoxFlat.new()
@@ -96,7 +96,7 @@ func _show_entry(entry: Dictionary) -> void:
 	if host == null or not host.has_method("_mount_overlay") or bool(host.get("_busy")) or int(host.get("_modal_count")) > 0:
 		return
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "%s · %d 层" % [entry.name, entry.stacks], "body": entry.description, "hud_details": true, "scroll_body": true, "options": [{"text": "返回战斗", "primary": true}]})
+	overlay.setup({"title": "%s · %d %s" % [entry.name, entry.stacks, entry.get("unit", "层")], "body": entry.description, "hud_details": true, "scroll_body": true, "options": [{"text": "返回战斗", "primary": true}]})
 	host._mount_overlay(overlay)
 
 
@@ -107,7 +107,7 @@ func _show_details() -> void:
 	var overlay := ChoiceOverlay.new()
 	var lines: Array[String] = []
 	for entry in entries:
-		lines.append("【%s】%d 层\n%s" % [entry.name, entry.stacks, entry.description])
+		lines.append("【%s】%d %s\n%s" % [entry.name, entry.stacks, entry.get("unit", "层"), entry.description])
 	overlay.setup({"title": "状态与能力", "body": "\n\n".join(lines), "hud_details": true, "scroll_body": true, "options": [{"text": "返回战斗", "primary": true}]})
 	if host != null and host.has_method("_mount_overlay"):
 		host._mount_overlay(overlay)

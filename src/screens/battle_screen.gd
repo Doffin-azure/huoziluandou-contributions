@@ -1523,7 +1523,7 @@ func _layout() -> void:
 	for widget in _enemy_widgets:
 		widget.ui_scale = ui_scale
 		widget.set_compact(_compact or _enemy_widgets.size() > 1)
-		widget.custom_minimum_size.y = (152 if not widget._status.entries.is_empty() else 108) * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
+		widget.custom_minimum_size.y = (156 if not widget._status.entries.is_empty() else 112) * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
 	_board_view._layout()
 	if _effects != null:
 		_effects.set_ui_scale(ui_scale)

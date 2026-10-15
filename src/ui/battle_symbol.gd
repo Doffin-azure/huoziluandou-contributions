@@ -31,7 +31,8 @@ const SPECS := {
 	"hit": ["sword", ""], "fracture": ["shield", "crack"], "blast": ["star", "flame"], "frost": ["snow", ""],
 	"move_left": ["arrow_left", ""], "move_right": ["arrow", ""], "return": ["loop", ""], "rotate": ["grid", "loop"],
 	"cleanse": ["drop", "plus"], "lantern": ["lantern", ""], "unlock": ["shield", "arrow"],
-	"intent_inject": ["cards", "drop"], "intent_buff": ["star", "up"], "intent_debuff": ["drop", "down"]
+	"intent_inject": ["cards", "drop"], "intent_buff": ["star", "up"], "intent_debuff": ["drop", "down"],
+	"draw_bonus_next": ["cards", "clock"], "manual_draw_pending": ["hand", "cards"], "heat_overload_bonus": ["flame", "cards"]
 }
 
 

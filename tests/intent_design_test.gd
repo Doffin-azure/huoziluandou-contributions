@@ -45,6 +45,8 @@ func _close() -> void:
 
 
 func _run() -> void:
+	get_window().size = Vector2i(1280, 720)
+	await _frames(12)
 	GameState.start_new_run("v03")
 	if _capture:
 		var stage := StudyStage.new()

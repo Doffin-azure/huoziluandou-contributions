@@ -13,6 +13,7 @@ var _hp_number: Label
 var _intent: EnemyIntent
 var _block: ResourceStrip
 var _status: StatusStrip
+var _status_rule: ColorRect
 var _portrait: Control
 var _visual: InkSpirit
 var _motion: Tween
@@ -35,12 +36,13 @@ func _ready() -> void:
 	_block = ResourceStrip.new()
 	_intent = EnemyIntent.new()
 	_status = StatusStrip.new()
+	_status_rule = Ink.hline()
 	_portrait = Control.new()
 	_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_visual = InkSpirit.new()
 	_visual.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_portrait.add_child(_visual)
-	for item in [_heading, _name, _hp, _hp_number, _block, _portrait, _intent, _status]:
+	for item in [_heading, _name, _hp, _hp_number, _block, _portrait, _intent, _status_rule, _status]:
 		item.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(item)
 	_status.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -59,7 +61,7 @@ func _on_gui_input(event: InputEvent) -> void:
 
 func set_compact(value: bool) -> void:
 	compact = value
-	custom_minimum_size.y = 132 if value else 270
+	custom_minimum_size.y = 112 if value else 270
 	if is_node_ready():
 		_layout()
 
@@ -69,6 +71,7 @@ func _layout() -> void:
 		return
 	var w := size.x
 	_heading.position = Vector2.ZERO
+	_heading.visible = not compact
 	var factor := ui_scale if compact else 1.0
 	_heading.size = Vector2(w, 20 * factor)
 	_heading.add_theme_font_size_override("font_size", int(14 * factor))
@@ -82,15 +85,19 @@ func _layout() -> void:
 	_hp_number.position = Vector2(w - number_width, _hp.position.y - 8 * factor)
 	_hp_number.size = Vector2(number_width, 32 * factor)
 	_hp_number.add_theme_font_size_override("font_size", int(18 * factor) if compact else 22)
-	_block.position = Vector2(0, 72 * factor if compact else 108)
-	_block.size = Vector2(w, 28 * factor)
 	_block.set_ui_scale(factor, true)
-	var art_side := minf(w + 18, maxf(64, size.y - 232))
+	var block_width := _block.get_combined_minimum_size().x
+	_block.position = Vector2(w - block_width, 42)
+	_block.size = Vector2(block_width, 24 * factor)
+	_name.size.x = maxf(1, w - block_width - 8 * factor)
+	_name.clip_text = true
+	var art_top := 196.0
+	var art_side := minf(w + 18, maxf(64, size.y - art_top - (44 if not _status.entries.is_empty() else 18)))
 	_portrait.visible = not compact
-	_portrait.position = Vector2((w - art_side) * 0.5, 132)
+	_portrait.position = Vector2((w - art_side) * 0.5, art_top)
 	_portrait.size = Vector2(art_side, art_side)
-	_intent.position = Vector2(0, 84 * factor if compact else size.y - 90)
-	_intent.size = Vector2(w, 48 * factor)
+	_intent.position = Vector2(0, 108)
+	_intent.size = Vector2(w, 76 * factor)
 	_intent.set_ui_scale(factor)
 	_status.position = Vector2(0, 124 * factor if compact else size.y - 36)
 	_status.size = Vector2(w, 36 * factor)
@@ -98,21 +105,23 @@ func _layout() -> void:
 	_status.visible = not _status.entries.is_empty()
 	if compact:
 		_heading.size.y = 16 * factor
-		_name.position.y = 18 * factor
+		_name.position.y = 0
 		_name.size.y = 28 * factor
 		_name.add_theme_font_size_override("font_size", int(22 * factor))
-		_hp.position.y = 48 * factor
+		_hp.position.y = 30 * factor
 		_hp.size.y = 10 * factor
-		_hp_number.position.y = 42 * factor
+		_hp_number.position.y = 24 * factor
 		_hp_number.size.y = 24 * factor
-		var block_width := _block.get_combined_minimum_size().x
-		_block.position = Vector2(w - block_width, 18 * factor)
+		_block.position = Vector2(w - block_width, 2 * factor)
 		_block.size = Vector2(block_width, 24 * factor)
 		_name.size.x = maxf(1, w - block_width - 8 * factor)
 		_name.clip_text = true
-		_intent.position.y = 60 * factor
-		_intent.size.y = 48 * factor
-		_status.position.y = 112 * factor
+		_intent.position.y = 46 * factor
+		_intent.size.y = EnemyIntent.ROW_HEIGHT * factor
+		_status.position.y = 116 * factor
+	_status_rule.visible = _status.visible
+	_status_rule.position = Vector2(0, _status.position.y - 4 * factor)
+	_status_rule.size = Vector2(w, 1)
 
 
 func refresh(animate := true) -> void:

@@ -64,6 +64,18 @@
 
 ## 结构与验证
 
+### 2026-10-15：补齐状态、提高悬停可读性与意图层级
+
+`StatusDisplay` 从实际生效的能力字典收集条目，覆盖当前处理器写入的公开能力；内部计数不进入状态条。急速的升温、过火的伤害倍率并入对应能力详情。过热使用实际待触发标记，触发后的额外补字独立显示；伴随标记不重复占位。
+
+下回合多抽实际记录在负数 `next_draw_penalty` 中，现同时处理正负净修正：多抽和少抽使用不同符号，显示具体字数，结算后随状态消失。额外补字、急速、超速、精力待补和待选抽牌也显示字数与真实触发时机。优先排列减益、下回合效果和下一次效果，持续能力及溢出详情仍可查看。
+
+共享 `HintButton` 和敌方意图使用原生自定义提示正文，统一为不透明纸底、墨色文字、18 px 字体和限制宽度换行。提示外框由引擎承载，避免套两层边框；全局 TooltipPanel / TooltipLabel 同时设置配色，资源和其他原生提示也能继承正确对比度。
+
+敌方意图移到生命条下方、墨灵上方的独立浅底区域，使用约 44 px 图形和 36 px 数值，电脑区域高 76 px、手机至少 64 屏幕像素。状态图标留在单独的下方区域并用细线区隔。手机省去重复的目标小标题、压紧名称与血条，保证单个敌人的意图不需要滚动就能看见；额外状态仍可滚动查看。
+
+`tests/status_intent_fix_test.tscn` 从效果处理器提取公开能力写入点，逐项核对条目、符号和说明，覆盖全部词库状态，并通过真实打出【流】和进入下一回合验证多抽及图标清除。原生鼠标悬停验证说明框，截图输出 `shots/status-intent-desktop.png`、`shots/status-intent-hover.png` 和 `shots/status-intent-phone.png`。Godot 4.7.2 原生渲染 81 项、headless 77 项通过；原 UI 69 项、表现回归 83 项通过。意图回归固定初始窗口后 headless 49 项通过，避免默认虚拟窗口影响点击坐标。
+
 `Combatant.feedback` 报告已结算的生命和护盾结果，`BattleState.enemy_acting` 报告敌人行动顺序。战斗屏仅在自己的操作结算期间收集事件。规则仍同步结算，输入在短表现队列期间锁定。视图长期复用，切屏时取消等待并断开绑定，所有瞬态节点和 Tween 随战斗场景释放。
 
 目标点击索引会转换为规则层使用的存活敌人索引，避免前面敌人死亡后攻击错目标。模态浮层阻断字盘快捷键和触点，选择回调仍可提交明确目标。
@@ -75,6 +87,7 @@
 <godot> --headless --path . res://tests/battle_ui_test.tscn
 <godot> --headless --path . res://tests/battle_presentation_regression.tscn
 <godot> --headless --path . res://tests/glyph_vfx_test.tscn
+<godot> --path . --resolution 1280x720 --fixed-fps 30 res://tests/status_intent_fix_test.tscn -- --capture
 <godot> --path . --resolution 1280x720 --fixed-fps 30 res://tests/intent_design_test.tscn -- --capture
 <godot> --path . --resolution 1280x720 --fixed-fps 30 res://tests/glyph_vfx_test.tscn -- --capture
 <godot> --path . --resolution 1280x720 --fixed-fps 30 res://tests/battle_presentation_regression.tscn -- --capture
