@@ -4,7 +4,7 @@ class_name SpeechBubble
 enum State { IDLE, PREVIEW, RESULT, ERROR }
 
 var title: Label
-var body: RichTextLabel
+var body: EffectText
 var _caption: Label
 var _context: Label
 var _column: VBoxContainer
@@ -13,6 +13,7 @@ var _state: int = State.IDLE
 var _pulse: Tween
 var _effect_text := ""
 var _context_text := ""
+var _source_word: WordData
 var ui_scale := 1.0
 var compact := false
 
@@ -40,11 +41,7 @@ func _ready() -> void:
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_column.add_child(title)
 	_column.add_child(_rule())
-	body = RichTextLabel.new()
-	body.bbcode_enabled = true
-	body.fit_content = true
-	body.scroll_active = false
-	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	body = EffectText.new()
 	body.add_theme_constant_override("line_separation", 0)
 	_column.add_child(body)
 	_column.add_child(_rule())
@@ -77,13 +74,14 @@ func set_state(s: int) -> void:
 	title.add_theme_color_override("font_color", Palette.VERMILION_DK if s != State.IDLE else Palette.INK_SOFT)
 
 
-func set_text(t: String, b: String, s: int = State.PREVIEW) -> void:
+func set_text(t: String, b: String, s: int = State.PREVIEW, source_word: WordData = null) -> void:
 	if title == null:
 		return
 	var next_title := t.replace("《", "").replace("》", "").replace("「", "").replace("」", "")
 	var changed := next_title != title.text
 	title.text = next_title
 	_effect_text = b
+	_source_word = source_word
 	set_ui_scale(ui_scale, compact)
 	set_state(s)
 	if changed and not Settings.reduced_motion:
@@ -93,20 +91,6 @@ func set_text(t: String, b: String, s: int = State.PREVIEW) -> void:
 		_pulse = create_tween()
 		_pulse.tween_property(title, "modulate:a", 1.0, 0.10)
 	_scroll.scroll_vertical = 0
-
-
-func _styled_effects(text: String) -> String:
-	var number := RegEx.new()
-	number.compile("[0-9]+(?:\\.[0-9]+)?")
-	var result := ""
-	var cursor := 0
-	var number_size := int(minf(29, (20 if compact else 26) * ui_scale))
-	for match_number in number.search_all(text):
-		result += text.substr(cursor, match_number.get_start() - cursor).replace("[", "[lb]")
-		result += "[color=#%s][font_size=%d]%s[/font_size][/color]" % [
-			Palette.VERMILION_DK.to_html(false), number_size, match_number.get_string()]
-		cursor = match_number.get_end()
-	return result + text.substr(cursor).replace("[", "[lb]")
 
 
 func set_result(word: WordData, glyphs: Array, messages: Array) -> void:
@@ -143,5 +127,5 @@ func set_ui_scale(value: float, is_compact := false) -> void:
 	body.add_theme_font_size_override("bold_font_size", int(minf(27, (18 if compact else 23) * value)))
 	_caption.add_theme_font_size_override("font_size", int(minf(24, (15 if compact else 19) * value)))
 	_context.add_theme_font_size_override("font_size", int(minf(23, (15 if compact else 19) * value)))
-	body.text = _styled_effects(_effect_text)
+	body.set_effect_text(_effect_text, int(minf(29, (20 if compact else 26) * ui_scale)), _source_word)
 	set_context(_context_text)

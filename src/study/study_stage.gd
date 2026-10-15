@@ -355,13 +355,13 @@ func set_screen(path: String) -> void:
 	if _battle_mode:
 		_sun.look_at_from_position(Vector3(-7, 4.8, -4), Vector3(0, 1.4, 0), Vector3.UP)
 		_sun.light_color = Color("fff1d6")
-		_sun.light_energy = 2.0
-		_sun.light_angular_distance = 1.0
-		_sun.shadow_blur = 1.4
+		_sun.light_energy = 1.65
+		_sun.light_angular_distance = 1.8
+		_sun.shadow_blur = 1.8
 		_sun.shadow_bias = 0.006
 		_sun.shadow_normal_bias = 0.10
 		_environment.ambient_light_color = Color("a8b5c9")
-		_environment.ambient_light_energy = 0.30
+		_environment.ambient_light_energy = 0.46
 		_environment.tonemap_mode = Environment.TONE_MAPPER_ACES
 		_environment.ssao_radius = 0.18
 		_environment.ssao_intensity = 1.35

@@ -5,11 +5,19 @@ class_name SettingsOverlay
 signal closed
 
 var _style_row: HBoxContainer
+var _panel: PanelContainer
 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build()
+	resized.connect(_layout)
+	_layout()
+
+
+func _layout() -> void:
+	if _panel != null:
+		_panel.custom_minimum_size = Vector2(minf(600, size.x - 32), minf(580, size.y - 32))
 
 
 func _build() -> void:
@@ -24,10 +32,14 @@ func _build() -> void:
 	add_child(center)
 
 	var panel := Ink.panel("PanelCard")
-	panel.custom_minimum_size = Vector2(600, 0)
+	_panel = panel
 	center.add_child(panel)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel.add_child(scroll)
 	var pad := Ink.margin(24)
-	panel.add_child(pad)
+	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(pad)
 	var col := Ink.vbox(14)
 	pad.add_child(col)
 
@@ -68,6 +80,18 @@ func _build() -> void:
 		motion.text = "开" if Settings.reduced_motion else "关")
 	motion_row.add_child(motion)
 	col.add_child(motion_row)
+	var audio_row := Ink.hbox(12)
+	audio_row.add_child(Ink.label("音效音量", "Subheading"))
+	var volume := HSlider.new()
+	volume.min_value = 0
+	volume.max_value = 100
+	volume.step = 1
+	volume.value = Settings.sfx_volume * 100
+	volume.custom_minimum_size = Vector2(160, 48)
+	volume.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	volume.value_changed.connect(func(value: float): Settings.set_sfx_volume(value / 100.0))
+	audio_row.add_child(volume)
+	col.add_child(audio_row)
 
 	var close := Ink.button("关闭", true)
 	close.pressed.connect(func():
@@ -109,7 +133,7 @@ func _set_style(style_id: String) -> void:
 		_build_style_buttons()
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("cancel_selection"):
 		closed.emit()
 		queue_free()

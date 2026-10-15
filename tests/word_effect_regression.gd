@@ -2,7 +2,7 @@ extends Control
 ## 词效回归：实体守恒、回合/跨战边界、结阵联动和实际 HUD 多阶段交互。
 
 ## 固定数量防止脚本异常中断某个测试函数后得到假通过。
-const EXPECTED_CHECKS := 406
+const EXPECTED_CHECKS := 411
 var checks: Array = []
 
 func _ready() -> void:
@@ -18,6 +18,7 @@ func _ready() -> void:
 	_run_solo_balance_three()
 	_run_solo_balance_four()
 	_run_word_balance()
+	_run_regen()
 	_run_description_previews()
 	_run_reconnect_return()
 	_run_flow_row_limits()
@@ -111,13 +112,27 @@ func _preview_signature(b: BattleState) -> String:
 		"enemies": b.enemies.map(func(enemy): return [enemy.hp, enemy.block, enemy.statuses.duplicate(true)]),
 		"energy": b.player.energy, "heat": b.player.heat})
 
+func _run_regen() -> void:
+	var b := _battle()
+	b.enemies[0].enemy_data.moves[0].damage = 0
+	_word(b, "回复")
+	_check("regen_word_status", b.player.status_stacks("regen") == 3 and StatusDisplay.collect(b.player, b).any(func(item): return item.id == "regen" and item.stacks == 3), "回复获得 3 层再生，并在 HUD 显示再生层数")
+	b.player.hp = 40
+	var hp: Array = []
+	var stacks: Array = []
+	for i in 3:
+		b.end_player_turn()
+		hp.append(b.player.hp)
+		stacks.append(b.player.status_stacks("regen"))
+	_check("regen_turn_tick", hp == [43, 45, 46] and stacks == [2, 1, 0], "再生每回合回复层数生命并减 1 层：血 %s，层 %s" % [str(hp), str(stacks)])
+
 func _run_description_previews() -> void:
 	var unified := true
 	for word in Database.words.values():
 		unified = unified and word.describe() == WordDescriptions.TEXT.get(word.word, "") and word.description == word.effect_summary
 		for stale in ["P23初稿", "尚未收敛", "临时草案", "未定稿", "倾向删除"]:
 			unified = unified and not stale in word.describe()
-	_check("word_description_source", unified and WordDescriptions.TEXT.size() == 161, "全部161词共享完整说明，游戏介绍没有旧设计草稿")
+	_check("word_description_source", unified and WordDescriptions.TEXT.size() == 162, "全部162词共享完整说明，游戏介绍没有旧设计草稿")
 	var b := _battle()
 	var pos := Vector2i(3, 3)
 	var source := _place(b, pos, "再")
@@ -444,7 +459,7 @@ func _run_converge() -> void:
 	_check("converge_invalid_anchor", b.converge_to(Vector2i(-1, 0)) == 0 and b.board.cells == stable, "越界锚点不改动盘面")
 
 func _run_word_completion() -> void:
-	for text in ["流速", "重回", "重连", "流连", "回心", "回能", "防反"]:
+	for text in ["流速", "重回", "重连", "流连", "回心", "回能", "防反", "回复"]:
 		var word := Database.get_word_by_glyphs_string(text)
 		_check("word_catalog_" + text, word != null and word.implemented and not word.effects.is_empty() and word.glyphs.all(func(g): return Database.get_character_by_glyph(g) != null), "词条已登记、组成字存在，并有实际词效")
 
@@ -2133,7 +2148,7 @@ func _manual_option(overlay: ChoiceOverlay, glyph: String) -> int:
 func _run_ui_word_completion() -> void:
 	var saved_motion := Settings.reduced_motion
 	Settings.reduced_motion = true
-	for text in ["流速", "重回", "重连", "流连", "回心", "回能", "防反"]:
+	for text in ["流速", "重回", "重连", "流连", "回心", "回能", "防反", "回复"]:
 		var screen = await _new_screen()
 		var prior: CharInstance = null
 		if text == "重回":
@@ -2154,9 +2169,8 @@ func _run_ui_word_completion() -> void:
 		_check("ui_recognize_" + text, screen._current_word != null and screen._current_word.word == text and not screen._confirm_btn.disabled, "真实选字可以识别本词，并允许点出字")
 		screen._on_primary()
 		if text == "流速":
-			var picker := _choice(screen, "流速")
-			if picker != null:
-				picker._on_choose(1)
+			screen._board_view._on_tile_pressed(Vector2i(0, 1))
+			screen._on_primary()
 		if text == "重连":
 			for y in range(1, 4):
 				screen._board_view._on_tile_pressed(Vector2i(2, y))
@@ -2171,6 +2185,7 @@ func _run_ui_word_completion() -> void:
 			"回心": effected = screen.battle.player.hp == 31 and screen._player_hp.value == 31 and screen.battle.board.fill_count() == 3
 			"回能": effected = screen.battle.player.energy == 2 and screen.battle.ability_value("energy_regen") == 2
 			"防反": effected = screen.battle.player.block == 6 and screen.battle.ability_value("counter") == 1
+			"回复": effected = screen.battle.player.status_stacks("regen") == 3
 		_check("ui_effect_" + text, effected and not screen._busy and screen._modal_count == 0 and screen._board_view._interactable and screen._board_view.path.is_empty(), "从主按钮完成实际词效，HUD 和盘面更新并恢复输入")
 		await _dispose_screen(screen)
 	Settings.reduced_motion = saved_motion
@@ -2398,9 +2413,8 @@ func _cast_ui_flow(screen, row: int) -> void:
 	screen._board_view._on_tile_pressed(Vector2i.ZERO)
 	screen._board_view._on_tile_pressed(Vector2i(1, 0))
 	screen._on_primary()
-	var picker := _choice(screen, "流速")
-	if picker != null:
-		picker._on_choose(row)
+	screen._board_view._on_tile_pressed(Vector2i(0, row))
+	screen._on_primary()
 	await _wait_for_screen_idle(screen)
 
 func _run_ui_flow_stacking() -> void:
@@ -2550,11 +2564,10 @@ func _run_ui_spatial_targets() -> void:
 		screen._board_view._on_tile_pressed(Vector2i.ZERO)
 		screen._board_view._on_tile_pressed(Vector2i(1, 0))
 		screen._on_primary()
-		var overlay := _choice(screen, text)
-		_check("ui_" + text + "_row_picker", overlay != null and overlay.cfg.options.size() == screen.battle.board.size, "真实出字入口弹出本词的选行浮层，只提供棋盘各行")
+		_check("ui_" + text + "_row_picker", screen._board_view.pick_mode == "row" and screen._board_view.pick_reselect, "真实出字入口进入整行选择，可直接点盘面改选")
 		_check("ui_" + text + "_deferred", enemy.hp == hp_before and screen.battle.board.get_cell(0, 0) == first and screen.battle.discard.is_empty(), "选行之前不造成伤害或消耗词字")
-		if overlay != null:
-			overlay._on_choose(3)
+		screen._board_view._on_tile_pressed(Vector2i(0, 3))
+		screen._on_primary()
 		await _wait_for_screen_idle(screen)
 		var dest_x := 3 if text == "左击" else 1
 		_check("ui_" + text + "_complete", hp_before - enemy.hp == 6 and screen.battle.board.get_cell(dest_x, 3) == marker and screen.battle.discard.size() == 2, "选第四行后完成 6 伤、正确方向的循环位移和两字消耗")
@@ -2568,10 +2581,9 @@ func _run_ui_spatial_targets() -> void:
 	screen._board_view._on_tile_pressed(Vector2i.ZERO)
 	screen._board_view._on_tile_pressed(Vector2i(1, 0))
 	screen._on_primary()
-	var overlay := _choice(screen, "流速")
-	_check("ui_flow_speed_picker", overlay != null and screen.battle.flow_speed_rows.is_empty() and screen.battle.discard.is_empty(), "流速打开选行浮层，选择前不消耗施词字")
-	if overlay != null:
-		overlay._on_choose(2)
+	_check("ui_flow_speed_picker", screen._board_view.pick_mode == "row" and screen.battle.flow_speed_rows.is_empty() and screen.battle.discard.is_empty(), "流速进入整行选择，选择前不消耗施词字")
+	screen._board_view._on_tile_pressed(Vector2i(0, 2))
+	screen._on_primary()
 	await _wait_for_screen_idle(screen)
 	_check("ui_flow_speed_complete", screen.battle.flow_speed_rows.get(2, 0) == 2 and screen.battle.discard.size() == 2 and screen._modal_count == 0 and not screen._busy, "流速为所选第三行增加两词，施放自身不扣额度")
 	await _dispose_screen(screen)

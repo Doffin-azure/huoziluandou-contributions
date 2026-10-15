@@ -1,0 +1,211 @@
+extends RichTextLabel
+class_name EffectText
+## 可复用的词条文本。浮层属于来源控件，离开界面即释放；只读取说明。
+
+var _plain := ""
+var _source_word: WordData
+var _layer: CanvasLayer
+var _cards: Array[PanelContainer] = []
+var _hovered: Dictionary = {}
+var _pinned := false
+var _away := 0.0
+var _viewport_size := Vector2.ZERO
+
+
+func _init() -> void:
+	bbcode_enabled = true
+	fit_content = true
+	scroll_active = false
+	selection_enabled = false
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	meta_hover_started.connect(_on_link_entered.bind(0))
+	meta_hover_ended.connect(_on_link_exited.bind(0))
+	meta_clicked.connect(_on_link_clicked.bind(0))
+	set_process(false)
+	set_process_input(false)
+
+
+func set_effect_text(value: String, number_size := 0, source_word: WordData = null) -> void:
+	if value != _plain or source_word != _source_word:
+		close_help()
+	_plain = value
+	_source_word = source_word
+	text = EffectGlossary.format_text(value, number_size)
+	if source_word != null and EffectGlossary.brief(source_word) != source_word.describe():
+		text += "\n[font_size=%d]%s[/font_size]" % [mini(get_theme_font_size("normal_font_size"), 16), EffectGlossary.link("完整词效", "word:" + source_word.word)]
+
+
+func _on_link_entered(meta: Variant, depth: int) -> void:
+	_hovered[depth] = str(meta)
+	open_entry(str(meta), depth)
+
+
+func _on_link_exited(meta: Variant, depth: int) -> void:
+	if _hovered.get(depth, "") == str(meta):
+		_hovered.erase(depth)
+
+
+func _on_link_clicked(meta: Variant, depth: int) -> void:
+	open_entry(str(meta), depth)
+	_pinned = not _cards.is_empty()
+	accept_event()
+
+
+func open_entry(meta: String, depth := 0) -> void:
+	var info := EffectGlossary.entry(meta)
+	if info.is_empty() or not is_inside_tree() or depth > _cards.size():
+		return
+	if depth == 0:
+		for other in get_tree().get_nodes_in_group("effect_help_open"):
+			if other != self and other.get_viewport() == get_viewport():
+				other.close_help()
+	if depth < _cards.size() and _cards[depth].get_meta("entry") == meta:
+		_away = 0.0
+		return
+	# 子词条形成一条阅读路径，最多同时显示三层；再深入替换最深一层。
+	depth = mini(depth, 2)
+	while _cards.size() > depth:
+		var old := _cards.pop_back() as PanelContainer
+		old.hide()
+		old.queue_free()
+	for level in _hovered.keys():
+		if level > depth:
+			_hovered.erase(level)
+	if _layer == null:
+		_layer = CanvasLayer.new()
+		_layer.layer = 90
+		add_child(_layer)
+	if not is_in_group("effect_help_open"):
+		add_to_group("effect_help_open")
+	_viewport_size = get_viewport_rect().size
+	var pixel_scale := get_viewport().get_screen_transform().get_scale().y
+	var help_scale := clampf(1.0 / maxf(0.01, pixel_scale), 1.0, 1.85)
+	var width := minf(380.0 * help_scale, _viewport_size.x - 24.0)
+	var card := Ink.panel("PanelCard")
+	# CanvasLayer 不继承 Control 的主题链，浮层需显式使用当前游戏主题。
+	card.theme = Ink.theme
+	card.name = "EffectHelp"
+	card.set_meta("entry", meta)
+	card.custom_minimum_size.x = width
+	card.mouse_filter = Control.MOUSE_FILTER_STOP
+	var style := (Ink.theme.get_stylebox("panel", "PanelCard") as StyleBoxFlat).duplicate()
+	style.bg_color = Palette.PAPER
+	style.border_color = Palette.INDIGO
+	style.set_border_width_all(1)
+	style.set_content_margin_all(10 * help_scale)
+	style.shadow_color = Palette.SHADOW
+	style.shadow_size = 8
+	card.add_theme_stylebox_override("panel", style)
+	_layer.add_child(card)
+	_cards.append(card)
+	var col := Ink.vbox(int(8 * help_scale))
+	card.add_child(col)
+	var head := Ink.hbox(8)
+	col.add_child(head)
+	var title := Ink.label(str(info.title), "Subheading", Palette.INDIGO)
+	title.add_theme_font_size_override("font_size", int(20 * help_scale))
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	head.add_child(title)
+	var close := Ink.button("×")
+	close.custom_minimum_size = Vector2(44, 44) * help_scale
+	close.add_theme_font_size_override("font_size", int(18 * help_scale))
+	close.pressed.connect(close_help)
+	head.add_child(close)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(width - 20 * help_scale, 64)
+	col.add_child(scroll)
+	var description := RichTextLabel.new()
+	description.bbcode_enabled = true
+	description.fit_content = true
+	description.scroll_active = false
+	description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	description.mouse_filter = Control.MOUSE_FILTER_STOP
+	description.add_theme_font_size_override("normal_font_size", int(18 * help_scale))
+	description.text = EffectGlossary.format_text(str(info.text), 0, meta)
+	description.meta_hover_started.connect(_on_link_entered.bind(depth + 1))
+	description.meta_hover_ended.connect(_on_link_exited.bind(depth + 1))
+	description.meta_clicked.connect(_on_link_clicked.bind(depth + 1))
+	scroll.add_child(description)
+	var hint := Ink.label("悬浮查看 · 点按词条固定 · ×关闭", "Muted")
+	hint.add_theme_font_size_override("font_size", int(13 * help_scale))
+	col.add_child(hint)
+	card.modulate.a = 0.0
+	_layout_card.call_deferred(card, scroll, description, get_global_mouse_position(), help_scale)
+	_away = 0.0
+	set_process(true)
+	set_process_input(true)
+
+
+func _layout_card(card: PanelContainer, scroll: ScrollContainer, description: RichTextLabel, anchor: Vector2, help_scale: float) -> void:
+	await get_tree().process_frame
+	if not is_instance_valid(card) or not is_inside_tree() or not card.visible:
+		return
+	scroll.custom_minimum_size.y = minf(description.get_content_height() + 4.0 * help_scale, maxf(48.0 * help_scale, minf(400.0 * help_scale, get_viewport_rect().size.y - 120.0 * help_scale)))
+	card.reset_size()
+	await get_tree().process_frame
+	if not is_instance_valid(card) or not is_inside_tree() or not card.visible:
+		return
+	var bounds := get_viewport_rect().size
+	var at := anchor + Vector2(18, 20)
+	if at.x + card.size.x > bounds.x - 12:
+		at.x = anchor.x - card.size.x - 18
+	if at.y + card.size.y > bounds.y - 12:
+		at.y = anchor.y - card.size.y - 12
+	card.position = Vector2(clampf(at.x, 12, maxf(12, bounds.x - card.size.x - 12)), clampf(at.y, 12, maxf(12, bounds.y - card.size.y - 12)))
+	card.modulate.a = 1.0
+
+
+func _process(delta: float) -> void:
+	_update_help(delta, get_global_mouse_position())
+
+
+func _update_help(delta: float, pointer: Vector2) -> void:
+	if not is_visible_in_tree() or _viewport_size != get_viewport_rect().size:
+		close_help()
+		return
+	if _pinned or not _hovered.is_empty() or contains_pointer(pointer, 12):
+		_away = 0.0
+	else:
+		_away += delta
+		if _away >= 0.3:
+			close_help()
+
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("cancel_selection"):
+		close_help()
+		get_viewport().set_input_as_handled()
+	elif (event is InputEventMouseButton and event.pressed) or (event is InputEventScreenTouch and event.pressed):
+		if not contains_pointer(event.position) and not get_global_rect().has_point(event.position):
+			close_help()
+
+
+func contains_pointer(point: Vector2, margin := 0.0) -> bool:
+	for card in _cards:
+		if card.visible and card.get_global_rect().grow(margin).has_point(point):
+			return true
+	return false
+
+
+static func blocks_pointer(viewport: Viewport, point: Vector2) -> bool:
+	for control in viewport.get_tree().get_nodes_in_group("effect_help_open"):
+		if control.get_viewport() == viewport and control.is_visible_in_tree() and control.contains_pointer(point):
+			return true
+	return false
+
+
+func close_help() -> void:
+	for card in _cards:
+		card.hide()
+		card.queue_free()
+	_cards.clear()
+	_hovered.clear()
+	_pinned = false
+	_away = 0.0
+	if is_in_group("effect_help_open"):
+		remove_from_group("effect_help_open")
+	set_process(false)
+	set_process_input(false)
