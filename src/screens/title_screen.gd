@@ -2,6 +2,7 @@ extends ScreenBase
 ## 书房标题菜单；开始后淡出菜单，镜头推进桌面，再开启地图。
 var _menu: VBoxContainer
 var _buttons: Array[Button] = []
+var _expedition := false
 var _entry_timer: Timer
 var _menu_tween: Tween
 var _starting := false
@@ -33,7 +34,7 @@ func build(root: Control) -> void:
 	start.custom_minimum_size.y = 64
 	start.add_theme_font_size_override("font_size", 24)
 	_menu.add_child(start)
-	for entries in [[["自定义构筑", _on_custom], ["字库图鉴", _on_library]], [["字网图谱", _on_graph], ["设置", _open_settings]], [["离开", _quit]]]:
+	for entries in [[["墨途远征", _on_expedition], ["自定义构筑", _on_custom]], [["字库图鉴", _on_library], ["字网图谱", _on_graph]], [["设置", _open_settings], ["离开", _quit]]]:
 		var row := Ink.hbox(12)
 		for entry in entries:
 			row.add_child(_button(entry[0], entry[1]))
@@ -93,11 +94,24 @@ func _on_start() -> void:
 func _finish_start() -> void:
 	if not _starting:
 		return
+	if _expedition:
+		Expedition.start()
+		goto("res://src/screens/expedition_map_screen.gd")
+		return
 	GameState.start_new_run("v03")
 	goto("res://src/screens/map_screen.gd")
 
 
+## 墨途远征（v0.3）：迷雾地图探索、首领追逐，遭遇进入 4×4 战斗
+func _on_expedition() -> void:
+	if _starting or _modal_count > 0:
+		return
+	_expedition = true
+	_on_start()
+
+
 func _cancel_entry() -> void:
+	_expedition = false
 	_entry_timer.stop()
 	_starting = false
 	if _menu_tween != null:

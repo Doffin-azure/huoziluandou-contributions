@@ -45,6 +45,8 @@ var pending_reveal: Array = []   ## 转化等：已从字袋取出待选的实�
 var reconnect_pending: Array = [] ## 重连：暂存原实体与原格 [{inst, pos, return_turn}]
 var empowered_glyphs: Dictionary = {}   ## 强化：本场额外触发单字效果的字
 var removed_this_battle: Array = []     ## 炼化：本场移出循环的牌
+var pierce_once := false                ## 墨途远征「重击」：本场第一次攻击无视护盾
+var enemy_skip_turns := 0               ## 墨途远征「停火」：敌方跳过的行动次数
 var bounty_paid: bool = false
 var bounty_reward: int = 0
 var words_played_all: Array = []
@@ -95,6 +97,8 @@ func start(deck: Array, enemy_datas: Array, seed_value: int = -1) -> void:
 	abilities.clear()
 	empowered_glyphs.clear()
 	removed_this_battle.clear()
+	pierce_once = false
+	enemy_skip_turns = 0
 	blackout_requested = false
 	end_turn_requested = false
 	overdo_count = 0
@@ -476,7 +480,19 @@ func deal_damage(target: Combatant, amount: int, is_attack: bool = true) -> int:
 			dmg *= 2  # 冷心：本回合伤害翻倍
 		if has_ability("split_mind") and not target.is_player:
 			target = player   # 精分：自己的攻击也打自己
-	var real := target.take_damage(dmg)
+	var real := 0
+	if is_attack and pierce_once and not target.is_player:
+		# 重击（墨途远征词谱）：本场第一次攻击无视护盾
+		pierce_once = false
+		var saved := [target.block, target.persistent_block]
+		target.block = 0
+		target.persistent_block = 0
+		real = target.take_damage(dmg)
+		target.block = saved[0]
+		target.persistent_block = saved[1]
+		_log("重击：这一击无视护盾")
+	else:
+		real = target.take_damage(dmg)
 	if not target.is_player:
 		damage_dealt_this_turn += real
 		# 爆金：敌方每受到一次「攻击」获得 1 金币（被格挡/护甲吸收也算，故不看 real）
@@ -1497,9 +1513,15 @@ func _resolve_counter() -> void:
 		_log("反击：造成 %d 伤害" % real)
 	abilities.erase("counter")
 
-func _enemy_act(e: Combatant) -> void:
+## opening=true：开场突袭 / 首领先手，不消耗「停火」
+func _enemy_act(e: Combatant, opening := false) -> void:
 	var ed: EnemyData = e.enemy_data
 	if ed == null or ed.moves.is_empty():
+		return
+	if not opening and enemy_skip_turns > 0:
+		enemy_skip_turns -= 1
+		e.move_index += 1
+		_log("停火：%s 这一回合不攻击" % e.display_name)
 		return
 	var mv: EnemyMoveData = ed.moves[e.move_index % ed.moves.size()]
 	enemy_acting.emit(e, mv)

@@ -36,6 +36,9 @@ var rng := RandomNumberGenerator.new()
 ## 调试入口与未来「自定义模式」共用这一处。
 var custom_deck: Array = []
 
+## 墨途远征的局内状态；经典冒险为 null
+var expedition: Expedition = null
+
 
 func _ready() -> void:
 	rules = Database.rules
@@ -47,6 +50,7 @@ func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> voi
 		Database.reload()
 	rules = Database.rules
 	deck.clear()
+	expedition = null
 	player_max_hp = rules.player_max_hp
 	player_hp = player_max_hp
 	gold = rules.starting_gold
