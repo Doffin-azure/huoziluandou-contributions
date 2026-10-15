@@ -95,7 +95,7 @@ func _build_header() -> Control:
 	var left := Ink.vbox(2)
 	_title_label = Ink.h2("")
 	left.add_child(_title_label)
-	_boss_label = Ink.label("", "", Palette.VERMILION.lightened(0.45))
+	_boss_label = Ink.label("", "", Palette.VERMILION)
 	left.add_child(_boss_label)
 	row.add_child(left)
 	row.add_child(Ink.expander())
@@ -106,9 +106,9 @@ func _build_header() -> Control:
 	hp_wrap.add_child(_hp_bar)
 	row.add_child(hp_wrap)
 	var stats := Ink.vbox(2)
-	_stat_label = Ink.label("", "", Palette.PAPER)
+	_stat_label = Ink.label("", "", Palette.INK)
 	stats.add_child(_stat_label)
-	_seal_label = Ink.label("", "", Palette.GOLD)
+	_seal_label = Ink.label("", "", Palette.GOLD_DK)
 	stats.add_child(_seal_label)
 	row.add_child(stats)
 	_power_btn = _ghost("超能力", func(): ex.use_power())
@@ -409,7 +409,7 @@ func _refresh_plate() -> void:
 	if ex.active.is_empty():
 		_words_box.add_child(Ink.caption("还没有生效的词。2×2 最多凑出 3 个词，例如「加速 / 急停」。"))
 	for w in ex.active:
-		var l := Ink.label("「%s」%s" % [w, Lexicon.WORDS[w][1]], "", Palette.JADE.lightened(0.45))
+		var l := Ink.label("「%s」%s" % [w, Lexicon.WORDS[w][1]], "", Palette.JADE.darkened(0.25))
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size.x = 200
 		_words_box.add_child(l)
@@ -504,7 +504,7 @@ func _event_idle() -> void:
 	_add(Ink.caption("首领被惊动后会沿最短路追来。战斗、休息都要花时间。被追上的位置会给首领战一个减益；主动迎战不吃减益。"))
 	_add(Ink.caption("「封」：被伏兵控制的奖励，伏兵就在附近。走进它的领地就必须开战。"))
 	if ex.tray.size() >= ex.tray_cap():
-		_add(Ink.label("字匣满了：把字放进字袋、摆上版面，或丢掉。", "", Palette.VERMILION.lightened(0.4)))
+		_add(Ink.label("字匣满了：把字放进字袋、摆上版面，或丢掉。", "", Palette.VERMILION))
 
 
 func _event_fight() -> void:
@@ -746,7 +746,7 @@ func _build_legend() -> Control:
 	var outer := Ink.vbox(4)
 	outer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(outer)
-	outer.add_child(Ink.label("图样说明（临时 · 给美术对照，美化后可删）", "", Palette.GOLD))
+	outer.add_child(Ink.label("图样说明（临时 · 给美术对照，美化后可删）", "", Palette.GOLD_DK))
 	var col := GridContainer.new()
 	col.columns = 2
 	col.add_theme_constant_override("h_separation", 10)
