@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_7huuj"]
 script = ExtResource("1_dhn60")
+kind = 29
 handler = "equity_interest"
 amount = 1
 note = "持有≥2股权时，支付 1 股权获得 2 金币并补 1 字"
@@ -14,11 +15,11 @@ script = ExtResource("2_itrjk")
 id = "w072"
 word = "利息"
 glyphs = Array[String](["利", "息"])
-description = "持有≥2股权时，支付1股权获得2金币并补1字"
+description = "持有≥2股权时，支付 1 股权获得 2 金币并补 1 字"
 effects = Array[ExtResource("1_dhn60")]([SubResource("Resource_7huuj")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "持有≥2股权时，支付1股权获得2金币并补1字"
+effect_summary = "持有≥2股权时，支付 1 股权获得 2 金币并补 1 字"
 effect_handler_id = "equity_interest"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P3·补全词效"

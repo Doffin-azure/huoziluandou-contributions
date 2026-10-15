@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_effect"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_word"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("1_effect")
+kind = 28
+handler = "suspend_three"
+amount = 3
+target = 0
+timing = "persistent"
+note = "选择施词以外3枚不同的非固定字，本回合暂时移出；下回合原格优先返回，原格被占则找空格，满盘时等待空位。"
+
+[resource]
+script = ExtResource("2_word")
+id = "extra_chonglian"
+word = "重连"
+glyphs = Array[String](["重", "连"])
+description = "选择施词以外3枚不同的非固定字，本回合暂时移出；下回合原格优先返回，原格被占则找空格，满盘时等待空位。"
+effects = Array[ExtResource("1_effect")]([SubResource("Effect")])
+group = "连携"
+design_stage = "2026-10-14 重设计"
+effect_summary = "选择施词以外3枚不同的非固定字，本回合暂时移出；下回合原格优先返回，原格被占则找空格，满盘时等待空位。"
+effect_handler_id = "suspend_three"
+timing = "delayed"
+priority = "连携"
+implemented = true
+interaction = "choose_three_tiles"

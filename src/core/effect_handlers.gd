@@ -12,19 +12,126 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 	var g: int = (ctx.get("glyphs", []) as Array).size()
 	var extra: int = max(0, g - 2)
 	var amount: int = eff.amount + eff.amount_per_extra_glyph * extra
+	if amount > 0 and handler in ["damage", "chip_shield_damage", "block_temp", "heal", "energy"]:
+		amount += b.take_solo_gain_bonus(ctx)
 
 	match handler:
+		"strength_growing":
+			var gained := maxi(1, int(ctx.get("strengthen_gain", b.strengthen_plays)))
+			src.add_status("strength", gained)
+			return ["加强：本场第 %d 次打出，获得 %d 层力量" % [b.strengthen_plays, gained]]
 		"damage":
 			return EffectUtil.damage(b, enemy, amount)
+		"chip_shield_damage":
+			if enemy == null:
+				return ["破：没有目标"]
+			var limit := int(eff.args.get("shield", 4))
+			var removed := enemy.remove_block(limit)
+			var persistent := mini(enemy.persistent_block, limit - removed)
+			if persistent > 0:
+				enemy.add_persistent_block(-persistent)
+				removed += persistent
+			return ["破：移除 %d 点护盾" % removed] + EffectUtil.damage(b, enemy, amount)
+		"retaliate_once":
+			b.enable_ability("retaliate_once", b.ability_value("retaliate_once") + amount)
+			return ["反：本回合下一次受到敌方攻击后，对攻击者反击 %d 伤（整次行动后，仅一次）" % amount]
+		"energy_next_turn":
+			b.enable_ability("energy_next_turn", b.ability_value("energy_next_turn") + amount)
+			return ["蓄：下回合开始获得 %d 储能" % amount]
+		"payment_discount_once":
+			b.enable_ability("payment_discount_once", b.ability_value("payment_discount_once") + amount)
+			return ["币：本回合下一次金币费用 -%d，最低 0（仅一次）" % amount]
+		"profit_if_earned":
+			if b.gold_earned_this_turn <= 0:
+				return ["利：本回合此前没有获得金币，未获利"]
+			return ["利：此前已有金币收入，再获得 %d 金币" % b.earn_gold(amount)]
+		"rest_cool":
+			b.add_heat(-amount)
+			if b.damage_dealt_this_turn <= 0:
+				var rested := 1 + b.take_solo_gain_bonus(ctx)
+				src.heal(rested)
+				return ["息：热度 -%d，本回合未造成伤害，回复 %d 生命" % [amount, rested]]
+			return ["息：热度 -%d" % amount]
+		"throw_neighbor":
+			return EffectHandlersActions._throw_neighbor(b, ctx)
+		"solo_release":
+			var release := ctx.get("word") == null and bool((ctx.get("target", {}) as Dictionary).get("release_energy", false))
+			if release and b.player.energy < 1:
+				return ["放：储能不足，未释放"]
+			if release:
+				b.spend_energy(1)
+			var release_damage: int = (8 if release else amount) + b.take_solo_gain_bonus(ctx)
+			return EffectUtil.damage(b, enemy, release_damage) + ["放：消耗 1 储能" if release else "放：未消耗储能"]
+		"force_once":
+			b.enable_ability("force_once", b.ability_value("force_once") + amount)
+			return ["力：下一次攻击总伤害 +%d（仅一次）" % amount]
+		"solo_gain_once":
+			b.enable_ability("solo_gain_once", b.ability_value("solo_gain_once") + amount)
+			return ["加：本回合下一次单字首项直接伤害、临挡、治疗或储能收益 +%d（仅一次）" % amount]
+		"next_gap":
+			b.enable_ability("next_gap", 1)
+			return ["超：本回合下一次成功组词允许横向或纵向跨过一个空格（最多一次）"]
+		"heat_to_energy_solo":
+			var heat_cost := int(eff.args.get("heat_cost", 2))
+			if src.heat < heat_cost:
+				return ["化：热度不足 %d，只弃掉本字" % heat_cost]
+			b.add_heat(-heat_cost)
+			var converted := amount + b.take_solo_gain_bonus(ctx)
+			b.add_energy(converted)
+			return ["化：消耗 %d 热度，获得 %d 储能" % [heat_cost, converted]]
+		"precision_draw", "buy_bag_solo":
+			return EffectHandlersActions._solo_bag_draw(b, ctx, handler)
+		"turn_strength":
+			src.turn_strength += amount
+			return ["强：本回合伤害 +%d，回合结束清除" % amount]
+		"energy_gain_once":
+			b.enable_ability("energy_gain_once", b.ability_value("energy_gain_once") + amount)
+			return ["能：本回合下一次获得储能时额外 +%d（仅一次）" % amount]
+		"link_next_word":
+			b.enable_ability("link_draw_once", b.ability_value("link_draw_once") + amount)
+			return ["连：本回合下一次成功组词后补 %d 字（仅一次）" % amount]
+		"combine_next_word":
+			b.enable_ability("combine_word_once", b.ability_value("combine_word_once") + amount)
+			return ["合：本回合下一次成功组词后获得 2 临时格挡、1 储能（仅一次）"]
+		"speed_next_word":
+			b.enable_ability("speed_word_once", b.ability_value("speed_word_once") + amount)
+			return ["速：本回合下一次成功组词后补 2 字、热度 +1（仅一次）"]
+		"energy_refund_once":
+			b.enable_ability("energy_refund_once", b.ability_value("energy_refund_once") + amount)
+			return ["复：本回合下一次实际消耗储能时返还 1 点（仅一次，不超过消耗量）"]
+		"stop_cool":
+			b.add_heat(-amount)
+			b.end_turn_requested = true
+			return ["停：热度 -%d，立即结束出字阶段，敌人正常行动" % amount]
+		"turn_heat_capacity":
+			b.temporary_heat_capacity += amount
+			src.heat_capacity += amount
+			return ["载：本回合热容 +%d，下回合恢复" % amount]
+		"split_neighbor", "recast_neighbor", "refine_junk_neighbor":
+			return EffectHandlersActions._solo_neighbor_action(b, ctx, handler)
 		"overdo":
 			b.overdo_count += 1
 			var overdo_dmg: int = amount * b.overdo_count
 			return EffectUtil.damage(b, enemy, overdo_dmg) + ["过分：第 %d 次，共 %d 伤" % [b.overdo_count, overdo_dmg]]
 		"damage_all":
 			var out: Array = []
+			b.begin_attack_sequence()
 			for e in b.alive_enemies():
 				out.append_array(EffectUtil.damage(b, e, amount))
+			b.end_attack_sequence()
 			return out
+		"damage_multi":
+			# 多段攻击：每段 amount 点，段数由 args.hits 指定（共享一次攻击加成序列）
+			var hits: int = max(1, int(eff.args.get("hits", 1)))
+			var multi_out: Array = []
+			b.begin_attack_sequence()
+			for i in hits:
+				if enemy == null or not enemy.is_alive():
+					break
+				multi_out.append_array(EffectUtil.damage(b, enemy, amount))
+			b.end_attack_sequence()
+			multi_out.append("%d 段 × %d 伤" % [hits, amount])
+			return multi_out
 		"block_temp":
 			src.add_block(amount)
 			return ["获得 %d 点临时格挡" % amount]
@@ -34,6 +141,37 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"guard_reduce":
 			src.turn_damage_reduction += amount
 			return ["御：本回合每次受伤 -%d" % amount]
+		"guard_once":
+			src.next_damage_reduction += amount
+			return ["御：下一次受到伤害减免 %d 点，触发后消失" % amount]
+		"block_next_turn":
+			b.enable_ability("block_next_turn", b.ability_value("block_next_turn") + amount)
+			return ["甲：下回合开始获得 %d 点格挡（仅一次）" % amount]
+		"guard_halve":
+			src.turn_damage_halve = true
+			return ["放心：本回合受到伤害减半（向上取整，再 -1）"]
+		"ability_warm_heart":
+			b.enable_ability("warm_heart", 1)
+			return ["热心：本场持续——每获得 1 热度回复 1 生命，每失去 1 热度扣 1 生命"]
+		"ability_strong_heart":
+			b.enable_ability("strong_heart", 1)
+			return ["强心：本场每回合开始回复 2 + 已触发心力层数的生命"]
+		"collect_own":
+			return EffectHandlersActions._collect_own(b, ctx)
+		"cold_heart":
+			src.turn_damage_double = true
+			src.no_block_turns = 2
+			return ["冷心：本回合攻击伤害翻倍；本回合及下一回合不能获得新格挡或持久盾，已有护盾仍生效"]
+		"cleanse_status":
+			var removed: Array = []
+			for sid in src.statuses.keys():
+				var sd: StatusData = Database.get_status(str(sid))
+				if sd != null and sd.kind == StatusData.Kind.DEBUFF:
+					removed.append(sd.name)
+					src.statuses.erase(sid)
+			if removed.is_empty():
+				return ["清心：没有可清除的负面状态"]
+			return ["清心：清除了 %s" % ", ".join(removed)]
 		"ability_armor_plating":
 			b.enable_ability("armor_plating", 1)
 			return ["甲：每回合获得 1 点格挡，格挡被击穿则碎裂"]
@@ -46,12 +184,20 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"draw_random":
 			var n := b.draw_to_board(amount)
 			return ["随机补 %d 字" % n]
+		"draw_excluding_source":
+			var excluded: Array = (ctx.get("consumed", []) as Array).map(func(item): return item.inst)
+			var drawn := b.draw_to_board(amount, excluded)
+			return ["补 %d 字（排除本次打出的实体）" % drawn]
 		"draw_penalty_next":
 			b.next_draw_penalty += amount
 			return ["下次补字 -%d" % amount]
 		"draw_bonus_next":
 			b.next_draw_penalty -= amount
 			return ["下回合多抽 %d 字" % amount]
+		"manual_draw_next":
+			b.next_draw_penalty += amount
+			b.enable_ability("manual_draw", 1)
+			return ["精心：下回合补字 -%d，但可从字袋定向选字（随机落地）" % amount]
 		"gold":
 			EffectUtil.add_gold(b, amount)
 			return ["获得 %d 金币（本战累计 %d）" % [amount, b.gold_earned]]
@@ -62,28 +208,28 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			b.add_energy(amount)
 			return ["储能 +%d（当前 %d）" % [amount, src.energy]]
 		"heat":
+			b.add_heat(amount)
 			if amount >= 0:
-				b.add_heat(amount)
 				return ["热度 +%d（当前 %d/%d）" % [amount, src.heat, src.heat_capacity]]
-			else:
-				src.add_heat(amount)
-				return ["热度 %d（当前 %d）" % [amount, src.heat]]
+			return ["热度 %d（当前 %d）" % [amount, src.heat]]
 		"heat_clear":
 			var lost := src.heat
-			src.heat = 0
+			b.clear_heat()
 			return ["清空热度（-%d）" % lost]
 		"apply_status_self":
 			src.add_status(eff.status_id, amount if amount != 0 else 1)
-			return ["获得状态 %s" % eff.status_id]
+			var self_sd: StatusData = Database.get_status(eff.status_id)
+			return ["获得状态【%s】×%d" % [self_sd.name if self_sd != null else eff.status_id, amount if amount != 0 else 1]]
 		"apply_status_enemy":
 			if enemy != null:
 				enemy.add_status(eff.status_id, amount if amount != 0 else 1)
-				return ["使敌人获得 %s" % eff.status_id]
+				var foe_sd: StatusData = Database.get_status(eff.status_id)
+				return ["使敌人获得【%s】×%d" % [foe_sd.name if foe_sd != null else eff.status_id, amount if amount != 0 else 1]]
 			return []
 		"permanent_damage_reduction":
 			if GameState.permanent_damage_reduction <= 0:
 				GameState.permanent_damage_reduction = amount
-				return ["获得永久能力：每次实际生命伤害 -%d" % amount]
+				return ["获得本局永久能力：从下一场战斗起，每次受到伤害减免%d" % amount]
 			return ["防御力已生效，不重复叠加"]
 		"permanent_gold_growth":
 			if GameState.gold_growth_percent <= 0:
@@ -97,7 +243,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["防护：抵消下一次敌方盘面干扰"]
 		"ability_convert_block":
 			b.enable_ability("convert_block", int(eff.args.get("percent", 50)))
-			return ["护甲：回合结束把临挡转为持久盾"]
+			return ["护甲：本场所有敌人行动结束后，获得剩余临挡%d%%的持久盾" % int(eff.args.get("percent", 50))]
 		"counter":
 			b.enable_ability("counter", b.ability_value("counter") + (amount if amount != 0 else 1))
 			return ["反击：预留 %d 层" % (amount if amount != 0 else 1)]
@@ -118,7 +264,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			if enemy.block > 0:
 				var mult: int = int(eff.args.get("mult", 2))
 				var absorbed: int = min(enemy.block, dmg3 * mult)
-				enemy.block -= absorbed
+				enemy.remove_block(absorbed)
 				var leftover: int = int(ceil((dmg3 * mult - absorbed) / float(mult)))
 				if enemy.block <= 0:
 					broke = true
@@ -134,7 +280,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"remove_enemy_block":
 			if enemy != null:
 				var removed := enemy.block
-				enemy.block = 0
+				enemy.remove_block(removed)
 				return ["移除敌方 %d 点护盾" % removed]
 			return []
 		"conditional_draw_after_attack":
@@ -165,6 +311,20 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return EffectHandlersActions._merge_duplicates(b, ctx)
 		"replay_last_attack":
 			return EffectHandlersActions._replay_last_attack(b)
+		"replay_word":
+			return EffectHandlersActions._replay_word(b)
+		"recover_recent":
+			return EffectHandlersActions._recover_recent(b, ctx, amount)
+		"suspend_three":
+			return EffectHandlersActions._suspend_three(b, ctx)
+		"linger_chance":
+			b.enable_ability("linger_chance", 50)
+			return ["流连：本回合后续打出的每个字有 50% 概率留在原位（不叠加）"]
+		"energy_regen":
+			var gained := b.activate_energy_regen(maxi(1, amount))
+			return ["回能：本回合储能 +%d，后续 %d 回合开局各获得 2 点储能" % [gained, b.ability_value("energy_regen")]]
+		"return_enemy":
+			return EffectHandlersActions._return_enemy(b, ctx)
 		"ability_shared_attack":
 			b.enable_ability("shared_attack", 1)
 			b.begin_formation()
@@ -188,7 +348,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			b.swap_cells(tt.get("tile", Vector2i.ZERO), tt.get("tile2", Vector2i.ZERO))
 			return ["交换两格"]
 		"overcool":
-			b.player.heat = 0
+			b.clear_heat()
 			b.enable_ability("next_heat_to_block", 2)
 			return ["过冷：热量清零；下次获得的热度转为每点 +2 持久盾"]
 		"rotate_repeat":
@@ -207,16 +367,19 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return EffectUtil.simple_ability(b, "electric_material", "电能：本场持续——每消耗 2 储能，随机空格生成临时【电】")
 		"ability_heat_to_energy":
 			return EffectUtil.simple_ability(b, "heat_to_energy", "蓄热：本场持续——回合结束热度 -2，每点转 1 储能")
-		"flow_row":
-			var frow := int((ctx.get("target", {}) as Dictionary).get("row", -1))
-			b.flow_row = frow
-			return ["流速：本回合第 %d 行腾出的空格立即补回" % (frow + 1)]
+		"flow_speed":
+			var row := int((ctx.get("target", {}) as Dictionary).get("row", -1))
+			if row < 0 or row >= b.board.size:
+				return ["流速：请选择棋盘内的一行"]
+			b.flow_speed_rows[row] = int(b.flow_speed_rows.get(row, 0)) + amount
+			return ["流速：第 %d 行本回合后续出词原地补回消耗字，增加 %d 词，剩余 %d 词" % [row + 1, amount, int(b.flow_speed_rows[row])]]
 		"fill_board_heat":
 			var placed := 0
 			while b.board.fill_count() < 12:
 				if not b._draw_one():
 					break
 				placed += 1
+			placed = b.record_draw(placed)
 			if placed > 0:
 				b.add_heat(placed)
 			return ["火速：补至 %d 字（+%d 枚，热度 +%d）" % [12, placed, placed]]
@@ -228,7 +391,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["蓄冷：下次过热可抵消 4 点污染【热】"]
 		"heat_to_persist_block":
 			var hb: int = src.heat
-			src.heat = 0
+			b.clear_heat()
 			src.add_persistent_block(hb * 2)
 			return ["冷热：消耗 %d 热度，获得 %d 持久盾" % [hb, hb * 2]]
 		"energy_to_heat_block":
@@ -239,12 +402,11 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["电热：消耗 %d 储能，热度 +%d，临挡 +%d" % [e2, e2, e2 * 3]]
 		"heat_to_energy_damage":
 			var h2: int = int(src.heat / 2)
-			src.heat = 0
+			b.clear_heat()
 			b.add_energy(h2)
 			return EffectUtil.damage(b, enemy, 5) + ["火电：热度转 %d 储能" % h2]
 		"refund_energy_half":
-			var half: int = int(b.last_energy_spent / 2)
-			b.add_energy(half)
+			var half := b.refund_half_energy()
 			return ["复电：恢复 %d 储能" % half]
 		"wash_heat":
 			var washed := 0
@@ -256,7 +418,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 					washed += 1
 			if washed > 0:
 				b._shuffle(b.bag)
-			b.player.heat = max(0, b.player.heat - 2)
+			b.add_heat(-2)
 			return ["流火：洗回 %d 枚【热】，热度 -2" % washed]
 		"next_copy_layer":
 			return EffectUtil.simple_ability(b, "next_copy_layer", "超能：下一条 3+ 字词可消耗储能保留临时复制层")
@@ -297,6 +459,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 				if not b._draw_one():
 					break
 				placed_fb += 1
+			placed_fb = b.record_draw(placed_fb)
 			return ["心急：补满盘面（+%d 枚）" % placed_fb]
 		"heart_link":
 			if enemy == null:
@@ -311,8 +474,8 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			GameState.player_hp = avg_hp
 			return ["心连心：双方生命上限与当前生命都平均为 %d（上限 %d，跨战保留）" % [avg_hp, avg_max]]
 		"ability_diagonal_next":
-			b.enable_ability("next_diagonal", 1)
-			return ["流利：下一次组词允许一步对角线（原型：仅记录）"]
+			b.enable_ability("next_free_word", 1)
+			return ["流利：本回合下一次组词可按字序选择任意位置的字，无需相邻"]
 
 		# --- 流转 ---
 		"recover_consumed":
@@ -322,17 +485,22 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["清洗：净化 %d 枚字的污染标记" % cn]
 		"cleanse_adjacent":
 			return EffectHandlersActions._cleanse_adjacent(b, ctx)
+		"wash_adjacent":
+			return EffectHandlersActions._cleanse_adjacent(b, ctx, true)
+		"move_neighbor":
+			return EffectHandlersActions._move_neighbor(b, ctx)
 		"ability_flow":
 			b.enable_ability("flow", amount)
 			return ["流转：本回合每 2 种不同多字词补 %d 字" % amount]
 		"ability_compound_next":
 			b.enable_ability("next_compound", amount)
-			return ["复合：下一次长词保留临时层（原型占位）"]
+			return ["复合：下一次 3 字及以上的词保留一枚临时复制"]
 
 		# --- 蓄放 ---
 		"ability_energy_idle":
 			b.enable_ability("energy_idle", amount)
-			return ["蓄能：回合结束若有可用多字词，储能 +%d" % amount]
+			b.add_energy(1)
+			return ["蓄能：立即储能 +1；本场回合结束若有可用多字词，储能 +%d" % amount]
 		"energy_around_tail":
 			var tail_n: int = int(ctx.get("tail_neighbors_own", 0))
 			var total: int = amount + tail_n
@@ -342,8 +510,16 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			var spent: int = src.energy
 			b.spend_energy(spent)
 			var msgs: Array = []
-			if spent > 0:
-				msgs.append_array(EffectUtil.damage(b, enemy, amount * spent))
+			b.begin_attack_sequence()
+			for hit in spent:
+				if not src.is_alive():
+					break
+				if enemy == null or not enemy.is_alive():
+					enemy = b.first_alive_enemy()
+				if enemy == null:
+					break
+				msgs.append_array(EffectUtil.damage(b, enemy, amount))
+			b.end_attack_sequence()
 			msgs.append("放电：消耗 %d 储能，每点 %d 伤" % [spent, amount])
 			if int(eff.args.get("draw_per", 0)) > 0:
 				var n6 := b.draw_to_board(spent * int(eff.args.get("draw_per", 1)))
@@ -352,9 +528,10 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 
 		# --- 热暴 ---
 		"ability_heat_overload_bonus":
-			b.enable_ability("heat_overload_bonus", amount)
-			b.enable_ability("heat_overload_bonus_armed", 1)
-			return ["过热：本回合首次溢热后，下一次多字词额外补 %d 字" % amount]
+			if not b.has_ability("heat_overload_bonus_armed"):
+				b.enable_ability("heat_overload_bonus", amount)
+			b.enable_ability("heat_overload_bonus_armed", amount)
+			return ["过热：本场每回合首次溢热后，下一次多字词额外补 %d 字" % amount]
 		"ability_accel":
 			b.enable_ability("accel", amount)
 			return ["加速：本回合每次多字词补 1 字并升温 1"]
@@ -367,28 +544,29 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["超速：本回合下一次补字最多额外 %d 字" % amount]
 		"heat_burst":
 			var heat_spent: int = src.heat
-			src.heat = 0
+			b.clear_heat()
 			var dmg6: int = amount + int(eff.args.get("per", 4)) * heat_spent
 			return EffectUtil.damage(b, enemy, dmg6) + ["火爆：消耗 %d 热度" % heat_spent]
 		"heat_cleanse":
-			src.add_heat(-amount)
+			b.add_heat(-amount)
 			var sc := b.cleanse_scorch()
 			return ["清热：热度 -%d，清除 %d 处灼热" % [amount, sc]]
 		"heat_to_damage_flow":
 			var maxh: int = int(eff.args.get("max", 4))
-			var reduce: int = min(maxh, b.drawn_this_turn)
-			src.add_heat(-reduce)
+			var reduce: int = mini(src.heat, mini(maxh, b.drawn_this_turn))
+			b.add_heat(-reduce)
 			var dmg7: int = amount * reduce
 			return EffectUtil.damage(b, enemy, dmg7) + ["热流：降热 %d" % reduce]
 		"ability_reload":
 			src.heat_capacity += amount
-			b.base_draw_penalty += int(eff.args.get("draw_penalty", 1))
-			return ["重载：热容 +%d，此后每回合补字 -%d" % [amount, int(eff.args.get("draw_penalty", 1))]]
+			b.add_heat(0)
+			b.next_draw_penalty += int(eff.args.get("draw_penalty", 1))
+			return ["重载：本场热容 +%d，仅下回合补字 -%d" % [amount, int(eff.args.get("draw_penalty", 1))]]
 		"ability_overfire":
 			b.enable_ability("next_overfire", 1)
-			src.add_heat(int(eff.args.get("heat", 2)))
+			b.add_heat(int(eff.args.get("heat", 2)))
 			b.enable_ability("next_overfire_per", int(eff.args.get("per", 3)))
-			return ["过火：下一次攻击附加热度×%d 伤" % int(eff.args.get("per", 3))]
+			return ["过火：本回合下一次攻击整次追加热度×%d伤害，仅一次；当前热度%d" % [int(eff.args.get("per", 3)), src.heat]]
 		"ability_electric_overload":
 			b.enable_ability("electric_overload", amount)
 			return ["电流过载：本战每次溢热生成热字并 +储能/+伤害"]
@@ -421,6 +599,8 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return EffectHandlersActions._refine_layer(b, ctx)
 		"gild_glyph":
 			return EffectHandlersActions._gild_glyph(b, ctx)
+		"pin_glyph":
+			return EffectHandlersActions._pin_glyph(b, ctx)
 		"precision_place":
 			return EffectHandlersActions._precision_place(b, ctx, eff)
 		"split_mind":
@@ -438,6 +618,8 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return EffectHandlersActions._recast_board(b)
 		"recast_copy":
 			return EffectHandlersActions._recast_copy(b, ctx)
+		"recast_three":
+			return EffectHandlersActions._recast_three(b, ctx)
 		"repeat_last":
 			return EffectHandlersActions._repeat_last(b, ctx)
 		"reverse_line":
@@ -464,7 +646,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			var spent_e: int = src.energy
 			b.spend_energy(spent_e)
 			b.abilities["next_energy_bonus"] = int(b.abilities.get("next_energy_bonus", 0)) + spent_e * int(eff.args.get("per", 2))
-			return ["蓄力：消耗 %d 储能，下一次攻击 +%d 伤" % [spent_e, spent_e * int(eff.args.get("per", 2))]]
+			return ["蓄力：消耗%d储能，下一次攻击每段+%d伤害，跨回合保留" % [spent_e, spent_e * int(eff.args.get("per", 2))]]
 		"energy_to_heat_damage":
 			var spent_e2: int = src.energy
 			b.spend_energy(spent_e2)
@@ -472,14 +654,14 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return EffectUtil.damage(b, enemy, int(eff.args.get("per", 2)) * spent_e2) + ["放热：储能 %d 转为热度" % spent_e2]
 		"heat_to_energy":
 			var h2e: int = src.heat
-			src.heat = 0
+			b.clear_heat()
 			b.add_energy(h2e)
 			return ["热能：热度 %d 转为储能" % h2e]
 		"heat_to_bonus":
 			var h2b: int = src.heat
-			src.heat = 0
+			b.clear_heat()
 			src.add_status("next_bonus", h2b * int(eff.args.get("per", 2)))
-			return ["热力：热度 %d 转为下一次攻击强化" % h2b]
+			return ["热力：消耗%d热度，下一次攻击每段+%d伤害，跨回合保留" % [h2b, h2b * int(eff.args.get("per", 2))]]
 		"flow_energy_or_draw":
 			if b.drawn_this_turn > 0:
 				b.add_energy(amount)
@@ -492,18 +674,18 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 
 		# ---- 经济 / 股权 ----
 		"invest_equity":
-			if EffectUtil.available(b) < amount:
+			if EffectUtil.available(b) < EffectUtil.discounted_cost(b, amount):
 				return ["投资：支付额不足（需 %d）" % amount]
 			EffectUtil.pay(b, amount)
 			var eq: int = amount
-			if b.has_ability("compound_equity"):
-				eq += 1
-				b.abilities.erase("compound_equity")
+			if b.has_ability("compound_equity") and not b.has_ability("_compound_claimed"):
+				eq += b.ability_value("compound_equity", 1) * b.passive_multiplier("复利")
+				b.enable_ability("_compound_claimed")
 			src.equity += eq
 			return ["投资：锁定 %d 金币为 %d 股权（当前 %d）" % [amount, eq, src.equity]]
 		"compound_equity":
 			b.enable_ability("compound_equity", amount)
-			return ["复利：本回合首次存股权额外 +1"]
+			return ["复利：本场每回合首次投资额外 +1 股权"]
 		"equity_interest":
 			if src.equity < 2:
 				return ["利息：需持有至少 2 股权（当前 %d）" % src.equity]
@@ -543,7 +725,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			if lock <= 0:
 				return ["再投资：没有可锁定的金币"]
 			GameState.add_gold(-lock)
-			GameState.reinvest_gold += lock
+			GameState.lock_reinvestment(lock)
 			return ["再投资：锁定 %d 金币，下战胜利返还 %d" % [lock, lock * 2]]
 		"bounty":
 			var bcost: int = int(eff.args.get("cost", 5))
@@ -556,7 +738,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		# ---- 热暴 P3 ----
 		"cold_snap":
 			var dmg_c: int = amount + int(eff.args.get("per", 2)) * b.damage_taken_last_turn
-			src.heat = 0
+			b.clear_heat()
 			return EffectUtil.damage(b, enemy, dmg_c) + ["爆冷：清空热度"]
 		"ceasefire":
 			b.enable_ability("ceasefire", 1)
@@ -564,8 +746,8 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"ignite":
 			if enemy != null:
 				var burn_dmg: int = amount + src.heat
-				enemy.add_status("burn", 2)
-				b.abilities["burn_dmg"] = burn_dmg
+				enemy.statuses["burn"] = 2
+				enemy.status_data["burn_damage"] = burn_dmg
 				return ["放火：敌方灼烧 2 次，每次 %d 伤" % burn_dmg]
 			return []
 
@@ -580,37 +762,20 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["合力：获得 %d 临挡与 %d 储能" % [amount, int(eff.args.get("energy", 2))]]
 		"serial":
 			b.enable_ability("serial", int(eff.args.get("bonus", 6)))
-			return ["连载：本战每 3 种不同多字词强化下一次攻击"]
+			return ["连载：本场每累计 3 次有效出词，下一次攻击每段 +6，待兑现奖励可叠加并跨回合保留"]
 		"repeat_zero":
 			b.enable_ability("repeat_zero", 1)
-			return ["反复：本回合首次无效果单字出牌时原位补 1 字"]
+			return ["反复：本回合下一次出词后，将整词的临时字复制分别放入随机空格"]
 
 		# ---- 流转 P3 ----
 		"divert":
-			var tile_d: Vector2i = EffectUtil.tile(ctx)
-			var nd := 0
-			for off in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]:
-				var c_d: CharInstance = b.board.get_xy(tile_d + off)
-				if c_d != null and not c_d.pollutions.is_empty():
-					c_d.clear_pollutions()
-					nd += 1
-			return ["分流：净化所选区域 %d 处污染" % nd]
+			return EffectHandlersActions._divert_junk(b, ctx)
 		"clear_flow":
 			var sc2 := b.cleanse_scorch()
 			var ncf2 := b.draw_to_board(amount)
 			return ["清流：清除 %d 处灼热，补 %d 字" % [sc2, ncf2]]
 		"buyback":
-			var cost_bb: int = int(eff.args.get("cost", 3))
-			if b.consumed_this_turn.is_empty():
-				return ["回购：本回合没有消耗过字"]
-			if not EffectUtil.pay(b, cost_bb):
-				return ["回购：支付额不足（需 %d）" % cost_bb]
-			var idx_bb: int = int(ctx.get("target", {}).get("discard_index", b.consumed_this_turn.size() - 1))
-			idx_bb = clampi(idx_bb, 0, b.consumed_this_turn.size() - 1)
-			var inst_bb: CharInstance = b.consumed_this_turn[idx_bb]
-			b.consumed_this_turn.remove_at(idx_bb)
-			b.bag.append(inst_bb)
-			return ["回购：支付 %d 金币，回收【%s】到袋顶" % [cost_bb, inst_bb.glyph()]]
+			return EffectHandlersActions._buyback(b, ctx)
 
 	return ["（未实现的效果 %s）" % handler]
 

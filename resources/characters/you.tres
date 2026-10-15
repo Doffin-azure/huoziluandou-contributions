@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_tvvcj"]
 script = ExtResource("2_lj5xh")
+kind = 29
 handler = "gravity_right"
 target = 4
 note = "字盘按行向右重力"

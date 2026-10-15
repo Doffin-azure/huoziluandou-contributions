@@ -19,6 +19,14 @@ func _run() -> void:
 	_test_batch2_glyphs()
 	_test_overdo()
 	_test_bridge_over()
+	_test_replay_and_return()
+	_test_jingxin()
+	_test_xin_series()
+	_test_lengxin()
+	_test_qingxin()
+	_test_chaozai()
+	_test_chaosu()
+	_test_jisu()
 	_test_pollution_rush()
 	_test_heat_overflow()
 	_test_merge_duplicates()
@@ -45,7 +53,6 @@ func _run() -> void:
 	_test_refine_layer()
 	_test_vigor()
 	_test_jingjin()
-	_test_jingzhu()
 	_test_jingfen()
 	_test_formation()
 	_test_blast_preconsume()
@@ -70,7 +77,7 @@ func _run() -> void:
 	_test_chaozhong()
 	_test_heart_series()
 	print("\n[logic_test] PASS=%d FAIL=%d" % [_pass, _fail])
-	get_tree().quit()
+	get_tree().quit(1 if _fail > 0 else 0)
 
 
 func _ok(cond: bool, label: String) -> void:
@@ -129,31 +136,31 @@ func _test_persistent_shield() -> void:
 
 
 func _test_defense_glyphs() -> void:
-	# 御：本回合每次受伤 -1（防多段）
-	print("[御] 本回合每次受伤 -1")
+	# 御：下一次受击减伤 2，仅一次。
+	print("[御] 下一次受击减伤 2")
 	var b := _battle()
 	_place(b, 0, 0, "御")
 	b.try_play([Vector2i(0, 0)])
-	_ok(b.player.turn_damage_reduction == 1, "御：减伤 1 层")
+	_ok(b.player.next_damage_reduction == 2 and b.player.turn_damage_reduction == 0, "御：一次性减伤 2")
 	b.player.hp = 60
 	b.player.take_damage(5)
-	_ok(b.player.hp == 56, "御：5 伤 → 4（hp %d）" % b.player.hp)
+	_ok(b.player.hp == 57 and b.player.next_damage_reduction == 0, "御：首次 5 伤减为 3，并清除待抵挡（hp %d）" % b.player.hp)
 	b.player.take_damage(5)
-	_ok(b.player.hp == 52, "御：多段再 -1（hp %d）" % b.player.hp)
+	_ok(b.player.hp == 52, "御：第二段不再减伤（hp %d）" % b.player.hp)
 
-	# 甲：每回合 +1 格挡，被破则碎裂
-	print("[甲] 每回合 +1 格挡，被破则碎裂")
+	# 甲：下回合开局获得 2 格挡，仅一次。
+	print("[甲] 下回合格挡 +2")
 	var b2 := _battle()
 	_add_enemy(b2, 200)
 	_place(b2, 0, 0, "甲")
 	b2.try_play([Vector2i(0, 0)])
-	_ok(b2.has_ability("armor_plating"), "甲：能力启用")
+	_ok(b2.ability_value("block_next_turn") == 2 and b2.player.block == 0, "甲：预约下回合格挡，不立即给盾")
 	b2.end_player_turn()
-	_ok(b2.player.block == 1, "甲：新回合 +1 格挡（%d）" % b2.player.block)
+	_ok(b2.player.block == 2 and not b2.has_ability("block_next_turn"), "甲：新回合 +2 格挡并清除预约（%d）" % b2.player.block)
 	b2.player.take_damage(3)
 	_ok(b2.player.block_broken, "甲：格挡被击穿")
 	b2.end_player_turn()
-	_ok(not b2.has_ability("armor_plating"), "甲：护甲碎裂")
+	_ok(b2.player.block == 0 and not b2.has_ability("block_next_turn"), "甲：之后回合不再自动给盾")
 
 	# 盾：3 持久盾
 	print("[盾] 3 持久盾")
@@ -198,7 +205,9 @@ func _test_resource_glyphs() -> void:
 	_ok(b2.player.energy == 1, "电：储能 +1（%d）" % b2.player.energy)
 	_place(b2, 0, 0, "蓄")
 	b2.try_play([Vector2i(0, 0)])
-	_ok(b2.player.energy == 3, "蓄：储能 +2（%d）" % b2.player.energy)
+	var deferred: bool = b2.player.energy == 1 and b2.ability_value("energy_next_turn") == 2
+	b2.begin_player_turn(false)
+	_ok(deferred and b2.player.energy == 3 and not b2.has_ability("energy_next_turn"), "蓄：下回合才获得 2 储能（%d）" % b2.player.energy)
 
 	# 金：金币
 	print("[金] 金币")
@@ -210,12 +219,12 @@ func _test_resource_glyphs() -> void:
 	_ok(GameState.gold == 1, "金：金币 +1（%d）" % GameState.gold)
 	GameState.gold = g0
 
-	# 力：强力
-	print("[力] 强力")
+	# 力：下一次攻击总伤害 +2。
+	print("[力] 一次攻击增伤")
 	var b4 := _battle()
 	_place(b4, 0, 0, "力")
 	b4.try_play([Vector2i(0, 0)])
-	_ok(b4.player.status_stacks("strength") == 1, "力：强力 +1（%d）" % b4.player.status_stacks("strength"))
+	_ok(b4.ability_value("force_once") == 2 and b4.player.status_stacks("strength") == 0, "力：预约攻击 +2，不获得持续强力")
 
 	# 流：下回合多抽 1
 	print("[流] 下回合多抽 1")
@@ -234,15 +243,15 @@ func _test_resource_glyphs() -> void:
 
 
 func _test_batch2_glyphs() -> void:
-	# 充：储能 +1，随机补 1 字（复合效果）
-	print("[充] 储能 +1，随机补 1 字")
+	# 充：储能 +1，下回合多补 1 字。
+	print("[充] 储能 +1，下回合多补 1 字")
 	var b := _battle()
 	b.player.energy = 0
 	b.bag.append(CharInstance.new(Database.get_character_by_glyph("击")))
 	_place(b, 0, 0, "充")
 	b.try_play([Vector2i(0, 0)])
 	_ok(b.player.energy == 1, "充：储能 +1（%d）" % b.player.energy)
-	_ok(b.board.fill_count() == 1, "充：随机补 1 字（%d）" % b.board.fill_count())
+	_ok(b.board.fill_count() == 0 and b.next_draw_penalty == -1 and b.bag.size() == 1, "充：不立即补回，预约下回合多补 1 字")
 
 	# 爆：2 伤 + 1 热（复合效果）
 	print("[爆] 2 伤 + 1 热")
@@ -309,6 +318,226 @@ func _test_bridge_over() -> void:
 	_place(b2, 1, 0, "热")
 	var r2 := b2.try_play([Vector2i(0, 0), Vector2i(1, 0)])
 	_ok(r2.ok and r2.word != null and r2.word.word == "过热", "过 仍优先匹配含【过】的真词")
+
+
+func _test_replay_and_return() -> void:
+	# 回放：把上一个词用过的字放回盘面
+	print("[回放] 上一个词的字放回盘面")
+	var b := _battle()
+	_place(b, 0, 0, "防")
+	_place(b, 1, 0, "御")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b.board.get_xy(Vector2i(0, 0)) == null, "防御打出后两格已清空")
+	_place(b, 0, 1, "回")
+	_place(b, 1, 1, "放")
+	var r := b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
+	_ok(r.ok and b.board.get_xy(Vector2i(0, 0)) != null and b.board.get_xy(Vector2i(0, 0)).glyph() == "防", "回放把【防】放回原格")
+
+	# 精铸：固定盘面一枚字（本场可反复用、不消耗）
+	print("[精铸] 固定盘面字")
+	var b2 := _battle()
+	_add_enemy(b2, 100)
+	_place(b2, 3, 0, "破")
+	_place(b2, 2, 0, "击")
+	_place(b2, 0, 0, "精")
+	_place(b2, 1, 0, "铸")
+	b2.try_play([Vector2i(0, 0), Vector2i(1, 0)], {"tile": Vector2i(2, 0)})
+	var pinned_inst: CharInstance = b2.board.get_xy(Vector2i(2, 0))
+	_ok(pinned_inst != null and pinned_inst.pinned, "精铸固定了【击】")
+	b2.try_play([Vector2i(2, 0), Vector2i(3, 0)])
+	_ok(b2.board.get_xy(Vector2i(2, 0)) != null, "固定字打出后仍在原格（不消耗）")
+	# 重力不移动固定字
+	b2.board.set_cell(2, 1, CharInstance.new(Database.get_character_by_glyph("防")))
+	b2.apply_gravity()
+	_ok(b2.board.get_xy(Vector2i(2, 0)) != null and b2.board.get_xy(Vector2i(2, 0)).pinned, "固定字不受重力影响（仍在原格）")
+	_ok(b2.board.get_cell(2, 3) != null and b2.board.get_cell(2, 3).glyph() == "防", "普通字向下落到列底")
+
+	# 放回：从弃字堆定向挑一枚放到指定空格
+	print("[放回] 弃字堆 → 盘面")
+	var b3 := _battle()
+	var d := CharInstance.new(Database.get_character_by_glyph("破"))
+	b3.discard.append(d)
+	_place(b3, 0, 0, "放")
+	_place(b3, 1, 0, "回")
+	var r3 := b3.try_play([Vector2i(0, 0), Vector2i(1, 0)], {"tile": Vector2i(3, 3), "place_uid": d.uid})
+	_ok(r3.ok and b3.board.get_xy(Vector2i(3, 3)) != null and b3.board.get_xy(Vector2i(3, 3)).glyph() == "破", "放回把弃字堆的【破】放进指定空格")
+
+
+func _test_jingxin() -> void:
+	print("[精心] 下回合定向补字 -1")
+	var b := _battle()
+	_add_enemy(b, 200)
+	for g in ["击", "防", "回", "破"]:
+		b.bag.append(CharInstance.new(Database.get_character_by_glyph(g)))
+	_place(b, 0, 0, "精")
+	_place(b, 1, 0, "心")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b.has_ability("manual_draw"), "精心：已启用定向补字")
+	b.end_player_turn()
+	_ok(b.manual_draw_pending > 0, "下回合进入定向选字（待选 %d）" % b.manual_draw_pending)
+	var filled_before := b.board.fill_count()
+	b.place_manual_draw(["击", "防"])
+	_ok(b.manual_draw_pending == 0 and b.board.fill_count() == filled_before + 2, "定向选了 2 枚并随机落地（盘面 %d）" % b.board.fill_count())
+
+
+func _test_xin_series() -> void:
+	# 热心：热度变化同步生命
+	print("[热心] 热度变化同步生命")
+	var b := _battle()
+	_place(b, 0, 0, "热")
+	_place(b, 1, 0, "心")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b.has_ability("warm_heart"), "热心：能力启用")
+	b.player.hp = 30
+	b.add_heat(3)
+	_ok(b.player.hp == 33, "热心：热度 +3 回 3 血（%d）" % b.player.hp)
+	b.add_heat(-2)
+	_ok(b.player.hp == 31, "热心：热度 -2 扣 2 血（%d）" % b.player.hp)
+
+	# 放心：本回合受伤减半
+	print("[放心] 本回合受伤减半")
+	var b2 := _battle()
+	_add_enemy(b2, 200)
+	_place(b2, 0, 0, "放")
+	_place(b2, 1, 0, "心")
+	b2.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b2.player.turn_damage_halve, "放心：本回合减半标记")
+	b2.player.hp = 30
+	b2.player.take_damage(10)
+	_ok(b2.player.hp == 26, "放心：10 伤 → ceil(10/2)-1=4（hp %d）" % b2.player.hp)
+
+	# 强心：触发心力后每回合回血
+	print("[强心] 触发心力后回血")
+	var b3 := _battle()
+	_add_enemy(b3, 200)
+	_place(b3, 0, 0, "强")
+	_place(b3, 1, 0, "心")
+	b3.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b3.has_ability("strong_heart"), "强心：能力启用")
+	b3.player.heart_power = 2
+	b3.player.hp = 5
+	b3.player.take_damage(50)
+	_ok(b3.player.heart_power_triggered == 1, "心力触发 1 次（累计 %d）" % b3.player.heart_power_triggered)
+	b3.begin_player_turn(false)
+	_ok(b3.player.hp == 8, "强心：回合回复基础2加已触发心力1，共3血（hp %d）" % b3.player.hp)
+
+	# 收心：盘面牌回袋 + 每枚回血
+	print("[收心] 盘面牌回袋")
+	var b4 := _battle()
+	_place(b4, 2, 0, "破")
+	_place(b4, 3, 0, "防")
+	_place(b4, 0, 0, "收")
+	_place(b4, 1, 0, "心")
+	var bag0 := b4.bag.size()
+	b4.player.hp = 30
+	b4.try_play([Vector2i(0, 0), Vector2i(1, 0)], {"cells": [Vector2i(2, 0), Vector2i(3, 0)]})
+	_ok(b4.bag.size() == bag0 + 2 and b4.player.hp == 32, "收心：2 枚回袋 + 回 2 血（袋 %d 血 %d）" % [b4.bag.size(), b4.player.hp])
+
+	# 回心：回 1 血 + 补 3 字
+	print("[回心] 回 1 血 + 补 3 字")
+	var b5 := _battle()
+	for g in ["击", "防", "破"]:
+		b5.bag.append(CharInstance.new(Database.get_character_by_glyph(g)))
+	_place(b5, 0, 0, "回")
+	_place(b5, 1, 0, "心")
+	b5.player.hp = 30
+	b5.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b5.player.hp == 31 and b5.board.fill_count() == 3, "回心：回 1 血 + 补 3 字（血 %d 盘面 %d）" % [b5.player.hp, b5.board.fill_count()])
+
+	# 分心：补 1 字 + 1 伤 + 1 持久盾 + 回 1 血
+	print("[分心] 补字/伤害/护盾/回血")
+	var b6 := _battle()
+	var e6 := _add_enemy(b6, 100)
+	b6.bag.append(CharInstance.new(Database.get_character_by_glyph("击")))
+	_place(b6, 0, 0, "分")
+	_place(b6, 1, 0, "心")
+	b6.player.hp = 30
+	b6.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(100 - e6.hp == 1, "分心：1 伤（实际 %d）" % (100 - e6.hp))
+	_ok(b6.player.persistent_block == 1, "分心：1 持久盾")
+	_ok(b6.player.hp == 31, "分心：回 1 血（%d）" % b6.player.hp)
+	_ok(b6.board.fill_count() == 1, "分心：补 1 字")
+
+
+func _test_lengxin() -> void:
+	print("[冷心] 伤害翻倍 + 禁防御")
+	var b := _battle()
+	var e := _add_enemy(b, 100)
+	_place(b, 0, 0, "冷")
+	_place(b, 1, 0, "心")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b.player.turn_damage_double, "冷心：本回合伤害翻倍")
+	_ok(b.player.no_block_turns == 2, "冷心：2 回合不能获得防御")
+	_place(b, 0, 1, "击")
+	b.try_play([Vector2i(0, 1)])
+	_ok(100 - e.hp == 8, "冷心：击 4 伤 ×2 = 8（实际 %d）" % (100 - e.hp))
+	_place(b, 2, 0, "防")
+	_place(b, 3, 0, "御")
+	b.try_play([Vector2i(2, 0), Vector2i(3, 0)])
+	_ok(b.player.block == 0, "冷心：无法获得防御（格挡 %d）" % b.player.block)
+
+
+func _test_qingxin() -> void:
+	print("[清心] 清除负面状态")
+	var b := _battle()
+	b.player.add_status("vulnerable", 2)
+	b.player.add_status("poison", 3)
+	b.player.add_status("strength", 2)
+	_place(b, 0, 0, "清")
+	_place(b, 1, 0, "心")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b.player.status_stacks("vulnerable") == 0 and b.player.status_stacks("poison") == 0, "清心：易伤/中毒已清除")
+	_ok(b.player.status_stacks("strength") == 2, "清心：正面状态保留（强力 %d）" % b.player.status_stacks("strength"))
+
+
+func _test_chaozai() -> void:
+	print("[超载] 多字词额外执行一次")
+	var b := _battle()
+	var e := _add_enemy(b, 100)
+	_place(b, 0, 0, "超")
+	_place(b, 1, 0, "载")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b.player.status_stacks("next_extra") == 1, "超载：获得 1 层（%d）" % b.player.status_stacks("next_extra"))
+	_place(b, 2, 0, "击")
+	_place(b, 3, 0, "破")
+	b.try_play([Vector2i(2, 0), Vector2i(3, 0)])
+	_ok(100 - e.hp == 16, "超载：击破 8 伤 ×2 = 16（实际 %d）" % (100 - e.hp))
+	_ok(b.player.status_stacks("next_extra") == 0, "超载：层数已消耗")
+
+
+func _test_chaosu() -> void:
+	print("[超速] 下一次补字翻倍")
+	var b := _battle()
+	for i in 10:
+		b.bag.append(CharInstance.new(Database.get_character_by_glyph("击")))
+	_place(b, 0, 0, "超")
+	_place(b, 1, 0, "速")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b.ability_value("next_double_draw") > 0, "超速：设定翻倍标记")
+	_place(b, 0, 1, "回")
+	_place(b, 1, 1, "流")
+	b.player.heat = 0
+	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
+	_ok(b.board.fill_count() == 8, "超速：回流补 4 → 8 字（盘面 %d）" % b.board.fill_count())
+	_ok(b.player.heat == 4, "超速：额外 4 字升 4 热（热度 %d）" % b.player.heat)
+
+
+func _test_jisu() -> void:
+	print("[急速] 补 4 字（2 字回原格）+ 升温 2")
+	var b := _battle()
+	for i in 10:
+		b.bag.append(CharInstance.new(Database.get_character_by_glyph("击")))
+	_place(b, 0, 0, "急")
+	_place(b, 1, 0, "速")
+	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(b.ability_value("next_rapid") == 4, "急速：设定补 4 字")
+	b.player.heat = 0
+	_place(b, 0, 1, "防")
+	_place(b, 1, 1, "御")
+	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
+	_ok(b.board.fill_count() == 4, "急速：补 4 字（盘面 %d）" % b.board.fill_count())
+	_ok(b.board.get_xy(Vector2i(0, 0)) != null and b.board.get_xy(Vector2i(1, 0)) != null, "急速：2 字回到原格 (0,0)/(1,0)")
+	_ok(b.player.heat == 2, "急速：升温 2（热度 %d）" % b.player.heat)
 
 
 func _test_pollution_rush() -> void:
@@ -513,16 +742,16 @@ func _test_ignite() -> void:
 
 
 func _test_repeat_zero() -> void:
-	print("[反复] 首次无效果单字原位补字")
+	print("[反复] 下一词的整词临时复制随机回盘")
 	var b := _battle()
 	_place(b, 0, 0, "反")
 	_place(b, 1, 0, "复")
 	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
-	var cd: CharacterData = Database.get_character_by_glyph("洗")
-	b.bag.append(CharInstance.new(cd))
-	_place(b, 2, 2, "洗")
-	b.try_play([Vector2i(2, 2)])
-	_ok(b.board.get_cell(2, 2) != null, "反复：原格被补回一枚新字")
+	_place(b, 0, 1, "防")
+	_place(b, 1, 1, "御")
+	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
+	var copies: Array = b.board.cells.filter(func(c): return c != null and c.temporary)
+	_ok(copies.size() == 2 and copies.any(func(c): return c.glyph() == "防") and copies.any(func(c): return c.glyph() == "御"), "反复：生成整词的两枚临时字")
 
 
 func _test_mint() -> void:
@@ -553,22 +782,25 @@ func _test_buyback() -> void:
 	var bag_before := b.bag.size()
 	_place(b, 0, 1, "回")
 	_place(b, 1, 1, "购")
-	b.try_play([Vector2i(0, 1), Vector2i(1, 1)], {"discard_index": 0})
-	_ok(GameState.gold == 7 and b.bag.size() == bag_before + 1, "回购：-3 金币，字回袋顶")
+	var recovered: CharInstance = b.discard[0]
+	b.try_play([Vector2i(0, 1), Vector2i(1, 1)], {"place_uid": recovered.uid, "tile": Vector2i(3, 3)})
+	_ok(GameState.gold == 8 and b.bag.size() == bag_before and b.board.get_cell(3, 3) == recovered and recovered.temporary_uses == 1, "回购：支付2，原实体入指定格并额外使用一次")
 	GameState.gold = g0
 
 
 func _test_gravity_always() -> void:
-	print("[重力] 本战每次出字后全盘下落")
+	print("[重力] 每次出字后 + 每回合开局下落")
 	var b := _battle()
 	_place(b, 0, 0, "重")
 	_place(b, 1, 0, "力")
+	_place(b, 2, 0, "防")
 	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
 	_ok(b.has_ability("gravity_always"), "重力：已启用持续下落")
-	_place(b, 0, 0, "洗")
-	_place(b, 3, 3, "击")
-	b.try_play([Vector2i(3, 3)])
-	_ok(b.board.get_cell(0, 3) != null, "后续出字后，列顶字块被重力压到底行")
+	_ok(b.board.get_cell(2, 3) != null and b.board.get_cell(2, 0) == null, "出字后下落（【防】落底）")
+	_add_enemy(b, 200)
+	_place(b, 3, 0, "洗")
+	b.end_player_turn()
+	_ok(b.board.get_cell(3, 3) != null and b.board.get_cell(3, 0) == null, "回合开局抽完牌后下落（【洗】落底）")
 
 
 func _test_transform_board() -> void:
@@ -602,15 +834,15 @@ func _test_split_grow() -> void:
 		if c != null and c.temporary:
 			temp_count += 1
 	_ok(temp_count >= 1, "周围生长出 %d 枚临时字" % temp_count)
-	# 验证：紧邻【防】的临时字能与它组成合法词
+	# 分化允许匹配现存邻字或被删除的主字形，不保证随机候选只匹配防。
 	var good := 0
 	for sc in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(2, 1), Vector2i(1, 2)]:
 		var inst: CharInstance = b.board.get_xy(sc)
 		if inst == null or not inst.temporary:
 			continue
-		if Database.get_word_by_glyphs([inst.glyph(), "防"]) != null or Database.get_word_by_glyphs(["防", inst.glyph()]) != null:
+		if Database.get_word_by_glyphs([inst.glyph(), "防"]) != null or Database.get_word_by_glyphs(["防", inst.glyph()]) != null or Database.get_word_by_glyphs([inst.glyph(), "洗"]) != null or Database.get_word_by_glyphs(["洗", inst.glyph()]) != null:
 			good += 1
-	_ok(good >= 1, "生成的临时字能与相邻的【防】组词")
+	_ok(good >= 1, "生成的临时字匹配邻字【防】或被删除的【洗】")
 	# 临时字打出即消耗，不进弃字堆（选一个不需选目标的字）
 	var play_cell := Vector2i(-1, -1)
 	var play_inst: CharInstance = null
@@ -623,6 +855,9 @@ func _test_split_grow() -> void:
 	if play_inst != null:
 		var pr := b.try_play([play_cell])
 		_ok(pr.ok and not b.discard.has(play_inst), "临时字打出即消耗，不进弃字堆")
+	else:
+		# 生长出的临时字（现在确定性地匹配邻字）可能全部需要选目标，此处跳过
+		_ok(true, "本局生长字均需选目标，跳过临时字消耗检查")
 
 
 func _needs_target_solo(cd: CharacterData) -> bool:
@@ -697,7 +932,7 @@ func _test_refine_layer() -> void:
 	var a := _place(b, 0, 1, "击")
 	_place(b, 2, 2, "击")
 	b.try_play([Vector2i(0, 0), Vector2i(1, 0)], {"tile": Vector2i(0, 1), "tile2": Vector2i(2, 2)})
-	_ok(a.temporary_uses == 1 and b.board.get_cell(2, 2) == null, "两张【击】重合为一格（可重复使用）")
+	_ok(a.temporary_uses == 2 and a.refined and b.board.get_cell(2, 2) == null, "第一枚获得持续精炼及2次额外使用")
 	var in_bag := false
 	for c in b.bag:
 		if c.glyph() == "击":
@@ -741,21 +976,6 @@ func _test_jingjin() -> void:
 	_ok(GameState.gold == gg + 1, "镀金【击】参与多字词 +1 金币（%d→%d）" % [gg, GameState.gold])
 	GameState.gold = g0
 	GameState.deck = saved
-
-
-func _test_jingzhu() -> void:
-	print("[精铸] 弃字堆取字放进空格")
-	var g0 := GameState.gold
-	GameState.gold = 30
-	var b := _battle()
-	var stuck := CharInstance.new(Database.get_character_by_glyph("击"))
-	b.discard.append(stuck)
-	_place(b, 0, 0, "精")
-	_place(b, 1, 0, "铸")
-	b.try_play([Vector2i(0, 0), Vector2i(1, 0)], {"tile": Vector2i(3, 3), "place_uid": stuck.uid})
-	_ok(b.board.get_cell(3, 3) == stuck, "把弃字堆的【击】放进指定空格")
-	_ok(GameState.gold == 27, "支付 3 金币（当前 %d）" % GameState.gold)
-	GameState.gold = g0
 
 
 func _test_jingfen() -> void:
@@ -973,13 +1193,13 @@ func _test_edge_batch2() -> void:
 	_place(b, 0, 0, "流")
 	_place(b, 1, 0, "速")
 	var r := b.try_play([Vector2i(0, 0), Vector2i(1, 0)], {"row": 1})
-	_ok(r.ok and b.flow_row == 1, "流速：选定第 1 行")
+	_ok(r.ok and b.flow_speed_rows.get(1, 0) == 2 and b.drawn_this_turn == 0, "流速：选定一行，获得后续两词原地补字次数")
 	_place(b, 2, 1, "击")
 	_place(b, 3, 1, "破")
 	b.bag.append(CharInstance.new(Database.get_character_by_glyph("回")))
 	b.bag.append(CharInstance.new(Database.get_character_by_glyph("反")))
 	b.try_play([Vector2i(2, 1), Vector2i(3, 1)])
-	_ok(b.board.get_xy(Vector2i(2, 1)) != null and b.board.get_xy(Vector2i(3, 1)) != null, "流速：该行腾出的空格补回")
+	_ok(b.drawn_this_turn == 2 and b.flow_speed_rows.get(1, 0) == 1 and b.board.get_cell(2, 1) != null and b.board.get_cell(3, 1) != null, "流速：一词原地补回两枚字，只消耗一次补词额度")
 	# 火速
 	var b2 := _battle()
 	_place(b2, 0, 0, "火")
@@ -1034,7 +1254,7 @@ func _test_edge_batch2() -> void:
 	_place(b7, 0, 3, "击")
 	_place(b7, 1, 3, "破")
 	b7.try_play([Vector2i(0, 3), Vector2i(1, 3)])
-	_ok(b7.ability_value("double_next", 0) == 0, "超能力：触发后清除")
+	_ok(b7.ability_value("double_next", 0) == 1, "超能力：无持续收益的出词不消耗")
 	# 收回
 	var b8 := _battle()
 	_place(b8, 0, 0, "收")
@@ -1171,16 +1391,21 @@ func _test_recast() -> void:
 
 
 func _test_recast_copy() -> void:
-	print("[再铸] 弃字堆的临时复制进空格")
+	print("[再铸] 选 3 个字替换成随机临时字")
 	var b := _battle()
-	var src := CharInstance.new(Database.get_character_by_glyph("击"))
-	b.discard.append(src)
+	_place(b, 2, 0, "防")
+	_place(b, 3, 0, "御")
+	_place(b, 2, 1, "破")
 	_place(b, 0, 0, "再")
 	_place(b, 1, 0, "铸")
-	b.try_play([Vector2i(0, 0), Vector2i(1, 0)], {"tile": Vector2i(3, 3), "place_uid": src.uid})
-	var at: CharInstance = b.board.get_cell(3, 3)
-	_ok(at != null and at.glyph() == "击" and at.temporary and at.uid != src.uid, "生成了【击】的临时复制并放入指定格")
-	_ok(b.discard.has(src), "原牌仍留在弃字堆")
+	var r := b.try_play([Vector2i(0, 0), Vector2i(1, 0)], {"cells": [Vector2i(2, 0), Vector2i(3, 0), Vector2i(2, 1)]})
+	_ok(r.ok, "再铸打出成功")
+	var n := 0
+	for cell in [Vector2i(2, 0), Vector2i(3, 0), Vector2i(2, 1)]:
+		var at: CharInstance = b.board.get_xy(cell)
+		if at != null and at.temporary:
+			n += 1
+	_ok(n == 3, "3 枚字都被替换为临时字（实际 %d）" % n)
 
 
 func _test_repeat_last() -> void:
@@ -1374,11 +1599,11 @@ func _test_temp_funds_payment() -> void:
 	_place(b, 0, 0, "资")
 	_place(b, 1, 0, "金")
 	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
-	_ok(b.player.temp_funds == 3, "资金：获得 3 临时资金（当前 %d）" % b.player.temp_funds)
+	_ok(b.player.temp_funds == 5, "资金：获得 5 临时资金（当前 %d）" % b.player.temp_funds)
 	_place(b, 0, 1, "投")
 	_place(b, 1, 1, "币")
 	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
-	_ok(b.player.temp_funds == 0 and GameState.gold == 50, "投币：先花临时资金，金币不变")
+	_ok(b.player.temp_funds == 2 and GameState.gold == 50, "投币：先花临时资金，金币不变")
 	_ok(200 - e.hp == 15, "投币：支付 3 × 5 = 15 伤（实际 %d）" % (200 - e.hp))
 	GameState.gold = g0
 

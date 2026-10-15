@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_w6raj"]
 script = ExtResource("2_6knsa")
+kind = 13
 handler = "energy"
 amount = 1
 note = "储能 +1"

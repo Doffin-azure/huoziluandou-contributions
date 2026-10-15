@@ -5,18 +5,18 @@
 
 [sub_resource type="Resource" id="Resource_dqa48"]
 script = ExtResource("2_gy4ue")
-handler = "apply_status_self"
-amount = 1
-status_id = "strength"
-note = "获得 1 层强力"
+kind = 29
+handler = "force_once"
+amount = 2
+note = "下一次攻击总伤害 +2，仅一次（多段攻击只增加一次）"
 
 [resource]
 script = ExtResource("1_ofcqu")
 id = "li"
 glyph = "力"
 pinyin = "li"
-description = "获得 1 层强力"
+description = "下一次攻击总伤害 +2，仅一次（多段攻击只增加一次）"
 tags = Array[String](["utility"])
 solo_effects = Array[ExtResource("2_gy4ue")]([SubResource("Resource_dqa48")])
-solo_handler = "apply_status_self"
+solo_handler = "force_once"
 rarity = 1

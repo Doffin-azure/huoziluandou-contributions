@@ -5,24 +5,25 @@
 
 [sub_resource type="Resource" id="Resource_raovl"]
 script = ExtResource("1_3u6mc")
+kind = 28
 handler = "ability_convert_block"
 amount = 50
 timing = "persistent"
 args = {
 "percent": 50
 }
-note = "回合结束把一半剩余临挡转为持久盾"
+note = "本场所有敌人行动结束后，获得剩余临时格挡50%的持久盾，向下取整。"
 
 [resource]
 script = ExtResource("2_ypsxl")
 id = "w003"
 word = "护甲"
 glyphs = Array[String](["护", "甲"])
-description = "战斗持续能力：把部分临挡转为跨回合持久盾"
+description = "本场所有敌人行动结束后，获得剩余临时格挡50%的持久盾，向下取整。"
 effects = Array[ExtResource("1_3u6mc")]([SubResource("Resource_raovl")])
 group = "防反"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "战斗持续能力：把部分临挡转为跨回合持久盾"
+effect_summary = "本场所有敌人行动结束后，获得剩余临时格挡50%的持久盾，向下取整。"
 effect_handler_id = "ability_convert_block"
 timing = "persistent"
 p25_implemented = true

@@ -62,6 +62,7 @@ func _target(w: WordData) -> String:
 		7: return "空格"
 		8: return "弃字堆"
 		9: return "敌方字"
+		_: return "—"
 
 
 func _effects(w: WordData) -> String:

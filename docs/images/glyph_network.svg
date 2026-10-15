@@ -1,315 +1,421 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1220" height="900" viewBox="0 0 1220 900">
   <rect width="1220" height="900" fill="#f4ecd8"/>
-  <text x="30" y="42" font-family="Noto Serif SC, SimSun, serif" font-size="24" font-weight="bold" fill="#221f1a">字网图谱 · 全部 106 词</text>
+  <text x="30" y="42" font-family="Noto Serif SC, SimSun, serif" font-size="24" font-weight="bold" fill="#221f1a">字网图谱 · 全部 156 词</text>
   <text x="30" y="66" font-family="Noto Serif SC, SimSun, serif" font-size="14" fill="#7c7360">有向边 A→B：存在某个词，其中 A 紧接在 B 之前。节点大小=总度，颜色=所属体系。</text>
-  <line x1="775.6" y1="378.0" x2="751.7" y2="433.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="751.7,433.7 751.3,425.9 757.7,428.7" fill="#9a8f79"/>
-  <line x1="553.5" y1="490.3" x2="710.3" y2="465.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="710.3,465.9 703.9,470.5 702.8,463.5" fill="#9a8f79"/>
-  <line x1="873.7" y1="406.2" x2="832.7" y2="473.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="832.7,473.9 833.3,466.1 839.3,469.7" fill="#9a8f79"/>
-  <line x1="908.5" y1="369.1" x2="988.6" y2="312.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="988.6,312.7 984.9,319.6 980.8,313.9" fill="#9a8f79"/>
-  <line x1="903.0" y1="363.3" x2="922.5" y2="337.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="922.5,337.5 921.1,345.2 915.5,341.0" fill="#9a8f79"/>
-  <line x1="388.3" y1="356.5" x2="405.3" y2="409.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="405.3,409.0 399.9,403.4 406.5,401.3" fill="#9a8f79"/>
-  <line x1="386.0" y1="302.6" x2="421.1" y2="151.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="421.1,151.3 423.0,158.9 416.1,157.3" fill="#9a8f79"/>
-  <line x1="448.0" y1="133.0" x2="542.6" y2="155.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="542.6,155.7 534.9,157.4 536.6,150.6" fill="#9a8f79"/>
-  <line x1="444.7" y1="115.4" x2="506.7" y2="72.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="506.7,72.5 503.0,79.4 499.0,73.6" fill="#9a8f79"/>
-  <line x1="750.3" y1="257.9" x2="587.2" y2="172.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="587.2,172.4 595.0,172.5 591.7,178.7" fill="#9a8f79"/>
-  <line x1="689.8" y1="352.0" x2="632.5" y2="277.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="632.5,277.6 639.5,281.0 634.0,285.3" fill="#9a8f79"/>
-  <line x1="533.1" y1="78.2" x2="597.6" y2="219.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="597.6,219.7 591.5,214.8 597.9,211.9" fill="#9a8f79"/>
-  <line x1="440.4" y1="258.0" x2="399.1" y2="306.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="399.1,306.9 400.9,299.3 406.3,303.9" fill="#9a8f79"/>
-  <line x1="407.8" y1="296.0" x2="398.9" y2="306.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="398.9,306.8 400.6,299.1 406.0,303.6" fill="#9a8f79"/>
-  <line x1="441.7" y1="262.4" x2="547.3" y2="176.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="547.3,176.4 544.1,183.5 539.7,178.1" fill="#9a8f79"/>
-  <line x1="580.1" y1="255.2" x2="448.8" y2="273.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="448.8,273.9 455.3,269.4 456.3,276.3" fill="#9a8f79"/>
-  <line x1="398.1" y1="351.0" x2="502.8" y2="470.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="502.8,470.9 495.6,467.9 500.9,463.3" fill="#9a8f79"/>
-  <line x1="368.6" y1="355.6" x2="325.2" y2="455.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="325.2,455.7 324.7,447.8 331.1,450.6" fill="#9a8f79"/>
-  <line x1="432.1" y1="430.3" x2="624.4" y2="433.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="624.4,433.7 617.3,437.1 617.4,430.1" fill="#9a8f79"/>
-  <line x1="683.0" y1="155.8" x2="632.2" y2="223.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="632.2,223.5 633.6,215.8 639.2,220.0" fill="#9a8f79"/>
-  <line x1="746.9" y1="268.6" x2="645.4" y2="255.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="645.4,255.1 652.8,252.6 651.9,259.5" fill="#9a8f79"/>
-  <line x1="760.2" y1="333.0" x2="641.5" y2="267.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="641.5,267.1 649.3,267.5 645.9,273.6" fill="#9a8f79"/>
-  <line x1="486.3" y1="239.2" x2="577.9" y2="247.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="577.9,247.6 570.6,250.4 571.2,243.4" fill="#9a8f79"/>
-  <line x1="578.0" y1="447.8" x2="606.0" y2="284.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="606.0,284.2 608.3,291.7 601.4,290.5" fill="#9a8f79"/>
-  <line x1="551.2" y1="482.6" x2="627.4" y2="448.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="627.4,448.3 622.4,454.4 619.5,448.0" fill="#9a8f79"/>
-  <line x1="761.5" y1="366.2" x2="686.7" y2="415.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="686.7,415.6 690.6,408.8 694.5,414.6" fill="#9a8f79"/>
-  <line x1="696.8" y1="590.4" x2="666.5" y2="467.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="666.5,467.3 671.5,473.3 664.8,475.0" fill="#9a8f79"/>
-  <line x1="630.7" y1="716.1" x2="687.6" y2="635.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="687.6,635.0 686.4,642.8 680.7,638.7" fill="#9a8f79"/>
-  <line x1="665.5" y1="572.8" x2="685.0" y2="594.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="685.0,594.4 677.8,591.6 682.9,586.9" fill="#9a8f79"/>
-  <line x1="782.7" y1="304.5" x2="784.0" y2="314.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="784.0,314.8 779.6,308.3 786.5,307.4" fill="#9a8f79"/>
-  <line x1="791.0" y1="302.3" x2="821.8" y2="376.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="821.8,376.2 815.9,371.1 822.4,368.4" fill="#9a8f79"/>
-  <line x1="693.6" y1="159.8" x2="684.6" y2="291.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="684.6,291.9 681.6,284.6 688.6,285.1" fill="#9a8f79"/>
-  <line x1="727.8" y1="376.4" x2="806.5" y2="394.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="806.5,394.4 798.9,396.3 800.5,389.4" fill="#9a8f79"/>
-  <line x1="475.7" y1="258.7" x2="607.1" y2="425.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="607.1,425.7 600.0,422.4 605.5,418.1" fill="#9a8f79"/>
-  <line x1="795.8" y1="490.9" x2="664.5" y2="461.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="664.5,461.8 672.1,459.9 670.5,466.7" fill="#9a8f79"/>
-  <line x1="761.6" y1="366.2" x2="659.3" y2="434.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="659.3,434.1 663.2,427.3 667.1,433.2" fill="#9a8f79"/>
-  <line x1="434.3" y1="222.5" x2="296.9" y2="141.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="296.9,141.8 304.7,142.3 301.2,148.3" fill="#9a8f79"/>
-  <line x1="439.4" y1="216.1" x2="330.0" y2="98.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="330.0,98.4 337.3,101.1 332.2,105.9" fill="#9a8f79"/>
-  <line x1="482.5" y1="250.9" x2="588.8" y2="313.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="588.8,313.9 581.0,313.3 584.6,307.3" fill="#9a8f79"/>
-  <line x1="624.5" y1="420.4" x2="614.9" y2="352.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="614.9,352.9 619.3,359.3 612.4,360.3" fill="#9a8f79"/>
-  <line x1="418.3" y1="621.3" x2="285.5" y2="688.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="285.5,688.9 290.2,682.6 293.3,688.9" fill="#9a8f79"/>
-  <line x1="454.9" y1="597.3" x2="601.5" y2="476.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="601.5,476.9 598.3,484.0 593.9,478.6" fill="#9a8f79"/>
-  <line x1="816.4" y1="381.9" x2="810.2" y2="374.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="810.2,374.5 817.3,377.6 812.0,382.1" fill="#9a8f79"/>
-  <line x1="469.5" y1="449.0" x2="464.9" y2="446.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="464.9,446.5 472.7,446.8 469.4,452.9" fill="#9a8f79"/>
-  <line x1="510.5" y1="456.4" x2="624.7" y2="439.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="624.7,439.3 618.3,443.8 617.3,436.9" fill="#9a8f79"/>
-  <line x1="510.3" y1="464.2" x2="541.6" y2="470.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="541.6,470.8 534.0,472.8 535.5,465.9" fill="#9a8f79"/>
-  <line x1="549.3" y1="424.8" x2="559.8" y2="448.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="559.8,448.2 553.7,443.2 560.1,440.4" fill="#9a8f79"/>
-  <line x1="519.3" y1="411.3" x2="466.8" y2="427.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="466.8,427.7 472.4,422.3 474.5,429.0" fill="#9a8f79"/>
-  <line x1="672.1" y1="502.2" x2="604.0" y2="485.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="604.0,485.1 611.6,483.4 609.9,490.2" fill="#9a8f79"/>
-  <line x1="673.1" y1="517.8" x2="595.5" y2="547.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="595.5,547.6 600.8,541.8 603.3,548.4" fill="#9a8f79"/>
-  <line x1="558.6" y1="416.9" x2="674.0" y2="493.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="674.0,493.1 666.2,492.1 670.1,486.3" fill="#9a8f79"/>
-  <line x1="544.6" y1="537.7" x2="460.7" y2="452.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="460.7,452.1 468.1,454.6 463.1,459.5" fill="#9a8f79"/>
-  <line x1="583.5" y1="535.0" x2="638.1" y2="461.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="638.1,461.6 636.7,469.3 631.1,465.1" fill="#9a8f79"/>
-  <line x1="578.5" y1="453.3" x2="569.5" y2="527.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="569.5,527.3 566.9,519.9 573.8,520.8" fill="#9a8f79"/>
-  <line x1="599.3" y1="408.4" x2="665.2" y2="336.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="665.2,336.9 663.1,344.4 657.9,339.7" fill="#9a8f79"/>
-  <line x1="652.7" y1="531.2" x2="679.2" y2="343.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="679.2,343.6 681.7,351.0 674.8,350.0" fill="#9a8f79"/>
-  <line x1="597.1" y1="741.0" x2="554.5" y2="754.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="554.5,754.9 560.1,749.4 562.3,756.0" fill="#9a8f79"/>
-  <line x1="397.3" y1="779.4" x2="507.9" y2="765.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="507.9,765.4 501.4,769.7 500.5,762.8" fill="#9a8f79"/>
-  <line x1="637.5" y1="575.9" x2="543.6" y2="741.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="543.6,741.5 544.0,733.6 550.1,737.1" fill="#9a8f79"/>
-  <line x1="182.1" y1="726.1" x2="74.6" y2="826.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="74.6,826.4 77.4,819.0 82.1,824.1" fill="#9a8f79"/>
-  <line x1="393.7" y1="769.9" x2="513.0" y2="689.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="513.0,689.1 509.1,696.0 505.2,690.2" fill="#9a8f79"/>
-  <line x1="533.1" y1="650.6" x2="525.8" y2="526.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="525.8,526.9 529.7,533.7 522.7,534.1" fill="#9a8f79"/>
-  <line x1="557.3" y1="682.1" x2="705.0" y2="730.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="705.0,730.9 697.2,732.0 699.4,725.4" fill="#9a8f79"/>
-  <line x1="458.3" y1="603.0" x2="536.0" y2="571.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="536.0,571.2 530.8,577.1 528.2,570.6" fill="#9a8f79"/>
-  <line x1="581.2" y1="533.4" x2="610.7" y2="484.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="610.7,484.8 610.0,492.6 604.0,489.0" fill="#9a8f79"/>
-  <line x1="494.0" y1="492.7" x2="340.7" y2="481.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="340.7,481.4 348.0,478.5 347.5,485.4" fill="#9a8f79"/>
-  <line x1="326.1" y1="458.4" x2="410.8" y2="300.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="410.8,300.4 410.6,308.3 404.4,305.0" fill="#9a8f79"/>
-  <line x1="304.0" y1="500.9" x2="209.0" y2="689.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="209.0,689.7 209.0,681.9 215.3,685.0" fill="#9a8f79"/>
-  <line x1="749.7" y1="286.4" x2="706.4" y2="306.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="706.4,306.7 711.2,300.6 714.2,306.9" fill="#9a8f79"/>
-  <line x1="967.7" y1="320.9" x2="1062.2" y2="346.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="1062.2,346.5 1054.6,348.1 1056.4,341.3" fill="#9a8f79"/>
-  <line x1="819.4" y1="341.4" x2="911.4" y2="320.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="911.4,320.3 905.4,325.3 903.8,318.5" fill="#9a8f79"/>
-  <line x1="1029.3" y1="311.9" x2="1066.0" y2="338.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="1066.0,338.7 1058.3,337.4 1062.4,331.7" fill="#9a8f79"/>
-  <line x1="973.7" y1="351.2" x2="960.5" y2="336.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="960.5,336.1 967.7,339.1 962.5,343.7" fill="#9a8f79"/>
-  <line x1="987.2" y1="461.0" x2="1069.3" y2="370.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="1069.3,370.6 1067.1,378.1 1062.0,373.4" fill="#9a8f79"/>
-  <line x1="290.1" y1="114.8" x2="301.6" y2="99.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="301.6,99.7 300.2,107.4 294.6,103.1" fill="#9a8f79"/>
-  <line x1="974.0" y1="454.6" x2="984.4" y2="391.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="984.4,391.3 986.7,398.8 979.8,397.7" fill="#9a8f79"/>
-  <line x1="808.9" y1="589.0" x2="736.6" y2="718.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="736.6,718.6 736.9,710.8 743.0,714.2" fill="#9a8f79"/>
-  <line x1="830.4" y1="424.2" x2="823.3" y2="538.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="823.3,538.4 820.2,531.2 827.2,531.6" fill="#9a8f79"/>
-  <line x1="933.2" y1="416.5" x2="938.5" y2="343.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="938.5,343.5 941.5,350.8 934.5,350.3" fill="#9a8f79"/>
-  <line x1="943.9" y1="482.9" x2="725.2" y2="505.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="725.2,505.6 731.8,501.4 732.5,508.4" fill="#9a8f79"/>
-  <line x1="820.0" y1="520.1" x2="820.6" y2="538.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="820.6,538.3 816.9,531.5 823.9,531.2" fill="#9a8f79"/>
-  <line x1="1115.8" y1="416.2" x2="995.4" y2="469.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="995.4,469.0 1000.4,463.0 1003.2,469.4" fill="#9a8f79"/>
-  <line x1="627.8" y1="344.5" x2="719.2" y2="439.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="719.2,439.7 711.8,437.0 716.8,432.2" fill="#9a8f79"/>
-  <line x1="797.2" y1="486.4" x2="767.4" y2="473.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="767.4,473.4 775.2,473.0 772.4,479.4" fill="#9a8f79"/>
-  <line x1="682.7" y1="360.8" x2="634.7" y2="338.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="634.7,338.2 642.6,338.0 639.6,344.4" fill="#9a8f79"/>
-  <line x1="903.7" y1="404.2" x2="916.5" y2="419.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="916.5,419.8 909.3,416.6 914.7,412.2" fill="#9a8f79"/>
-  <line x1="708.2" y1="590.4" x2="732.8" y2="490.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="732.8,490.4 734.5,498.1 727.7,496.4" fill="#9a8f79"/>
-  <line x1="810.4" y1="276.2" x2="984.0" y2="295.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="984.0,295.0 976.7,297.7 977.4,290.8" fill="#9a8f79"/>
-  <line x1="909.8" y1="441.0" x2="769.7" y2="457.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="769.7,457.8 776.3,453.4 777.1,460.4" fill="#9a8f79"/>
-  <line x1="1119.2" y1="394.9" x2="1029.3" y2="315.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="1029.3,315.1 1036.8,317.1 1032.2,322.3" fill="#9a8f79"/>
-  <line x1="600.6" y1="465.9" x2="596.1" y2="467.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="596.1,467.8 590.9,473.7 588.3,467.2" fill="#9a8f79"/>
-  <line x1="611.7" y1="713.1" x2="574.8" y2="589.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="574.8,589.7 580.1,595.4 573.4,597.4" fill="#9a8f79"/>
-  <line x1="355.1" y1="774.0" x2="220.5" y2="720.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="220.5,720.1 228.3,719.4 225.7,725.9" fill="#9a8f79"/>
-  <line x1="539.1" y1="651.0" x2="566.8" y2="508.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="566.8,508.8 568.9,516.3 562.0,515.0" fill="#9a8f79"/>
-  <line x1="671.4" y1="506.5" x2="555.8" y2="497.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="555.8,497.4 563.0,494.5 562.5,501.5" fill="#9a8f79"/>
-  <line x1="564.8" y1="447.2" x2="544.7" y2="470.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="544.7,470.7 546.6,463.1 551.9,467.6" fill="#9a8f79"/>
-  <line x1="697.5" y1="394.0" x2="656.8" y2="530.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="656.8,530.1 655.5,522.4 662.2,524.4" fill="#9a8f79"/>
-  <line x1="820.1" y1="351.6" x2="964.4" y2="365.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="964.4,365.4 957.1,368.2 957.7,361.2" fill="#9a8f79"/>
-  <line x1="658.7" y1="471.2" x2="797.4" y2="552.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="797.4,552.2 789.6,551.7 793.1,545.6" fill="#9a8f79"/>
-  <line x1="809.7" y1="280.6" x2="911.6" y2="306.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="911.6,306.3 903.9,308.0 905.7,301.2" fill="#9a8f79"/>
-  <line x1="861.9" y1="389.6" x2="691.6" y2="427.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="691.6,427.0 697.7,422.1 699.2,428.9" fill="#9a8f79"/>
-  <line x1="844.0" y1="553.3" x2="945.5" y2="494.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="945.5,494.3 941.2,500.8 937.7,494.8" fill="#9a8f79"/>
-  <line x1="599.6" y1="437.5" x2="606.1" y2="441.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="606.1,441.1 614.0,441.5 610.6,447.6" fill="#9a8f79"/>
-  <line x1="578.1" y1="447.8" x2="576.8" y2="455.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="576.8,455.1 579.1,462.6 572.2,461.4" fill="#9a8f79"/>
-  <line x1="759.5" y1="298.5" x2="678.7" y2="407.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
-  <polygon points="678.7,407.0 680.0,399.3 685.7,403.5" fill="#9a8f79"/>
-  <circle cx="534.5" cy="674.6" r="24.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="534.5" y="683.6" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">停</text>
-  <circle cx="540.2" cy="404.7" r="22.0" fill="#c9a35a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="540.2" y="413.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">充</text>
-  <circle cx="1134.1" cy="408.2" r="20.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="1134.1" y="415.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="21" fill="#f4ecd8">再</text>
-  <circle cx="198.2" cy="711.1" r="22.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="198.2" y="719.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">冷</text>
-  <circle cx="611.7" cy="250.7" r="32.0" fill="#8c2a20" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="611.7" y="261.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">击</text>
-  <circle cx="819.2" cy="496.1" r="24.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="819.2" y="505.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">分</text>
-  <circle cx="821.6" cy="566.3" r="26.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="821.6" y="576.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">利</text>
-  <circle cx="658.4" cy="434.3" r="32.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="658.4" y="445.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">力</text>
-  <circle cx="618.1" cy="734.2" r="22.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="618.1" y="742.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">加</text>
-  <circle cx="739.9" cy="461.3" r="28.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="739.9" y="471.9" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">化</text>
-  <circle cx="60.0" cy="840.0" r="18.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="60.0" y="846.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="19" fill="#f4ecd8">却</text>
-  <circle cx="704.4" cy="371.0" r="24.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="704.4" y="380.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">反</text>
-  <circle cx="788.2" cy="348.5" r="32.0" fill="#8c2a20" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="788.2" y="359.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">合</text>
-  <circle cx="458.4" cy="236.6" r="28.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="458.4" y="247.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">回</text>
-  <circle cx="831.8" cy="400.2" r="24.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="831.8" y="409.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">复</text>
-  <circle cx="1085.4" cy="352.8" r="22.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="1085.4" y="361.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">币</text>
-  <circle cx="702.5" cy="613.7" r="24.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="702.5" y="622.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">强</text>
-  <circle cx="412.1" cy="429.9" r="20.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="412.1" y="437.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="21" fill="#f4ecd8">御</text>
-  <circle cx="375.5" cy="782.2" r="22.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="375.5" y="790.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">急</text>
-  <circle cx="725.9" cy="737.8" r="20.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="725.9" y="745.4" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="21" fill="#f4ecd8">息</text>
-  <circle cx="969.7" cy="480.2" r="26.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="969.7" y="490.0" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">投</text>
-  <circle cx="426.6" cy="127.9" r="22.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="426.6" y="136.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">护</text>
-  <circle cx="277.9" cy="130.6" r="20.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="277.9" y="138.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="21" fill="#f4ecd8">收</text>
-  <circle cx="697.4" cy="508.5" r="26.0" fill="#c9a35a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="697.4" y="518.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">放</text>
-  <circle cx="267.7" cy="698.0" r="18.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="267.7" y="704.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="19" fill="#f4ecd8">洗</text>
-  <circle cx="629.3" cy="454.0" r="34.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="629.3" y="464.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">流</text>
-  <circle cx="437.9" cy="611.3" r="22.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="437.9" y="619.6" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">清</text>
-  <circle cx="523.9" cy="495.0" r="30.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="523.9" y="505.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">火</text>
-  <circle cx="931.6" cy="438.4" r="22.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="931.6" y="446.7" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">炼</text>
-  <circle cx="565.6" cy="559.1" r="30.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="565.6" y="569.9" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">热</text>
-  <circle cx="314.8" cy="479.5" r="24.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="314.8" y="488.6" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">爆</text>
-  <circle cx="565.9" cy="161.2" r="22.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="565.9" y="169.6" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">甲</text>
-  <circle cx="572.9" cy="477.4" r="30.0" fill="#c9a35a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="572.9" y="488.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">电</text>
-  <circle cx="524.8" cy="60.0" r="20.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="524.8" y="67.6" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="21" fill="#f4ecd8">盾</text>
-  <circle cx="423.1" cy="277.5" r="24.0" fill="#8c2a20" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="423.1" y="286.6" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">破</text>
-  <circle cx="887.2" cy="384.0" r="26.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="887.2" y="393.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">精</text>
-  <circle cx="443.9" cy="434.9" r="22.0" fill="#c9a35a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="443.9" y="443.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">能</text>
-  <circle cx="488.7" cy="459.6" r="22.0" fill="#c9a35a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="488.7" y="467.9" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">蓄</text>
-  <circle cx="315.0" cy="82.3" r="20.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="315.0" y="89.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="21" fill="#f4ecd8">购</text>
-  <circle cx="988.2" cy="367.7" r="22.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="988.2" y="376.0" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">资</text>
-  <circle cx="649.4" cy="555.0" r="24.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="649.4" y="564.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">超</text>
-  <circle cx="611.2" cy="327.1" r="24.0" fill="#7a4a63" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="611.2" y="336.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">转</text>
-  <circle cx="682.9" cy="317.8" r="24.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="682.9" y="326.9" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">载</text>
-  <circle cx="581.7" cy="427.5" r="26.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="581.7" y="437.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">过</text>
-  <circle cx="695.0" cy="139.8" r="20.0" fill="#8c2a20" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="695.0" y="147.4" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="21" fill="#f4ecd8">连</text>
-  <circle cx="531.7" cy="762.3" r="22.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="531.7" y="770.7" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">速</text>
-  <circle cx="778.6" cy="272.8" r="32.0" fill="#7a4a63" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="778.6" y="283.6" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">重</text>
-  <circle cx="940.7" cy="313.6" r="28.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="940.7" y="324.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">金</text>
-  <circle cx="1009.9" cy="297.8" r="24.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="1009.9" y="306.9" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">铸</text>
-  <circle cx="379.7" cy="329.9" r="28.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
-  <text x="379.7" y="340.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">防</text>
+  <line x1="815.4" y1="298.2" x2="972.4" y2="429.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="972.4,429.7 964.8,427.9 969.3,422.5" fill="#9a8f79"/>
+  <line x1="1016.2" y1="473.2" x2="1123.8" y2="601.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1123.8,601.8 1116.7,598.7 1122.0,594.2" fill="#9a8f79"/>
+  <line x1="651.7" y1="353.1" x2="486.6" y2="338.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="486.6,338.9 493.9,336.0 493.3,343.0" fill="#9a8f79"/>
+  <line x1="484.7" y1="334.6" x2="609.5" y2="326.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="609.5,326.7 602.7,330.7 602.3,323.7" fill="#9a8f79"/>
+  <line x1="707.5" y1="353.2" x2="813.9" y2="344.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="813.9,344.2 807.2,348.3 806.6,341.3" fill="#9a8f79"/>
+  <line x1="574.4" y1="408.2" x2="622.8" y2="354.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="622.8,354.0 620.7,361.6 615.5,356.9" fill="#9a8f79"/>
+  <line x1="521.1" y1="408.3" x2="476.7" y2="358.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="476.7,358.7 484.0,361.6 478.8,366.3" fill="#9a8f79"/>
+  <line x1="511.2" y1="421.7" x2="518.9" y2="425.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="518.9,425.1 526.7,424.8 523.9,431.2" fill="#9a8f79"/>
+  <line x1="978.9" y1="253.5" x2="887.9" y2="375.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="887.9,375.0 889.3,367.3 894.9,371.5" fill="#9a8f79"/>
+  <line x1="634.1" y1="551.2" x2="625.5" y2="560.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="625.5,560.2 623.2,567.6 618.1,562.8" fill="#9a8f79"/>
+  <line x1="606.6" y1="541.9" x2="593.4" y2="432.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="593.4,432.1 597.7,438.6 590.8,439.4" fill="#9a8f79"/>
+  <line x1="682.9" y1="479.3" x2="619.0" y2="419.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="619.0,419.1 626.5,421.4 621.7,426.5" fill="#9a8f79"/>
+  <line x1="720.2" y1="521.1" x2="585.6" y2="456.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="585.6,456.3 593.4,456.2 590.3,462.5" fill="#9a8f79"/>
+  <line x1="592.9" y1="358.1" x2="684.8" y2="474.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="684.8,474.9 677.7,471.5 683.2,467.2" fill="#9a8f79"/>
+  <line x1="557.2" y1="309.9" x2="553.2" y2="304.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="553.2,304.1 560.0,307.8 554.3,311.8" fill="#9a8f79"/>
+  <line x1="821.9" y1="513.6" x2="815.9" y2="525.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="815.9,525.2 816.0,517.4 822.2,520.6" fill="#9a8f79"/>
+  <line x1="626.9" y1="558.7" x2="635.5" y2="549.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="635.5,549.7 637.8,542.2 642.9,547.1" fill="#9a8f79"/>
+  <line x1="637.2" y1="499.8" x2="605.5" y2="428.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="605.5,428.7 611.6,433.7 605.2,436.6" fill="#9a8f79"/>
+  <line x1="591.8" y1="435.9" x2="589.7" y2="436.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="589.7,436.0 596.5,432.2 596.8,439.2" fill="#9a8f79"/>
+  <line x1="664.6" y1="456.8" x2="777.3" y2="534.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="777.3,534.7 769.6,533.6 773.6,527.9" fill="#9a8f79"/>
+  <line x1="596.2" y1="452.3" x2="530.9" y2="485.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="530.9,485.9 535.5,479.6 538.7,485.8" fill="#9a8f79"/>
+  <line x1="592.3" y1="427.2" x2="522.0" y2="415.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="522.0,415.0 529.5,412.8 528.3,419.7" fill="#9a8f79"/>
+  <line x1="607.4" y1="465.8" x2="557.9" y2="530.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="557.9,530.6 559.4,522.9 564.9,527.2" fill="#9a8f79"/>
+  <line x1="440.3" y1="556.8" x2="475.6" y2="524.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="475.6,524.4 472.8,531.7 468.1,526.5" fill="#9a8f79"/>
+  <line x1="444.4" y1="585.9" x2="538.4" y2="632.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="538.4,632.4 530.6,632.5 533.7,626.2" fill="#9a8f79"/>
+  <line x1="532.2" y1="507.0" x2="540.4" y2="508.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="540.4,508.4 532.9,510.6 534.1,503.7" fill="#9a8f79"/>
+  <line x1="843.3" y1="453.0" x2="731.9" y2="489.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="731.9,489.2 737.4,483.7 739.6,490.3" fill="#9a8f79"/>
+  <line x1="842.4" y1="439.0" x2="629.7" y2="398.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="629.7,398.3 637.2,396.2 635.9,403.0" fill="#9a8f79"/>
+  <line x1="896.8" y1="452.1" x2="1063.5" y2="500.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1063.5,500.7 1055.8,502.1 1057.8,495.3" fill="#9a8f79"/>
+  <line x1="897.9" y1="445.6" x2="965.0" y2="448.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="965.0,448.7 957.8,451.9 958.1,444.9" fill="#9a8f79"/>
+  <line x1="530.3" y1="513.5" x2="690.2" y2="578.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="690.2,578.8 682.4,579.4 685.0,572.9" fill="#9a8f79"/>
+  <line x1="524.9" y1="305.1" x2="497.3" y2="369.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="497.3,369.3 496.8,361.5 503.2,364.3" fill="#9a8f79"/>
+  <line x1="548.0" y1="304.7" x2="570.5" y2="352.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="570.5,352.4 564.4,347.6 570.7,344.6" fill="#9a8f79"/>
+  <line x1="602.7" y1="481.5" x2="609.8" y2="469.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="609.8,469.8 609.2,477.6 603.2,474.0" fill="#9a8f79"/>
+  <line x1="552.4" y1="542.7" x2="561.8" y2="534.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="561.8,534.1 564.5,526.8 569.3,531.9" fill="#9a8f79"/>
+  <line x1="596.1" y1="446.1" x2="594.2" y2="432.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="594.2,432.0 598.6,438.4 591.7,439.4" fill="#9a8f79"/>
+  <line x1="345.5" y1="418.2" x2="546.7" y2="395.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="546.7,395.2 540.2,399.4 539.4,392.5" fill="#9a8f79"/>
+  <line x1="520.1" y1="401.5" x2="547.0" y2="397.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="547.0,397.1 540.6,401.7 539.5,394.8" fill="#9a8f79"/>
+  <line x1="585.0" y1="619.9" x2="592.5" y2="606.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="592.5,606.8 592.0,614.6 586.0,611.1" fill="#9a8f79"/>
+  <line x1="595.7" y1="630.2" x2="720.2" y2="549.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="720.2,549.6 716.2,556.3 712.4,550.5" fill="#9a8f79"/>
+  <line x1="587.6" y1="621.6" x2="629.6" y2="563.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="629.6,563.5 628.3,571.3 622.6,567.2" fill="#9a8f79"/>
+  <line x1="565.2" y1="679.3" x2="550.5" y2="803.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="550.5,803.9 547.9,796.5 554.8,797.4" fill="#9a8f79"/>
+  <line x1="571.3" y1="615.6" x2="585.3" y2="432.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="585.3,432.2 588.2,439.5 581.2,439.0" fill="#9a8f79"/>
+  <line x1="563.6" y1="421.7" x2="521.8" y2="474.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="521.8,474.7 523.4,467.1 528.8,471.4" fill="#9a8f79"/>
+  <line x1="615.6" y1="361.0" x2="622.3" y2="353.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="622.3,353.6 620.1,361.1 615.0,356.4" fill="#9a8f79"/>
+  <line x1="603.4" y1="353.3" x2="641.6" y2="258.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="641.6,258.7 642.3,266.5 635.8,263.9" fill="#9a8f79"/>
+  <line x1="642.4" y1="256.9" x2="604.2" y2="351.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="604.2,351.4 603.6,343.6 610.0,346.2" fill="#9a8f79"/>
+  <line x1="559.4" y1="362.9" x2="379.6" y2="193.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="379.6,193.2 387.1,195.5 382.3,200.6" fill="#9a8f79"/>
+  <line x1="471.4" y1="271.0" x2="506.3" y2="275.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="506.3,275.6 498.9,278.1 499.8,271.2" fill="#9a8f79"/>
+  <line x1="451.9" y1="292.9" x2="470.4" y2="367.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="470.4,367.1 465.4,361.2 472.1,359.5" fill="#9a8f79"/>
+  <line x1="897.8" y1="588.2" x2="825.8" y2="434.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="825.8,434.0 831.9,438.8 825.6,441.8" fill="#9a8f79"/>
+  <line x1="885.2" y1="606.2" x2="755.5" y2="594.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="755.5,594.6 762.8,591.8 762.2,598.7" fill="#9a8f79"/>
+  <line x1="816.3" y1="347.7" x2="629.7" y2="382.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="629.7,382.6 636.0,377.9 637.3,384.8" fill="#9a8f79"/>
+  <line x1="690.3" y1="585.2" x2="569.1" y2="560.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="569.1,560.4 576.6,558.4 575.2,565.3" fill="#9a8f79"/>
+  <line x1="858.3" y1="633.5" x2="817.4" y2="436.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="817.4,436.7 822.3,442.9 815.4,444.3" fill="#9a8f79"/>
+  <line x1="877.9" y1="639.1" x2="890.7" y2="625.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="890.7,625.6 888.4,633.1 883.3,628.2" fill="#9a8f79"/>
+  <line x1="842.7" y1="646.0" x2="752.7" y2="605.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="752.7,605.5 760.5,605.2 757.6,611.6" fill="#9a8f79"/>
+  <line x1="762.4" y1="199.1" x2="695.0" y2="86.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="695.0,86.4 701.6,90.6 695.6,94.2" fill="#9a8f79"/>
+  <line x1="798.2" y1="205.1" x2="952.0" y2="75.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="952.0,75.5 948.9,82.7 944.4,77.3" fill="#9a8f79"/>
+  <line x1="983.9" y1="77.3" x2="1010.4" y2="111.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1010.4,111.1 1003.3,107.7 1008.9,103.4" fill="#9a8f79"/>
+  <line x1="973.0" y1="81.8" x2="989.1" y2="212.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="989.1,212.0 984.8,205.5 991.8,204.6" fill="#9a8f79"/>
+  <line x1="874.6" y1="313.2" x2="1010.0" y2="148.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1010.0,148.5 1008.2,156.1 1002.8,151.7" fill="#9a8f79"/>
+  <line x1="845.1" y1="398.3" x2="847.7" y2="398.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="847.7,398.2 854.5,394.5 854.8,401.5" fill="#9a8f79"/>
+  <line x1="975.7" y1="250.5" x2="838.0" y2="374.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="838.0,374.1 840.8,366.9 845.5,372.1" fill="#9a8f79"/>
+  <line x1="665.3" y1="499.4" x2="765.5" y2="250.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="765.5,250.9 766.2,258.7 759.7,256.1" fill="#9a8f79"/>
+  <line x1="884.6" y1="185.9" x2="805.1" y2="213.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="805.1,213.3 810.6,207.7 812.9,214.3" fill="#9a8f79"/>
+  <line x1="929.5" y1="169.0" x2="1003.0" y2="139.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1003.0,139.0 997.8,144.9 995.2,138.4" fill="#9a8f79"/>
+  <line x1="824.2" y1="366.6" x2="896.8" y2="201.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="896.8,201.8 897.2,209.6 890.7,206.8" fill="#9a8f79"/>
+  <line x1="760.9" y1="246.2" x2="655.5" y2="399.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="655.5,399.4 656.6,391.6 662.4,395.6" fill="#9a8f79"/>
+  <line x1="785.3" y1="249.8" x2="786.9" y2="254.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="786.9,254.8 781.5,249.2 788.1,247.1" fill="#9a8f79"/>
+  <line x1="681.1" y1="87.3" x2="654.7" y2="284.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="654.7,284.6 652.2,277.2 659.1,278.1" fill="#9a8f79"/>
+  <line x1="668.0" y1="251.9" x2="783.4" y2="372.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="783.4,372.1 776.0,369.5 781.1,364.6" fill="#9a8f79"/>
+  <line x1="830.7" y1="370.3" x2="831.9" y2="368.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="831.9,368.7 833.1,360.9 838.8,365.0" fill="#9a8f79"/>
+  <line x1="827.1" y1="454.7" x2="821.1" y2="435.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="821.1,435.8 826.6,441.4 819.9,443.5" fill="#9a8f79"/>
+  <line x1="679.3" y1="509.5" x2="780.7" y2="424.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="780.7,424.0 777.6,431.2 773.0,425.9" fill="#9a8f79"/>
+  <line x1="587.3" y1="432.3" x2="772.1" y2="405.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="772.1,405.1 765.7,409.5 764.7,402.6" fill="#9a8f79"/>
+  <line x1="638.1" y1="394.5" x2="643.1" y2="363.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="643.1,363.7 645.4,371.2 638.5,370.1" fill="#9a8f79"/>
+  <line x1="812.4" y1="464.4" x2="679.8" y2="350.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="679.8,350.3 687.3,352.2 682.8,357.5" fill="#9a8f79"/>
+  <line x1="608.0" y1="447.2" x2="636.7" y2="362.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="636.7,362.1 637.7,369.9 631.1,367.6" fill="#9a8f79"/>
+  <line x1="443.7" y1="561.4" x2="575.4" y2="485.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="575.4,485.8 571.1,492.3 567.6,486.2" fill="#9a8f79"/>
+  <line x1="663.7" y1="378.6" x2="615.6" y2="448.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="615.6,448.8 616.6,441.0 622.4,445.0" fill="#9a8f79"/>
+  <line x1="848.0" y1="376.8" x2="840.2" y2="451.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="840.2,451.5 837.5,444.1 844.4,444.9" fill="#9a8f79"/>
+  <line x1="834.3" y1="372.5" x2="759.9" y2="507.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="759.9,507.0 760.3,499.2 766.4,502.6" fill="#9a8f79"/>
+  <line x1="668.8" y1="218.1" x2="685.2" y2="202.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="685.2,202.6 682.5,209.9 677.7,204.8" fill="#9a8f79"/>
+  <line x1="853.4" y1="416.5" x2="765.8" y2="511.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="765.8,511.3 768.0,503.8 773.1,508.5" fill="#9a8f79"/>
+  <line x1="616.8" y1="524.2" x2="622.6" y2="525.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="622.6,525.6 630.2,523.9 628.6,530.7" fill="#9a8f79"/>
+  <line x1="675.6" y1="502.4" x2="623.4" y2="509.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="623.4,509.8 629.8,505.3 630.8,512.3" fill="#9a8f79"/>
+  <line x1="804.9" y1="489.1" x2="623.5" y2="510.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="623.5,510.7 630.0,506.4 630.9,513.3" fill="#9a8f79"/>
+  <line x1="630.7" y1="561.9" x2="588.8" y2="620.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="588.8,620.0 590.1,612.3 595.7,616.4" fill="#9a8f79"/>
+  <line x1="633.2" y1="563.5" x2="521.2" y2="748.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="521.2,748.1 521.9,740.3 527.8,743.9" fill="#9a8f79"/>
+  <line x1="679.3" y1="555.9" x2="695.6" y2="569.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="695.6,569.7 688.0,567.9 692.6,562.5" fill="#9a8f79"/>
+  <line x1="616.9" y1="534.7" x2="691.8" y2="575.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="691.8,575.4 683.9,575.1 687.3,569.0" fill="#9a8f79"/>
+  <line x1="297.7" y1="419.4" x2="80.0" y2="404.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="80.0,404.9 87.2,401.9 86.7,408.9" fill="#9a8f79"/>
+  <line x1="344.2" y1="429.2" x2="542.3" y2="501.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="542.3,501.3 534.6,502.2 536.9,495.6" fill="#9a8f79"/>
+  <line x1="770.2" y1="520.3" x2="806.6" y2="501.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="806.6,501.1 802.1,507.5 798.8,501.3" fill="#9a8f79"/>
+  <line x1="449.8" y1="293.3" x2="451.9" y2="306.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="451.9,306.7 447.4,300.4 454.3,299.3" fill="#9a8f79"/>
+  <line x1="470.7" y1="274.6" x2="610.9" y2="313.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="610.9,313.5 603.2,315.0 605.1,308.3" fill="#9a8f79"/>
+  <line x1="459.0" y1="290.0" x2="526.1" y2="402.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="526.1,402.1 519.5,397.8 525.5,394.2" fill="#9a8f79"/>
+  <line x1="400.6" y1="484.9" x2="507.7" y2="450.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="507.7,450.8 502.1,456.3 500.0,449.6" fill="#9a8f79"/>
+  <line x1="389.4" y1="471.9" x2="443.4" y2="363.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="443.4,363.2 443.4,371.0 437.1,367.9" fill="#9a8f79"/>
+  <line x1="596.5" y1="544.8" x2="565.2" y2="476.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="565.2,476.3 571.3,481.2 564.9,484.1" fill="#9a8f79"/>
+  <line x1="589.8" y1="548.8" x2="506.3" y2="441.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="506.3,441.1 513.4,444.5 507.9,448.8" fill="#9a8f79"/>
+  <line x1="400.3" y1="499.1" x2="576.8" y2="563.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="576.8,563.4 569.0,564.3 571.4,557.7" fill="#9a8f79"/>
+  <line x1="467.9" y1="369.9" x2="466.2" y2="364.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="466.2,364.8 471.8,370.3 465.1,372.6" fill="#9a8f79"/>
+  <line x1="516.5" y1="390.1" x2="613.6" y2="342.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="613.6,342.0 608.9,348.2 605.8,341.9" fill="#9a8f79"/>
+  <line x1="550.7" y1="353.0" x2="513.7" y2="382.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="513.7,382.0 517.0,374.9 521.4,380.4" fill="#9a8f79"/>
+  <line x1="594.0" y1="311.9" x2="687.0" y2="204.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="687.0,204.3 685.1,211.9 679.8,207.3" fill="#9a8f79"/>
+  <line x1="683.5" y1="327.8" x2="700.4" y2="210.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="700.4,210.4 702.8,217.8 695.9,216.9" fill="#9a8f79"/>
+  <line x1="446.7" y1="570.0" x2="510.1" y2="559.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="510.1,559.4 503.8,564.0 502.6,557.1" fill="#9a8f79"/>
+  <line x1="519.6" y1="527.2" x2="521.9" y2="530.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="521.9,530.3 514.9,526.7 520.6,522.6" fill="#9a8f79"/>
+  <line x1="663.5" y1="378.4" x2="556.9" y2="529.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="556.9,529.9 558.1,522.1 563.8,526.2" fill="#9a8f79"/>
+  <line x1="495.2" y1="533.0" x2="481.5" y2="613.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="481.5,613.1 479.2,605.6 486.1,606.8" fill="#9a8f79"/>
+  <line x1="491.5" y1="619.5" x2="606.4" y2="467.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="606.4,467.5 605.0,475.2 599.4,471.0" fill="#9a8f79"/>
+  <line x1="485.4" y1="661.2" x2="539.3" y2="805.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="539.3,805.3 533.6,799.9 540.2,797.5" fill="#9a8f79"/>
+  <line x1="345.6" y1="419.0" x2="438.8" y2="411.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="438.8,411.3 432.1,415.4 431.5,408.4" fill="#9a8f79"/>
+  <line x1="508.0" y1="437.0" x2="553.0" y2="485.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="553.0,485.0 545.7,482.3 550.8,477.5" fill="#9a8f79"/>
+  <line x1="661.0" y1="406.7" x2="775.0" y2="300.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="775.0,300.5 772.2,307.9 767.5,302.8" fill="#9a8f79"/>
+  <line x1="814.6" y1="263.8" x2="888.2" y2="195.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="888.2,195.7 885.4,203.0 880.7,197.9" fill="#9a8f79"/>
+  <line x1="769.5" y1="281.3" x2="566.0" y2="279.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="566.0,279.7 573.1,276.2 573.0,283.2" fill="#9a8f79"/>
+  <line x1="827.0" y1="314.9" x2="721.9" y2="203.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="721.9,203.6 729.2,206.3 724.2,211.1" fill="#9a8f79"/>
+  <line x1="868.0" y1="478.4" x2="965.7" y2="457.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="965.7,457.1 959.6,462.0 958.1,455.1" fill="#9a8f79"/>
+  <line x1="1098.4" y1="529.8" x2="1129.4" y2="598.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1129.4,598.4 1123.3,593.4 1129.7,590.6" fill="#9a8f79"/>
+  <line x1="1031.1" y1="599.8" x2="1004.1" y2="481.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1004.1,481.4 1009.0,487.5 1002.2,489.0" fill="#9a8f79"/>
+  <line x1="956.0" y1="705.3" x2="1117.5" y2="630.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1117.5,630.4 1112.6,636.5 1109.7,630.1" fill="#9a8f79"/>
+  <line x1="554.7" y1="676.2" x2="519.6" y2="747.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="519.6,747.2 519.5,739.4 525.8,742.5" fill="#9a8f79"/>
+  <line x1="951.6" y1="698.7" x2="1018.3" y2="637.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1018.3,637.5 1015.5,644.8 1010.8,639.6" fill="#9a8f79"/>
+  <line x1="689.0" y1="725.1" x2="567.1" y2="813.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="567.1,813.6 570.7,806.7 574.9,812.3" fill="#9a8f79"/>
+  <line x1="739.9" y1="560.7" x2="715.5" y2="682.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="715.5,682.3 713.4,674.8 720.3,676.2" fill="#9a8f79"/>
+  <line x1="1010.6" y1="512.6" x2="1003.8" y2="481.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1003.8,481.5 1008.7,487.6 1001.8,489.1" fill="#9a8f79"/>
+  <line x1="908.6" y1="705.9" x2="643.6" y2="590.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="643.6,590.1 651.4,589.7 648.6,596.1" fill="#9a8f79"/>
+  <line x1="704.2" y1="526.4" x2="709.1" y2="681.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="709.1,681.8 705.4,674.9 712.4,674.7" fill="#9a8f79"/>
+  <line x1="1140.0" y1="725.3" x2="960.4" y2="717.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="960.4,717.5 967.6,714.3 967.3,721.3" fill="#9a8f79"/>
+  <line x1="750.3" y1="577.4" x2="775.1" y2="565.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="775.1,565.1 770.4,571.4 767.3,565.1" fill="#9a8f79"/>
+  <line x1="728.0" y1="511.8" x2="775.6" y2="537.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="775.6,537.5 767.8,537.3 771.1,531.1" fill="#9a8f79"/>
+  <line x1="855.2" y1="418.0" x2="742.4" y2="564.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="742.4,564.7 743.9,557.0 749.4,561.3" fill="#9a8f79"/>
+  <line x1="893.7" y1="459.0" x2="994.8" y2="521.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="994.8,521.5 987.0,520.8 990.7,514.8" fill="#9a8f79"/>
+  <line x1="623.9" y1="481.4" x2="774.1" y2="540.8" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="774.1,540.8 766.3,541.5 768.9,535.0" fill="#9a8f79"/>
+  <line x1="881.2" y1="361.8" x2="1067.3" y2="492.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1067.3,492.9 1059.5,491.8 1063.5,486.1" fill="#9a8f79"/>
+  <line x1="993.3" y1="535.9" x2="831.9" y2="549.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="831.9,549.3 838.6,545.3 839.1,552.2" fill="#9a8f79"/>
+  <line x1="1153.8" y1="707.1" x2="1096.6" y2="532.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1096.6,532.6 1102.1,538.2 1095.5,540.4" fill="#9a8f79"/>
+  <line x1="563.8" y1="474.7" x2="564.9" y2="477.2" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="564.9,477.2 558.9,472.2 565.3,469.4" fill="#9a8f79"/>
+  <line x1="429.9" y1="549.8" x2="466.5" y2="447.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="466.5,447.4 467.4,455.2 460.8,452.8" fill="#9a8f79"/>
+  <line x1="505.7" y1="469.8" x2="531.3" y2="309.1" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="531.3,309.1 533.7,316.5 526.8,315.4" fill="#9a8f79"/>
+  <line x1="485.0" y1="616.1" x2="533.8" y2="477.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="533.8,477.7 534.7,485.5 528.1,483.1" fill="#9a8f79"/>
+  <line x1="615.6" y1="542.1" x2="625.5" y2="475.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="625.5,475.5 628.0,483.0 621.0,482.0" fill="#9a8f79"/>
+  <line x1="589.3" y1="360.5" x2="610.7" y2="397.6" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="610.7,397.6 604.2,393.3 610.3,389.8" fill="#9a8f79"/>
+  <line x1="845.7" y1="391.9" x2="708.9" y2="361.9" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="708.9,361.9 716.5,360.0 715.0,366.8" fill="#9a8f79"/>
+  <line x1="863.1" y1="503.3" x2="1016.2" y2="607.7" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="1016.2,607.7 1008.4,606.6 1012.4,600.9" fill="#9a8f79"/>
+  <line x1="603.8" y1="549.0" x2="694.6" y2="686.4" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="694.6,686.4 687.8,682.5 693.6,678.7" fill="#9a8f79"/>
+  <line x1="880.5" y1="362.7" x2="971.4" y2="431.0" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="971.4,431.0 963.7,429.6 967.9,424.0" fill="#9a8f79"/>
+  <line x1="845.3" y1="430.9" x2="684.5" y2="343.3" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="684.5,343.3 692.4,343.6 689.0,349.8" fill="#9a8f79"/>
+  <line x1="736.0" y1="710.6" x2="904.5" y2="715.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="904.5,715.5 897.4,718.8 897.6,711.8" fill="#9a8f79"/>
+  <line x1="580.1" y1="475.7" x2="575.6" y2="366.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="575.6,366.5 579.4,373.4 572.4,373.7" fill="#9a8f79"/>
+  <line x1="557.7" y1="399.3" x2="566.4" y2="365.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="566.4,365.5 568.0,373.2 561.2,371.4" fill="#9a8f79"/>
+  <line x1="815.9" y1="338.1" x2="689.3" y2="327.5" stroke="#9a8f79" stroke-width="1.6" stroke-linecap="round"/>
+  <polygon points="689.3,327.5 696.6,324.6 696.0,331.6" fill="#9a8f79"/>
+  <circle cx="477.0" cy="638.7" r="24.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="477.0" y="647.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">停</text>
+  <circle cx="379.6" cy="491.6" r="22.0" fill="#c9a35a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="379.6" y="499.9" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">充</text>
+  <circle cx="1160.0" cy="726.1" r="20.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="1160.0" y="733.7" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="21" fill="#f4ecd8">再</text>
+  <circle cx="536.0" cy="279.4" r="28.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="536.0" y="290.0" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">冷</text>
+  <circle cx="809.7" cy="399.5" r="36.0" fill="#8c2a20" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="809.7" y="410.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">击</text>
+  <circle cx="703.3" cy="498.5" r="28.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="703.3" y="509.0" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">分</text>
+  <circle cx="710.0" cy="709.8" r="26.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="710.0" y="719.6" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">利</text>
+  <circle cx="649.4" cy="324.2" r="38.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="649.4" y="335.0" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">力</text>
+  <circle cx="421.1" cy="574.3" r="26.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="421.1" y="584.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">加</text>
+  <circle cx="802.0" cy="551.8" r="28.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="802.0" y="562.4" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">化</text>
+  <circle cx="871.1" cy="397.4" r="26.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="871.1" y="407.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">反</text>
+  <circle cx="907.2" cy="608.1" r="22.0" fill="#7a4a63" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="907.2" y="616.4" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">右</text>
+  <circle cx="836.7" cy="485.3" r="32.0" fill="#8c2a20" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="836.7" y="496.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">合</text>
+  <circle cx="651.8" cy="532.7" r="36.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="651.8" y="543.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">回</text>
+  <circle cx="745.4" cy="533.3" r="28.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="745.4" y="543.9" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">复</text>
+  <circle cx="862.8" cy="655.1" r="22.0" fill="#7a4a63" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="862.8" y="663.4" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">左</text>
+  <circle cx="1139.2" cy="620.3" r="22.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="1139.2" y="628.6" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">币</text>
+  <circle cx="599.7" cy="471.9" r="26.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="599.7" y="481.7" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">强</text>
+  <circle cx="683.7" cy="67.5" r="20.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="683.7" y="75.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="21" fill="#f4ecd8">御</text>
+  <circle cx="588.4" cy="390.4" r="40.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="588.4" y="401.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">心</text>
+  <circle cx="500.7" cy="501.4" r="32.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="500.7" y="512.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">急</text>
+  <circle cx="547.7" cy="827.7" r="22.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="547.7" y="836.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">息</text>
+  <circle cx="932.4" cy="716.3" r="26.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="932.4" y="726.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">投</text>
+  <circle cx="970.3" cy="60.0" r="22.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="970.3" y="68.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">护</text>
+  <circle cx="568.9" cy="647.5" r="32.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="568.9" y="658.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">收</text>
+  <circle cx="610.6" cy="575.7" r="34.0" fill="#c9a35a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="610.6" y="586.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">放</text>
+  <circle cx="60.0" cy="403.6" r="18.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="60.0" y="410.4" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="19" fill="#f4ecd8">洗</text>
+  <circle cx="581.8" cy="515.7" r="40.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="581.8" y="526.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">流</text>
+  <circle cx="321.6" cy="421.0" r="24.0" fill="#3c4a6b" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="321.6" y="430.0" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">清</text>
+  <circle cx="631.7" cy="434.0" r="40.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="631.7" y="444.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">火</text>
+  <circle cx="1015.3" cy="534.1" r="22.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="1015.3" y="542.4" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">炼</text>
+  <circle cx="480.6" cy="407.9" r="40.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="480.6" y="418.7" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">热</text>
+  <circle cx="795.5" cy="281.5" r="26.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="795.5" y="291.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">爆</text>
+  <circle cx="1025.2" cy="130.0" r="22.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="1025.2" y="138.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">甲</text>
+  <circle cx="547.7" cy="438.1" r="40.0" fill="#c9a35a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="547.7" y="448.9" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">电</text>
+  <circle cx="992.1" cy="235.8" r="22.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="992.1" y="244.2" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">盾</text>
+  <circle cx="907.3" cy="178.0" r="24.0" fill="#8c2a20" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="907.3" y="187.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">破</text>
+  <circle cx="869.9" cy="444.3" r="28.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="869.9" y="454.9" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">精</text>
+  <circle cx="456.7" cy="336.4" r="28.0" fill="#c9a35a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="456.7" y="346.9" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">能</text>
+  <circle cx="445.6" cy="267.7" r="26.0" fill="#c9a35a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="445.6" y="277.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="27" fill="#f4ecd8">蓄</text>
+  <circle cx="365.1" cy="179.5" r="18.0" fill="#7c7360" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="365.1" y="186.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="19" fill="#f4ecd8">蚀</text>
+  <circle cx="509.8" cy="766.9" r="20.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="509.8" y="774.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="21" fill="#f4ecd8">购</text>
+  <circle cx="1036.0" cy="621.2" r="22.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="1036.0" y="629.5" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="23" fill="#f4ecd8">资</text>
+  <circle cx="679.6" cy="355.5" r="28.0" fill="#4a4438" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="679.6" y="366.1" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">超</text>
+  <circle cx="721.6" cy="591.6" r="32.0" fill="#7a4a63" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="721.6" y="602.4" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">转</text>
+  <circle cx="704.0" cy="184.7" r="24.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="704.0" y="193.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">载</text>
+  <circle cx="574.3" cy="334.5" r="30.0" fill="#7a4a63" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="574.3" y="345.3" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">过</text>
+  <circle cx="651.4" cy="234.6" r="24.0" fill="#8c2a20" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="651.4" y="243.7" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">连</text>
+  <circle cx="539.7" cy="554.4" r="28.0" fill="#c9662e" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="539.7" y="565.0" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">速</text>
+  <circle cx="851.7" cy="341.0" r="36.0" fill="#7a4a63" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="851.7" y="351.8" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">重</text>
+  <circle cx="996.9" cy="450.2" r="30.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="996.9" y="461.0" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="30" fill="#f4ecd8">金</text>
+  <circle cx="1088.5" cy="507.9" r="24.0" fill="#5f7d6a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="1088.5" y="517.0" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="25" fill="#f4ecd8">铸</text>
+  <circle cx="776.8" cy="223.1" r="28.0" fill="#5f7f9a" stroke="#f4ecd8" stroke-width="1.6"/>
+  <text x="776.8" y="233.7" text-anchor="middle" font-family="Noto Serif SC, SimSun, serif" font-size="29" fill="#f4ecd8">防</text>
 </svg>

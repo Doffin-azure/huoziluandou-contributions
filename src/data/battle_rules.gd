@@ -16,7 +16,7 @@ class_name BattleRules
 @export_group("V0.2 新规则")
 @export var heat_capacity: int = 10       ## 初始热容
 @export var allow_zero_effect_words: bool = true  ## P0 待决：合法零效词是否允许出掉
-@export var gold_cap_per_battle: int = 18         ## 战内金币收入安全阀（原型值）
+@export var gold_cap_per_battle: int = 0          ## 战内金币收入上限；0 = 不限制（原型阶段开放）
 
 
 static func default_rules() -> BattleRules:

@@ -4,6 +4,9 @@ class_name BoardState
 
 var size: int = 4
 var cells: Array = []   ## Array[CharInstance | null]，长度 size*size
+var diagonal_steps_allowed: int = 0
+var gap_steps_allowed: int = 0 ## 超：下次组词最多跨过一个四方向空格。
+var free_word_link: bool = false ## 流利：下一次组词无需相邻，仍逐枚按字序选择。
 
 
 func _init(p_size: int = 4) -> void:
@@ -90,13 +93,58 @@ func is_adjacent(a: Vector2i, b: Vector2i) -> bool:
 func valid_path(path: Array) -> bool:
 	if path.is_empty():
 		return true
+	var visited := {}
+	var diagonals := 0
+	var gaps := 0
 	for i in path.size():
 		var v: Vector2i = path[i]
-		if not in_bounds(v.x, v.y) or get_xy(v) == null:
+		if visited.has(v) or not in_bounds(v.x, v.y) or get_xy(v) == null:
 			return false
-		if i > 0 and not is_adjacent(path[i - 1], v):
+		if get_xy(v).pinned and get_xy(v).pinned_exhausted:
 			return false
+		visited[v] = true
+		if i > 0 and not free_word_link and not is_adjacent(path[i - 1], v):
+			if is_gap_step(path[i - 1], v):
+				gaps += 1
+				if gaps > gap_steps_allowed:
+					return false
+				continue
+			var delta: Vector2i = v - path[i - 1]
+			if absi(delta.x) != 1 or absi(delta.y) != 1:
+				return false
+			diagonals += 1
+			if diagonals > diagonal_steps_allowed:
+				return false
 	return true
+
+
+func can_extend_path(path: Array, pos: Vector2i) -> bool:
+	return valid_path(path + [pos])
+
+func is_gap_step(a: Vector2i, b: Vector2i) -> bool:
+	var delta := b - a
+	if not ((absi(delta.x) == 2 and delta.y == 0) or (delta.x == 0 and absi(delta.y) == 2)):
+		return false
+	var middle := a + Vector2i(delta.x / 2, delta.y / 2)
+	return in_bounds(b.x, b.y) and get_xy(middle) == null
+
+## UI、词搜索共用同一份连线规则，跨格与斜连预算彼此独立。
+func path_extensions(path: Array) -> Array:
+	if path.is_empty():
+		return []
+	var tail: Vector2i = path.back()
+	var candidates := neighbors(tail)
+	if free_word_link:
+		candidates.clear()
+		for i in cells.size():
+			candidates.append(to_xy(i))
+	if diagonal_steps_allowed > 0:
+		for offset in [Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1)]:
+			candidates.append(tail + offset)
+	if gap_steps_allowed > 0:
+		for offset in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
+			candidates.append(tail + offset * 2)
+	return candidates.filter(func(pos): return can_extend_path(path, pos))
 
 
 func glyphs_of(path: Array) -> Array:

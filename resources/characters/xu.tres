@@ -5,17 +5,18 @@
 
 [sub_resource type="Resource" id="Resource_ar2kk"]
 script = ExtResource("2_v6q3f")
-handler = "energy"
+kind = 29
+handler = "energy_next_turn"
 amount = 2
-note = "储能 +2"
+note = "下回合开始获得 2 储能，仅一次"
 
 [resource]
 script = ExtResource("1_mo0pc")
 id = "xu"
 glyph = "蓄"
 pinyin = "xu"
-description = "储能 +2"
+description = "下回合开始获得 2 储能，仅一次"
 tags = Array[String](["energy"])
 solo_effects = Array[ExtResource("2_v6q3f")]([SubResource("Resource_ar2kk")])
-solo_handler = "energy"
+solo_handler = "energy_next_turn"
 rarity = 1

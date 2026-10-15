@@ -29,7 +29,7 @@ const CUT_GLYPHS := ["纯", "攻", "剑", "雷", "毒", "愈", "却"]
 const CUT_WORDS := ["纯化", "纯金", "纯利", "精纯", "强力反击", "冷却"]
 
 ## 特殊交互（WordData.interaction）
-const INTERACTIONS := {"转化": "reveal_pick_board", "强化": "choose_glyph_empower", "炼化": "choose_battle_card_remove", "化合": "choose_fuse_pair", "精炼": "choose_same_pair", "精金": "choose_glyph_gild", "精铸": "choose_discard_place", "再铸": "choose_discard_place", "反转": "choose_line", "合流": "choose_merge_flow"}
+const INTERACTIONS := {"转化": "reveal_pick_board", "强化": "choose_glyph_empower", "炼化": "choose_battle_card_remove", "化合": "choose_fuse_pair", "精炼": "choose_same_pair", "精金": "choose_glyph_gild", "再铸": "choose_three_tiles", "反转": "choose_line", "合流": "choose_merge_flow"}
 ## 界面分组覆盖（设计负责人重定义后，不再归入原总账分组）
 const GROUP_OVERRIDES := {"转化": "空间", "分化": "空间", "停电": "彩蛋"}
 
@@ -85,6 +85,8 @@ func _strs(list: Array) -> Array[String]:
 	return out
 
 func _save(res: Resource, path: String) -> void:
+	if res is WordData:
+		ContentBuild.WordDescriptionsS.apply_to(res)
 	var err := ResourceSaver.save(res, path)
 	if err != OK:
 		push_error("保存失败 %s (%d)" % [path, err])
@@ -118,22 +120,24 @@ func _build_pollutions() -> void:
 
 func _build_statuses() -> void:
 	var defs := [
-		{"id": "strength", "name": "强力", "glyph": "力", "kind": 0, "color": "b8523a", "decay": 0,
-		 "desc": "每层使你的伤害 +1。"},
+		{"id": "strength", "name": "力量", "glyph": "力", "kind": 0, "color": "b8523a", "decay": 0,
+		 "desc": "本场每层使你的攻击每段伤害+1。"},
 		{"id": "vulnerable", "name": "易伤", "glyph": "脆", "kind": 1, "color": "7a4a63", "decay": 1,
 		 "desc": "受到的伤害提高 50%。"},
 		{"id": "poison", "name": "中毒", "glyph": "毒", "kind": 1, "color": "5f7d6a", "decay": 1,
 		 "desc": "回合开始损失等量生命。"},
-		{"id": "next_bonus", "name": "加强", "glyph": "增", "kind": 0, "color": "3c4a6b", "decay": 0,
-		 "desc": "下一次攻击每段 +2 伤害。"},
+		{"id": "next_bonus", "name": "热力强化", "glyph": "增", "kind": 0, "color": "3c4a6b", "decay": 0,
+		 "desc": "每层使下一次攻击每段伤害+1，整次攻击后消耗；跨回合保留。"},
 		{"id": "next_double", "name": "超强", "glyph": "倍", "kind": 0, "color": "7a3b3b", "decay": 0,
-		 "desc": "下一次造成伤害的攻击翻倍。"},
+		 "desc": ContentBuild.WordDescriptionsS.TEXT["超强"]},
 		{"id": "next_extra", "name": "超载", "glyph": "载", "kind": 0, "color": "b0522e", "decay": 0,
-		 "desc": "下一次多字词的即时效果额外执行一次。"},
+		 "desc": "下一次多字词的即时效果额外执行一次，不重复消耗材料；费用再付，跨回合保留。"},
 		{"id": "burn", "name": "灼烧", "glyph": "燃", "kind": 1, "color": "b0522e", "decay": 0,
 		 "desc": "接下来 2 次敌方行动各受到一次灼烧伤害。"},
 		{"id": "heart_corrosion", "name": "心蚀", "glyph": "蚀", "kind": 1, "color": "8a4a63", "decay": 0,
 		 "desc": "每回合损失等量层数的生命（不衰减）。"},
+		{"id": "gold_burst", "name": "爆金", "glyph": "币", "kind": 1, "color": "b8912e", "decay": 0,
+		 "desc": "每受到一次攻击，攻击者获得 1 金币（被护甲/格挡吸收也算）。"},
 	]
 	for d in defs:
 		var s: StatusData = StatusDataS.new()
@@ -168,16 +172,16 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"击": return {"h": "damage", "a": 4, "note": "造成 4 伤害"}
 		"防": return {"h": "block_temp", "a": 4, "note": "获得 4 点临时格挡"}
 		"护": return {"h": "ability_guard_inject", "a": 1, "note": "下次敌方塞字减少 1 个"}
-		"御": return {"h": "guard_reduce", "a": 1, "note": "本回合每次受伤 -1"}
+		"御": return {"h": "guard_once", "a": 2, "note": "下一次受到伤害减免 2 点，触发后消失"}
 		"回": return {"h": "replace_self", "note": "在原位置随机换一枚字"}
 		"重": return {"h": "gravity", "target": EffectDataS.Target.BOARD, "note": "字盘按列向下重力"}
 		"心": return {"h": "heal", "a": 1, "note": "回复 1 生命"}
-		"清": return {"h": "cleanse_adjacent", "target": EffectDataS.Target.BOARD_TILE, "note": "净化一个四邻污染标记（保留字与所有权）"}
-		"反": return {"h": "damage", "a": 2, "note": "占位：造成 2 伤害（用户未确认）"}
-		"甲": return {"h": "ability_armor_plating", "a": 1, "note": "每回合获得 1 点格挡，格挡被击穿则碎裂"}
+		"清": return {"h": "cleanse_adjacent", "target": EffectDataS.Target.BOARD_TILE, "note": "选择原格四邻的一枚字，清除一个污染标签（保留原字与归属）"}
+		"反": return {"h": "retaliate_once", "a": 6, "note": "本回合下一次受到敌方攻击后，对攻击者反击 6 伤；整次行动结束后仅一次，完全格挡也触发"}
+		"甲": return {"h": "block_next_turn", "a": 2, "note": "下回合开始获得 2 点格挡，仅一次"}
 		"盾": return {"h": "block_persist", "a": 3, "note": "获得 3 点持久盾"}
-		"破": return {"h": "damage", "a": 3, "note": "占位：造成 3 伤害（单字用途未定）"}
-		"再": return {"h": "repeat_last", "note": "单字：重复上一个词/字的最后一个字（临时）"}
+		"破": return {"h": "chip_shield_damage", "a": 2, "args": {"shield": 4}, "note": "先移除敌人最多 4 点护盾，再造成 2 伤"}
+		"再": return {"h": "repeat_last", "note": "复制上一手成功出字的最后一个字为临时副本，原格优先、被占则找空格；副本用后移除，不能复制【再】本身"}
 		"左": return {"h": "gravity_left", "target": EffectDataS.Target.BOARD, "note": "字盘按行向左重力"}
 		"右": return {"h": "gravity_right", "target": EffectDataS.Target.BOARD, "note": "字盘按行向右重力"}
 		# 资源 / 主题字（设计负责人补充）
@@ -185,17 +189,41 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"热": return {"h": "heat", "a": 2, "note": "热度 +2"}
 		"冷": return {"h": "heat", "a": -2, "note": "热度 -2"}
 		"电": return {"h": "energy", "a": 1, "note": "储能 +1"}
-		"蓄": return {"h": "energy", "a": 2, "note": "储能 +2"}
+		"蓄": return {"h": "energy_next_turn", "a": 2, "note": "下回合开始获得 2 储能，仅一次"}
 		"金": return {"h": "gold", "a": 1, "note": "获得 1 金币"}
-		"力": return {"h": "apply_status_self", "status": "strength", "a": 1, "note": "获得 1 层强力"}
+		"币": return {"h": "payment_discount_once", "a": 1, "note": "本回合下一次字／词的金币费用 -1，最低 0，仅一次"}
+		"利": return {"h": "profit_if_earned", "a": 2, "note": "若本回合此前已获得过金币，再获得 2 金币；否则无收益"}
+		"投": return {"h": "throw_neighbor", "target": EffectDataS.Target.BOARD_TILE, "note": "支付 1 金币，将原格四邻的一枚非固定字移到指定空格"}
+		"急": return {"effects": [{"h": "draw_excluding_source", "a": 1, "note": "立即补 1 字，排除本次打出的实体"}, {"h": "heat", "a": 1, "note": "热度 +1"}], "note": "立即补 1 字、热度 +1；排除本次打出的实体"}
+		"息": return {"h": "rest_cool", "a": 1, "note": "热度 -1；若本回合尚未造成伤害，再回复 1 生命"}
+		"力": return {"h": "force_once", "a": 2, "note": "下一次攻击总伤害 +2，仅一次（多段攻击只增加一次）"}
+		"能": return {"h": "energy_gain_once", "a": 1, "note": "本回合下一次获得储能时额外 +1，仅一次"}
+		"连": return {"h": "link_next_word", "a": 1, "note": "本回合下一次成功组词后补 1 字，仅一次"}
+		"转": return {"h": "move_neighbor", "target": EffectDataS.Target.BOARD_TILE, "note": "选择原格四邻的一枚非固定字，移入本字腾出的格子"}
+		"放": return {"h": "solo_release", "a": 2, "note": "不消耗储能造成 2 伤；可选择消耗 1 储能，改为造成 8 伤"}
+		"洗": return {"h": "wash_adjacent", "target": EffectDataS.Target.BOARD_TILE, "note": "选择原格四邻的一枚字，清除它的全部污染标签（保留原字与归属）"}
+		"强": return {"h": "turn_strength", "a": 1, "note": "本回合伤害 +1，回合结束后清除"}
 		"流": return {"h": "draw_bonus_next", "a": 1, "note": "下回合多抽 1 字"}
 		"蚀": return {"h": "damage", "a": 2, "note": "对敌造成 2 伤害"}
 		# 下一批（复合 / 独立定位）
-		"充": return {"effects": [{"h": "energy", "a": 1, "note": "储能 +1"}, {"h": "draw_random", "a": 1, "note": "随机补 1 字"}], "note": "储能 +1，随机补 1 字"}
+		"充": return {"effects": [{"h": "energy", "a": 1, "note": "储能 +1"}, {"h": "draw_bonus_next", "a": 1, "note": "下回合多补 1 字"}], "note": "储能 +1，下回合多补 1 字"}
 		"爆": return {"effects": [{"h": "damage", "a": 2, "note": "造成 2 伤害"}, {"h": "heat", "a": 1, "note": "热度 +1"}], "note": "造成 2 伤，热度 +1"}
 		"资": return {"h": "temp_funds", "a": 2, "note": "获得 2 点临时资金（本回合有效）"}
-		"收": return {"h": "draw_random", "a": 1, "note": "随机补 1 字"}
+		"收": return {"h": "draw_excluding_source", "a": 1, "note": "随机补 1 字，排除本次打出的实体；没有其他可补字时不补"}
 		"障": return {"h": "block_temp", "a": 2, "note": "获得 2 点临时格挡"}
+		"合": return {"h": "combine_next_word", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次成功组词后，获得 2 点临时格挡和 1 点储能，仅一次"}
+		"分": return {"h": "split_neighbor", "a": 0, "target": EffectDataS.Target.BOARD_TILE, "note": "选择原格四邻的一枚己方字，在本字原格生成其主字形的临时复制；仅供组词，单独打出只弃掉，不复制附加属性"}
+		"复": return {"h": "energy_refund_once", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次实际消耗储能时返还 1 点，不超过实际消耗量，仅一次"}
+		"速": return {"h": "speed_next_word", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次成功组词后补 2 字、热度 +1，仅一次"}
+		"停": return {"h": "stop_cool", "a": 4, "target": EffectDataS.Target.NONE, "note": "热度 -4，立即结束出字阶段；敌人正常行动"}
+		"载": return {"h": "turn_heat_capacity", "a": 2, "target": EffectDataS.Target.NONE, "note": "本回合热容 +2，下回合开始撤销临时加成；热度保持不变"}
+		"铸": return {"h": "recast_neighbor", "a": 0, "target": EffectDataS.Target.BOARD_TILE, "note": "选择原格四邻的一枚非固定己方实体字，将原实体放回字袋，原格随机换入另一枚实体字；排除目标及本次打出的字，无替换字则保留目标"}
+		"炼": return {"h": "refine_junk_neighbor", "a": 0, "target": EffectDataS.Target.BOARD_TILE, "note": "选择原格四邻的一枚非固定敌方字、临时字或自生污染字，移除并获得 1 金币、热度 +1；不移除永久己方字"}
+		"加": return {"h": "solo_gain_once", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次单字的首项直接伤害、临时格挡、治疗或储能收益 +1，仅一次；不增加热度、费用或持续标记"}
+		"超": return {"h": "next_gap", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次成功组词允许横向或纵向跨过一个空格，最多一次；不能跨过有字的格子"}
+		"精": return {"h": "precision_draw", "a": 0, "target": EffectDataS.Target.BAG_GLYPH, "note": "从字袋揭示 2 枚实体字，选择 1 枚补入原格，另一枚留在字袋；只有 1 枚时直接补入，空袋时只弃字"}
+		"化": return {"h": "heat_to_energy_solo", "a": 1, "target": EffectDataS.Target.NONE, "note": "消耗 2 热度，获得 1 储能；不足 2 热度时只弃掉本字"}
+		"购": return {"h": "buy_bag_solo", "a": 2, "target": EffectDataS.Target.BAG_GLYPH, "note": "支付 2 金币，从字袋选择 1 枚己方实体字补入原格，保留原属性；空袋时只弃字，不支付"}
 	return {}
 
 
@@ -356,6 +384,11 @@ func _build_words_from_ledger() -> void:
 		w.p25_implemented = row[7].strip_edges() == "是"
 		w.implementation_delta = row[10]
 		w.description = row[5]
+		if ContentBuild.BALANCE_SPECS.has(word):
+			var spec: Dictionary = ContentBuild.BALANCE_SPECS[word]
+			w.description = spec.desc
+			w.effect_summary = spec.desc
+			w.interaction = spec.interaction
 		w.effects = _teffects(effects_list)
 		w.implemented = not effects_list.is_empty()
 		w.rarity = 1
@@ -419,10 +452,10 @@ func _build_extra_words() -> void:
 		ContentBuild.e("gild_glyph", 0, -1, "", "选择一枚己方字永久镀金", {})),
 		"%s/words/extra_jinjin.tres" % RES)
 
-	# 精铸：精准制造
-	_save(_extra("extra_jingzhu", "精铸", ["精", "铸"], "流转", "choose_discard_place",
-		"支付 3 金币，从弃字堆选一枚己方实体字，直接放进指定空格",
-		ContentBuild.e("precision_place", 3, -1, "", "支付 3 金币，把弃字堆中的一枚字放进指定空格", {})),
+	# 精铸：固定一枚盘面字（本场可反复使用，不可移动/换字）
+	_save(_extra_list("extra_jingzhu", "精铸", ["精", "铸"], "空间", "",
+		"选择盘面一枚己方实体字将其固定：本场不再回抽字袋/弃字堆，可反复使用；但固定后不可移动、不可换字",
+		[ContentBuild.e("pin_glyph", 0, EffectDataS.Target.BOARD_TILE, "", "选一枚盘面己方字固定（本场不消耗，不可移动/换字）", {})]),
 		"%s/words/extra_jingzhu.tres" % RES)
 
 	# 精分：彩蛋
@@ -509,8 +542,8 @@ func _build_extra_words() -> void:
 
 	# 字网加边 · 第二批（蓄放 / 流转 / 经济）
 	_save(_extra_list("extra_liusu", "流速", ["流", "速"], "流转", "",
-		"选定一行：本回合每次打出涉及该行的词，都立即从字袋补回该行被腾出的空格",
-		[ContentBuild.e("flow_row", 0, EffectDataS.Target.BOARD_ROW, "", "选定一行：本回合该行腾出的空格立即补字", {})]),
+		"选择一行：本回合该行后续两次出词消耗的字原地补回；重复施放叠加次数",
+		[ContentBuild.e("flow_speed", 2, EffectDataS.Target.BOARD_ROW, "", "选择一行：本回合该行后续两次出词消耗的字原地补回；重复施放叠加次数", {}, -1, "persistent")]),
 		"%s/words/extra_liusu.tres" % RES)
 	_save(_extra_list("extra_huosu", "火速", ["火", "速"], "流转", "",
 		"把盘面补到至少 12 字；每实际补入 1 字，增加 1 热度",
@@ -587,8 +620,8 @@ func _build_extra_words() -> void:
 
 	# 心系（设计负责人新增）
 	_save(_extra_list("extra_zhongxin", "重心", ["重", "心"], "空间", "",
-		"选择一个字，让所有字向它聚拢（冲突优先左上）",
-		[ContentBuild.e("converge", 0, EffectDataS.Target.BOARD_TILE, "", "选择一个字，让所有字向它聚拢（冲突优先左上）", {})]),
+		"选择一个字作为锚点，其余未固定字逐轮聚拢至稳定（冲突优先左上）",
+		[ContentBuild.e("converge", 0, EffectDataS.Target.BOARD_TILE, "", "选择一个字作为锚点，其余未固定字逐轮聚拢至稳定（冲突优先左上）", {})]),
 		"%s/words/extra_zhongxin.tres" % RES)
 	_save(_extra_list("extra_xinli", "心力", ["心", "力"], "连携", "",
 		"能力牌：每打出一颗【心】，叠加一层心力；心力可抵挡一次致命伤害",
@@ -616,7 +649,115 @@ func _build_extra_words() -> void:
 		"%s/words/extra_guofen.tres" % RES)
 	print("  · 新增词：过分（过系）")
 
+	# 放回 / 回放（流转）
+	_save(_extra_list("extra_fanghui", "放回", ["放", "回"], "流转", "choose_discard_place",
+		"从弃字堆定向挑一枚己方实体字，放入盘面指定空格",
+		[ContentBuild.e("precision_place", 0, -1, "", "从弃字堆选一枚己方字放进指定空格", {})]),
+		"%s/words/extra_fanghui.tres" % RES)
+	_save(_extra_list("extra_huifang", "回放", ["回", "放"], "流转", "",
+		"把上一个词用过的字放回盘面（原格优先，被占则找空格）",
+		[ContentBuild.e("replay_word", 0, -1, "", "把上一个词用过的字放回盘面", {})]),
+		"%s/words/extra_huifang.tres" % RES)
+	print("  · 新增词：放回/回放（流转）")
+
+	# 精心（抽字控制）
+	_save(_extra_list("extra_jingxin", "精心", ["精", "心"], "流转", "",
+		"下回合补字数 -1，但补的字可从字袋定向挑选（随机落地）",
+		[ContentBuild.e("manual_draw_next", 1, -1, "", "下回合补字 -1，但可从字袋定向选字（随机落地）", {})]),
+		"%s/words/extra_jingxin.tres" % RES)
+	print("  · 新增词：精心")
+
+	# 心系补全（设计负责人）
+	_save(_extra_list("extra_rexin", "热心", ["热", "心"], "热暴", "",
+		"本场能力：每获得 1 热度回复 1 生命，每失去 1 热度扃 1 生命",
+		[ContentBuild.e("ability_warm_heart", 1, -1, "", "本场：热度 +1=回 1 血，-1=扣 1 血", {}, -1, "persistent")]),
+		"%s/words/extra_rexin.tres" % RES)
+	_save(_extra_list("extra_fangxin", "放心", ["放", "心"], "防反", "",
+		"本回合受到的伤害减半（向上取整，再 -1）",
+		[ContentBuild.e("guard_halve", 0, -1, "", "本回合受伤减半（向上取整再 -1）", {})]),
+		"%s/words/extra_fangxin.tres" % RES)
+	_save(_extra_list("extra_qiangxin", "强心", ["强", "心"], "防反", "",
+		"本场能力：每回合回复「已触发的心力层数」点生命（本场累计）",
+		[ContentBuild.e("ability_strong_heart", 1, -1, "", "本场：每回合回已触发心力层数的血", {}, -1, "persistent")]),
+		"%s/words/extra_qiangxin.tres" % RES)
+	_save(_extra_list("extra_shouxin", "收心", ["收", "心"], "流转", "choose_own_tiles",
+		"选择任意数量盘面己方牌放回抽字袋，每选 1 枚回复 1 生命",
+		[ContentBuild.e("collect_own", 0, -1, "", "选盘面牌回袋，每枚回 1 血", {})]),
+		"%s/words/extra_shouxin.tres" % RES)
+	_save(_extra_list("extra_huixin", "回心", ["回", "心"], "流转", "",
+		"回复 1 生命，并随机补 3 字",
+		[ContentBuild.e("heal", 1, -1, "", "回复 1 生命", {}),
+			ContentBuild.e("draw_random", 3, -1, "", "随机补 3 字", {})]),
+		"%s/words/extra_huixin.tres" % RES)
+	_save(_extra_list("extra_fenxin", "分心", ["分", "心"], "流转", "",
+		"补 1 字，对敌造成 1 伤，获得 1 持久盾，回复 1 生命",
+		[ContentBuild.e("draw_random", 1, -1, "", "补 1 字", {}),
+			ContentBuild.e("damage", 1, EffectDataS.Target.ENEMY, "", "造成 1 伤", {}),
+			ContentBuild.e("block_persist", 1, -1, "", "获得 1 持久盾", {}),
+			ContentBuild.e("heal", 1, -1, "", "回复 1 生命", {})]),
+		"%s/words/extra_fenxin.tres" % RES)
+	print("  · 新增词：热心/放心/强心/收心/回心/分心")
+
+	# 冷心（高风险爆发）
+	_save(_extra_list("extra_lengxin", "冷心", ["冷", "心"], "热暴", "",
+		"本回合伤害翻倍；接下来 2 回合不能获得防御（格挡/持久盾无效）",
+		[ContentBuild.e("cold_heart", 0, -1, "", "本回合伤害翻倍；2 回合不能获得防御", {})]),
+		"%s/words/extra_lengxin.tres" % RES)
+	print("  · 新增词：冷心")
+
+	# 清心（清除负面状态）
+	_save(_extra_list("extra_qingxin", "清心", ["清", "心"], "流转", "",
+		"清除自身全部负面状态",
+		[ContentBuild.e("cleanse_status", 0, -1, "", "清除自身全部负面状态", {})]),
+		"%s/words/extra_qingxin.tres" % RES)
+	print("  · 新增词：清心")
+
+	# 盾反（防反：先立盾再反击）
+	_save(_extra_list("extra_dunfan", "盾反", ["盾", "反"], "防反", "",
+		"获得 3 点持久盾，并预留 1 层反击（敌人行动结束后把剩余临挡转为反击伤害，每层 +3）",
+		[ContentBuild.e("block_persist", 3, -1, "", "获得 3 点持久盾", {}),
+			ContentBuild.e("counter", 1, -1, "", "预留 1 层反击", {})]),
+		"%s/words/extra_dunfan.tres" % RES)
+	print("  · 新增词：盾反")
+
+	# 词义补全：自动恢复、下一词连携、储能和防御反击。
+	_save(_extra_list("extra_chonghui", "重回", ["重", "回"], "流转", "",
+		"把本回合此前最近消耗的最多两枚己方实体字放回字袋顶（不包含本词）",
+		[ContentBuild.e("recover_recent", 2, EffectDataS.Target.NONE, "", "把本回合此前最近消耗的最多两枚己方实体字放回字袋顶（不包含本词）")]),
+		"%s/words/extra_chonghui.tres" % RES)
+	var reconnect := _extra_list("extra_chonglian", "重连", ["重", "连"], "连携", "choose_three_tiles",
+		"选择三个不同的非固定字，本回合暂时移出，下回合原格优先返回（占格找空位，满盘待回）",
+		[ContentBuild.e("suspend_three", 3, EffectDataS.Target.NONE, "", "选择三个不同的非固定字，本回合暂时移出，下回合原格优先返回（占格找空位，满盘待回）", {}, -1, "persistent")])
+	reconnect.timing = "delayed"
+	_save(reconnect, "%s/words/extra_chonglian.tres" % RES)
+	var linger := _extra_list("extra_liulian", "流连", ["流", "连"], "流转", "",
+		"本回合后续打出的每个字有 50% 概率留在原位（原实体保留，不叠加）",
+		[ContentBuild.e("linger_chance", 50, EffectDataS.Target.NONE, "", "本回合后续打出的每个字有 50% 概率留在原位（原实体保留，不叠加）", {}, -1, "persistent")])
+	linger.timing = "persistent"
+	_save(linger, "%s/words/extra_liulian.tres" % RES)
+	var regen := _extra_list("extra_huineng", "回能", ["回", "能"], "蓄放", "",
+		"持续三回合，每回合获得 2 点储能（含施放回合；重施刷新，同回合不重复发放）",
+		[ContentBuild.e("energy_regen", 3, EffectDataS.Target.NONE, "", "持续三回合，每回合获得 2 点储能（含施放回合；重施刷新，同回合不重复发放）", {}, -1, "persistent")])
+	regen.timing = "persistent"
+	_save(regen, "%s/words/extra_huineng.tres" % RES)
+	_save(_extra_list("extra_fangfan", "防反", ["防", "反"], "防反", "",
+		"获得 6 点临时格挡，并预留 1 层反击（敌人行动结束后，以剩余临挡加 3 造成反击伤害）",
+		[ContentBuild.e("block_temp", 6, EffectDataS.Target.NONE, "", "获得 6 点临时格挡"),
+		 ContentBuild.e("counter", 1, EffectDataS.Target.NONE, "", "预留 1 层反击（敌人行动结束后，以剩余临挡加 3 造成反击伤害）", {}, -1, "delayed")]),
+		"%s/words/extra_fangfan.tres" % RES)
+	print("  · 新增词：重回/重连/流连/回能/防反")
+
+	# 爆金币（5 段伤害 + 爆金印记）
+	_save(_extra_list("extra_baojinbi", "爆金币", ["爆", "金", "币"], "经济", "",
+		"造成 5 段 1 点伤害，并使目标获得【爆金】：此后每受到一次攻击你获得 1 金币（被护甲/格挡吸收也算）",
+		[ContentBuild.e("apply_status_enemy", 1, EffectDataS.Target.ENEMY, "gold_burst", "使目标获得【爆金】"),
+			ContentBuild.e("damage_multi", 1, EffectDataS.Target.ENEMY, "", "5 段 1 点伤害", {"hits": 5})]),
+		"%s/words/extra_baojinbi.tres" % RES)
+	print("  · 新增词：爆金币")
+
 func _extra(id: String, word: String, glyphs: Array, group: String, interaction: String, desc: String, effect: EffectData) -> WordData:
+	if ContentBuild.BALANCE_SPECS.has(word):
+		return _extra_list(id, word, glyphs, group, interaction, desc, [effect])
 	var w: WordData = WordDataS.new()
 	w.id = id
 	w.word = word
@@ -649,6 +790,15 @@ func _extra_list(id: String, word: String, glyphs: Array, group: String, interac
 	w.implemented = true
 	w.effect_handler_id = effects[0].handler
 	w.interaction = interaction
+	if ContentBuild.BALANCE_SPECS.has(word):
+		var spec: Dictionary = ContentBuild.BALANCE_SPECS[word]
+		w.effects = _teffects(ContentBuild.word_effects(word))
+		w.description = spec.desc
+		w.effect_summary = spec.desc
+		w.interaction = spec.interaction
+		w.effect_handler_id = spec.handler
+		effects = w.effects
+		w.timing = spec.timing
 	if requires_target >= 0:
 		w.requires_target = requires_target
 	else:
@@ -835,4 +985,5 @@ func _build_rules() -> void:
 	r.starting_gold = 6
 	r.plays_per_turn = 0   # V0.2：无固定出字次数上限
 	r.heat_capacity = 10
+	r.gold_cap_per_battle = 0   # 开放：战内金币收入不设上限
 	_save(r, "%s/rules/default_rules.tres" % RES)

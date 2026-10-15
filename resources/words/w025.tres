@@ -5,20 +5,21 @@
 
 [sub_resource type="Resource" id="Resource_pgd2w"]
 script = ExtResource("1_6ab26")
+kind = 29
 handler = "merge_duplicates"
 target = 5
-note = "汇聚同字：保留 1 实体并获得同数量临时层，其余回字袋"
+note = "选1枚己方非固定字，将盘上与它完整字形相同的字汇聚到原格；总可用次数为这些字原有可用次数之和，其余原实体回袋。"
 
 [resource]
 script = ExtResource("2_csuw7")
 id = "w025"
 word = "重合"
 glyphs = Array[String](["重", "合"])
-description = "盘上每种重复己方字选择原格；一枚实体留格获得同数量可用层，其余真实副本立刻洗入抽字袋"
+description = "选1枚己方非固定字，将盘上与它完整字形相同的字汇聚到原格；总可用次数为这些字原有可用次数之和，其余原实体回袋。"
 effects = Array[ExtResource("1_6ab26")]([SubResource("Resource_pgd2w")])
 group = "连携"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "盘上每种重复己方字选择原格；一枚实体留格获得同数量可用层，其余真实副本立刻洗入抽字袋"
+effect_summary = "选1枚己方非固定字，将盘上与它完整字形相同的字汇聚到原格；总可用次数为这些字原有可用次数之和，其余原实体回袋。"
 effect_handler_id = "merge_duplicates"
 requires_target = 5
 p25_implemented = true

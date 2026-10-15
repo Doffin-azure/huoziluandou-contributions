@@ -17,9 +17,24 @@ var visited: Dictionary = {}   ## "act:node" -> true
 # --- V0.2 跨战永久能力 ---
 var permanent_damage_reduction: int = 0
 var gold_growth_percent: int = 0
-var reinvest_gold: int = 0
+var battle_sequence: int = 0
+var _reinvestments: Array = []
+var reinvest_gold: int:
+	get:
+		var total := 0
+		for investment in _reinvestments:
+			total += int(investment.amount)
+		return total
+	set(value):
+		_reinvestments.clear()
+		if value > 0:
+			_reinvestments.append({"amount": value, "due_battle": battle_sequence + 1})
 
 var rng := RandomNumberGenerator.new()
+
+## 自定义起始字袋（字形字符串列表，如 ["火","火","电"]）；非空时 start_new_run 优先用它。
+## 调试入口与未来「自定义模式」共用这一处。
+var custom_deck: Array = []
 
 
 func _ready() -> void:
@@ -27,24 +42,29 @@ func _ready() -> void:
 	rng.randomize()
 
 
-func start_new_run(starter_id: String = "v03") -> void:
+func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> void:
 	if Database.rules == null:
 		Database.reload()
 	rules = Database.rules
 	deck.clear()
-	var starter: StarterDeckData = Database.starter_decks.get(starter_id)
-	if starter == null and not Database.starter_decks.is_empty():
-		starter = Database.starter_decks.values()[0]
-	if starter != null:
-		for entry in starter.entries:
-			add_character(entry.character, entry.count)
-		player_max_hp = rules.player_max_hp
-		player_hp = player_max_hp
-		gold = rules.starting_gold
+	player_max_hp = rules.player_max_hp
+	player_hp = player_max_hp
+	gold = rules.starting_gold
+	if not custom_glyphs.is_empty():
+		# 自定义模式 / 调试：按给定字形列表建袋
+		custom_deck = custom_glyphs.duplicate()
+		for g in custom_glyphs:
+			var cd: CharacterData = Database.get_character_by_glyph(str(g))
+			if cd != null:
+				add_character(cd, 1)
 	else:
-		player_max_hp = rules.player_max_hp
-		player_hp = player_max_hp
-		gold = rules.starting_gold
+		custom_deck.clear()
+		var starter: StarterDeckData = Database.starter_decks.get(starter_id)
+		if starter == null and not Database.starter_decks.is_empty():
+			starter = Database.starter_decks.values()[0]
+		if starter != null:
+			for entry in starter.entries:
+				add_character(entry.character, entry.count)
 	act_index = 1
 	node_index = 1
 	fork_choice = -1
@@ -52,6 +72,7 @@ func start_new_run(starter_id: String = "v03") -> void:
 	permanent_damage_reduction = 0
 	gold_growth_percent = 0
 	reinvest_gold = 0
+	battle_sequence = 0
 	EventBus.run_started.emit()
 	EventBus.deck_changed.emit()
 	EventBus.gold_changed.emit(gold)
@@ -82,10 +103,21 @@ func settle_victory_economy() -> void:
 		var bonus: int = int(floor(gold * gold_growth_percent / 100.0))
 		if bonus > 0:
 			add_gold(bonus)
-	if reinvest_gold > 0:
-		var back: int = reinvest_gold * 2
+	var pending: Array = []
+	var back := 0
+	for investment in _reinvestments:
+		if int(investment.due_battle) <= battle_sequence:
+			back += int(investment.amount) * 2
+		else:
+			pending.append(investment)
+	_reinvestments = pending
+	if back > 0:
 		add_gold(back)
-		reinvest_gold = 0
+
+
+func lock_reinvestment(amount: int) -> void:
+	if amount > 0:
+		_reinvestments.append({"amount": amount, "due_battle": battle_sequence + 1})
 
 
 func remove_by_uid(uid: int) -> bool:

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_ujbun")
 id = "strength"
-name = "强力"
+name = "力量"
 glyph = "力"
-description = "每层使你的伤害 +1。"
+description = "本场每层使你的攻击每段伤害+1。"
 color = Color(0.72156864, 0.32156864, 0.22745098, 1)

@@ -66,6 +66,13 @@ static func paper() -> GameStyle:
 	s.BG_BOTTOM = Color("d8c8a2")
 	s.BORDER = s.INK_SOFT
 	s.BORDER_SOFT = s.PAPER_SHADE
+	s.PAPER = Color("efe8d8")
+	s.PAPER_WARM = Color("e8deca")
+	s.INK = Color("28241f")
+	s.VERMILION = Color("aa392d")
+	s.WOOD_DARK = Color("b39368")
+	s.WOOD_LIGHT = Color("dcc8a3")
+	s.PANEL_DARK = Color("30251d")
 	return s
 
 

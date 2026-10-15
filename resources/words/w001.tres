@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_a8ska"]
 script = ExtResource("1_eajmc")
+kind = 2
 handler = "block_temp"
 amount = 10
 note = "获得 10 点临时格挡"
@@ -14,11 +15,11 @@ script = ExtResource("2_d5iw1")
 id = "w001"
 word = "防御"
 glyphs = Array[String](["防", "御"])
-description = "获得10点临时格挡"
+description = "获得 10 点临时格挡"
 effects = Array[ExtResource("1_eajmc")]([SubResource("Resource_a8ska")])
 group = "防反"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "获得10点临时格挡"
+effect_summary = "获得 10 点临时格挡"
 effect_handler_id = "block_temp"
 p25_implemented = true
 implementation_delta = "—"

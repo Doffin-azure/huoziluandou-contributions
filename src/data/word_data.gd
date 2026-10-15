@@ -45,6 +45,17 @@ class_name WordData
 func length() -> int:
 	return glyphs.size()
 
+## 预览、图鉴与能力提示共用整词说明；效果 note 仅用于单项效果的回退。
+func describe() -> String:
+	if not effect_summary.is_empty():
+		return effect_summary
+	if not description.is_empty():
+		return description
+	var parts: PackedStringArray = []
+	for effect in effects:
+		parts.append(effect.describe())
+	return "；".join(parts)
+
 
 func glyph_string() -> String:
 	var s := ""

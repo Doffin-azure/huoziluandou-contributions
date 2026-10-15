@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_cs2ke"]
 script = ExtResource("1_ttija")
+kind = 29
 handler = "recover_consumed"
 amount = 1
 target = 8
@@ -15,11 +16,11 @@ script = ExtResource("2_jo3l6")
 id = "w032"
 word = "回收"
 glyphs = Array[String](["回", "收"])
-description = "从本回合此前消耗的己方实体字里指定1枚，放回抽字袋顶"
+description = "从弃字堆回收本回合消耗的 1 枚字到袋顶"
 effects = Array[ExtResource("1_ttija")]([SubResource("Resource_cs2ke")])
 group = "流转"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "从本回合此前消耗的己方实体字里指定1枚，放回抽字袋顶"
+effect_summary = "从弃字堆回收本回合消耗的 1 枚字到袋顶"
 effect_handler_id = "recover_consumed"
 requires_target = 8
 p25_implemented = true

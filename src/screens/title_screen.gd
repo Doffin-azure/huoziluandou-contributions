@@ -1,113 +1,155 @@
 extends ScreenBase
-## 标题界面。
+## 书房标题菜单；开始后淡出菜单，镜头推进桌面，再开启地图。
+var _menu: VBoxContainer
+var _buttons: Array[Button] = []
+var _entry_timer: Timer
+var _menu_tween: Tween
+var _starting := false
+var _modal_count := 0
+
 
 func build(root: Control) -> void:
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.add_child(center)
-
-	var col := Ink.vbox(18)
-	col.alignment = BoxContainer.ALIGNMENT_CENTER
-	center.add_child(col)
-
-	# —— 标题：四枚木活字 ——
-	var title_row := Ink.hbox(14)
-	title_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	col.add_child(title_row)
-	var chars := ["活", "字", "战", "斗"]
-	var rots := [-0.06, 0.03, -0.04, 0.07]
-	var offsets := [6.0, -4.0, 8.0, -2.0]
-	for i in chars.size():
-		var t := _title_tile(chars[i], rots[i], offsets[i])
-		title_row.add_child(t)
-
-	col.add_child(Ink.spacer(6))
-	var sub := Ink.label("以字为剑 · 铸词为阵", "Subheading", Palette.INK_SOFT)
-	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	col.add_child(sub)
-	var tip := Ink.label("4×4 字盘 · 相邻成词 · 字袋构筑", "Muted")
-	tip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	col.add_child(tip)
-
-	col.add_child(Ink.spacer(24))
-
-	var btns := Ink.vbox(10)
-	btns.custom_minimum_size.x = 300
-	col.add_child(btns)
-	var start := Ink.button("开始新冒险", true)
-	start.pressed.connect(_on_start)
-	btns.add_child(start)
-
-	var library := Ink.button("字库图鉴")
-	library.pressed.connect(_on_library)
-	btns.add_child(library)
-
-	var graph := Ink.button("字网图谱")
-	graph.pressed.connect(func(): goto("res://src/screens/glyph_graph_screen.gd"))
-	btns.add_child(graph)
-
-	var settings_btn := Ink.button("设置")
-	settings_btn.pressed.connect(_open_settings)
-	btns.add_child(settings_btn)
-
-	var quit := Ink.button("离开")
-	quit.theme_type_variation = "GhostButton"
-	quit.pressed.connect(func(): get_tree().quit())
-	btns.add_child(quit)
-
-	var footer := Ink.label("GDD V0.3 脚手架 · Godot 4.7", "Muted")
-	footer.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	footer.position = Vector2(-220, -34)
-	root.add_child(footer)
-
-	if OS.is_debug_build():
-		var dbg_hint := Ink.label("调试：按 ~ 或 F1 打开控制台　·　ESC 打开菜单", "Muted")
-		dbg_hint.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-		dbg_hint.position = Vector2(16, -34)
-		root.add_child(dbg_hint)
+	var scrim := ColorRect.new()
+	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var material := ShaderMaterial.new()
+	material.shader = load("res://src/shaders/study_scrim.gdshader")
+	scrim.material = material
+	root.add_child(scrim)
+	_menu = Ink.vbox(18)
+	root.add_child(_menu)
+	var title := Ink.label("活字战斗", "Title", Color("f0e4c7"))
+	title.add_theme_font_size_override("font_size", 58)
+	title.add_theme_font_override("font", Ink.serif)
+	_menu.add_child(title)
+	var subtitle := Ink.label("以字为剑 · 铸词为阵", "", Color("dbccb0"))
+	subtitle.add_theme_font_size_override("font_size", 20)
+	_menu.add_child(subtitle)
+	var tip := Ink.caption("相邻成词，在字袋中构筑你的冒险。")
+	tip.add_theme_color_override("font_color", Color("b8aa91"))
+	_menu.add_child(tip)
+	_menu.add_child(Ink.spacer(12))
+	var start := _button("开始新冒险", _on_start, true)
+	start.custom_minimum_size.y = 64
+	start.add_theme_font_size_override("font_size", 24)
+	_menu.add_child(start)
+	for entries in [[["自定义构筑", _on_custom], ["字库图鉴", _on_library]], [["字网图谱", _on_graph], ["设置", _open_settings]], [["离开", _quit]]]:
+		var row := Ink.hbox(12)
+		for entry in entries:
+			row.add_child(_button(entry[0], entry[1]))
+		_menu.add_child(row)
+	_entry_timer = Timer.new()
+	_entry_timer.one_shot = true
+	_entry_timer.timeout.connect(_finish_start)
+	add_child(_entry_timer)
+	resized.connect(_layout)
+	_layout.call_deferred()
 
 
-func _title_tile(ch: String, rot: float, y_off: float) -> Control:
-	var holder := Control.new()
-	holder.custom_minimum_size = Vector2(112, 112)
-	var rect := ColorRect.new()
-	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var mat := Ink.make_wood_material()
-	mat.set_shader_parameter("tile_size", Vector2(112, 112))
-	mat.set_shader_parameter("corner_radius", 14.0)
-	rect.material = mat
-	holder.add_child(rect)
-	var lab := Ink.label(ch, "", Palette.INK)
-	lab.set_anchors_preset(Control.PRESET_FULL_RECT)
-	lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lab.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lab.add_theme_font_size_override("font_size", 62)
-	lab.add_theme_color_override("font_shadow_color", Color(1, 1, 1, 0.2))
-	holder.add_child(lab)
-	holder.rotation = rot
-	holder.position.y = y_off
-	holder.pivot_offset = Vector2(56, 56 + y_off)
-	return holder
+func _button(text: String, callback: Callable, primary := false) -> Button:
+	var button := Ink.button(text, primary)
+	button.custom_minimum_size.y = 48
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.focus_mode = Control.FOCUS_ALL
+	if not primary:
+		button.theme_type_variation = "GhostButton"
+		button.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+		button.add_theme_color_override("font_color", Color("e1d1b2"))
+		button.add_theme_color_override("font_hover_color", Palette.PAPER)
+	button.pressed.connect(callback)
+	_buttons.append(button)
+	return button
+
+
+func _layout() -> void:
+	if _menu == null:
+		return
+	var width := clampf(size.x * 0.28, 300, 400)
+	_menu.size.x = width
+	var height := _menu.get_combined_minimum_size().y
+	_menu.position = Vector2(size.x - width - maxf(38, size.x * 0.065), maxf(32, (size.y - height) * 0.50))
+
+
+func _lock_buttons() -> void:
+	for button in _buttons:
+		button.disabled = _starting or _modal_count > 0
 
 
 func _on_start() -> void:
+	if _starting or _modal_count > 0:
+		return
+	_starting = true
+	_lock_buttons()
+	var duration := 0.05
+	if is_instance_valid(Router.study_stage) and Router.study_stage.visible:
+		duration = Router.study_stage.enter_desk()
+	if _menu_tween != null:
+		_menu_tween.kill()
+	_menu_tween = create_tween()
+	_menu_tween.tween_property(_menu, "modulate:a", 0.0, minf(0.22, duration))
+	_entry_timer.start(duration)
+
+
+func _finish_start() -> void:
+	if not _starting:
+		return
 	GameState.start_new_run("v03")
 	goto("res://src/screens/map_screen.gd")
 
 
+func _cancel_entry() -> void:
+	_entry_timer.stop()
+	_starting = false
+	if _menu_tween != null:
+		_menu_tween.kill()
+	_menu.modulate.a = 1.0
+	if is_instance_valid(Router.study_stage):
+		Router.study_stage.show_room()
+	_lock_buttons()
+
+
+func _mount_overlay(overlay: Control) -> void:
+	_modal_count += 1
+	_lock_buttons()
+	overlay.tree_exited.connect(func():
+		_modal_count = maxi(0, _modal_count - 1)
+		if is_inside_tree():
+			_lock_buttons())
+	add_child(overlay)
+
+
 func _open_settings() -> void:
-	var ov := SettingsOverlay.new()
-	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(ov)
+	if _starting or _modal_count > 0:
+		return
+	_mount_overlay(SettingsOverlay.new())
+
+
+func _on_custom() -> void:
+	goto("res://src/screens/custom_deck_screen.gd")
 
 
 func _on_library() -> void:
-	var viewer: CollectionOverlay = load("res://src/ui/collection_overlay.gd").new()
+	if _starting or _modal_count > 0:
+		return
+	var viewer := CollectionOverlay.new()
 	viewer.setup({
 		"title": "字库图鉴",
 		"subtitle": "%d 种实体字 · %d 个词" % [Database.characters.size() - 1, Database.words.size()],
 		"words": Database.words.values(),
 	})
-	viewer.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(viewer)
+	_mount_overlay(viewer)
+
+
+func _on_graph() -> void:
+	if not _starting and _modal_count == 0:
+		goto("res://src/screens/glyph_graph_screen.gd")
+
+
+func _quit() -> void:
+	get_tree().quit()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _starting and event.is_action_pressed("cancel_selection"):
+		_cancel_entry()
+		get_viewport().set_input_as_handled()

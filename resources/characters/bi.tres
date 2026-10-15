@@ -3,11 +3,20 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_vu64t"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_omsgf"]
 
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("2_omsgf")
+kind = 29
+handler = "payment_discount_once"
+amount = 1
+note = "本回合下一次字／词的金币费用 -1，最低 0，仅一次"
+
 [resource]
 script = ExtResource("1_vu64t")
 id = "bi"
 glyph = "币"
 pinyin = "bi"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "本回合下一次字／词的金币费用 -1，最低 0，仅一次"
 tags = Array[String](["economy"])
+solo_effects = Array[ExtResource("2_omsgf")]([SubResource("Effect")])
+solo_handler = "payment_discount_once"
 rarity = 1

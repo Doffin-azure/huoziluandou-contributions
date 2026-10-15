@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_22wvv"]
 script = ExtResource("2_xo448")
+kind = 3
 handler = "heal"
 amount = 1
 note = "回复 1 生命"

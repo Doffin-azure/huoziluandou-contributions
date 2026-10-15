@@ -3,10 +3,19 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_ysqar"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_f6q3r"]
 
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("2_f6q3r")
+kind = 29
+handler = "link_next_word"
+amount = 1
+note = "本回合下一次成功组词后补 1 字，仅一次"
+
 [resource]
 script = ExtResource("1_ysqar")
 id = "lian"
 glyph = "连"
 pinyin = "lian"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "本回合下一次成功组词后补 1 字，仅一次"
 tags = Array[String](["attack"])
+solo_effects = Array[ExtResource("2_f6q3r")]([SubResource("Effect")])
+solo_handler = "link_next_word"

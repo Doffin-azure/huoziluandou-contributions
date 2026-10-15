@@ -5,16 +5,17 @@
 
 [sub_resource type="Resource" id="Resource_co6pb"]
 script = ExtResource("2_xctjx")
+kind = 29
 handler = "cleanse_adjacent"
 target = 5
-note = "净化一个四邻污染标记（保留字与所有权）"
+note = "选择原格四邻的一枚字，清除一个污染标签（保留原字与归属）"
 
 [resource]
 script = ExtResource("1_xjkc6")
 id = "qing"
 glyph = "清"
 pinyin = "qing"
-description = "净化一个四邻污染标记（保留字与所有权）"
+description = "选择原格四邻的一枚字，清除一个污染标签（保留原字与归属）"
 tags = Array[String](["flow"])
 solo_effects = Array[ExtResource("2_xctjx")]([SubResource("Resource_co6pb")])
 solo_handler = "cleanse_adjacent"

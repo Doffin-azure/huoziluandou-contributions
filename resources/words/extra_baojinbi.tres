@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_l4n2t"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_tee0q"]
+
+[sub_resource type="Resource" id="Resource_y4kll"]
+script = ExtResource("1_l4n2t")
+kind = 6
+handler = "apply_status_enemy"
+amount = 1
+status_id = "gold_burst"
+note = "使目标获得爆金：本场此后每受到一次攻击，你获得1金币，被护盾全挡也计入。"
+
+[sub_resource type="Resource" id="Resource_k1hdi"]
+script = ExtResource("1_l4n2t")
+handler = "damage_multi"
+amount = 1
+args = {
+"hits": 5
+}
+note = "对目标造成5段各1点基础伤害。"
+
+[resource]
+script = ExtResource("2_tee0q")
+id = "extra_baojinbi"
+word = "爆金币"
+glyphs = Array[String](["爆", "金", "币"])
+description = "使目标获得爆金：本场此后每受到一次攻击，你获得1金币，被护盾全挡也计入；随后对目标造成5段各1点基础伤害。"
+effects = Array[ExtResource("1_l4n2t")]([SubResource("Resource_y4kll"), SubResource("Resource_k1hdi")])
+group = "经济"
+design_stage = "设计负责人新增"
+effect_summary = "使目标获得爆金：本场此后每受到一次攻击，你获得1金币，被护盾全挡也计入；随后对目标造成5段各1点基础伤害。"
+effect_handler_id = "apply_status_enemy"
+priority = "经济"
+implemented = true

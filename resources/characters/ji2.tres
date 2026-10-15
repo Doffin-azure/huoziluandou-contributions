@@ -3,11 +3,27 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_vw5yg"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_3fdtb"]
 
+[sub_resource type="Resource" id="Draw"]
+script = ExtResource("2_3fdtb")
+kind = 4
+handler = "draw_excluding_source"
+amount = 1
+note = "立即补 1 字，排除本次打出的实体"
+
+[sub_resource type="Resource" id="Heat"]
+script = ExtResource("2_3fdtb")
+kind = 14
+handler = "heat"
+amount = 1
+note = "热度 +1"
+
 [resource]
 script = ExtResource("1_vw5yg")
 id = "ji2"
 glyph = "急"
 pinyin = "ji"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "立即补 1 字、热度 +1；排除本次打出的实体"
 tags = Array[String](["heat"])
+solo_effects = Array[ExtResource("2_3fdtb")]([SubResource("Draw"), SubResource("Heat")])
+solo_handler = "draw_excluding_source"
 rarity = 1

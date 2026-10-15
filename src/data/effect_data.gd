@@ -56,6 +56,7 @@ enum Target {
 	RANDOM_TILE,
 	BOARD_ROW,       ## 指定一整行（循环位移用）
 	BOARD_3X3,       ## 指定 3×3 左上角（旋转用）
+	BAG_GLYPH,       ## 精/购：指定字袋里的原实体（UID）。
 }
 
 @export var kind: Kind = Kind.DAMAGE
@@ -73,6 +74,34 @@ enum Target {
 @export var pre_consume: bool = false
 @export var args: Dictionary = {}
 @export_multiline var note: String = ""
+
+
+## handler 驱动的效果以 handler 为准，不能把旧资源的默认 DAMAGE 当作攻击。
+func semantic_kind() -> int:
+	if handler.is_empty():
+		return kind
+	match handler:
+		"damage", "overdo", "gravity_damage", "shield_smash", "break_shield_damage", \
+		"energy_discharge", "heat_burst", "destroy_2x2", "clear_board", \
+		"heat_to_damage_flow", "spend_gold_damage", "electric_strike", "fire_power", \
+		"energy_to_heat_damage", "cold_snap", "damage_multi", "solo_release", "chip_shield_damage":
+			return Kind.DAMAGE
+		"damage_all": return Kind.DAMAGE_ALL
+		"block_temp", "joint_force": return Kind.BLOCK
+		"block_persist", "alloy": return Kind.PERSISTENT_BLOCK
+		"heal": return Kind.HEAL
+		"draw_random", "draw_excluding_source": return Kind.DRAW_CHARS
+		"gold": return Kind.GAIN_GOLD
+		"energy", "energy_around_tail": return Kind.ENERGY
+		"heat", "heat_clear", "heat_cleanse": return Kind.HEAT
+		"temp_funds": return Kind.TEMP_FUNDS
+		"apply_status_self", "apply_status_enemy", "ignite", "strength_growing": return Kind.APPLY_STATUS
+		_:
+			return Kind.ABILITY if timing == "persistent" else Kind.SPECIAL
+
+
+func is_attack() -> bool:
+	return semantic_kind() in [Kind.DAMAGE, Kind.DAMAGE_ALL]
 
 
 func describe() -> String:

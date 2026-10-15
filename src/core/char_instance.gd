@@ -13,12 +13,18 @@ var owner: int = Owner.PLAYER
 var pollutions: Array[String] = []      ## PollutionData.id 列表
 var modifiers: Array[String] = []
 var temporary_uses: int = 0             ## 非实体复制层：原格上还能多用几次
+var refined: bool = false              ## 精炼：本场重新入盘时恢复两次额外使用；复制不继承
 ## 临时牌：打出即消耗，不进抽字袋/弃字堆，战后消失
 var temporary: bool = false
+## 分生成的复制仅供组词；单独打出只弃掉，不触发单字效果。
+var word_only: bool = false
 ## 融合（化合）：本格除主字形外附带的其他字形，作为一个不可拆的单位在牌堆中移动
 var fusion: Array[String] = []
 ## 镀金（精金）：永久；参与有效多字词时 +1 金币
 var gilded: bool = false
+## 精铸（固定）：本场原格保留，每回合可使用一次；不可移动/换字
+var pinned: bool = false
+var pinned_exhausted: bool = false
 var statuses: Dictionary = {}
 var upgrade_level: int = 0
 
@@ -85,8 +91,10 @@ func clone() -> CharInstance:
 	c.modifiers = modifiers.duplicate()
 	c.temporary_uses = temporary_uses
 	c.temporary = temporary
+	c.word_only = word_only
 	c.fusion = fusion.duplicate()
 	c.gilded = gilded
+	c.pinned = pinned
 	c.statuses = statuses.duplicate(true)
 	c.upgrade_level = upgrade_level
 	return c

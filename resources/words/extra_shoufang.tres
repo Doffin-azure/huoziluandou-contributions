@@ -5,19 +5,20 @@
 
 [sub_resource type="Resource" id="Resource_ki2mc"]
 script = ExtResource("1_qrn63")
+kind = 29
 handler = "move_cell"
-note = "把选中字移动到空格"
+note = "选1枚非固定盘面字或完整融合叠层，移到任意空格，不交换其他字。"
 
 [resource]
 script = ExtResource("2_n65ws")
 id = "extra_shoufang"
 word = "收放"
 glyphs = Array[String](["收", "放"])
-description = "选择盘上一枚字或完整叠层，移动到任意空格，不交换其他字"
+description = "选1枚非固定盘面字或完整融合叠层，移到任意空格，不交换其他字。"
 effects = Array[ExtResource("1_qrn63")]([SubResource("Resource_ki2mc")])
 group = "空间"
 design_stage = "设计负责人新增"
-effect_summary = "选择盘上一枚字或完整叠层，移动到任意空格，不交换其他字"
+effect_summary = "选1枚非固定盘面字或完整融合叠层，移到任意空格，不交换其他字。"
 effect_handler_id = "move_cell"
 priority = "空间"
 implemented = true

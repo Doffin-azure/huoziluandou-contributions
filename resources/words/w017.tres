@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_kkapf"]
 script = ExtResource("1_xax0j")
+kind = 28
 handler = "ability_shared_attack"
 timing = "persistent"
 note = "进入结阵：之后打出的词只登记不结算，点「发动」一起结算；多词可共享同一枚【击】"
@@ -14,11 +15,11 @@ script = ExtResource("2_02qxn")
 id = "w017"
 word = "合击"
 glyphs = Array[String](["合", "击"])
-description = "改变滑词规则：多个攻击词共用同一实体【击】，效果排队结算并只消耗字并集"
+description = "进入结阵：之后打出的词只登记不结算，点「发动」一起结算；多词可共享同一枚【击】"
 effects = Array[ExtResource("1_xax0j")]([SubResource("Resource_kkapf")])
 group = "连携"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "改变滑词规则：多个攻击词共用同一实体【击】，效果排队结算并只消耗字并集"
+effect_summary = "进入结阵：之后打出的词只登记不结算，点「发动」一起结算；多词可共享同一枚【击】"
 effect_handler_id = "ability_shared_attack"
 timing = "persistent"
 p25_implemented = true

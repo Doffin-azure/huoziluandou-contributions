@@ -1,26 +1,26 @@
 extends Control
 class_name BoardView
-## 4×4 字盘视图 + 连线选择逻辑。
-## 交互：点击起手 / 拖动连线 / 点回退。释放或点“出字”提交。
-
 signal commit(path: Array)
 signal selection_changed(path: Array, glyphs: Array, word: WordData)
 signal tile_picked(pos: Vector2i)
 signal pick_cancelled
 
 var board: BoardState
-var tiles: Array = []          ## Array[TileView]
-var path: Array = []           ## Array[Vector2i]
-
-var pick_mode: String = ""     ## "" / "any" / "empty" / "2x2" / "enemy"
-var reserved_cells: Array = []   ## 结阵中被锁定的格（置暗）
-var preview_cells: Array = []    ## 待发动目标的高亮预览
-
-var _grid: GridContainer
-var _tray: PanelContainer
+var tiles: Array = []
+var path: Array = []
+var pick_mode := ""
+var pick_multi := false   ## true=多选：选完不自动退出选区模式（由调用方 end_pick）
+var pick_selected: Array = []
+var pick_excluded: Array = []
 var _dragging := false
 var _drag_moved := false
 var _interactable := true
+var _dim_locked := true
+var _touch_index := -1
+var _last_pointer := Vector2.ZERO
+var _cancelled_drag_cell := Vector2i(-1, -1)
+var _path_layer: Control
+var _presentation: BoardPresentation3D
 
 
 func setup(p_board: BoardState) -> void:
@@ -28,221 +28,357 @@ func setup(p_board: BoardState) -> void:
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	_build()
+	resized.connect(_layout)
+	_layout()
 
 
 func _build() -> void:
-	_tray = PanelContainer.new()
-	_tray.theme_type_variation = "PanelDark"
-	_tray.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_tray.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_tray)
-
-	var pad := MarginContainer.new()
-	pad.add_theme_constant_override("margin_left", 12)
-	pad.add_theme_constant_override("margin_right", 12)
-	pad.add_theme_constant_override("margin_top", 12)
-	pad.add_theme_constant_override("margin_bottom", 12)
-	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_tray.add_child(pad)
-
-	var center := CenterContainer.new()
-	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pad.add_child(center)
-
-	_grid = GridContainer.new()
-	_grid.columns = board.size if board != null else 4
-	_grid.add_theme_constant_override("h_separation", 7)
-	_grid.add_theme_constant_override("v_separation", 7)
-	center.add_child(_grid)
-
-	var n0: int = board.size if board != null else 4
-	var side: float = n0 * TileView.TILE_SIZE.x + (n0 - 1) * 7 + 24
-	custom_minimum_size = Vector2(side, side)
-
-	tiles.clear()
-	for y in n0:
-		for x in n0:
-			var t := TileView.new()
-			t.grid_pos = Vector2i(x, y)
-			t.tile_pressed.connect(_on_tile_pressed)
-			t.tile_hovered.connect(_on_tile_hovered)
-			_grid.add_child(t)
-			tiles.append(t)
+	var tray := Panel.new()
+	var frame := StyleBoxFlat.new()
+	frame.bg_color = Palette.PANEL_DARK
+	frame.border_color = Palette.WOOD_DARK.darkened(0.5)
+	frame.set_border_width_all(4)
+	frame.set_corner_radius_all(7)
+	frame.shadow_color = Color(Palette.INK, 0.22)
+	frame.shadow_size = 8
+	frame.shadow_offset = Vector2(0, 4)
+	tray.add_theme_stylebox_override("panel", frame)
+	tray.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	tray.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(tray)
+	if Palette.STYLE_ID == "paper":
+		tray.hide()
+		_presentation = BoardPresentation3D.new()
+		add_child(_presentation)
+		_presentation.resized.connect(func(): _layout.call_deferred())
+	for y in board.size:
+		for x in board.size:
+			var tile := TileView.new()
+			tile.grid_pos = Vector2i(x, y)
+			tile.tile_pressed.connect(_on_tile_pressed)
+			tile.tile_hovered.connect(_on_tile_hovered)
+			add_child(tile)
+			tiles.append(tile)
+			if _presentation != null:
+				tile._visual.hide()
+				tile.get_child(0).hide()
+	if _presentation != null:
+		_presentation.set_tiles(tiles)
+	_path_layer = Control.new()
+	_path_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_path_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_path_layer.draw.connect(_draw_path)
+	add_child(_path_layer)
 	rebuild()
 
 
-func rebuild() -> void:
+func _layout() -> void:
+	if tiles.is_empty():
+		return
+	var gap := 7.0
+	var pad := 14.0
+	var tile_side := (minf(size.x, size.y) - pad * 2.0 - (board.size - 1) * gap) / board.size
+	for tile in tiles:
+		tile.position = Vector2(pad, pad) + Vector2(tile.grid_pos) * (tile_side + gap)
+		tile.size = Vector2.ONE * tile_side
+	if _presentation != null and _presentation.has_projection():
+		for index in tiles.size():
+			var rect := _presentation.cell_rect(index)
+			tiles[index].position = rect.position
+			tiles[index].size = rect.size
+	_path_layer.queue_redraw()
+
+
+func _process(_delta: float) -> void:
+	if not path.is_empty():
+		_path_layer.queue_redraw()
+
+
+func rebuild(animate := false) -> void:
 	if board == null:
 		return
-	for t in tiles:
-		var inst: CharInstance = board.get_xy(t.grid_pos)
-		t.set_instance(inst)
-		t.set_selected(path.has(t.grid_pos) or preview_cells.has(t.grid_pos))
-		t.set_dimmed((not _interactable) or reserved_cells.has(t.grid_pos))
+	var positions: Dictionary = {}
+	for tile in tiles:
+		if tile.display_uid >= 0:
+			positions[tile.display_uid] = tile.position
+	for tile in tiles:
+		var inst: CharInstance = board.get_xy(tile.grid_pos)
+		var old_uid: int = tile.display_uid
+		var old_key: String = tile.display_key
+		tile.set_instance(inst)
+		tile.set_selected(path.has(tile.grid_pos), path.find(tile.grid_pos))
+		tile.set_dimmed(not _interactable and _dim_locked)
+		if animate and inst != null and (old_uid != inst.uid or old_key != tile.display_key):
+			var fresh := not positions.has(inst.uid)
+			var offset: Vector2 = Vector2(0, -10) if fresh else positions[inst.uid] - tile.position
+			tile.enter(offset, fresh, float(tile.grid_pos.y) * 0.015 if fresh else 0.0)
 	if not pick_mode.is_empty():
+		_apply_pick_highlight()
+	if _path_layer != null:
+		_path_layer.queue_redraw()
+
+
+func release_selected(selected: Array) -> void:
+	var surviving: Dictionary = {}
+	for cell in board.cells:
+		if cell != null:
+			surviving[cell.uid] = true
+	for tile in tiles:
+		if selected.has(tile.grid_pos):
+			tile.release(surviving.has(tile.display_uid))
+
+
+func play_opening() -> void:
+	for tile in tiles:
+		if tile.instance != null:
+			tile.enter(Vector2(0, -8), true, tile.grid_pos.y * 0.025 + tile.grid_pos.x * 0.015)
+
+
+func set_interactable(value: bool, dim := true) -> void:
+	_interactable = value
+	_dim_locked = dim
+	if not value:
+		_dragging = false
+		_touch_index = -1
+		_cancelled_drag_cell = Vector2i(-1, -1)
+	for tile in tiles:
+		tile.set_dimmed(not value and dim)
+	if value and not pick_mode.is_empty():
 		_apply_pick_highlight()
 
 
-func set_interactable(value: bool) -> void:
-	_interactable = value
-	for t in tiles:
-		t.set_dimmed(not value)
-
-
-# ---------------------------------------------------------------- 选择逻辑
 func _on_tile_pressed(pos: Vector2i) -> void:
 	if not _interactable:
 		return
 	if not pick_mode.is_empty():
 		if _valid_pick(pos):
-			end_pick()
+			if pick_mode == "three":
+				pick_selected.append(pos)
+				_apply_pick_highlight()
+			if not pick_multi:
+				end_pick()
 			tile_picked.emit(pos)
 		return
-	if board.get_xy(pos) == null:
+	if board.get_xy(pos) == null or (board.get_xy(pos).pinned and board.get_xy(pos).pinned_exhausted):
 		return
 	_dragging = true
 	_drag_moved = false
+	_last_pointer = get_viewport().get_mouse_position()
+	_cancelled_drag_cell = Vector2i(-1, -1)
 	if path.has(pos):
-		# 点已选中的字 -> 回退到它
-		var i := path.find(pos)
-		path = path.slice(0, i + 1)
-	elif path.is_empty() or board.is_adjacent(path[-1], pos):
+		# 点击撤销该字及其后续路径；拖动回退仍由 _extend_path 保留经过的字。
+		path = path.slice(0, path.find(pos))
+		_cancelled_drag_cell = pos
+	elif board.can_extend_path(path, pos):
 		path.append(pos)
 	else:
 		path = [pos]
 	_sync_selection()
 
 
-func _on_tile_hovered(pos: Vector2i) -> void:
-	if pick_mode != "":
+func _extend_path(pos: Vector2i) -> void:
+	if not pick_mode.is_empty() or not _dragging or board.get_xy(pos) == null:
 		return
-	if not _interactable or not _dragging or not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+	# 点击取消后的手指/鼠标微动不能立即把同一枚字重新选回来。
+	if pos == _cancelled_drag_cell:
 		return
-	if board.get_xy(pos) == null:
-		return
+	_cancelled_drag_cell = Vector2i(-1, -1)
 	if path.has(pos):
 		var i := path.find(pos)
 		if i != path.size() - 1:
 			path = path.slice(0, i + 1)
 			_drag_moved = true
 			_sync_selection()
-		return
-	if path.is_empty():
-		path = [pos]
-		_drag_moved = true
-		_sync_selection()
-		return
-	if board.is_adjacent(path[-1], pos):
+	elif board.can_extend_path(path, pos):
 		path.append(pos)
 		_drag_moved = true
 		_sync_selection()
 
 
+func _on_tile_hovered(pos: Vector2i) -> void:
+	if _interactable and _dragging and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		_extend_path(pos)
+
+
+func _cell_at(screen_pos: Vector2) -> Vector2i:
+	var local := get_global_transform().affine_inverse() * screen_pos
+	if _presentation != null and _presentation.has_projection():
+		return _presentation.cell_at(local)
+	for tile in tiles:
+		if Rect2(tile.position, tile.size).has_point(local):
+			return tile.grid_pos
+	return Vector2i(-1, -1)
+
+
+func _trace_pointer(next: Vector2) -> void:
+	var steps := maxi(1, int(ceil(_last_pointer.distance_to(next) / 16.0)))
+	for i in range(1, steps + 1):
+		var cell := _cell_at(_last_pointer.lerp(next, float(i) / steps))
+		if cell.x >= 0:
+			_extend_path(cell)
+	_last_pointer = next
+
+
+func _finish_drag() -> void:
+	var was_dragging := _dragging
+	_dragging = false
+	_cancelled_drag_cell = Vector2i(-1, -1)
+	if was_dragging and _drag_moved and not path.is_empty() and Settings.drag_release_play:
+		commit.emit(path.duplicate())
+
+
 func _input(event: InputEvent) -> void:
-	if not _interactable:
+	if not _interactable or Debug.is_open():
 		return
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-		if pick_mode != "":
-			return
-		if _dragging:
-			_dragging = false
-			if _drag_moved and not path.is_empty() and Settings.drag_release_play:
-				commit.emit(path.duplicate())
+	if event is InputEventScreenTouch:
+		if event.pressed and _touch_index < 0:
+			var cell := _cell_at(event.position)
+			if cell.x < 0:
+				return
+			_on_tile_pressed(cell)
+			_touch_index = event.index if _dragging else -1
+			_last_pointer = event.position
+			get_viewport().set_input_as_handled()
+		elif not event.pressed and event.index == _touch_index:
+			_touch_index = -1
+			if event.canceled:
+				_dragging = false
+				clear_selection()
+			else:
+				_finish_drag()
+			get_viewport().set_input_as_handled()
+	elif event is InputEventScreenDrag and event.index == _touch_index:
+		_trace_pointer(event.position)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton and event.device != InputEvent.DEVICE_ID_EMULATION and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and _presentation != null:
+		var cell := _cell_at(event.position)
+		if cell.x >= 0:
+			_on_tile_pressed(cell)
+			_last_pointer = event.position
+			get_viewport().set_input_as_handled()
+		elif get_global_rect().has_point(event.position):
+			get_viewport().set_input_as_handled()
+	elif event is InputEventMouseMotion and event.device != InputEvent.DEVICE_ID_EMULATION and _dragging:
+		_trace_pointer(event.position)
+	elif event is InputEventMouseButton and event.device != InputEvent.DEVICE_ID_EMULATION and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+		_finish_drag()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not _interactable:
+	if not _interactable or event.is_echo() or Debug.is_open():
 		return
-	if event.is_action_pressed("confirm_word"):
-		if not path.is_empty() and pick_mode == "":
-			commit.emit(path.duplicate())
-			get_viewport().set_input_as_handled()
+	if event.is_action_pressed("confirm_word") and not path.is_empty() and pick_mode.is_empty():
+		commit.emit(path.duplicate())
+		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("cancel_selection"):
-		if pick_mode != "":
+		if not pick_mode.is_empty():
 			end_pick()
 			pick_cancelled.emit()
 			get_viewport().set_input_as_handled()
 		elif not path.is_empty():
 			clear_selection()
 			get_viewport().set_input_as_handled()
-		# 否则不消费 ESC，交给暂停菜单
 
 
-# ---------------------------------------------------------------- 目标选择模式
-func begin_pick(mode: String) -> void:
+func begin_pick(mode: String, multi := false, excluded: Array = []) -> void:
 	pick_mode = mode
+	pick_multi = multi
+	pick_selected = []
+	pick_excluded = excluded.duplicate()
 	clear_selection()
 	_apply_pick_highlight()
 
 
 func end_pick() -> void:
 	pick_mode = ""
-	for t in tiles:
-		t.set_dimmed(not _interactable)
-		t.set_selected(false)
+	pick_multi = false
+	pick_selected = []
+	pick_excluded = []
+	for tile in tiles:
+		tile.set_dimmed(not _interactable and _dim_locked)
+		tile.set_selected(false)
 
 
 func _valid_pick(pos: Vector2i) -> bool:
+	if pick_excluded.has(pos):
+		return false
+	var cell: CharInstance = board.get_xy(pos)
 	match pick_mode:
-		"any":
-			return board.get_xy(pos) != null
-		"empty":
-			return board.get_xy(pos) == null
-		"enemy":
-			var c: CharInstance = board.get_xy(pos)
-			return c != null and c.is_enemy_owned()
-		"own":
-			var c2: CharInstance = board.get_xy(pos)
-			return c2 != null and c2.is_player_owned()
-		"2x2":
-			return pos.x >= 0 and pos.y >= 0 and pos.x <= board.size - 2 and pos.y <= board.size - 2
-		"3x3":
-			return pos.x >= 0 and pos.y >= 0 and pos.x <= board.size - 3 and pos.y <= board.size - 3
-		"row":
-			return pos.y >= 0 and pos.y < board.size
+		"three":
+			if cell == null or cell.pinned or pick_selected.size() >= 3:
+				return false
+			for chosen in pick_selected:
+				var inst := board.get_xy(chosen)
+				if inst != null and inst.uid == cell.uid:
+					return false
+			return true
+		"any": return cell != null
+		"empty": return cell == null
+		"throw_destination": return true # 落点由调用方用 pick_excluded 限定，包含将腾空的施词原格。
+		"enemy": return cell != null and cell.is_enemy_owned()
+		"own": return cell != null and cell.is_player_owned()
+		"2x2": return pos.x >= 0 and pos.y >= 0 and pos.x <= board.size - 2 and pos.y <= board.size - 2
+		"3x3": return pos.x >= 0 and pos.y >= 0 and pos.x <= board.size - 3 and pos.y <= board.size - 3
 	return false
 
 
 func _apply_pick_highlight() -> void:
-	for t in tiles:
-		t.set_dimmed(not _valid_pick(t.grid_pos))
+	for tile in tiles:
+		var selected := pick_selected.has(tile.grid_pos)
+		tile.set_dimmed(not selected and not _valid_pick(tile.grid_pos))
+		tile.set_selected(selected, pick_selected.find(tile.grid_pos))
 
 
 func _sync_selection() -> void:
-	for t in tiles:
-		t.set_selected(path.has(t.grid_pos))
+	for tile in tiles:
+		tile.set_selected(path.has(tile.grid_pos), path.find(tile.grid_pos))
 	var glyphs := board.glyphs_of(path)
-	var word: WordData = null
-	if glyphs.size() >= 2:
-		word = Database.get_word_by_glyphs(glyphs)
+	var word: WordData = Database.get_word_by_glyphs(glyphs) if glyphs.size() >= 2 else null
 	selection_changed.emit(path.duplicate(), glyphs, word)
+	_path_layer.queue_redraw()
 
 
 func clear_selection() -> void:
 	path.clear()
+	_dragging = false
+	_cancelled_drag_cell = Vector2i(-1, -1)
 	_sync_selection()
-	for t in tiles:
-		t.set_selected(false)
 
 
 func flash_invalid() -> void:
-	for t in tiles:
-		if path.has(t.grid_pos):
-			t.shake()
-	var tw := create_tween()
-	tw.tween_interval(0.18)
+	for tile in tiles:
+		if path.has(tile.grid_pos):
+			tile.shake()
 
 
 func remove_xy(pos: Vector2i) -> void:
 	board.clear_xy(pos)
-	if path.has(pos):
-		path = path.filter(func(p): return p != pos)
+	path = path.filter(func(p): return p != pos)
 	_on_sync()
 
 
 func _on_sync() -> void:
 	rebuild()
 	_sync_selection()
+
+
+func _draw_path() -> void:
+	for i in range(1, path.size()):
+		var previous: TileView = tiles[board.from_xy(path[i - 1])]
+		var current: TileView = tiles[board.from_xy(path[i])]
+		var from: Vector2 = previous.position + previous.size * 0.5
+		var to: Vector2 = current.position + current.size * 0.5
+		if _presentation != null and _presentation.has_projection():
+			from = _presentation.center_of(board.from_xy(path[i - 1]))
+			to = _presentation.center_of(board.from_xy(path[i]))
+		var dir := (to - from).normalized()
+		var mid := (from + to) * 0.5 + Vector2(0, -5 if not Settings.reduced_motion else 0)
+		if _presentation != null and _presentation.has_projection():
+			mid = (from + to) * 0.5
+		var start := mid - dir * 16
+		var tip := mid + dir * 16
+		_path_layer.draw_line(start, tip, Palette.VERMILION, 2.5, true)
+		_path_layer.draw_line(tip, tip - dir.rotated(0.55) * 8, Palette.VERMILION, 2.5, true)
+		_path_layer.draw_line(tip, tip - dir.rotated(-0.55) * 8, Palette.VERMILION, 2.5, true)

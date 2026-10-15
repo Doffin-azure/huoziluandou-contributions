@@ -5,27 +5,28 @@
 
 [sub_resource type="Resource" id="Resource_sy16x"]
 script = ExtResource("1_e7p4b")
+kind = 28
 handler = "charge_overheat"
 amount = 8
+target = 0
 timing = "persistent"
-args = {
-"energy": 8,
-"heat": 8
-}
-note = "获得 8 储能 + 8 热度；本战此后每次出字后立即补满盘面"
+note = "获得 8 储能和 8 热度；本场每次出字后立即补满盘面，后续自动补位每实际补 1 字增加 1 热度，启用当次免维护热度"
+args = {"energy": 8, "heat": 8}
 
 [resource]
 script = ExtResource("2_voiu7")
 id = "w104"
 word = "充电过热"
 glyphs = Array[String](["充", "电", "过", "热"])
-description = "四字稀有：同时获取大量储能和热度并承担过热反噬"
+description = "获得 8 储能和 8 热度；本场每次出字后立即补满盘面，后续自动补位每实际补 1 字增加 1 热度，启用当次免维护热度"
 effects = Array[ExtResource("1_e7p4b")]([SubResource("Resource_sy16x")])
 group = "蓄放"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "四字稀有：同时获取大量储能和热度并承担过热反噬"
+effect_summary = "获得 8 储能和 8 热度；本场每次出字后立即补满盘面，后续自动补位每实际补 1 字增加 1 热度，启用当次免维护热度"
 effect_handler_id = "charge_overheat"
 timing = "persistent"
-implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+implementation_delta = "已按 2026-10-14 确认方案更新"
 priority = "P3·补全词效"
 implemented = true
+requires_target = 0
+interaction = ""

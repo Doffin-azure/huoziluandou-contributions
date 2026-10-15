@@ -19,8 +19,8 @@ func _ready() -> void:
 	var impl_words: Array = all_words.filter(func(w): return w.implemented)
 
 	_scopes = [
-		{"name": "全部 105 词", "words": all_words, "file": "all"},
-		{"name": "已实现 82 词", "words": impl_words, "file": "implemented"},
+		{"name": "全部 %d 词" % all_words.size(), "words": all_words, "file": "all"},
+		{"name": "已实现 %d 词" % impl_words.size(), "words": impl_words, "file": "implemented"},
 		{"name": "初始字袋（9 种字 / 全部词）", "words": all_words, "file": "starter", "only_glyphs": ["击", "防", "回", "反", "破", "重", "流", "连", "御"]},
 	]
 

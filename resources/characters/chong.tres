@@ -5,22 +5,24 @@
 
 [sub_resource type="Resource" id="Resource_2r0i6"]
 script = ExtResource("2_vt25t")
+kind = 13
 handler = "energy"
 amount = 1
 note = "储能 +1"
 
 [sub_resource type="Resource" id="Resource_njo4g"]
 script = ExtResource("2_vt25t")
-handler = "draw_random"
+kind = 29
+handler = "draw_bonus_next"
 amount = 1
-note = "随机补 1 字"
+note = "下回合多补 1 字"
 
 [resource]
 script = ExtResource("1_5uluj")
 id = "chong"
 glyph = "充"
 pinyin = "chong"
-description = "储能 +1，随机补 1 字"
+description = "储能 +1，下回合多补 1 字"
 tags = Array[String](["energy"])
 solo_effects = Array[ExtResource("2_vt25t")]([SubResource("Resource_2r0i6"), SubResource("Resource_njo4g")])
 solo_handler = "energy"

@@ -3,11 +3,21 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_sxe6b"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_cku4i"]
 
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("2_cku4i")
+kind = 29
+handler = "solo_gain_once"
+amount = 1
+target = 0
+note = "本回合下一次单字的首项直接伤害、临时格挡、治疗或储能收益 +1，仅一次；不增加热度、费用或持续标记"
+
 [resource]
 script = ExtResource("1_sxe6b")
 id = "jia2"
 glyph = "加"
 pinyin = "jia"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "本回合下一次单字的首项直接伤害、临时格挡、治疗或储能收益 +1，仅一次；不增加热度、费用或持续标记"
 tags = Array[String](["utility"])
 rarity = 1
+solo_effects = Array[ExtResource("2_cku4i")]([SubResource("Effect")])
+solo_handler = "solo_gain_once"

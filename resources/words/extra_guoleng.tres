@@ -5,19 +5,20 @@
 
 [sub_resource type="Resource" id="Resource_f55yo"]
 script = ExtResource("1_dkqfi")
+kind = 29
 handler = "overcool"
-note = "清空热度；下次获得的热度转为每点 +2 持久盾"
+note = "立即清空热度；本回合下一次正热度收益改为每点获得2持久盾，不增加热度或生成溢热污染。"
 
 [resource]
 script = ExtResource("2_fp0hl")
 id = "extra_guoleng"
 word = "过冷"
 glyphs = Array[String](["过", "冷"])
-description = "立即清空热度；下一次本应获得的热度改为每点 +2 持久盾，且不生成过热污染"
+description = "立即清空热度；本回合下一次正热度收益改为每点获得2持久盾，不增加热度或生成溢热污染。"
 effects = Array[ExtResource("1_dkqfi")]([SubResource("Resource_f55yo")])
 group = "蓄放"
 design_stage = "设计负责人新增"
-effect_summary = "立即清空热度；下一次本应获得的热度改为每点 +2 持久盾，且不生成过热污染"
+effect_summary = "立即清空热度；本回合下一次正热度收益改为每点获得2持久盾，不增加热度或生成溢热污染。"
 effect_handler_id = "overcool"
 priority = "蓄放"
 implemented = true

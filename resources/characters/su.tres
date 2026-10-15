@@ -3,11 +3,21 @@
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_ltgcf"]
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_q7cqd"]
 
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("2_q7cqd")
+kind = 29
+handler = "speed_next_word"
+amount = 1
+target = 0
+note = "本回合下一次成功组词后补 2 字、热度 +1，仅一次"
+
 [resource]
 script = ExtResource("1_ltgcf")
 id = "su"
 glyph = "速"
 pinyin = "su"
-description = "可单字打出（暂无单字效果，用于腾出空格）。"
+description = "本回合下一次成功组词后补 2 字、热度 +1，仅一次"
 tags = Array[String](["heat"])
 rarity = 2
+solo_effects = Array[ExtResource("2_q7cqd")]([SubResource("Effect")])
+solo_handler = "speed_next_word"

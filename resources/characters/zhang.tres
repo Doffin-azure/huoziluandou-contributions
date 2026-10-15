@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_d4rtp"]
 script = ExtResource("2_2xk6v")
+kind = 2
 handler = "block_temp"
 amount = 2
 note = "获得 2 点临时格挡"

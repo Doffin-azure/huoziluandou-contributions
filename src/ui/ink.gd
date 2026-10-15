@@ -35,12 +35,22 @@ func apply_style(new_style: GameStyle) -> void:
 func _load_fonts() -> void:
 	var bundled := "res://assets/fonts/NotoSerifSC-VF.ttf"
 	if ResourceLoader.exists(bundled):
-		serif = load(bundled)
+		var font_file: Font = load(bundled)
+		var weight_tag := TextServerManager.get_primary_interface().name_to_tag("wght")
+		var display := FontVariation.new()
+		display.base_font = font_file
+		display.variation_opentype = {weight_tag: 650.0}
+		serif = display
+		var reading := FontVariation.new()
+		reading.base_font = font_file
+		reading.variation_opentype = {weight_tag: 450.0}
+		sans = reading
 	else:
 		var sf := SystemFont.new()
 		sf.font_names = PackedStringArray(["Noto Serif SC", "SimSun", "Microsoft YaHei", "PingFang SC"])
 		serif = sf
-	sans = serif
+	if sans == null:
+		sans = serif
 
 
 func _load_shaders() -> void:
@@ -53,11 +63,11 @@ func _load_shaders() -> void:
 # ---------------------------------------------------------------- 主题构建
 func _build_theme() -> Theme:
 	var t := Theme.new()
-	t.default_font = serif
+	t.default_font = sans
 	t.default_font_size = 17
 
 	t.set_color("font_color", "Label", Palette.INK)
-	t.set_font("font", "Label", serif)
+	t.set_font("font", "Label", sans)
 	t.set_font("normal_font", "RichTextLabel", serif)
 	t.set_font("bold_font", "RichTextLabel", serif)
 	t.set_color("default_color", "RichTextLabel", Palette.INK)
@@ -116,6 +126,8 @@ func _build_theme() -> Theme:
 	t.set_font("font", "Stat", serif)
 	t.set_font_size("font_size", "Stat", 22)
 	t.set_color("font_color", "Stat", Palette.INK)
+	for kind in ["Heading", "Subheading", "Stat"]:
+		t.set_font("font", kind, serif)
 
 	t.set_type_variation("PanelCard", "PanelContainer")
 	t.set_stylebox("panel", "PanelCard", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2, 0.8))
@@ -178,6 +190,10 @@ func background(stain := 0.45) -> ColorRect:
 	else:
 		mat.shader = _paper_shader
 		mat.set_shader_parameter("stain_amount", stain)
+		mat.set_shader_parameter("paper_color", Palette.PAPER)
+		mat.set_shader_parameter("grain", 0.025)
+		mat.set_shader_parameter("fiber", 0.025)
+		mat.set_shader_parameter("vignette", 0.18)
 	cr.material = mat
 	cr.color = Color.WHITE
 	cr.set_anchors_preset(Control.PRESET_FULL_RECT)

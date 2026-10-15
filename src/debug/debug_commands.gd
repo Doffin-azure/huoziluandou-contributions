@@ -58,6 +58,33 @@ static func _ck() -> Array:
 	return ["（当前不在战斗中）"]
 
 
+## 把调试命令参数解析成字形列表：逐字拆分，支持 "火x2" / "火*2" / 逗号分隔。
+static func _parse_glyphs(args: Array) -> Array:
+	var out: Array = []
+	for tok in args:
+		var s := str(tok).replace("，", ",")
+		var parts: Array = s.split(",", false) if s.contains(",") else [s]
+		for p in parts:
+			var t := str(p).strip_edges()
+			if t.is_empty():
+				continue
+			var mult := 1
+			var glyph := t
+			var m := t.find("x")
+			if m < 0:
+				m = t.find("*")
+			if m > 0:
+				glyph = t.substr(0, m)
+				mult = maxi(1, int(t.substr(m + 1)))
+			elif t.length() > 1 and t.substr(t.length() - 1, 1).is_valid_int():
+				glyph = t.substr(0, t.length() - 1)
+				mult = maxi(1, int(t.substr(t.length() - 1, 1)))
+			for k in mult:
+				if Database.get_character_by_glyph(glyph) != null:
+					out.append(glyph)
+	return out
+
+
 static func _glyph(args: Array, i: int) -> String:
 	return str(args[i]) if args.size() > i else ""
 
@@ -89,6 +116,15 @@ static func install() -> void:
 		if b == null: return _ck()
 		b.rng.seed = _int(a, 0, 0)
 		return ["种子 = %d" % b.rng.seed])
+	register("custom", "自定义字袋重开一局：/custom 火火电电 或 /custom 火x2,电x2（无参数=查看当前）", func(a):
+		if a.is_empty():
+			return ["当前字袋：%s" % JSON.stringify(GameState.glyph_counts())]
+		var glyphs := _parse_glyphs(a)
+		if glyphs.is_empty():
+			return ["用法：/custom 火火电电 或 /custom 火x2,电,回"]
+		GameState.start_new_run("v03", glyphs)
+		Router.goto("res://src/screens/map_screen.gd")
+		return ["自定义字袋 %d 枚，已开新局" % GameState.deck_size()])
 
 	# ---- A. 数值 / 规则 ----
 	register("hp", "设置当前生命", func(a):
@@ -159,11 +195,11 @@ static func install() -> void:
 		if b != null: b.rules.plays_per_turn = Database.rules.plays_per_turn
 		_refresh()
 		return ["每回合出字 = %d" % Database.rules.plays_per_turn])
-	register("goldcap", "设置每战金币收入上限", func(a):
+	register("goldcap", "设置每战金币收入上限（0 = 不限）", func(a):
 		Database.rules.gold_cap_per_battle = maxi(0, _int(a, 0, Database.rules.gold_cap_per_battle))
 		var b := _battle()
 		if b != null: b.rules.gold_cap_per_battle = Database.rules.gold_cap_per_battle
-		return ["金币上限 = %d" % Database.rules.gold_cap_per_battle])
+		return ["金币上限 = %s" % ("不限" if Database.rules.gold_cap_per_battle <= 0 else str(Database.rules.gold_cap_per_battle))])
 
 	# ---- B. 盘面 ----
 	register("board", "打印字盘（0 基坐标）", func(_a): return _print_board())

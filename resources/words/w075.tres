@@ -5,24 +5,29 @@
 
 [sub_resource type="Resource" id="Resource_kcw1v"]
 script = ExtResource("1_vmu6e")
+kind = 29
 handler = "reveal_place"
-amount = 3
-target = 7
-note = "支付 3 金币，随机揭示一枚实体字并指定空格落下"
+amount = 2
+target = 0
+timing = "immediate"
+note = "支付 2 金币，查看字袋顶部至多 3 枚己方原实体，选一枚放入指定空格并获得 1 次额外使用，其他留袋；无候选不支付"
+args = {}
 
 [resource]
 script = ExtResource("2_jqlhy")
 id = "w075"
 word = "投放"
 glyphs = Array[String](["投", "放"])
-description = "支付3金币，先随机揭示1枚实体字，随后玩家指定空格落下"
+description = "支付 2 金币，查看字袋顶部至多 3 枚己方原实体，选一枚放入指定空格并获得 1 次额外使用，其他留袋；无候选不支付"
 effects = Array[ExtResource("1_vmu6e")]([SubResource("Resource_kcw1v")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "支付3金币，先随机揭示1枚实体字，随后玩家指定空格落下"
+effect_summary = "支付 2 金币，查看字袋顶部至多 3 枚己方原实体，选一枚放入指定空格并获得 1 次额外使用，其他留袋；无候选不支付"
 effect_handler_id = "reveal_place"
-requires_target = 7
+requires_target = 0
 p25_implemented = true
-implementation_delta = "—"
+implementation_delta = "已按 2026-10-14 确认方案更新"
 priority = "P1·重点机制"
 implemented = true
+interaction = "choose_bag_deploy"
+timing = "immediate"

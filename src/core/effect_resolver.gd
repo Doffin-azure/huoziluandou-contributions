@@ -15,6 +15,10 @@ static func resolve_all(effects: Array, ctx: Dictionary) -> Array:
 	return messages
 
 
+static func instant_effects(effects: Array, repeat_self: bool = false) -> Array:
+	return effects.filter(func(e): return e.timing != "persistent" or (repeat_self and e.handler == "repeat_word"))
+
+
 static func _resolve_kind(eff: EffectData, ctx: Dictionary) -> Array:
 	var b: BattleState = ctx.get("battle")
 	var src: Combatant = ctx.get("source")

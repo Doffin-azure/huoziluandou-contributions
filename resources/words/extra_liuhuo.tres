@@ -5,19 +5,20 @@
 
 [sub_resource type="Resource" id="Resource_ewn5e"]
 script = ExtResource("1_3k3vu")
+kind = 29
 handler = "wash_heat"
-note = "洗回污染【热】并冷却 2 点"
+note = "将盘面全部【热】洗回字袋，包含干净的【热】，再降低2热度。"
 
 [resource]
 script = ExtResource("2_p658i")
 id = "extra_liuhuo"
 word = "流火"
 glyphs = Array[String](["流", "火"])
-description = "将盘上所有污染【热】洗回抽字袋，再冷却 2 点热度；腾出的空间保留"
+description = "将盘面全部【热】洗回字袋，包含干净的【热】，再降低2热度。"
 effects = Array[ExtResource("1_3k3vu")]([SubResource("Resource_ewn5e")])
 group = "流转"
 design_stage = "设计负责人新增"
-effect_summary = "将盘上所有污染【热】洗回抽字袋，再冷却 2 点热度；腾出的空间保留"
+effect_summary = "将盘面全部【热】洗回字袋，包含干净的【热】，再降低2热度。"
 effect_handler_id = "wash_heat"
 priority = "流转"
 implemented = true

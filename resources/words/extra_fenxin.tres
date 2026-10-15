@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_j2xil"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_cd7k2"]
+
+[sub_resource type="Resource" id="Resource_unv1q"]
+script = ExtResource("1_j2xil")
+kind = 4
+handler = "draw_random"
+amount = 1
+note = "补 1 字"
+
+[sub_resource type="Resource" id="Resource_nfdnx"]
+script = ExtResource("1_j2xil")
+handler = "damage"
+amount = 1
+note = "造成 1 伤"
+
+[sub_resource type="Resource" id="Resource_65b8n"]
+script = ExtResource("1_j2xil")
+kind = 12
+handler = "block_persist"
+amount = 1
+note = "获得 1 持久盾"
+
+[sub_resource type="Resource" id="Resource_ncb6r"]
+script = ExtResource("1_j2xil")
+kind = 3
+handler = "heal"
+amount = 1
+note = "回复 1 生命"
+
+[resource]
+script = ExtResource("2_cd7k2")
+id = "extra_fenxin"
+word = "分心"
+glyphs = Array[String](["分", "心"])
+description = "补 1 字；造成 1 伤；获得 1 持久盾；回复 1 生命"
+effects = Array[ExtResource("1_j2xil")]([SubResource("Resource_unv1q"), SubResource("Resource_nfdnx"), SubResource("Resource_65b8n"), SubResource("Resource_ncb6r")])
+group = "流转"
+design_stage = "设计负责人新增"
+effect_summary = "补 1 字；造成 1 伤；获得 1 持久盾；回复 1 生命"
+effect_handler_id = "draw_random"
+priority = "流转"
+implemented = true

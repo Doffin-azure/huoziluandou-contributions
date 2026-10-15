@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_yrykw"]
 script = ExtResource("2_8aiqa")
+kind = 12
 handler = "block_persist"
 amount = 3
 note = "获得 3 点持久盾"

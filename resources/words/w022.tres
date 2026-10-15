@@ -5,22 +5,23 @@
 
 [sub_resource type="Resource" id="Resource_uwtvv"]
 script = ExtResource("1_cr06b")
+kind = 6
 handler = "apply_status_self"
 amount = 2
 target = 3
 status_id = "strength"
-note = "获得状态【强力】×2"
+note = "本场所有攻击的每段伤害+2，可叠加。"
 
 [resource]
 script = ExtResource("2_oqy8f")
 id = "w022"
 word = "强力"
 glyphs = Array[String](["强", "力"])
-description = "战斗持续性力量+2为临时草案"
+description = "本场所有攻击的每段伤害+2，可叠加。"
 effects = Array[ExtResource("1_cr06b")]([SubResource("Resource_uwtvv")])
 group = "连携"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "战斗持续性力量+2为临时草案"
+effect_summary = "本场所有攻击的每段伤害+2，可叠加。"
 effect_handler_id = "apply_status_self"
 p25_implemented = true
 implementation_delta = "—"

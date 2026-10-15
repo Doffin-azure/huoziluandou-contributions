@@ -1,44 +1,55 @@
 extends ScreenBase
-## 战斗界面（HUD v2 / 参考「墨芯」概念）。
-## 顶部：玩家条 · 回合 · 敌人条；左侧：鲸鱼气泡（预览/结果）+ 已选路径 + 资源；
-## 中部：字盘；右侧：战报；底部：操作行。无效词弹 0.6s 反应。
-
+signal presentation_step_finished
+## 简洁活字 HUD + 独立表现队列。规则同步结算，动效逐次播放真实结果。
 var battle: BattleState
 var node: MapNodeData
 var _board_view: BoardView
-var _enemy_row: HBoxContainer
-var _enemy_widgets: Array = []
+var _enemy_row: VBoxContainer
+var _enemy_widgets: Array[EnemyView] = []
 var _player_hp: StatBar
+var _player_hp_caption: Label
+var _player_hp_value: Label
+var _menu_btn: Button
 var _player_block: Label
-var _player_status: HBoxContainer
+var _player_status: Label
 var _resource_label: Label
 var _pile_label: Label
 var _turn_label: Label
 var _bubble: SpeechBubble
-var _path_bar: PathBar
-var _preview_glyphs: Label
-var _preview_effect: Label
 var _confirm_btn: Button
-var _ready_action: Dictionary = {}   ## 已选好、待【发动】执行的操作 {path, target}
-var _pending_target_kind: int = 0     ## 当前目标选择的类型（用于预览）
-var _place_two_active := false        ## 火急：正在放 2 枚
-var _place_two_cell1 := Vector2i(-1, -1)
-var _recover_active := false          ## 收复：正在放回弃字
-var _recover_pairs: Array = []
-var _recover_pick_uid := -1
-var _recover_bag_active := false      ## 收回：盘面字→袋顶，弃字→原格
-var _recover_bag_tile := Vector2i(-1, -1)
-var _move_active := false             ## 收放：把字移到空格
-var _move_from := Vector2i(-1, -1)
-var _queue_panel: PanelContainer
-var _queue_box: VBoxContainer
-var _reaction: ReactionOverlay
-var _hit_fx: HitFX
+var _clear_btn: Button
+var _end_btn: Button
 var _log_box: VBoxContainer
 var _log_scroll: ScrollContainer
+var _log_overlay: Control
+var _topbar: Control
+var _player_panel: Control
+var _preview_panel: Control
+var _enemy_panel: ScrollContainer
+var _enemy_paper: ArtPaper
+var _footer: Control
+var _hint: Label
+var _selection_actions: HBoxContainer
+var _effects: BattleEffects
 var _target_index := 0
 var _pending_path: Array = []
-var _current_word: WordData = null
+var _ready_action: Dictionary = {}   ## 待发动：已选好路径+目标，点「发动」才执行
+var _recast_three_active := false    ## 再铸/重连共用三字选择
+var _recast_three_cells: Array = []
+var _three_tiles_word := ""
+var _collect_own_active := false     ## 收心：正在选盘面牌回袋
+var _collect_own_cells: Array = []
+var _collect_junk := false
+var _word_transfer_target: Dictionary = {}
+var _compound_picker_active := false ## 复合：正在选保留的临时字
+var _solo_release_picker_active := false ## 放：正在选择是否消耗储能
+var _solo_bag_picker_active := false ## 精/购：按原实体选择字袋字。
+var _solo_throw_active := false
+var _solo_throw_from := Vector2i(-1, -1)
+var _solo_throw_uid: int = -1
+var _manual_draw_picks: Array = []   ## 精心：已选的定向字
+var _manual_draw_active := false
+var _current_word: WordData
 var _transform_uid := -1
 var _fuse_stage := 0
 var _fuse_first := Vector2i(-1, -1)
@@ -49,9 +60,23 @@ var _merge_bag_uid := -1
 var _merge_discard_uid := -1
 var _merge_cell1 := Vector2i(-1, -1)
 var _finished := false
+var _busy := false
+var _collecting := false
+var _modal_count := 0
+var _compact := false
+var _events: Array[Dictionary] = []
+var _feedback_watches: Array = []
+var _confirm_motion: Tween
+var _confirm_ink: ShaderMaterial
+var _step_timer: Timer
+var _exiting := false
 
 
 func build(root: Control) -> void:
+	_step_timer = Timer.new()
+	_step_timer.one_shot = true
+	_step_timer.timeout.connect(func(): presentation_step_finished.emit())
+	add_child(_step_timer)
 	node = params.get("node", null)
 	if node == null:
 		var act := Database.get_act(GameState.act_index)
@@ -59,473 +84,309 @@ func build(root: Control) -> void:
 			node = act.nodes[GameState.node_index - 1]
 	if node == null:
 		node = MapNodeData.new()
-
 	battle = BattleState.new(Database.rules)
 	var enemy_datas: Array = node.enemies
 	if enemy_datas.is_empty():
 		enemy_datas = [Database.get_enemy("ink_spirit")]
-	battle.start(GameState.make_battle_deck(), enemy_datas)
-
-	var main := Ink.vbox(0)
-	main.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.add_child(main)
-	main.add_child(_build_topbar())
-
-	var middle := Ink.hbox(10)
-	middle.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	main.add_child(middle)
-	middle.add_child(_build_left())
-	middle.add_child(_build_center())
-	middle.add_child(_build_log_panel())
-
-	main.add_child(_build_bottombar())
-
-	_reaction = ReactionOverlay.new()
-	_reaction.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(_reaction)
-
-	_hit_fx = HitFX.new()
-	_hit_fx.setup(content)
-	add_child(_hit_fx)
-
+	battle.start(GameState.make_battle_deck(), enemy_datas, int(params.get("seed", -1)))
+	_topbar = _build_topbar()
+	root.add_child(_topbar)
+	root.move_child(_player_panel, root.get_child_count() - 1)
+	_preview_panel = _build_left()
+	root.add_child(_preview_panel)
+	_board_view = _build_center()
+	root.add_child(_board_view)
+	_enemy_panel = ScrollContainer.new()
+	_enemy_panel.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_enemy_row = Ink.vbox(16)
+	_enemy_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_enemy_panel.add_child(_enemy_row)
+	_enemy_paper = ArtPaper.new()
+	_enemy_paper.tilt = 1.2
+	root.add_child(_enemy_paper)
+	root.add_child(_enemy_panel)
+	root.move_child(_player_panel, _enemy_panel.get_index())
+	_footer = _build_bottombar()
+	root.add_child(_footer)
+	_end_btn = Ink.button("结束回合")
+	_end_btn.add_theme_font_size_override("font_size", 22)
+	var end_style := StyleBoxFlat.new()
+	end_style.bg_color = Palette.PANEL_DARK
+	end_style.border_color = Palette.GOLD_DK
+	end_style.set_border_width_all(1)
+	end_style.set_corner_radius_all(4)
+	end_style.set_content_margin_all(10)
+	_end_btn.add_theme_stylebox_override("normal", end_style)
+	_end_btn.add_theme_color_override("font_color", Palette.PAPER_WARM)
+	_end_btn.pressed.connect(_on_end_turn)
+	root.add_child(_end_btn)
+	_log_overlay = _build_log_panel()
+	root.add_child(_log_overlay)
+	_log_overlay.hide()
+	_effects = BattleEffects.new()
+	root.add_child(_effects)
 	EventBus.log_message.connect(_on_log)
-	EventBus.damage_dealt.connect(_on_damage_dealt)
+	battle.enemy_acting.connect(_on_enemy_acting)
+	_watch_combatant(battle.player)
+	_refresh_all()
 	for line in battle.log:
 		_on_log(line)
-	_refresh_all()
+	_bubble.set_idle(_preview_hint())
+	resized.connect(_layout)
+	_layout()
+	_bind_table_print.call_deferred()
+	_board_view.call_deferred("play_opening")
 	_on_log("战斗开始：%s" % node.title)
 
 
 func _exit_tree() -> void:
+	_exiting = true
+	_step_timer.stop()
+	presentation_step_finished.emit()
 	if EventBus.log_message.is_connected(_on_log):
 		EventBus.log_message.disconnect(_on_log)
-	if EventBus.damage_dealt.is_connected(_on_damage_dealt):
-		EventBus.damage_dealt.disconnect(_on_damage_dealt)
+	for watch in _feedback_watches:
+		if is_instance_valid(watch[0]) and watch[0].feedback.is_connected(watch[1]):
+			watch[0].feedback.disconnect(watch[1])
+	_feedback_watches.clear()
+	_events.clear()
 
 
-# ---------------------------------------------------------------- 顶部：玩家 / 回合 / 敌人
+func _bind_table_print() -> void:
+	if not is_instance_valid(Router.study_stage) or not Router.study_stage.shared_table_active():
+		return
+	var lighting := ShaderMaterial.new()
+	lighting.shader = load("res://src/shaders/table_print.gdshader")
+	lighting.set_shader_parameter("table_scene", Router.study_stage.viewport.get_texture())
+	for panel in [_preview_panel, _enemy_panel]:
+		_shade_print_nodes(panel, lighting)
+
+
+func _shade_print_nodes(parent: Node, lighting: ShaderMaterial) -> void:
+	if parent is Label or parent is RichTextLabel or parent is InkSpirit or parent is StatBar:
+		parent.material = lighting
+	for child in parent.get_children():
+		_shade_print_nodes(child, lighting)
+
+
 func _build_topbar() -> Control:
-	var panel := Ink.panel("PanelInset")
-	var pad := Ink.margin(6)
-	panel.add_child(pad)
-	var row := Ink.hbox(10)
-	pad.add_child(row)
-
-	# 玩家
-	var pblock := Ink.hbox(8)
-	var pseal := SealView.new()
-	pseal.custom_minimum_size = Vector2(44, 44)
-	pseal.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	pseal.setup("你", Palette.INK_SOFT, SealView.Shape.SQUARE, Palette.PAPER)
-	pblock.add_child(pseal)
-	var pcol := Ink.vbox(2)
-	pcol.custom_minimum_size.x = 240
-	pcol.add_child(Ink.label("玩家", "Subheading"))
-	_player_hp = StatBar.new()
-	pcol.add_child(_player_hp)
-	_player_block = Ink.label("", "", Palette.BLOCK)
-	pcol.add_child(_player_block)
-	pblock.add_child(pcol)
-	row.add_child(pblock)
-	row.add_child(Ink.expander())
-
-	# 回合
-	var rv := Ink.vbox(0)
+	var bar := Control.new()
+	var surface := ArtPaper.new()
+	surface.strip = true
+	surface.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	bar.add_child(surface)
+	var title := Ink.label("活字战斗", "Heading")
+	title.name = "Title"
+	bar.add_child(title)
 	_turn_label = Ink.label("回合 1", "Stat")
-	_turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	rv.add_child(_turn_label)
-	var rl := Ink.label("TURN", "Muted")
-	rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	rv.add_child(rl)
-	row.add_child(rv)
-	row.add_child(Ink.expander())
-
-	# 敌人
-	_enemy_row = Ink.hbox(10)
-	_enemy_row.alignment = BoxContainer.ALIGNMENT_END
-	row.add_child(_enemy_row)
-	return panel
-
-
-func _make_enemy_card(i: int, e: Combatant) -> Dictionary:
-	var card := Ink.panel("PanelCard")
-	card.custom_minimum_size = Vector2(236, 0)
-	card.mouse_filter = Control.MOUSE_FILTER_STOP
-	card.gui_input.connect(func(ev):
-		if ev is InputEventMouseButton and ev.pressed:
-			_on_enemy_clicked(i))
-	var pad := Ink.margin(8)
-	card.add_child(pad)
-	var hrow := Ink.hbox(8)
-	pad.add_child(hrow)
-
-	var info := Ink.vbox(2)
-	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var name := Ink.label(e.display_name, "Subheading")
-	info.add_child(name)
-	var hp := StatBar.new()
-	info.add_child(hp)
-	var intent := Ink.label("", "", Palette.VERMILION)
-	intent.add_theme_font_size_override("font_size", 15)
-	info.add_child(intent)
-	hrow.add_child(info)
-
-	var seal := SealView.new()
-	seal.custom_minimum_size = Vector2(54, 54)
-	seal.shape = SealView.Shape.CIRCLE
-	hrow.add_child(seal)
-	return {"card": card, "seal": seal, "hp": hp, "intent": intent}
-
-
-# ---------------------------------------------------------------- 左侧：鲸鱼气泡 + 路径 + 资源
-func _build_left() -> Control:
-	var col := Ink.vbox(8)
-	col.custom_minimum_size.x = 330
-	col.size_flags_vertical = Control.SIZE_EXPAND_FILL
-
-	var top := Ink.hbox(8)
-	top.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	var mascot := MascotView.new()
-	mascot.size_flags_vertical = Control.SIZE_SHRINK_END
-	top.add_child(mascot)
-	_bubble = SpeechBubble.new()
-	_bubble.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_bubble.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	top.add_child(_bubble)
-	col.add_child(top)
-	_preview_glyphs = _bubble.title
-	_preview_effect = _bubble.body
-	_bubble.call_deferred("set_idle", _preview_hint())
-
-	_path_bar = PathBar.new()
-	col.add_child(_path_bar)
-
-	_queue_panel = Ink.panel("PanelInset")
-	var qpad := Ink.margin(8)
-	_queue_panel.add_child(qpad)
-	var qcol := Ink.vbox(3)
-	qpad.add_child(qcol)
-	qcol.add_child(Ink.label("结阵队列", "Subheading"))
-	_queue_box = Ink.vbox(2)
-	qcol.add_child(_queue_box)
-	_queue_panel.visible = false
-	col.add_child(_queue_panel)
-
-	var rp := Ink.panel("PanelInset")
-	var rpad := Ink.margin(10)
-	rp.add_child(rpad)
-	var rcol := Ink.vbox(4)
-	rpad.add_child(rcol)
+	bar.add_child(_turn_label)
 	_resource_label = Ink.label("", "Muted")
 	_resource_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	rcol.add_child(_resource_label)
-	_player_status = Ink.hbox(8)
-	rcol.add_child(_player_status)
-	_pile_label = Ink.label("", "Muted")
-	_pile_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	rcol.add_child(_pile_label)
-	col.add_child(rp)
+	bar.add_child(_resource_label)
+	var rule := Ink.hline()
+	rule.name = "Rule"
+	bar.add_child(rule)
+	_menu_btn = Ink.button("菜单")
+	_menu_btn.custom_minimum_size = Vector2(80, 48)
+	_menu_btn.pressed.connect(_open_menu)
+	bar.add_child(_menu_btn)
+	_player_panel = Control.new()
+	_player_hp_caption = Ink.label("玩家气血", "", Palette.INK)
+	_player_hp_caption.add_theme_font_override("font", Ink.serif)
+	_player_hp_caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_player_panel.add_child(_player_hp_caption)
+	_player_hp_value = Ink.label("", "", Palette.VERMILION_DK)
+	_player_hp_value.add_theme_font_override("font", Ink.serif)
+	_player_hp_value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_player_panel.add_child(_player_hp_value)
+	_player_hp = StatBar.new()
+	_player_hp.show_text = false
+	_player_panel.add_child(_player_hp)
+	_player_block = Ink.label("", "Muted")
+	_player_panel.add_child(_player_block)
+	_player_status = Ink.caption("")
+	_player_status.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_player_status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_player_panel.add_child(_player_status)
+	content.add_child(_player_panel)
+	return bar
+
+
+func _make_enemy_card(i: int, e: Combatant) -> EnemyView:
+	var view := EnemyView.new()
+	view.setup(i, e)
+	view.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	view.clicked.connect(_on_enemy_clicked)
+	_watch_combatant(e)
+	return view
+
+
+func _build_left() -> Control:
+	var col := Control.new()
+	var surface := ArtPaper.new()
+	surface.tilt = -1.6
+	surface.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	col.add_child(surface)
+	_bubble = SpeechBubble.new()
+	col.add_child(_bubble)
+	_selection_actions = Ink.hbox(12)
+	_confirm_btn = Ink.button("出字", true)
+	_confirm_btn.custom_minimum_size = Vector2(128, 56)
+	_confirm_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_confirm_btn.add_theme_font_size_override("font_size", 28)
+	_confirm_btn.disabled = true
+	_confirm_btn.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+	_confirm_btn.add_theme_stylebox_override("hover", StyleBoxEmpty.new())
+	_confirm_btn.add_theme_stylebox_override("pressed", StyleBoxEmpty.new())
+	_confirm_btn.add_theme_stylebox_override("disabled", StyleBoxEmpty.new())
+	var stamp := ColorRect.new()
+	stamp.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	stamp.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stamp.show_behind_parent = true
+	_confirm_ink = ShaderMaterial.new()
+	_confirm_ink.shader = load("res://src/shaders/seal_button.gdshader")
+	_confirm_ink.set_shader_parameter("seal_color", Palette.VERMILION)
+	stamp.material = _confirm_ink
+	_confirm_btn.add_child(stamp)
+	_confirm_btn.mouse_entered.connect(func(): _confirm_ink.set_shader_parameter("hovered", true))
+	_confirm_btn.mouse_exited.connect(func(): _confirm_ink.set_shader_parameter("hovered", false))
+	_confirm_btn.button_down.connect(func(): _confirm_ink.set_shader_parameter("pressed", true))
+	_confirm_btn.button_up.connect(func(): _confirm_ink.set_shader_parameter("pressed", false))
+	_confirm_btn.pressed.connect(_on_primary)
+	_selection_actions.add_child(_confirm_btn)
+	_clear_btn = Ink.button("清除")
+	var clear_style := StyleBoxFlat.new()
+	clear_style.bg_color = Color(0, 0, 0, 0)
+	clear_style.border_color = Color(Palette.INK_SOFT, 0.65)
+	clear_style.set_border_width_all(1)
+	clear_style.set_content_margin_all(10)
+	_clear_btn.add_theme_stylebox_override("normal", clear_style)
+	_clear_btn.add_theme_stylebox_override("disabled", clear_style)
+	_clear_btn.custom_minimum_size = Vector2(72, 56)
+	_clear_btn.pressed.connect(_on_clear_cancel)
+	_selection_actions.add_child(_clear_btn)
+	col.add_child(_selection_actions)
 	return col
 
 
-# ---------------------------------------------------------------- 中部：字盘
-func _build_center() -> Control:
-	var shell := Ink.vbox(6)
-	shell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	shell.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	var heading := Ink.hbox(8)
-	heading.add_child(Ink.label("字盘", "Heading"))
-	var rule := Ink.label("四方字阵", "Muted")
-	rule.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	heading.add_child(rule)
-	heading.add_child(Ink.expander())
-	shell.add_child(heading)
-	var stage := Ink.stage_panel()
-	stage.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	var pad := Ink.margin(10)
-	stage.add_child(pad)
-	var center := CenterContainer.new()
-	pad.add_child(center)
-	_board_view = BoardView.new()
-	_board_view.setup(battle.board)
-	_board_view.commit.connect(_on_commit)
-	_board_view.selection_changed.connect(_on_selection_changed)
-	_board_view.tile_picked.connect(_on_tile_picked)
-	_board_view.pick_cancelled.connect(_on_pick_cancelled)
-	center.add_child(_board_view)
-	shell.add_child(stage)
-	return shell
+func _build_center() -> BoardView:
+	var view := BoardView.new()
+	view.setup(battle.board)
+	view.commit.connect(_on_commit)
+	view.selection_changed.connect(_on_selection_changed)
+	view.tile_picked.connect(_on_tile_picked)
+	view.pick_cancelled.connect(_on_pick_cancelled)
+	return view
 
 
-# ---------------------------------------------------------------- 右侧：战报
 func _build_log_panel() -> Control:
-	var panel := Ink.panel("PanelCard")
-	panel.custom_minimum_size = Vector2(206, 0)
-	var pad := Ink.margin(8)
-	panel.add_child(pad)
-	var col := Ink.vbox(6)
-	pad.add_child(col)
-	col.add_child(Ink.h2("战报"))
-	col.add_child(Ink.hline())
+	var overlay := Control.new()
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var dim := ColorRect.new()
+	dim.color = Color(Palette.INK, 0.45)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	dim.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.pressed:
+			_toggle_log())
+	overlay.add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Ink.panel()
+	panel.custom_minimum_size = Vector2(600, 420)
+	center.add_child(panel)
+	var col := Ink.vbox(12)
+	panel.add_child(col)
+	var head := Ink.hbox(10)
+	head.add_child(Ink.h2("战报"))
+	head.add_child(Ink.expander())
+	var close := Ink.button("关闭")
+	close.pressed.connect(_toggle_log)
+	head.add_child(close)
+	col.add_child(head)
 	_log_scroll = ScrollContainer.new()
 	_log_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_log_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	col.add_child(_log_scroll)
-	_log_box = Ink.vbox(4)
+	_log_box = Ink.vbox(6)
 	_log_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_log_scroll.add_child(_log_box)
-	return panel
+	return overlay
 
 
-# ---------------------------------------------------------------- 底部：操作行
 func _build_bottombar() -> Control:
-	var panel := Ink.panel("PanelInset")
-	var pad := Ink.margin(6)
-	panel.add_child(pad)
-	var row := Ink.hbox(8)
-	pad.add_child(row)
-	row.add_child(Ink.label("拖动连词　·　回车确认　·　ESC 取消", "Muted"))
-	row.add_child(Ink.expander())
-
-	_confirm_btn = Ink.button("出字", true)
-	_confirm_btn.custom_minimum_size = Vector2(96, 42)
-	_confirm_btn.disabled = true
-	_confirm_btn.pressed.connect(_on_primary)
-	row.add_child(_confirm_btn)
-
-	var clear := Ink.button("清除")
-	clear.custom_minimum_size = Vector2(72, 42)
-	clear.pressed.connect(_on_clear)
-	row.add_child(clear)
-
-	var deck := Ink.button("字袋")
-	deck.custom_minimum_size = Vector2(76, 42)
-	deck.theme_type_variation = "GhostButton"
-	deck.pressed.connect(_open_deck)
-	row.add_child(deck)
-
-	var set_btn := Ink.button("设置")
-	set_btn.custom_minimum_size = Vector2(76, 42)
-	set_btn.theme_type_variation = "GhostButton"
-	set_btn.pressed.connect(_open_settings)
-	row.add_child(set_btn)
-
-	var end := Ink.button("结束回合")
-	end.custom_minimum_size = Vector2(110, 42)
-	end.pressed.connect(_on_end_turn)
-	row.add_child(end)
-
-	var menu := Ink.button("菜单")
-	menu.custom_minimum_size = Vector2(76, 42)
-	menu.theme_type_variation = "GhostButton"
-	menu.pressed.connect(func(): PauseMenu.open())
-	row.add_child(menu)
-	return panel
+	var bar := Control.new()
+	var surface := ArtPaper.new()
+	surface.strip = true
+	surface.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	bar.add_child(surface)
+	var line := Ink.hline()
+	line.name = "Rule"
+	bar.add_child(line)
+	_hint = Ink.label("拖动连词 · 回车出字 · ESC 取消", "Muted")
+	bar.add_child(_hint)
+	_pile_label = Ink.label("", "Muted")
+	bar.add_child(_pile_label)
+	return bar
 
 
-# ---------------------------------------------------------------- 刷新
-func _refresh_all() -> void:
+func _refresh_all(animate_board := false) -> void:
 	_refresh_enemies()
 	_refresh_player()
 	_refresh_piles()
-	_refresh_queue_panel()
-	_refresh_primary()
 	_turn_label.text = "回合 %d" % battle.turn
-	_board_view.reserved_cells = battle.reserved_cells.duplicate()
-	_board_view.rebuild()
-
-
-# ---------------------------------------------------------------- 统一主按钮（出字 / 发动）
-# 原则：只在“有待交付的操作”时出现【发动】，按它才执行；选对象 ≠ 执行。
-func _refresh_primary() -> void:
-	if _confirm_btn == null:
-		return
-	if not _ready_action.is_empty():
-		if _ready_action.get("repeat_rotate", false):
-			_confirm_btn.text = "发动（转速 %d/3）" % battle.repeat_rotate_count
-		else:
-			_confirm_btn.text = "发动"
-		_confirm_btn.disabled = false
-		return
-	if _board_view != null and _board_view.pick_mode != "":
-		_confirm_btn.text = "发动"
-		_confirm_btn.disabled = true
-		return
-	if battle.formation_mode:
-		_confirm_btn.text = "发动 (%d)" % battle.formation_queue.size()
-		_confirm_btn.disabled = battle.formation_queue.is_empty()
-		return
-	_confirm_btn.text = "出字"
-	_confirm_btn.disabled = _board_view == null or _board_view.path.is_empty()
-
-
-func _on_clear() -> void:
-	# 取消选中 / 取消待发动 / 退出目标选择
-	if _board_view.pick_mode != "":
-		_on_pick_cancelled()
-		_board_view.end_pick()
-		_refresh_primary()
-		return
-	if battle.repeat_rotate_tile.x >= 0:
-		battle.end_repeat_rotate()
-		_ready_action = {}
-		_refresh_all()
-		return
-	_board_view.clear_selection()
-	_ready_action = {}
-	_pending_target_kind = 0
-	_board_view.preview_cells = []
-	_board_view.rebuild()
-	_refresh_primary()
-
-
-func _on_primary() -> void:
-	if _finished:
-		return
-	if not _ready_action.is_empty():
-		var a := _ready_action
-		if a.get("repeat_rotate", false):
-			battle.do_repeat_rotate()
-			if battle.repeat_rotate_count >= 3:
-				battle.end_repeat_rotate()
-				_ready_action = {}
-			_refresh_all()
-			_check_battle_over()
-			return
-		_ready_action = {}
-		_on_commit(a.path, a.target)
-		return
-	if _board_view.pick_mode != "":
-		return
-	if battle.formation_mode and not battle.formation_queue.is_empty():
-		battle.resolve_formation()
-		_board_view.clear_selection()
-		_refresh_all()
-		_check_battle_over()
-		return
-	_on_commit(_board_view.path.duplicate())
-
-
-func _fill_ready(path: Array, target: Dictionary) -> void:
-	_pending_path = []
-	_ready_action = {"path": path, "target": target}
-	if _board_view != null:
-		_board_view.end_pick()
-		_board_view.preview_cells = _preview_cells(target)
-		_board_view.rebuild()
-	_refresh_primary()
-
-
-func _preview_cells(target: Dictionary) -> Array:
-	var out: Array = []
-	if _pending_target_kind == EffectData.Target.BOARD_ROW and target.has("row"):
-		var row: int = target["row"]
-		for x in battle.board.size:
-			out.append(Vector2i(x, row))
-		return out
-	if _pending_target_kind == EffectData.Target.BOARD_3X3 and target.has("tile"):
-		var a: Vector2i = target["tile"]
-		for dx in 3:
-			for dy in 3:
-				out.append(a + Vector2i(dx, dy))
-		return out
-	if target.has("tile2"):
-		out.append(target["tile"])
-		out.append(target["tile2"])
-	elif target.has("cell1"):
-		out.append(target["cell1"])
-		out.append(target["cell2"])
-	elif target.has("tile"):
-		var tile: Vector2i = target["tile"]
-		if _pending_target_kind == EffectData.Target.BOARD_2X2:
-			for dx in 2:
-				for dy in 2:
-					out.append(tile + Vector2i(dx, dy))
-		else:
-			out.append(tile)
-	return out
-
-
-func _refresh_queue_panel() -> void:
-	if _queue_panel == null:
-		return
-	var on := battle.formation_mode
-	_queue_panel.visible = on
-	if not on:
-		return
-	for c in _queue_box.get_children():
-		c.queue_free()
-	if battle.formation_queue.is_empty():
-		_queue_box.add_child(Ink.label("（空）拖动连词登记", "Muted"))
-		return
-	for item in battle.formation_queue:
-		var w: WordData = item.word
-		var label: String = w.word if w != null else str(item.glyphs[0])
-		_queue_box.add_child(Ink.label("· " + label, "Muted"))
+	_board_view.rebuild(animate_board)
+	_update_input()
 
 
 func _refresh_enemies() -> void:
-	for w in _enemy_widgets:
-		w["card"].queue_free()
-	_enemy_widgets.clear()
-	for i in battle.enemies.size():
-		var e: Combatant = battle.enemies[i]
-		var w := _make_enemy_card(i, e)
-		_enemy_row.add_child(w["card"])
-		_enemy_widgets.append(w)
+	if _enemy_widgets.size() != battle.enemies.size():
+		for widget in _enemy_widgets:
+			_enemy_row.remove_child(widget)
+			widget.queue_free()
+		_enemy_widgets.clear()
+		for i in battle.enemies.size():
+			var widget := _make_enemy_card(i, battle.enemies[i])
+			_enemy_row.add_child(widget)
+			_enemy_widgets.append(widget)
+	for widget in _enemy_widgets:
+		widget.refresh()
 	_refresh_intents()
+	if is_node_ready() or _end_btn != null:
+		_layout()
 
 
 func _refresh_intents() -> void:
-	for i in battle.enemies.size():
-		var e: Combatant = battle.enemies[i]
-		var w: Dictionary = _enemy_widgets[i]
-		var ed: EnemyData = e.enemy_data
-		w["seal"].setup(ed.glyph if ed != null else "敌", ed.accent if ed != null else Palette.VERMILION, SealView.Shape.CIRCLE)
-		w["hp"].setup_bar(e.hp, e.max_hp, Palette.HP)
-		if e.is_alive():
-			var mv: EnemyMoveData = battle.current_intent(e)
-			w["intent"].text = ("⟶ " + mv.intent_text()) if mv != null else ""
-		else:
-			w["intent"].text = "（已倒下）"
-		w["card"].modulate = Color(0.5, 0.48, 0.46, 0.75) if not e.is_alive() else Color.WHITE
-		var targeted := i == _target_index and battle.alive_enemies().size() > 1
-		w["card"].modulate = Color(1.0, 0.85, 0.6) if targeted else w["card"].modulate
+	if _target_index >= battle.enemies.size() or not battle.enemies[_target_index].is_alive():
+		var first := battle.first_alive_enemy()
+		_target_index = battle.enemies.find(first) if first != null else 0
+	for i in _enemy_widgets.size():
+		_enemy_widgets[i].set_intent(battle.current_intent(battle.enemies[i]))
+		_enemy_widgets[i].set_targeted(i == _target_index)
 
 
 func _refresh_player() -> void:
-	_player_hp.setup_bar(battle.player.hp, battle.player.max_hp, Palette.HP)
-	var block_txt := ""
-	if battle.player.block > 0:
-		block_txt += "临挡 %d　" % battle.player.block
-	if battle.player.persistent_block > 0:
-		block_txt += "持久盾 %d" % battle.player.persistent_block
-	_player_block.text = block_txt
-	var res: Array = []
-	res.append("储能 %d" % battle.player.energy)
-	res.append("热度 %d/%d" % [battle.player.heat, battle.player.heat_capacity])
+	_show_player_hp(battle.player.hp, battle.player.max_hp)
+	_player_block.text = "临挡 %d · 持久盾 %d" % [battle.player.block, battle.player.persistent_block]
+	var resources: Array[String] = ["热度 %d / %d" % [battle.player.heat, battle.player.heat_capacity], "储能 %d" % battle.player.energy, "金币 %d" % GameState.gold]
 	if battle.player.temp_funds > 0:
-		res.append("临时资金 %d" % battle.player.temp_funds)
+		resources.append("资金 %d" % battle.player.temp_funds)
 	if battle.player.equity > 0:
-		res.append("股权 %d" % battle.player.equity)
-	if battle.player.block > 0:
-		res.append("临挡 %d" % battle.player.block)
-	if battle.player.persistent_block > 0:
-		res.append("持久盾 %d" % battle.player.persistent_block)
-	res.append("金币 %d" % GameState.gold)
-	_resource_label.text = "　".join(res)
-
-	for c in _player_status.get_children():
-		c.queue_free()
-	if battle.player.statuses.is_empty() and GameState.permanent_damage_reduction <= 0:
-		_player_status.add_child(Ink.label("（无状态）", "Muted"))
-	for sid in battle.player.statuses.keys():
+		resources.append("股权 %d" % battle.player.equity)
+	_resource_label.text = "    ".join(resources)
+	var states: Array[String] = []
+	for sid in battle.player.statuses:
 		var sd: StatusData = Database.get_status(sid)
-		var txt: String = ("%s %s %d" % [sd.glyph, sd.name, battle.player.statuses[sid]]) if sd != null else ("%s %d" % [sid, battle.player.statuses[sid]])
-		_player_status.add_child(Ink.label(txt))
+		states.append("%s %d" % [sd.name if sd != null else sid, battle.player.statuses[sid]])
 	if GameState.permanent_damage_reduction > 0:
-		_player_status.add_child(Ink.label("永久减伤 %d" % GameState.permanent_damage_reduction, "Muted"))
+		states.append("减伤 %d" % GameState.permanent_damage_reduction)
+	_player_status.text = " · ".join(states)
+	_player_status.tooltip_text = _player_status.text
+
+
+func _show_player_hp(hp: int, max_hp: int) -> void:
+	_player_hp.setup_bar(hp, max_hp, Palette.HP)
+	_player_hp_value.text = "%d / %d" % [hp, max_hp]
 
 
 func _refresh_piles() -> void:
@@ -547,48 +408,45 @@ func _on_log(text: String) -> void:
 		_log_box.remove_child(first)
 		first.queue_free()
 	await get_tree().process_frame
-	if _log_scroll:
+	if is_inside_tree() and is_instance_valid(_log_scroll):
 		_log_scroll.scroll_vertical = int(_log_scroll.get_v_scroll_bar().max_value)
 
 
-# ---------------------------------------------------------------- 预览（走气泡框）
-func _on_selection_changed(path: Array, glyphs: Array, word: WordData) -> void:
-	_path_bar.update(glyphs)
+# ---------------------------------------------------------------- 独立词效预览
+func _on_selection_changed(path: Array, glyphs: Array, word: WordData, preview_target: Dictionary = {}) -> void:
 	if glyphs.is_empty():
 		_current_word = null
 		_bubble.set_idle(_preview_hint())
-		_refresh_primary()
+		_update_input()
 		return
+	if word == null and glyphs.size() >= 2:
+		word = EffectPreview.word_for(glyphs)
+	var word_changed := _current_word != word
 	_current_word = word
 	var text := ""
 	for g in glyphs:
 		text += str(g)
-	_refresh_primary()
-	if word != null and not Settings.drag_release_play:
+	_update_input()
+	_bubble.set_context(_selection_context(path))
+	if word != null and word_changed and not Settings.drag_release_play:
 		_pop_confirm()
 
-	var costs := _pollution_cost_text(path)
 	if word == null:
 		if glyphs.size() >= 2:
-			_bubble.set_text("「%s」" % text, "不成词。%s" % costs, SpeechBubble.State.ERROR)
+			_bubble.set_text("「%s」" % text, "不成词。调整路径后重试，不消耗字块。", SpeechBubble.State.ERROR)
 		else:
-			var cd: CharacterData = null
 			var inst: CharInstance = battle.board.get_xy(path[0])
-			if inst != null:
-				cd = inst.data
-			_bubble.set_text("「%s」" % text, "单字：%s%s" % [(cd.description if cd != null else ""), costs], SpeechBubble.State.PREVIEW)
+			var solo_description := EffectPreview.solo_text(inst, battle, path, preview_target)
+			_bubble.set_text("「%s」" % text, "单字：%s" % solo_description, SpeechBubble.State.PREVIEW)
 		return
 	if not word.implemented:
-		_bubble.set_text("《%s》" % word.word, "效果待定。%s" % costs, SpeechBubble.State.PREVIEW)
+		_bubble.set_text("《%s》" % word.word, "效果待定。", SpeechBubble.State.PREVIEW)
 		return
-	var parts: Array = []
-	for eff in word.effects:
-		parts.append(eff.describe())
 	var req := ""
-	if word.requires_target != EffectData.Target.NONE:
+	if preview_target.is_empty() and (word.requires_target != EffectData.Target.NONE or not word.interaction.is_empty()):
 		req = "　→ 需选目标"
-	var body_text: String = " / ".join(parts) if not parts.is_empty() else word.effect_summary
-	_bubble.set_text("《%s》" % word.word, "%s%s%s" % [body_text, req, costs], SpeechBubble.State.PREVIEW)
+	var body_text := EffectPreview.word_text(word, battle, path, preview_target)
+	_bubble.set_text("《%s》" % word.word, "%s%s" % [body_text, req], SpeechBubble.State.PREVIEW)
 
 
 func _pollution_cost_text(path: Array) -> String:
@@ -608,23 +466,92 @@ func _pollution_cost_text(path: Array) -> String:
 
 # ---------------------------------------------------------------- 交互
 func _on_enemy_clicked(index: int) -> void:
+	if _busy or _finished or _modal_count > 0 or not battle.enemies[index].is_alive():
+		return
 	_target_index = index
 	_refresh_intents()
+	var path: Array = _ready_action.get("path", _board_view.path)
+	if not path.is_empty():
+		_on_selection_changed(path, battle.board.glyphs_of(path), EffectPreview.word_for(battle.board.glyphs_of(path)), _ready_action.get("target", {}))
+	else:
+		_bubble.set_context(_selection_context(path))
 
 
-func _show_invalid_reaction() -> void:
-	if _reaction != null:
-		_reaction.show_invalid()
-
-
-func _on_commit(path: Array, target: Dictionary = {}) -> void:
-	if _finished:
+func _on_primary() -> void:
+	if _finished or _busy:
+		return
+	if _collect_own_active:
+		var cp := _pending_path
+		_collect_own_active = false
+		_collect_junk = false
+		var cells := _collect_own_cells.duplicate()
+		_collect_own_cells = []
+		_board_view.end_pick()
+		_on_commit(cp, {"cells": cells})
+		return
+	# 转速：继续旋转（最多 3 次）；转满自动结束，也可点「清除」提前停下
+	if _ready_action.get("repeat_rotate", false):
+		battle.do_repeat_rotate()
+		if battle.repeat_rotate_count >= 3:
+			battle.end_repeat_rotate()
+			_ready_action = {}
+			_on_log("转速：已转满 3 次，结束")
+		else:
+			_ready_action = {"repeat_rotate": true, "path": [], "target": {}}
+		_refresh_all(true)
+		_update_input()
+		_check_battle_over()
+		return
+	if not _ready_action.is_empty():
+		var a := _ready_action
+		_ready_action = {}
+		_board_view.end_pick()
+		_on_commit(a.path, a.target)
 		return
 	if _board_view.pick_mode != "":
 		return
-	if _board_view != null:
-		_board_view.preview_cells = []
-	_pending_target_kind = 0
+	# 合击·结阵：点「发动」时才把登记的词一起结算
+	if battle.formation_mode and not battle.formation_queue.is_empty():
+		battle.resolve_formation()
+		_board_view.clear_selection()
+		_refresh_all()
+		if _handle_effect_requests():
+			return
+		_check_battle_over()
+		return
+	_on_commit(_board_view.path.duplicate())
+
+
+## 选好路径+目标后进入「待发动」：不立即结算，可继续点别处改选，或点「发动」执行。
+func _fill_ready(path: Array, target: Dictionary) -> void:
+	_pending_path = []
+	_ready_action = {"path": path, "target": target}
+	_on_selection_changed(path, battle.board.glyphs_of(path), EffectPreview.word_for(battle.board.glyphs_of(path)), target)
+	_update_input()
+
+
+func _on_clear_cancel() -> void:
+	if _collect_own_active or _recast_three_active or not _ready_action.is_empty() or _board_view.pick_mode != "":
+		_on_pick_cancelled()
+		_board_view.end_pick()
+		_update_input()
+		return
+	_board_view.clear_selection()
+
+
+func _on_commit(path: Array, target: Dictionary = {}) -> void:
+	if _finished or _compound_picker_active or _solo_release_picker_active or _solo_bag_picker_active or _busy or (_modal_count > 0 and target.is_empty()):
+		return
+	if _board_view.pick_mode != "" and _ready_action.is_empty():
+		return
+	if _choose_solo_release(path, target):
+		return
+	if _choose_solo_throw(path, target):
+		return
+	if _choose_solo_bag(path, target):
+		return
+	if _choose_word_transfer(path, target):
+		return
 	if target.is_empty() and _current_word != null and not _current_word.interaction.is_empty():
 		match _current_word.interaction:
 			"reveal_pick_board":
@@ -642,24 +569,6 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 			"choose_same_pair":
 				_run_pair(path, "same")
 				return
-			"choose_row_pair":
-				_run_pair(path, "row")
-				return
-			"choose_any_pair":
-				_run_pair(path, "any")
-				return
-			"choose_place_two":
-				_run_place_two(path)
-				return
-			"choose_recover_two":
-				_run_recover_two(path)
-				return
-			"choose_recover_to_bag":
-				_run_recover_to_bag(path)
-				return
-			"choose_move":
-				_run_move(path)
-				return
 			"choose_glyph_gild":
 				_open_glyph_picker(path, "gild_glyph", GameState.glyph_counts(), "精金：选择要永久镀金的字")
 				return
@@ -672,149 +581,203 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 			"choose_merge_flow":
 				_run_merge_flow(path)
 				return
-	var result := battle.try_play(path, target)
+			"choose_three_tiles":
+				_run_three_tiles(path, _current_word.word)
+				return
+			"choose_own_tiles":
+				_run_collect_own(path)
+				return
+			"choose_junk_tiles":
+				_run_collect_own(path, true)
+				return
+	if _choose_compound_copy(path, target):
+		return
+	var play_target := target.duplicate()
+	var glyphs_before := battle.board.glyphs_of(path)
+	var word_before: WordData = Database.get_word_by_glyphs(glyphs_before) if glyphs_before.size() >= 2 else null
+	var needs_target := word_before != null and word_before.requires_target != EffectData.Target.NONE
+	if glyphs_before.size() == 1 and not path.is_empty():
+		var inst: CharInstance = battle.board.get_xy(path[0])
+		needs_target = inst != null and inst.data != null and battle._solo_requires_target(inst.data, path) != EffectData.Target.NONE
+	if not play_target.is_empty() or not needs_target:
+		# 规则层索引针对存活列表；HUD 索引针对固定敌人列表。
+		play_target["target_index"] = battle.alive_enemies().find(battle.enemies[_target_index]) if not battle.enemies.is_empty() else 0
+	var old_resources := [battle.player.energy, battle.player.heat, GameState.gold]
+	_events.clear()
+	_collecting = true
+	var result := battle.try_play(path, play_target)
+	_collecting = false
 	if not result.ok:
 		if int(result.need_target) >= 0:
 			_pending_path = path
 			_request_target(int(result.need_target))
 			return
 		_board_view.flash_invalid()
-		var glyphs: Array = result.get("glyphs", [])
-		if glyphs.size() >= 2 and result.get("word") == null:
-			# 无效词：弹 0.6s 反应
-			_show_invalid_reaction()
 		_on_log("✗ " + str(result.reason))
 		_bubble.set_error(str(result.reason))
 		return
-	# 合击·结阵：只登记，不结算
+	# 合击·结阵：本词只登记，不结算（点「发动」后一起结算）
 	if result.get("queued", false):
+		_ready_action = {}
+		_board_view.end_pick()
 		_board_view.clear_selection()
-		_refresh_all()
-		var gs: Array = result.glyphs
-		var qtext := ""
-		for g in gs:
-			qtext += str(g)
-		_bubble.set_text("结阵登记：《%s》" % qtext, "点「发动」与本回合其他词一起结算。", SpeechBubble.State.PREVIEW)
+		_refresh_all(true)
+		var queued_text := ""
+		for g in result.glyphs:
+			queued_text += str(g)
+		_bubble.set_text("结阵登记：《%s》" % queued_text, "点「发动」与本回合其他词一起结算。", SpeechBubble.State.PREVIEW)
+		return
+	_set_busy(true)
+	_ready_action = {}
+	_board_view.end_pick()
+	_board_view.release_selected(path)
+	# 停息/停电等即时请求：在演出前即刻结算，保证逻辑与输入时机、动画开关无关
+	if _handle_effect_requests():
+		return
+	if not await _wait_step(0.11 if not Settings.reduced_motion else 0.01):
+		return
+	var aim: Control = _player_panel
+	for event in _events:
+		if event.kind == "damage" or (event.kind == "shield" and int(event.get("gain", 0)) < 0):
+			aim = _view_for(event.target)
+			break
+	var launch := Vector2.ZERO
+	for cell in path:
+		launch += _effects.point_of(_board_view.tiles[_board_view.board.from_xy(cell)])
+	launch /= maxf(1.0, path.size())
+	_effects.fly_word("".join(result.glyphs), launch, _effects.point_of(aim))
+	if not await _wait_step(0.20 if not Settings.reduced_motion else 0.01):
+		return
+	if not await _replay_feedback():
 		return
 	_board_view.clear_selection()
-	_refresh_all()
-	if result.word != null and _hit_fx != null:
-		_hit_fx.word_slam(result.word.word, Vector2(get_viewport_rect().size.x * 0.5, get_viewport_rect().size.y * 0.46))
+	_refresh_all(true)
 	_bubble.set_result(result.word, result.glyphs, result.messages)
+	_bubble.set_context(_selection_context([]))
+	_resource_feedback(old_resources)
 	if result.word != null:
 		_on_log("成词：%s" % result.word.word)
-		_float_at_enemy("《%s》" % result.word.word, Palette.VERMILION_DK)
-	else:
-		_float_at_enemy("打出「%s」" % (result.glyphs[0] if not result.glyphs.is_empty() else ""), Palette.INK_SOFT)
+	_set_busy(false)
+
 	if result.zero_effect:
 		_on_log("（该字/词没有效果，仅消耗）")
+	if _handle_effect_requests():
+		return
+	# 转速：本词结算后保留「发动」，可继续旋转同一处（最多 3 次）；点「清除」即停下。
+	if battle.repeat_rotate_tile.x >= 0 and battle.repeat_rotate_count < 3:
+		_ready_action = {"repeat_rotate": true, "path": [], "target": {}}
+		_update_input()
+		_check_battle_over()
+		return
+	_check_battle_over()
+
+
+## 处理「停息/停电」等需要立即结算的请求。返回 true 表示应中断后续演出/检查。
+func _handle_effect_requests() -> bool:
 	if battle.blackout_requested:
 		battle.blackout_requested = false
 		_show_blackout()
 	if battle.end_turn_requested:
 		battle.end_turn_requested = false
-		_on_end_turn()
-		return
-	# 转速：结算后保留「发动」，可继续旋转（最多 3 次）
-	if battle.repeat_rotate_tile.x >= 0 and battle.repeat_rotate_count < 3:
-		_ready_action = {"repeat_rotate": true}
-		_refresh_primary()
-	_check_battle_over()
+		_on_end_turn(true)
+		return true
+	return false
 
 
 func _show_blackout() -> void:
 	var ov := BlackoutOverlay.new()
 	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
 	ov.restored.connect(func(): _on_log("来电了。"))
-	add_child(ov)
+	_mount_overlay(ov)
 
 
 func _request_target(target_kind: int) -> void:
 	_on_log("请选择目标")
-	_pending_target_kind = target_kind
-	if _board_view != null:
-		_board_view.preview_cells = []
 	match target_kind:
 		EffectData.Target.BOARD_2X2:
 			_board_view.begin_pick("2x2")
 		EffectData.Target.BOARD_3X3:
 			_board_view.begin_pick("3x3")
 		EffectData.Target.BOARD_ROW:
-			_board_view.begin_pick("row")
+			_run_line_pick(_pending_path, true)
 		EffectData.Target.EMPTY_TILE:
 			_board_view.begin_pick("empty")
 		EffectData.Target.ENEMY_GLYPH:
 			_board_view.begin_pick("enemy")
 		EffectData.Target.BOARD_TILE:
-			_board_view.begin_pick("any")
+			var inst: CharInstance = battle.board.get_xy(_pending_path[0]) if _pending_path.size() == 1 else null
+			if inst != null and inst.glyph_list().size() == 1 and inst.data.solo_handler in ["cleanse_adjacent", "wash_adjacent", "move_neighbor", "split_neighbor", "recast_neighbor", "refine_junk_neighbor"]:
+				var candidates := battle.solo_target_cells(inst, _pending_path[0])
+				var excluded: Array = []
+				for i in battle.board.cells.size():
+					var pos := battle.board.to_xy(i)
+					if not candidates.has(pos):
+						excluded.append(pos)
+				_board_view.begin_pick("any", false, excluded)
+			else:
+				_board_view.begin_pick("any")
 		EffectData.Target.DISCARD_GLYPH:
 			_choose_discard()
-	_refresh_primary()
+		EffectData.Target.BAG_GLYPH:
+			_choose_solo_bag(_pending_path, {})
 
 
 func _on_tile_picked(pos: Vector2i) -> void:
-	if _recover_bag_active:
-		_recover_bag_tile = pos
-		_recover_bag_active = false
-		_board_view.end_pick()
-		var rlist := battle.discard_instances()
-		if rlist.is_empty():
-			var rp := _pending_path
-			_pending_path = []
-			_fill_ready(rp, {"tile": pos})
-			return
-		var ropts: Array = []
-		for d in rlist:
-			ropts.append({"text": "【%s】" % d["glyph"]})
-		ropts.append({"text": "（不替换，只回袋顶）"})
-		var rov := ChoiceOverlay.new()
-		rov.setup({"title": "收回：从弃字堆选一枚放入原格", "options": ropts})
-		rov.chose.connect(_on_recover_bag_chosen.bind(rlist))
-		rov.set_anchors_preset(Control.PRESET_FULL_RECT)
-		add_child(rov)
+	if not _word_transfer_target.is_empty():
+		var path := _pending_path
+		var chosen := _word_transfer_target.duplicate()
+		_word_transfer_target.clear()
+		chosen["tile"] = pos
+		_fill_ready(path, chosen)
 		return
-	if _move_active:
-		if _move_from == Vector2i(-1, -1):
-			_move_from = pos
-			_board_view.begin_pick("empty")
-			_on_log("收放：选择目标空格")
-			return
-		var mp := _pending_path
-		var mf := _move_from
-		_move_active = false
-		_move_from = Vector2i(-1, -1)
-		_fill_ready(mp, {"tile": mf, "tile2": pos})
-		return
-	if _place_two_active:
-		if _place_two_cell1 == Vector2i(-1, -1):
-			_place_two_cell1 = pos
-			_board_view.begin_pick("empty")
-			_on_log("火急：选择第二个空格")
-			return
-		if pos == _place_two_cell1:
-			_board_view.begin_pick("empty")
-			_on_log("火急：两个空格不能相同")
-			return
-		var pp2 := _pending_path
-		_place_two_active = false
-		var c1p := _place_two_cell1
-		_place_two_cell1 = Vector2i(-1, -1)
-		_fill_ready(pp2, {"cell1": c1p, "cell2": pos})
-		return
-	if _recover_active:
-		if _recover_pick_uid < 0:
-			return
-		if not _recover_pairs.is_empty() and not battle.board.is_adjacent(_recover_pairs[0][1], pos):
-			_board_view.begin_pick("empty")
-			_on_log("收复：第二个空格必须与第一个相邻")
-			return
-		_recover_pairs.append([_recover_pick_uid, pos])
-		_recover_pick_uid = -1
-		if _recover_pairs.size() >= 2 or battle.discard_instances().is_empty():
-			_finish_recover()
+	if _solo_throw_active:
+		if _solo_throw_from == Vector2i(-1, -1):
+			_solo_throw_from = pos
+			_solo_throw_uid = battle.board.get_xy(pos).uid
+			var origin := battle.board.get_xy(_pending_path[0])
+			_pick_only("throw_destination", battle.solo_throw_destinations(origin, _pending_path[0]))
+			_on_log("投：选择落点空格（可选本字发动后腾出的原格）")
 		else:
-			_board_view.end_pick()
-			_show_recover_pick(2)
+			var path := _pending_path
+			var chosen := {"tile": _solo_throw_from, "tile2": pos, "throw_uid": _solo_throw_uid}
+			_solo_throw_active = false
+			_solo_throw_from = Vector2i(-1, -1)
+			_solo_throw_uid = -1
+			_fill_ready(path, chosen)
+		return
+	if _collect_own_active:
+		if battle.board.get_xy(pos) == null:
+			return
+		if _collect_junk and (_pending_path.has(pos) or not BattleState.is_refinable_junk(battle.board.get_xy(pos))):
+			return
+		if _collect_own_cells.has(pos):
+			_collect_own_cells.erase(pos)   # 再点已选格 = 取消该格
+		else:
+			if _collect_junk and _collect_own_cells.size() >= 2:
+				return
+			_collect_own_cells.append(pos)
+		_on_log("%s：已选 %d 枚（再点可取消），点「发动」结束" % ["分流" if _collect_junk else "收心", _collect_own_cells.size()])
+		_update_input()
+		return
+	if _recast_three_active:
+		var rc: CharInstance = battle.board.get_xy(pos)
+		if rc == null or rc.pinned or _pending_path.has(pos):
+			_on_log("%s：请选择施词以外的非固定字（%d/3）" % [_three_tiles_word, _recast_three_cells.size()])
+			return
+		for chosen in _recast_three_cells:
+			var inst := battle.board.get_xy(chosen)
+			if inst != null and inst.uid == rc.uid:
+				return
+		_recast_three_cells.append(pos)
+		if _recast_three_cells.size() >= 3:
+			var rp := _pending_path
+			_recast_three_active = false
+			var cells := _recast_three_cells.duplicate()
+			_recast_three_cells = []
+			_fill_ready(rp, {"cells": cells})
+		else:
+			_on_log("%s：已选 %d/3（点清除可重新选择）" % [_three_tiles_word, _recast_three_cells.size()])
+			_update_input()
 		return
 	if _merge_active:
 		if _merge_cell1 == Vector2i(-1, -1):
@@ -827,11 +790,13 @@ func _on_tile_picked(pos: Vector2i) -> void:
 			_on_log("合流：第二个空格必须与第一个相邻")
 			return
 		var mp := _pending_path
+		_pending_path = []
 		_merge_active = false
 		_fill_ready(mp, {"cell1": _merge_cell1, "cell2": pos, "merge_bag_uid": _merge_bag_uid, "merge_discard_uid": _merge_discard_uid})
 		return
 	if _pending_place_uid >= 0:
 		var pp := _pending_path
+		_pending_path = []
 		var uidp := _pending_place_uid
 		_pending_place_uid = -1
 		_fill_ready(pp, {"tile": pos, "place_uid": uidp})
@@ -839,41 +804,41 @@ func _on_tile_picked(pos: Vector2i) -> void:
 	if _fuse_stage == 1:
 		_fuse_first = pos
 		_fuse_stage = 2
-		_board_view.begin_pick("own" if (_pair_mode == "fuse" or _pair_mode == "same") else "any")
-		if _pair_mode == "row":
-			_on_log("再选同一行的第二格")
-		elif _pair_mode == "any":
-			_on_log("再选第二个格子（与第一个不同）")
+		if _pair_mode == "same":
+			var first := battle.board.get_xy(pos)
+			var matches: Array = []
+			for i in battle.board.cells.size():
+				var other: CharInstance = battle.board.cells[i]
+				var cell := battle.board.to_xy(i)
+				if other != null and cell != pos and not _pending_path.has(cell) and other.is_player_owned() and not other.temporary and not other.pinned and other.glyph_list() == first.glyph_list():
+					matches.append(cell)
+			_pick_only("own", matches)
 		else:
-			_on_log("再选第二张（%s）" % ("与它相邻" if _pair_mode == "fuse" else "与它相同"))
+			_board_view.begin_pick("own")
+		_on_log("再选第二张（%s）" % ("与它相邻" if _pair_mode == "fuse" else "与它相同"))
 		return
 	if _fuse_stage == 2:
 		var ok := false
 		if _pair_mode == "fuse":
 			ok = battle.board.is_adjacent(_fuse_first, pos)
-		elif _pair_mode == "row":
-			ok = pos != _fuse_first and pos.y == _fuse_first.y
-		elif _pair_mode == "any":
-			ok = pos != _fuse_first
 		else:
 			var c1: CharInstance = battle.board.get_xy(_fuse_first)
 			var c2: CharInstance = battle.board.get_xy(pos)
-			ok = c2 != null and pos != _fuse_first and c1 != null and c2.glyph() == c1.glyph()
+			ok = c2 != null and pos != _fuse_first and c1 != null and c2.glyph_list() == c1.glyph_list() and not c1.temporary and not c2.temporary and not c1.pinned and not c2.pinned and not _pending_path.has(pos) and not _pending_path.has(_fuse_first)
 		if not ok:
-			_board_view.begin_pick("own" if (_pair_mode == "fuse" or _pair_mode == "same") else "any")
-			_on_log("选择不合法，请重选第二格")
+			_board_view.begin_pick("own")
+			_on_log("选择不合法，请重选第二张")
 			return
 		var fp := _pending_path
+		_pending_path = []
 		_fuse_stage = 0
 		_fill_ready(fp, {"tile": _fuse_first, "tile2": pos})
 		return
 	var path := _pending_path
+	_pending_path = []
 	if path.is_empty():
-		_pending_path = []
 		return
-	var t: Dictionary = {"tile": pos, "enemy_glyph": pos}
-	if _pending_target_kind == EffectData.Target.BOARD_ROW:
-		t["row"] = pos.y
+	var t := {"tile": pos, "enemy_glyph": pos}
 	if _transform_uid >= 0:
 		t["transform_uid"] = _transform_uid
 		t["chosen_uid"] = _transform_uid
@@ -882,146 +847,48 @@ func _on_tile_picked(pos: Vector2i) -> void:
 
 
 func _run_pair(path: Array, mode: String) -> void:
+	if mode == "same":
+		var candidates: Array = []
+		for i in battle.board.cells.size():
+			var first: CharInstance = battle.board.cells[i]
+			var pos := battle.board.to_xy(i)
+			if first == null or path.has(pos) or not first.is_player_owned() or first.temporary or first.pinned:
+				continue
+			for j in battle.board.cells.size():
+				var second: CharInstance = battle.board.cells[j]
+				if i != j and not path.has(battle.board.to_xy(j)) and second != null and second.is_player_owned() and not second.temporary and not second.pinned and first.glyph_list() == second.glyph_list():
+					candidates.append(pos)
+					break
+		if candidates.is_empty():
+			_bubble.set_error("精炼：需要两枚施词以外、字形相同的己方原实体")
+			return
+		_pending_path = path
+		_pair_mode = mode
+		_fuse_stage = 1
+		_pick_only("own", candidates)
+		_on_log("精炼：选择要持续强化的第一枚实体")
+		return
 	_pending_path = path
 	_pair_mode = mode
 	_fuse_stage = 1
-	_board_view.begin_pick("own" if (mode == "fuse" or mode == "same") else "any")
-	if mode == "row":
-		_on_log("选择同一行的第一格")
-	elif mode == "any":
-		_on_log("选择第一个格子")
-	else:
-		_on_log("选择第一张己方牌")
-	_refresh_primary()
-
-
-func _run_recover_to_bag(path: Array) -> void:
-	_pending_path = path
-	_recover_bag_active = true
-	_recover_bag_tile = Vector2i(-1, -1)
 	_board_view.begin_pick("own")
-	_on_log("收回：选择要放回袋顶的己方字")
-	_refresh_primary()
-
-
-func _on_recover_bag_chosen(index: int, list: Array) -> void:
-	var path := _pending_path
-	_pending_path = []
-	var tile := _recover_bag_tile
-	if index < 0 or index >= list.size():
-		_fill_ready(path, {"tile": tile})
-		return
-	_fill_ready(path, {"tile": tile, "place_uid": int(list[index]["uid"])})
-
-
-func _run_move(path: Array) -> void:
-	_pending_path = path
-	_move_active = true
-	_move_from = Vector2i(-1, -1)
-	_board_view.begin_pick("any")
-	_on_log("收放：选择要移动的字")
-	_refresh_primary()
-
-
-func _run_place_two(path: Array) -> void:
-	var revealed := battle.reveal_from_bag(2)
-	if revealed.is_empty():
-		_on_log("火急：字袋为空")
-		return
-	_pending_path = path
-	_place_two_active = true
-	_place_two_cell1 = Vector2i(-1, -1)
-	_board_view.begin_pick("empty")
-	_on_log("火急：选择第一个空格")
-	_refresh_primary()
-
-
-func _run_recover_two(path: Array) -> void:
-	if battle.discard_instances().is_empty():
-		_on_log("收复：弃字堆为空")
-		return
-	_pending_path = path
-	_recover_active = true
-	_recover_pairs = []
-	_recover_pick_uid = -1
-	_show_recover_pick(1)
-	_refresh_primary()
-
-
-func _show_recover_pick(n: int) -> void:
-	var chosen: Dictionary = {}
-	for pr in _recover_pairs:
-		chosen[int(pr[0])] = true
-	var list: Array = []
-	for d in battle.discard_instances():
-		if not chosen.has(int(d["uid"])):
-			list.append(d)
-	if list.is_empty():
-		if _recover_pairs.is_empty():
-			_abort_recover()
-		else:
-			_finish_recover()
-		return
-	var options: Array = []
-	for d2 in list:
-		options.append({"text": "【%s】" % d2["glyph"]})
-	if n >= 2:
-		options.append({"text": "（就此打住）"})
-	var ov := ChoiceOverlay.new()
-	ov.setup({"title": "收复：选择第 %d 枚（最多 2 枚）" % n, "options": options})
-	ov.chose.connect(_on_recover_chosen.bind(list, n))
-	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(ov)
-
-
-func _on_recover_chosen(index: int, list: Array, n: int) -> void:
-	if not _recover_active:
-		return
-	if index < 0 or index >= list.size():
-		if n <= 1:
-			_abort_recover()
-		else:
-			_finish_recover()
-		return
-	_recover_pick_uid = int(list[index]["uid"])
-	_board_view.begin_pick("empty")
-	_on_log("收复：为第 %d 枚选择落点" % n)
-	_refresh_primary()
-
-
-func _finish_recover() -> void:
-	var path := _pending_path
-	_pending_path = []
-	_recover_active = false
-	var places: Array = _recover_pairs.duplicate()
-	_recover_pairs = []
-	_recover_pick_uid = -1
-	_fill_ready(path, {"places": places})
-
-
-func _abort_recover() -> void:
-	_recover_active = false
-	_recover_pairs = []
-	_recover_pick_uid = -1
-	_pending_path = []
-	_board_view.end_pick()
-	_refresh_primary()
+	_on_log("选择第一张己方牌")
 
 
 func _open_discard_place(path: Array) -> void:
 	var list := battle.discard_instances()
 	if list.is_empty():
-		_on_log("精铸：弃字堆为空")
+		_on_log("放回：弃字堆为空")
 		return
 	_pending_path = path
 	var options: Array = []
 	for d in list:
 		options.append({"text": "【%s】" % d["glyph"]})
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "精铸：选择弃字堆中的一枚己方字", "options": options})
+	overlay.setup({"title": "放回：选择弃字堆中的一枚己方字", "options": options})
 	overlay.chose.connect(_on_discard_place_chosen.bind(list))
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(overlay)
+	_mount_overlay(overlay)
 
 
 func _on_discard_place_chosen(index: int, list: Array) -> void:
@@ -1030,8 +897,7 @@ func _on_discard_place_chosen(index: int, list: Array) -> void:
 		return
 	_pending_place_uid = int(list[index]["uid"])
 	_board_view.begin_pick("empty")
-	_on_log("精铸：选择放置的空格")
-	_refresh_primary()
+	_on_log("放回：选择放置的空格")
 
 
 func _on_pick_cancelled() -> void:
@@ -1043,50 +909,262 @@ func _on_pick_cancelled() -> void:
 	_pending_place_uid = -1
 	_merge_active = false
 	_merge_cell1 = Vector2i(-1, -1)
-	_place_two_active = false
-	_place_two_cell1 = Vector2i(-1, -1)
-	_recover_active = false
-	_recover_pairs = []
-	_recover_pick_uid = -1
-	_recover_bag_active = false
-	_recover_bag_tile = Vector2i(-1, -1)
-	_move_active = false
-	_move_from = Vector2i(-1, -1)
-	if battle.repeat_rotate_tile.x >= 0:
-		battle.end_repeat_rotate()
 	_ready_action = {}
-	_pending_target_kind = 0
-	if _board_view != null:
-		_board_view.preview_cells = []
-		_board_view.rebuild()
-	_refresh_primary()
+	_recast_three_active = false
+	_recast_three_cells = []
+	_three_tiles_word = ""
+	_collect_own_active = false
+	_collect_own_cells = []
+	_collect_junk = false
+	_word_transfer_target.clear()
+	_solo_throw_active = false
+	_solo_throw_from = Vector2i(-1, -1)
+	_solo_throw_uid = -1
+	if battle.repeat_rotate_tile.x >= 0:
+		battle.end_repeat_rotate()   # 转速：点「清除」= 提前停下
 
 
-func _run_line_pick(path: Array) -> void:
+func _run_line_pick(path: Array, rows_only := false) -> void:
 	_pending_path = path
 	var options: Array = []
-	for i in 4:
+	for i in battle.board.size:
 		options.append({"text": "第 %d 行" % (i + 1)})
-	for i in 4:
-		options.append({"text": "第 %d 列" % (i + 1)})
+	if not rows_only:
+		for i in battle.board.size:
+			options.append({"text": "第 %d 列" % (i + 1)})
+	var word_name := _current_word.word if _current_word != null else "目标选择"
 	var ov := ChoiceOverlay.new()
-	ov.setup({"title": "反转：选择一行或一列", "options": options})
-	ov.chose.connect(_on_line_chosen)
+	ov.setup({"title": "%s：选择%s" % [word_name, "一行" if rows_only else "一行或一列"], "options": options})
+	ov.chose.connect(_on_line_chosen.bind(rows_only))
 	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(ov)
+	_mount_overlay(ov)
 
 
-func _on_line_chosen(index: int) -> void:
+func _on_line_chosen(index: int, rows_only := false) -> void:
 	var p := _pending_path
 	_pending_path = []
-	if index < 0 or index >= 8:
+	var n := battle.board.size
+	if index < 0 or index >= (n if rows_only else n * 2):
 		return
 	var t: Dictionary = {}
-	if index < 4:
+	if index < n:
 		t["row"] = index
 	else:
-		t["col"] = index - 4
+		t["col"] = index - n
 	_on_commit(p, t)
+
+
+func _pick_only(mode: String, allowed: Array) -> void:
+	var excluded: Array = []
+	for i in battle.board.cells.size():
+		var pos := battle.board.to_xy(i)
+		if not allowed.has(pos):
+			excluded.append(pos)
+	_board_view.begin_pick(mode, false, excluded)
+
+func _choose_solo_throw(path: Array, target: Dictionary) -> bool:
+	if target.has("tile2") or path.size() != 1 or not battle.board.valid_path(path):
+		return false
+	var inst := battle.board.get_xy(path[0])
+	if inst == null or inst.word_only or inst.glyph_list().size() != 1 or inst.data.solo_handler != "throw_neighbor":
+		return false
+	var candidates := battle.solo_target_cells(inst, path[0])
+	if candidates.is_empty():
+		return false
+	var due := EffectUtil.discounted_cost(battle, 1)
+	if EffectUtil.available(battle) < due or battle.solo_throw_destinations(inst, path[0]).is_empty():
+		_bubble.set_error("投：需要可用空格与 %d 金币支付额" % due)
+		return true
+	_pending_path = path
+	_solo_throw_active = true
+	_solo_throw_from = Vector2i(-1, -1)
+	_solo_throw_uid = -1
+	_pick_only("any", candidates)
+	_on_log("投：选择一枚四邻非固定字，发动时支付 %d" % due)
+	_update_input()
+	return true
+
+## 精/购预览现有字袋实体，选择与取消均不提前改变任何资源。
+func _choose_word_transfer(path: Array, target: Dictionary) -> bool:
+	if not target.is_empty() or not battle.board.valid_path(path):
+		return false
+	var glyphs := battle.board.glyphs_of(path)
+	var word := Database.get_word_by_glyphs(glyphs)
+	if word == null and glyphs.has("过"):
+		word = Database.get_word_by_glyphs(glyphs.filter(func(g): return g != "过"))
+	if word == null or word.word not in ["投放", "回购"]:
+		return false
+	var deploying := word.word == "投放"
+	var cards := EffectHandlersActions.deploy_candidates(battle) if deploying else battle.discard.filter(func(c): return c.is_player_owned() and not c.temporary)
+	if cards.is_empty():
+		_on_commit(path, {"skip_transfer": true})
+		return true
+	if EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, 2):
+		_bubble.set_error("%s：需要 2 金币支付额" % word.word)
+		return true
+	var spaces := battle.board.empty_indices()
+	for pos in path:
+		var inst := battle.board.get_xy(pos)
+		if not inst.pinned and inst.temporary_uses == 0:
+			spaces.append(pos)
+	if spaces.is_empty():
+		_bubble.set_error("%s：没有可用落点" % word.word)
+		return true
+	var options: Array = []
+	for card in cards:
+		options.append({"text": "【%s】 · 额外使用 +1" % "".join(card.glyph_list())})
+	options.append({"text": "取消"})
+	var overlay := ChoiceOverlay.new()
+	_solo_bag_picker_active = true
+	overlay.setup({"title": "%s：选择原实体" % word.word, "body": "选字、选落点后确认时支付 2；保留原实体属性。", "options": options})
+	overlay.chose.connect(func(index):
+		_solo_bag_picker_active = false
+		if index < 0 or index >= cards.size():
+			return
+		_pending_path = path.duplicate()
+		_word_transfer_target = {"bag_uid": cards[index].uid} if deploying else {"place_uid": cards[index].uid}
+		_pick_only("throw_destination", spaces)
+		_on_log("%s：选择落点，再点确认发动" % word.word))
+	_mount_overlay(overlay)
+	return true
+
+func _choose_solo_bag(path: Array, target: Dictionary) -> bool:
+	if target.has("bag_uid") or path.size() != 1 or not battle.board.valid_path(path):
+		return false
+	var source := battle.board.get_xy(path[0])
+	if source == null or source.word_only or source.glyph_list().size() != 1 or source.data.solo_handler not in ["precision_draw", "buy_bag_solo"]:
+		return false
+	var cards := battle.solo_bag_candidates(source)
+	if cards.is_empty():
+		return false
+	var buying := source.data.solo_handler == "buy_bag_solo"
+	var due := EffectUtil.discounted_cost(battle, 2) if buying else 0
+	if buying and EffectUtil.available(battle) < due:
+		_bubble.set_error("购：支付额不足（需要 %d 金币支付额）" % due)
+		return true
+	if not buying and cards.size() == 1:
+		var chosen := target.duplicate()
+		chosen["bag_uid"] = cards[0].uid
+		chosen["bag_source_uid"] = source.uid
+		_on_commit(path, chosen)
+		return true
+	var options: Array = []
+	for card in cards:
+		var traits: Array = []
+		if card.gilded:
+			traits.append("镀金")
+		if card.temporary:
+			traits.append("临时")
+		if not card.pollutions.is_empty():
+			traits.append("有污染")
+		options.append({"text": "【%s】%s" % ["".join(card.glyph_list()), " · " + "、".join(traits) if not traits.is_empty() else ""]})
+	options.append({"text": "取消"})
+	_solo_bag_picker_active = true
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": "购：选择字袋实体" if buying else "精：二选一补入原格", "body": "确认时支付 %d，保留所选字的原属性。" % due if buying else "选一枚补入原格，另一枚留在字袋。", "options": options})
+	overlay.chose.connect(func(index):
+		_solo_bag_picker_active = false
+		if index == cards.size():
+			return
+		if battle.board.get_xy(path[0]) != source:
+			_bubble.set_error("选字：原字已离开所选格，请重新选择")
+			return
+		var chosen := target.duplicate()
+		chosen["bag_uid"] = cards[index].uid
+		chosen["bag_source_uid"] = source.uid
+		_on_commit(path, chosen))
+	_mount_overlay(overlay)
+	return true
+
+## 放有储能时选择释放或普通攻击；选择/取消前保留字块和资源。
+func _choose_solo_release(path: Array, target: Dictionary) -> bool:
+	if target.has("release_energy") or path.size() != 1 or battle.player.energy < 1 or not battle.board.valid_path(path):
+		return false
+	var inst := battle.board.get_xy(path[0])
+	if inst == null or inst.word_only or inst.glyph_list().size() != 1 or inst.data.solo_handler != "solo_release":
+		return false
+	_solo_release_picker_active = true
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": "放：选择攻击方式", "body": "当前储能：%d" % battle.player.energy, "options": [
+		{"text": "消耗 1 储能，造成 8 伤害", "primary": true},
+		{"text": "不消耗储能，造成 2 伤害"},
+		{"text": "取消"}]})
+	overlay.chose.connect(func(index):
+		_solo_release_picker_active = false
+		if index == 2:
+			return
+		if battle.board.get_xy(path[0]) != inst:
+			_bubble.set_error("放：原字已离开所选格，请重新选择")
+			return
+		var chosen := target.duplicate()
+		chosen["release_energy"] = index == 0
+		_on_commit(path, chosen))
+	_mount_overlay(overlay)
+	return true
+
+## 复合（next_compound）：让玩家选定要保留为临时字的盘面字，选定前不结算。
+func _choose_compound_copy(path: Array, target: Dictionary) -> bool:
+	if target.has("compound_uid") or not battle.has_ability("next_compound") or not battle.board.valid_path(path):
+		return false
+	var word := Database.get_word_by_glyphs(battle.board.glyphs_of(path))
+	if word == null or word.length() < 3:
+		return false
+	var cards: Array = []
+	var options: Array = []
+	for pos in path:
+		var inst: CharInstance = battle.board.get_xy(pos)
+		if inst != null and not inst.pinned and inst.temporary_uses == 0:
+			cards.append(inst)
+			options.append({"text": "保留【%s】" % "".join(inst.glyph_list())})
+	if cards.is_empty():
+		return false
+	_compound_picker_active = true
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": "复合：选择保留的临时字", "options": options})
+	overlay.chose.connect(func(index):
+		_compound_picker_active = false
+		if index >= 0 and index < cards.size():
+			var chosen := target.duplicate()
+			chosen["compound_uid"] = cards[index].uid
+			_on_commit(path, chosen))
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_mount_overlay(overlay)
+	return true
+
+
+func _run_three_tiles(path: Array, word_name: String) -> void:
+	var eligible := {}
+	for i in battle.board.cells.size():
+		var inst: CharInstance = battle.board.cells[i]
+		if inst != null and not inst.pinned and not path.has(battle.board.to_xy(i)):
+			eligible[inst.uid] = true
+	if eligible.size() < 3:
+		_bubble.set_error("%s：需要三个施词以外的非固定字" % word_name)
+		return
+	_pending_path = path
+	_recast_three_active = true
+	_recast_three_cells = []
+	_three_tiles_word = word_name
+	_board_view.begin_pick("three", true, path)
+	_on_log("%s：选择三个不同的非固定字，点清除可重新选择" % word_name)
+	_update_input()
+
+
+func _run_collect_own(path: Array, junk := false) -> void:
+	_pending_path = path
+	_collect_own_active = true
+	_collect_junk = junk
+	_collect_own_cells = []
+	if junk:
+		var excluded := path.duplicate()
+		for i in battle.board.cells.size():
+			if not BattleState.is_refinable_junk(battle.board.cells[i]):
+				excluded.append(battle.board.to_xy(i))
+		_board_view.begin_pick("any", true, excluded)
+	else:
+		_board_view.begin_pick("any", true)
+	_on_log("分流：选择至多两枚杂字移出，点「发动」确认" if junk else "收心：点选盘面字放回字袋（可 0 张，再点取消），点「发动」结束")
+	_update_input()
 
 
 func _run_merge_flow(path: Array) -> void:
@@ -1114,7 +1192,7 @@ func _run_merge_flow(path: Array) -> void:
 	ov.setup({"title": "合流：从弃字堆指定 1 枚", "options": options})
 	ov.chose.connect(_on_merge_discard_chosen.bind(list))
 	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(ov)
+	_mount_overlay(ov)
 
 
 func _on_merge_discard_chosen(index: int, list: Array) -> void:
@@ -1124,7 +1202,6 @@ func _on_merge_discard_chosen(index: int, list: Array) -> void:
 	_merge_discard_uid = int(list[index]["uid"])
 	_board_view.begin_pick("empty")
 	_on_log("合流：选择第一个空格")
-	_refresh_primary()
 
 
 func _abort_merge() -> void:
@@ -1151,7 +1228,7 @@ func _run_transform(path: Array) -> void:
 	overlay.setup({"title": "转化：从揭示的 %d 枚中选择 1 枚" % revealed.size(), "options": options})
 	overlay.chose.connect(_on_transform_chosen)
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(overlay)
+	_mount_overlay(overlay)
 
 
 func _on_transform_chosen(index: int) -> void:
@@ -1161,7 +1238,6 @@ func _on_transform_chosen(index: int) -> void:
 		return
 	_transform_uid = battle.pending_reveal[index].uid
 	_board_view.begin_pick("any")
-	_refresh_primary()
 
 
 func _open_glyph_picker(path: Array, key: String, glyph_counts: Dictionary, title: String) -> void:
@@ -1182,7 +1258,7 @@ func _open_glyph_picker(path: Array, key: String, glyph_counts: Dictionary, titl
 	overlay.setup({"title": title, "characters": chars, "counts": counts, "pick_on_click": true})
 	overlay.picked.connect(_on_glyph_chosen.bind(key))
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(overlay)
+	_mount_overlay(overlay)
 
 
 func _on_glyph_chosen(cd: CharacterData, key: String) -> void:
@@ -1205,7 +1281,7 @@ func _choose_discard() -> void:
 	overlay.setup({"title": "回收：选择本回合消耗过的一枚字", "options": options})
 	overlay.chose.connect(_on_discard_chosen)
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(overlay)
+	_mount_overlay(overlay)
 
 
 func _on_discard_chosen(index: int) -> void:
@@ -1213,22 +1289,103 @@ func _on_discard_chosen(index: int) -> void:
 	_pending_path = []
 	if path.is_empty():
 		return
-	_on_commit(path, {"discard_index": index})
+	if index < 0 or index >= battle.consumed_this_turn.size():
+		return
+	_on_commit(path, {"discard_uid": battle.consumed_this_turn[index].uid})
 
 
-func _on_end_turn() -> void:
-	if _finished:
+func _on_end_turn(from_effect: bool = false) -> void:
+	# 强制结束来自正在结算的出字，不应被该出字自身的 busy 状态挡住。
+	if _finished or (_busy and not from_effect) or _modal_count > 0:
 		return
 	if _board_view.pick_mode != "":
 		_board_view.end_pick()
-		_pending_path = []
-		_transform_uid = -1
-		_fuse_stage = 0
-		_pending_place_uid = -1
-		if not battle.pending_reveal.is_empty():
-			battle.return_pending_reveal()
+		_on_pick_cancelled()
 	_board_view.clear_selection()
+	_set_busy(true)
+	_events.clear()
+	_collecting = true
 	battle.end_player_turn()
+	_collecting = false
+	if not await _replay_feedback():
+		return
+	_refresh_all(true)
+	if not battle.is_over():
+		_bubble.set_text("你的回合", "新字已落盘，继续连词。", SpeechBubble.State.IDLE)
+		_bubble.set_context(_selection_context([]))
+		_effects.number("回合 %d" % battle.turn, _effects.point_of(_board_view), Palette.INK_SOFT)
+	# 精心：本回合补字改由玩家从字袋定向选择（随机落地）
+	if battle.manual_draw_pending > 0:
+		_start_manual_draw()
+		_set_busy(false)
+		return
+	_set_busy(false)
+	_check_battle_over()
+
+
+func _start_manual_draw() -> void:
+	if _manual_draw_active or battle.manual_draw_pending <= 0:
+		return
+	_manual_draw_active = true
+	_manual_draw_picks = []
+	battle.ensure_bag()
+	_show_manual_draw_pick(1)
+
+
+func _manual_draw_counts() -> Dictionary:
+	var counts: Dictionary = {}
+	for inst in battle.bag:
+		var g: String = inst.glyph()
+		counts[g] = int(counts.get(g, 0)) + 1
+	for g in _manual_draw_picks:
+		var remaining: int = int(counts.get(g, 0)) - 1
+		if remaining > 0:
+			counts[g] = remaining
+		else:
+			counts.erase(g)
+	return counts
+
+
+func _show_manual_draw_pick(n: int) -> void:
+	var total: int = mini(battle.manual_draw_pending, battle.board.free_count())
+	if n > total:
+		_finish_manual_draw()
+		return
+	var counts := _manual_draw_counts()
+	var glyphs: Array = counts.keys()
+	if glyphs.is_empty():
+		_finish_manual_draw()
+		return
+	var options: Array = []
+	for g in glyphs:
+		options.append({"text": "【%s】×%d" % [g, counts[g]]})
+	options.append({"text": "（剩下随机补）"})
+	var ov := ChoiceOverlay.new()
+	ov.setup({"title": "精心：从字袋选第 %d/%d 枚（随机落地）" % [n, total], "options": options})
+	ov.chose.connect(_on_manual_draw_chosen.bind(glyphs, n))
+	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_mount_overlay(ov)
+
+
+func _on_manual_draw_chosen(index: int, glyphs: Array, n: int) -> void:
+	if not _manual_draw_active or n != _manual_draw_picks.size() + 1:
+		return
+	if index < 0 or index >= glyphs.size():
+		_finish_manual_draw()
+		return
+	if int(_manual_draw_counts().get(glyphs[index], 0)) <= 0:
+		_show_manual_draw_pick(n)
+		return
+	_manual_draw_picks.append(glyphs[index])
+	_show_manual_draw_pick(n + 1)
+
+
+func _finish_manual_draw() -> void:
+	if not _manual_draw_active:
+		return
+	_manual_draw_active = false
+	battle.place_manual_draw(_manual_draw_picks)
+	_manual_draw_picks = []
 	_refresh_all()
 	_check_battle_over()
 
@@ -1238,11 +1395,9 @@ func _check_battle_over() -> void:
 		return
 	if battle.is_over():
 		_finished = true
+		_update_input()
 		var victory := battle.is_victory()
 		GameState.player_hp = battle.player.hp
-		if victory and node != null and node.type == MapNodeData.Type.BOSS:
-			GameState.player_hp = GameState.player_max_hp
-			_on_log("幕末首领已破：回满生命")
 		EventBus.hp_changed.emit(GameState.player_hp, GameState.player_max_hp)
 		if victory:
 			GameState.add_captured(battle.captured_chars)
@@ -1250,7 +1405,8 @@ func _check_battle_over() -> void:
 				GameState.add_gold(battle.player.equity)
 				_on_log("投资本金返还：+%d 金币" % battle.player.equity)
 			GameState.settle_victory_economy()
-		await get_tree().create_timer(0.5).timeout
+		if not await _wait_step(0.35):
+			return
 		if victory:
 			goto("res://src/screens/reward_screen.gd", {"node": node})
 		else:
@@ -1266,7 +1422,7 @@ func _show_defeat() -> void:
 	})
 	overlay.chose.connect(_on_defeat_choice)
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(overlay)
+	_mount_overlay(overlay)
 
 
 func _on_defeat_choice(index: int) -> void:
@@ -1277,57 +1433,6 @@ func _on_defeat_choice(index: int) -> void:
 		goto("res://src/screens/title_screen.gd")
 
 
-func _on_damage_dealt(target_is_player: bool, amount: int) -> void:
-	if _hit_fx == null or _finished:
-		return
-	if target_is_player:
-		# 玩家受击：全屏红闪 + 震动 + 玩家血条弹伤害数字
-		_hit_fx.flash_screen()
-		_hit_fx.add_trauma(amount)
-		var ppos := _player_hp.global_position + Vector2(_player_hp.size.x * 0.5, 2)
-		_hit_fx.damage_popup(ppos, amount, true)
-	else:
-		# 敌人受击：敌人卡闪白 + 震动 + 敌人卡弹伤害数字
-		_hit_fx.add_trauma(amount)
-		var card := _first_alive_enemy_card()
-		if card != null:
-			_hit_fx.flash_target(card)
-			var epos := card.global_position + Vector2(card.size.x * 0.5, 10)
-			_hit_fx.damage_popup(epos, amount, false)
-	if amount >= HitFX.HITSTOP_THRESHOLD:
-		_hit_fx.hit_stop()
-
-
-func _first_alive_enemy_card() -> Control:
-	for i in battle.enemies.size():
-		if battle.enemies[i].is_alive() and i < _enemy_widgets.size():
-			return _enemy_widgets[i]["card"]
-	return null
-
-
-func _float_at_enemy(text: String, color: Color) -> void:
-	var pos := Vector2(get_viewport_rect().size.x * 0.5, 200)
-	for i in battle.enemies.size():
-		if battle.enemies[i].is_alive() and i < _enemy_widgets.size():
-			var card: Control = _enemy_widgets[i]["card"]
-			pos = card.global_position + Vector2(card.size.x * 0.5, 10)
-			break
-	_float_text(text, pos, color)
-
-
-func _float_text(text: String, pos: Vector2, color: Color) -> void:
-	var l := Ink.label(text, "", color)
-	l.add_theme_font_size_override("font_size", 26)
-	l.add_theme_color_override("font_shadow_color", Color(1, 1, 1, 0.4))
-	l.position = pos
-	content.add_child(l)
-	var tw := create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(l, "position:y", pos.y - 52, 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tw.tween_property(l, "modulate:a", 0.0, 0.5).set_delay(0.35)
-	get_tree().create_timer(0.95).timeout.connect(l.queue_free)
-
-
 func _preview_hint() -> String:
 	if Settings.drag_release_play:
 		return "拖动连线，松手即出字；也可按「出字」或回车确认。"
@@ -1335,18 +1440,14 @@ func _preview_hint() -> String:
 
 
 func _pop_confirm() -> void:
-	if _confirm_btn == null or not is_instance_valid(_confirm_btn) or _confirm_btn.disabled:
+	if _confirm_btn == null or _confirm_btn.disabled or Settings.reduced_motion:
 		return
+	if _confirm_motion != null:
+		_confirm_motion.kill()
 	_confirm_btn.pivot_offset = _confirm_btn.size * 0.5
-	var tw := create_tween()
-	tw.tween_property(_confirm_btn, "scale", Vector2(1.12, 1.12), 0.08)
-	tw.tween_property(_confirm_btn, "scale", Vector2.ONE, 0.12)
-
-
-func _open_settings() -> void:
-	var ov := SettingsOverlay.new()
-	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(ov)
+	_confirm_motion = create_tween()
+	_confirm_motion.tween_property(_confirm_btn, "scale", Vector2(1.025, 1.025), 0.06)
+	_confirm_motion.tween_property(_confirm_btn, "scale", Vector2.ONE, 0.10)
 
 
 func _open_deck() -> void:
@@ -1365,4 +1466,281 @@ func _open_deck() -> void:
 		"words": Database.words.values(),
 	})
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_mount_overlay(overlay)
+
+func _layout() -> void:
+	if _end_btn == null or size.x < 100:
+		return
+	var w := size.x
+	var h := size.y
+	_compact = bool(params.get("touch_layout", false)) or DisplayServer.is_touchscreen_available() or w / maxf(1.0, h) >= 1.95 or w < 1100
+	var ui_scale := clampf(h / maxf(1, DisplayServer.window_get_size().y), 1.0, 1.85) if _compact else 1.0
+	var margin := 24.0
+	var top := 88.0 if not _compact else 66.0
+	var footer := maxf(70.0, 48 * ui_scale + 22)
+	var side := minf(h - top - footer - 30, w * 0.44)
+	var column := (w - side) * 0.5 - margin * 2
+	var board_x := (w - side) * 0.5
+	_topbar.position = Vector2(margin, 12)
+	_topbar.size = Vector2(w - margin * 2, top - 12)
+	_topbar.get_node("Title").visible = not _compact
+	_topbar.get_node("Title").position = Vector2(320, 0)
+	_topbar.get_node("Title").size = Vector2(150, 36)
+	_turn_label.position = Vector2(320 if not _compact else 8, 36 if not _compact else 4)
+	_turn_label.size = Vector2(120, 32)
+	var menu_width := 80 * ui_scale
+	_menu_btn.position = Vector2(_topbar.size.x - menu_width, 0)
+	_menu_btn.size = Vector2(menu_width, 48 * ui_scale)
+	_menu_btn.custom_minimum_size = _menu_btn.size
+	_menu_btn.add_theme_font_size_override("font_size", int(minf(34, 20 * ui_scale)))
+	_resource_label.position = Vector2(490 if not _compact else 160, 18 if not _compact else 4)
+	_resource_label.size = Vector2(_menu_btn.position.x - _resource_label.position.x - 18, 42)
+	_resource_label.add_theme_font_size_override("font_size", int(minf(24, 15 * ui_scale)))
+	_topbar.get_node("Rule").position = Vector2(0, top - 14)
+	_topbar.get_node("Rule").size = Vector2(w - margin * 2, 1)
+	_board_view.position = Vector2(board_x, top + 12)
+	_board_view.size = Vector2(side, side)
+	var right_x := board_x + side + margin
+	if _compact:
+		_player_panel.position = Vector2(margin, top + 12)
+		_player_panel.size = Vector2(column, 76 * ui_scale)
+		_enemy_panel.position = Vector2(margin, top + 28 + _player_panel.size.y)
+		_enemy_panel.size = Vector2(column, side - _player_panel.size.y - 48 * ui_scale - 16)
+		_preview_panel.position = Vector2(right_x, top + 12)
+		_preview_panel.size = Vector2(column, side)
+		_end_btn.position = Vector2(margin, top + side - 48 * ui_scale + 12)
+		_end_btn.size = Vector2(column, 48 * ui_scale)
+	else:
+		_player_panel.position = Vector2(margin + 8, 12)
+		_player_panel.size = Vector2(280, 76)
+		_enemy_panel.position = Vector2(right_x, top + 12)
+		_enemy_panel.size = Vector2(column, side)
+		_preview_panel.position = Vector2(margin, top + 46)
+		_preview_panel.size = Vector2(column, side - 48)
+		_end_btn.position = Vector2(w - margin - 196, h - 60)
+		_end_btn.size = Vector2(196, 48)
+	_player_hp_caption.position = Vector2.ZERO
+	_player_hp_caption.size = Vector2(110 * ui_scale, 42 * ui_scale)
+	_player_hp_caption.add_theme_font_size_override("font_size", int(minf(28, 17 * ui_scale)))
+	_player_hp_value.position = Vector2(110 * ui_scale, 0)
+	_player_hp_value.size = Vector2(_player_panel.size.x - 110 * ui_scale, 44 * ui_scale)
+	_player_hp_value.add_theme_font_size_override("font_size", int(minf(52, 32 * ui_scale)))
+	_player_hp.position = Vector2(0, 44 * ui_scale)
+	_player_hp.custom_minimum_size.y = 8
+	_player_hp.size = Vector2(_player_panel.size.x, 8 * ui_scale)
+	_player_block.position = Vector2(0, 54 * ui_scale)
+	_player_block.size = Vector2(_player_panel.size.x, 22 * ui_scale)
+	_player_block.add_theme_font_size_override("font_size", int(minf(24, 14 * ui_scale)))
+	_player_status.position = Vector2(0, 76 * ui_scale)
+	_player_status.size = Vector2(_player_panel.size.x, 26)
+	_player_status.visible = not _player_status.text.is_empty()
+	var action_h := 64.0 * ui_scale if _compact else 60.0
+	_bubble.set_ui_scale(ui_scale, _compact)
+	var paper_pad := 22.0 if _compact else 26.0
+	var paper_height := _preview_panel.size.y
+	_bubble.position = Vector2(paper_pad, paper_pad)
+	_bubble.size = Vector2(column - paper_pad * 2, paper_height - action_h - paper_pad * 3)
+	_selection_actions.position = Vector2(paper_pad, paper_height - action_h - paper_pad)
+	_selection_actions.size = Vector2(column - paper_pad * 2, action_h)
+	_confirm_btn.custom_minimum_size.y = action_h
+	_clear_btn.custom_minimum_size.y = action_h
+	_confirm_btn.add_theme_font_size_override("font_size", int((28 if _compact else 36) * ui_scale))
+	_clear_btn.add_theme_font_size_override("font_size", int(18 * ui_scale))
+	_end_btn.add_theme_font_size_override("font_size", int(22 * ui_scale))
+	_footer.position = Vector2(margin, h - footer + 10)
+	_footer.size = Vector2(w - margin * 2, footer - 10)
+	_footer.get_node("Rule").size = Vector2(w - margin * 2, 1)
+	_hint.visible = not _compact
+	_hint.position = Vector2(8, 6)
+	_hint.size = Vector2(w - 260, 22)
+	_pile_label.position = Vector2(8, 30 if not _compact else 18)
+	_pile_label.size = Vector2(w - 260 if not _compact else w - 64, 24)
+	_pile_label.add_theme_font_size_override("font_size", int(minf(22, 15 * ui_scale)))
+	_enemy_paper.position = _enemy_panel.position - Vector2(12, 8)
+	_enemy_paper.size = _enemy_panel.size + Vector2(24, 16)
+	if _compact:
+		_enemy_paper.position = _player_panel.position - Vector2(12, 8)
+		_enemy_paper.size.y = _enemy_panel.position.y + _enemy_panel.size.y + 8 - _enemy_paper.position.y
+		_enemy_paper.tilt = 0.0
+		_enemy_paper._place_sheet()
+	else:
+		_enemy_paper.tilt = 1.2
+		_enemy_paper._place_sheet()
+	_enemy_panel.position += Vector2(14, 8 if _compact else 16)
+	_enemy_panel.size -= Vector2(28, 16 if _compact else 32)
+	for widget in _enemy_widgets:
+		widget.ui_scale = ui_scale
+		widget.set_compact(_compact or _enemy_widgets.size() > 1)
+		widget.custom_minimum_size.y = 118 * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
+	_board_view._layout()
+
+
+func _update_input() -> void:
+	var locked := _busy or _finished or _modal_count > 0
+	_board_view.set_interactable(not locked, false)
+	if _recast_three_active:
+		_confirm_btn.text = "%s（%d/3）" % [_three_tiles_word, _recast_three_cells.size()]
+		_confirm_btn.disabled = true
+	elif _collect_own_active:
+		_confirm_btn.text = "发动（%s %d）" % ["分流" if _collect_junk else "收心", _collect_own_cells.size()]
+		_confirm_btn.disabled = locked
+	elif not _ready_action.is_empty():
+		if _ready_action.get("repeat_rotate", false):
+			_confirm_btn.text = "发动（转速 %d/3）" % battle.repeat_rotate_count
+		else:
+			_confirm_btn.text = "发动"
+		_confirm_btn.disabled = locked
+	elif _board_view.pick_mode != "":
+		_confirm_btn.text = "发动"
+		_confirm_btn.disabled = true
+	else:
+		_confirm_btn.text = "出字"
+		_confirm_btn.disabled = locked or _board_view.path.is_empty()
+	if _confirm_ink != null:
+		_confirm_ink.set_shader_parameter("disabled", _confirm_btn.disabled)
+	_clear_btn.disabled = locked or (_board_view.path.is_empty() and _ready_action.is_empty() and not _recast_three_active and not _collect_own_active and _board_view.pick_mode == "")
+	_end_btn.disabled = locked
+	_menu_btn.disabled = locked
+
+
+func _set_busy(value: bool) -> void:
+	_busy = value
+	_update_input()
+
+
+func _mount_overlay(overlay: Control) -> void:
+	_modal_count += 1
+	_update_input()
+	overlay.tree_exited.connect(func():
+		_modal_count = maxi(0, _modal_count - 1)
+		if is_inside_tree():
+			_update_input())
 	add_child(overlay)
+
+
+func _open_menu() -> void:
+	if _busy:
+		return
+	PauseMenu.open()
+
+
+func _toggle_log() -> void:
+	if _busy:
+		return
+	_log_overlay.visible = not _log_overlay.visible
+	_modal_count += 1 if _log_overlay.visible else -1
+	_update_input()
+
+
+func _selection_context(path: Array) -> String:
+	var enemy: Combatant = battle.enemies[_target_index] if not battle.enemies.is_empty() else null
+	var target := enemy.display_name if enemy != null and enemy.is_alive() else "无"
+	var cost := _pollution_cost_text(path).strip_edges()
+	var context := "目标：%s\n%s" % [target, "污染代价：无" if cost.is_empty() else cost]
+	if battle.board.gap_steps_allowed > 0:
+		context += "\n超：下次组词可跨一个横／竖空格。"
+	if battle.board.free_word_link:
+		context += "\n流利：下次组词可按字序点击任意位置，无需相邻。"
+	return context
+
+
+func _watch_combatant(combatant: Combatant) -> void:
+	for watch in _feedback_watches:
+		if watch[0] == combatant:
+			return
+	var listener := _on_feedback.bind(combatant)
+	combatant.feedback.connect(listener)
+	_feedback_watches.append([combatant, listener])
+
+
+func _on_feedback(event: Dictionary, target: Combatant) -> void:
+	if not _collecting:
+		return
+	var captured := event.duplicate(true)
+	captured["target"] = target
+	_events.append(captured)
+
+
+func _on_enemy_acting(enemy: Combatant, move: EnemyMoveData) -> void:
+	if _collecting:
+		_events.append({"kind": "enemy_action", "target": enemy, "move": move})
+
+
+func _view_for(target: Combatant) -> Control:
+	if target.is_player:
+		return _player_panel
+	var index := battle.enemies.find(target)
+	return _enemy_widgets[index] if index >= 0 and index < _enemy_widgets.size() else _preview_panel
+
+
+func _replay_feedback() -> bool:
+	for event in _events:
+		var view := _view_for(event.target)
+		if event.kind == "enemy_action":
+			if view is EnemyView:
+				view.anticipate()
+			var move: EnemyMoveData = event.move
+			_bubble.set_text(event.target.display_name, move.title + " · " + move.intent_text(), SpeechBubble.State.PREVIEW)
+			if not await _wait_step(0.12 if not Settings.reduced_motion else 0.04):
+				return false
+			continue
+		var point := _effects.point_of(view)
+		if view is EnemyView:
+			view.apply_feedback(event)
+			point = _effects.get_global_transform().affine_inverse() * view.impact_point()
+		else:
+			if event.has("hp"):
+				_show_player_hp(int(event.hp), int(event.max_hp))
+			if event.has("block"):
+				_player_block.text = "临挡 %d · 持久盾 %d" % [event.block, event.persistent_block]
+		match event.kind:
+			"damage":
+				var loss := int(event.hp_loss)
+				var blocked := int(event.blocked)
+				if loss > 0:
+					_effects.number("−%d" % loss, point + Vector2(0, -26), Palette.VERMILION_DK)
+					_effects.burst(point, false, loss >= 12 or int(event.hp) <= 0)
+				if blocked > 0:
+					_effects.number("格挡 %d" % blocked, point + Vector2(0, 14), Palette.BLOCK)
+					_effects.burst(point, true)
+				elif loss == 0:
+					_effects.number("免疫", point, Palette.INK_SOFT)
+			"shield":
+				var gain := int(event.gain)
+				_effects.number("护盾 +%d" % gain if gain > 0 else ("破盾" if int(event.block) == 0 else "拆盾 %d" % -gain), point, Palette.BLOCK if gain > 0 else Palette.GOLD_DK)
+				_effects.burst(point, true)
+			"heal":
+				_effects.number("+%d" % int(event.gain), point, Palette.JADE)
+		if not await _wait_step(0.16 if not Settings.reduced_motion else 0.045):
+			return false
+	_events.clear()
+	return true
+
+
+func _wait_step(duration: float) -> bool:
+	if _exiting:
+		return false
+	_step_timer.start(duration)
+	await presentation_step_finished
+	return not _exiting
+
+
+func _resource_feedback(before: Array) -> void:
+	var after := [battle.player.energy, battle.player.heat, GameState.gold]
+	var names := ["储能", "热度", "金币"]
+	var parts: Array[String] = []
+	for i in 3:
+		var change := int(after[i]) - int(before[i])
+		if change != 0:
+			parts.append("%s %+d" % [names[i], change])
+	if not parts.is_empty():
+		_effects.number(" · ".join(parts), _effects.point_of(_resource_label) + Vector2(0, 28), Palette.GOLD_DK)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _log_overlay.visible and event.is_action_pressed("cancel_selection"):
+		_toggle_log()
+		get_viewport().set_input_as_handled()
+	elif not event.is_echo() and event.is_action_pressed("end_turn"):
+		_on_end_turn()
+		get_viewport().set_input_as_handled()
