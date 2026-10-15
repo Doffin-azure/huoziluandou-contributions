@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://src/data/status_data.gd" id="1_regen"]
+
+[resource]
+script = ExtResource("1_regen")
+id = "regen"
+name = "再生"
+glyph = "生"
+description = "回合开始时回复等于层数的生命。"
+decay_per_turn = 1
+color = Color(0.29019608, 0.56078431, 0.4, 1)

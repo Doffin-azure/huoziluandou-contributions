@@ -76,6 +76,7 @@ func _run() -> void:
 	_test_edge_batch2()
 	_test_chaozhong()
 	_test_heart_series()
+	_test_regen()
 	print("\n[logic_test] PASS=%d FAIL=%d" % [_pass, _fail])
 	get_tree().quit(1 if _fail > 0 else 0)
 
@@ -1717,3 +1718,35 @@ func _test_heart_series() -> void:
 	_ok(GameState.player_max_hp == 80, "跨战：GameState 上限保留 80（当前 %d）" % GameState.player_max_hp)
 	GameState.player_max_hp = mhp0
 	GameState.player_hp = php0
+
+
+func _add_quiet_enemy(b: BattleState, hp := 100) -> Combatant:
+	var ed := EnemyData.new()
+	ed.name = "quiet_dummy"
+	ed.max_hp = hp
+	var mv := EnemyMoveData.new()
+	mv.kind = EnemyMoveData.Kind.BLOCK
+	mv.block = 1
+	ed.moves.append(mv)
+	var e := Combatant.new(ed.name, hp)
+	e.enemy_data = ed
+	b.enemies.append(e)
+	return e
+
+
+func _test_regen() -> void:
+	print("[回复] 3 层再生：每回合按层数回血并衰减")
+	var b := _battle()
+	_add_quiet_enemy(b)
+	_place(b, 0, 0, "回")
+	_place(b, 1, 0, "复")
+	var r := b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
+	_ok(r.ok and r.word != null and r.word.word == "回复", "【回复】可正常组词打出")
+	_ok(b.player.status_stacks("regen") == 3, "回复获得 3 层再生（当前 %d）" % b.player.status_stacks("regen"))
+	b.player.hp = 40
+	var hp: Array = []
+	for i in 3:
+		b.end_player_turn()
+		hp.append(b.player.hp)
+	_ok(b.player.status_stacks("regen") == 0, "3 回合后再生耗尽（当前 %d）" % b.player.status_stacks("regen"))
+	_ok(hp == [43, 45, 46], "每回合回复层数生命并减 1 层：%s" % str(hp))

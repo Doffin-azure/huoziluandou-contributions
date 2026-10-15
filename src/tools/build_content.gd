@@ -138,6 +138,8 @@ func _build_statuses() -> void:
 		 "desc": "每回合损失等量层数的生命（不衰减）。"},
 		{"id": "gold_burst", "name": "爆金", "glyph": "币", "kind": 1, "color": "b8912e", "decay": 0,
 		 "desc": "每受到一次攻击，攻击者获得 1 金币（被护甲/格挡吸收也算）。"},
+		{"id": "regen", "name": "再生", "glyph": "生", "kind": 0, "color": "4a8f66", "decay": 1,
+		 "desc": "回合开始时回复等于层数的生命。"},
 	]
 	for d in defs:
 		var s: StatusData = StatusDataS.new()
@@ -689,6 +691,10 @@ func _build_extra_words() -> void:
 		[ContentBuild.e("heal", 1, -1, "", "回复 1 生命", {}),
 			ContentBuild.e("draw_random", 3, -1, "", "随机补 3 字", {})]),
 		"%s/words/extra_huixin.tres" % RES)
+	_save(_extra_list("extra_huifu", "回复", ["回", "复"], "流转", "",
+		"获得 3 层再生：每回合开始时回复等于层数的生命，随后减少 1 层。",
+		[ContentBuild.e("apply_status_self", 3, EffectDataS.Target.SELF, "regen", "获得 3 层再生：每回合开始时回复等于层数的生命，随后减少 1 层。")]),
+		"%s/words/extra_huifu.tres" % RES)
 	_save(_extra_list("extra_fenxin", "分心", ["分", "心"], "流转", "",
 		"补 1 字，对敌造成 1 伤，获得 1 持久盾，回复 1 生命",
 		[ContentBuild.e("draw_random", 1, -1, "", "补 1 字", {}),
@@ -696,7 +702,7 @@ func _build_extra_words() -> void:
 			ContentBuild.e("block_persist", 1, -1, "", "获得 1 持久盾", {}),
 			ContentBuild.e("heal", 1, -1, "", "回复 1 生命", {})]),
 		"%s/words/extra_fenxin.tres" % RES)
-	print("  · 新增词：热心/放心/强心/收心/回心/分心")
+	print("  · 新增词：热心/放心/强心/收心/回心/回复/分心")
 
 	# 冷心（高风险爆发）
 	_save(_extra_list("extra_lengxin", "冷心", ["冷", "心"], "热暴", "",

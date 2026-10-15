@@ -106,8 +106,9 @@ assets/fonts/  随仓库字体
 | 工具 | 命令 | 用途 |
 |---|---|---|
 | 逻辑测试 | `<godot> --headless --path . res://tests/logic_test.tscn` | 246 条规则断言 |
-| 词效回归 | `<godot> --headless --path . res://tests/word_effect_regression.tscn` | 342 条实体守恒、词效联动、回合/跨战与交互检查 |
+| 词效回归 | `<godot> --headless --path . res://tests/word_effect_regression.tscn` | 406 条实体守恒、词效联动、回合/跨战与交互检查 |
 | 战斗界面 | `<godot> --headless --path . res://tests/battle_ui_test.tscn` | 52 条真实场景、输入与异步结算检查 |
+| 词条预览 | `<godot> --headless --path . res://tests/effect_help_test.tscn` | 29 条词条显示、嵌套阅读、点按固定与点击隔离检查 |
 | 内容生成 | `<godot> --headless --path . --script res://src/tools/build_content.gd` | 从表格重建 `.tres` |
 | 词效表 | `<godot> --headless --path . res://src/tools/dump_words.tscn` | 导出 161 词效果表 |
 | 字表 | `<godot> --headless --path . res://src/tools/dump_chars.tscn` | 导出 65 字表（含出/入度） |
@@ -134,6 +135,7 @@ assets/fonts/  随仓库字体
 - **取消**：`ESC` 或「清除」。
 - **选目标**：需要时字盘/浮层会进入选择模式（选格 / 选行或列 / 选弃字堆 / 揭示 N 选 1 等）。
 - **词语预览 / 结果**：独立词效区显示实时预览与结算结果；字盘上的箭头与序号显示已选路径。战斗内暂时移除鲸鱼。
+- **词条悬浮**：战斗预览与词语图鉴中，带下划线的关键词可悬浮查看细则；点按可固定，点外部、×或 ESC 关闭。精简说明保留「完整词效」入口。
 - **无效词反馈**：字块轻抖，词效区显示原因，不消费字块、不弹出表情图。
 - **视觉风格**：标题页或战斗内「设置」可切换 `宣纸活字 ↔ 墨芯`（战斗内切换下一场生效）。
 - 设置持久化到 `user://settings.cfg`。
@@ -142,7 +144,7 @@ assets/fonts/  随仓库字体
 
 ## 协作约定
 
-- 提交前运行逻辑测试、词效回归和战斗界面无头检查，保持 **246/246、342/342、52/52**。
+- 提交前运行逻辑测试、词效回归、战斗界面和词条预览无头检查，保持 **246/246、406/406、52/52、29/29**。
 - 改内容优先改 `.tres`；批量改内容改 `data/import/` + `src/tools/content_build.gd` 后重生成。
 - 换行统一 LF（见 `.gitattributes`）；二进制资源（字体 / PNG）已在属性中标注。
 - **不要提交** `.godot/`（编辑器缓存，已在 `.gitignore`）；首次打开工程会自动重建。

@@ -8,8 +8,8 @@ static func word_for(glyphs: Array) -> WordData:
 		word = Database.get_word_by_glyphs(glyphs.filter(func(g): return g != "过"))
 	return word
 
-static func word_text(word: WordData, b: BattleState, path: Array = [], target: Dictionary = {}) -> String:
-	var lines: Array[String] = [word.describe()]
+static func word_text(word: WordData, b: BattleState, path: Array = [], target: Dictionary = {}, concise := false) -> String:
+	var lines: Array[String] = [EffectGlossary.brief(word) if concise else word.describe()]
 	var current := _current(word.effects, b, path, target)
 	if not current.is_empty():
 		lines.append("当前：" + current)

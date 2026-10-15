@@ -1430,7 +1430,17 @@ func _tick_player_statuses() -> void:
 	if poison > 0:
 		var real := player.take_damage(poison)
 		_log("中毒：失去 %d 生命" % real)
-	for sid in ["vulnerable", "poison"]:
+	# 再生：按层数回复生命，然后每回合固定衰减 1 层
+	var regen := player.status_stacks("regen")
+	if regen > 0:
+		var before := player.hp
+		player.heal(regen)
+		var healed := player.hp - before
+		if healed > 0:
+			_log("再生：回复 %d 生命" % healed)
+		else:
+			_log("再生：生命已满，未回复")
+	for sid in ["vulnerable", "poison", "regen"]:
 		if player.status_stacks(sid) > 0:
 			var sd: StatusData = Database.get_status(sid)
 			if sd != null and sd.decay_per_turn > 0:

@@ -243,6 +243,9 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("cancel_selection") and not pick_mode.is_empty() and get_tree().get_nodes_in_group("effect_help_open").is_empty():
 		_unhandled_input(event)
 		return
+	# 字典浮层可能盖在投影字盘上；全局输入必须先排除浮层，避免查看词条时选中字块。
+	if (event is InputEventMouse or event is InputEventScreenTouch or event is InputEventScreenDrag) and EffectText.blocks_pointer(get_viewport(), event.position):
+		return
 	if event is InputEventScreenTouch:
 		if event.pressed and _touch_index < 0:
 			var cell := _cell_at(event.position)

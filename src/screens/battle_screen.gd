@@ -475,8 +475,8 @@ func _on_selection_changed(path: Array, glyphs: Array, word: WordData, preview_t
 	var req := ""
 	if preview_target.is_empty() and (word.requires_target != EffectData.Target.NONE or not word.interaction.is_empty()):
 		req = "　→ 需选目标"
-	var body_text := EffectPreview.word_text(word, battle, path, preview_target)
-	_bubble.set_text("《%s》" % word.word, "%s%s" % [body_text, req], SpeechBubble.State.PREVIEW)
+	var body_text := EffectPreview.word_text(word, battle, path, preview_target, true)
+	_bubble.set_text("《%s》" % word.word, "%s%s" % [body_text, req], SpeechBubble.State.PREVIEW, word)
 
 
 func _pollution_cost_text(path: Array) -> String:
