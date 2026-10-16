@@ -47,6 +47,15 @@ var empowered_glyphs: Dictionary = {}   ## 强化：本场额外触发单字效�
 var removed_this_battle: Array = []     ## 炼化：本场移出循环的牌
 var pierce_once := false                ## 墨途远征「重击」：本场第一次攻击无视护盾
 var enemy_skip_turns := 0               ## 墨途远征「停火」：敌方跳过的行动次数
+## 遗物（src/core/relics.gd）：开战时从 GameState 复制，按获得顺序
+var relics: Array = []
+var relic_binds: Dictionary = {}        ## 遗物 id -> 永久实体 uid
+var wheel_step := 0                     ## 仓鼠轮：已转过几次
+var blitz_turn := 0                     ## 闪电战：这一回合结束时敌人跳过行动（0 = 不跳）
+var slab_uid := -1                      ## 沉重石板绑定的实体
+var slab_uses := 0                      ## 沉重石板本场剩余额外次数
+var breeders: Dictionary = {}           ## 化肥：有繁殖资格的临时字 uid
+var strike_active := false              ## 打击增强：当前出字带【击】
 var bounty_paid: bool = false
 var bounty_reward: int = 0
 var words_played_all: Array = []
@@ -138,7 +147,15 @@ func start(deck: Array, enemy_datas: Array, seed_value: int = -1) -> void:
 	_attack_sequence_depth = 0
 	_attack_sequence_bonus.clear()
 	_resolving_play = false
-	board = BoardState.new(rules.board_size)
+	relics = GameState.relics.duplicate()
+	relic_binds = GameState.relic_binds.duplicate()
+	wheel_step = 0
+	blitz_turn = 0
+	slab_uid = -1
+	slab_uses = 0
+	breeders.clear()
+	strike_active = false
+	board = BoardState.new(Relics.board_size(rules, relics))
 	for c in deck:
 		c.owner = CharInstance.Owner.PLAYER
 		c.temporary_uses = 0
@@ -147,6 +164,7 @@ func start(deck: Array, enemy_datas: Array, seed_value: int = -1) -> void:
 		c.pinned_exhausted = false
 		c.refined = false
 		bag.append(c)
+	Relics.prepare_deck(self)
 	_shuffle(bag)
 	player = Combatant.new("玩家", GameState.player_max_hp, true)
 	player.hp = GameState.player_hp
@@ -158,8 +176,9 @@ func start(deck: Array, enemy_datas: Array, seed_value: int = -1) -> void:
 		e.enemy_data = ed
 		enemies.append(e)
 	turn = 0
-	draw_to_board(rules.opening_draw)
+	draw_to_board(Relics.opening_draw(rules, relics))
 	begin_player_turn(false)
+	Relics.on_battle_start(self)
 
 func _shuffle(arr: Array) -> void:
 	for i in range(arr.size() - 1, 0, -1):
@@ -467,6 +486,7 @@ func deal_damage(target: Combatant, amount: int, is_attack: bool = true) -> int:
 		else:
 			bonus = _take_attack_bonus()
 		dmg += player.status_stacks("strength") + player.turn_strength
+		dmg += Relics.strike_bonus(self, target)
 		dmg += int(bonus.base)
 		if bonus.double:
 			dmg *= 2
@@ -616,6 +636,17 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 	return _execute_prepared_play(_prepare_play(path, target, word, glyphs), {})
 
 
+## 遗物包一层：打击增强按本次出字是否带【击】；出字后沉重石板下落
+func _execute_prepared_play(play: Dictionary, shared: Dictionary) -> Dictionary:
+	var prev := strike_active
+	strike_active = Relics.play_has_strike(play.glyphs)
+	var result := _execute_prepared_play_core(play, shared)
+	strike_active = prev
+	if result.get("ok", false) and relics.has("slab"):
+		Relics.slab_fall(self)
+	return result
+
+
 static func has_required_target(kind: int, target: Dictionary) -> bool:
 	match kind:
 		EffectData.Target.NONE, EffectData.Target.SELF, EffectData.Target.BOARD, EffectData.Target.ALL_ENEMIES:
@@ -678,7 +709,7 @@ func path_uses_gap(path: Array) -> bool:
 
 
 ## 普通出词和结阵共用效果、污染、自动能力和快照流程；结阵仅共享消耗记录。
-func _execute_prepared_play(play: Dictionary, shared: Dictionary) -> Dictionary:
+func _execute_prepared_play_core(play: Dictionary, shared: Dictionary) -> Dictionary:
 	# 只读表现通知：普通出字与结阵各词都报告自己的字、效果和目标。
 	play_resolving.emit(play)
 	var path: Array = play.path
@@ -1226,12 +1257,23 @@ func _consume_path(path: Array, expected: Array, shared: Dictionary) -> Array:
 			shared[inst.uid] = item
 			out.append(item)
 			continue
+		var slab_kind := ""
 		if inst.pinned:
 			inst.pinned_exhausted = true
 			item.kind = "pinned"
 		elif inst.temporary_uses > 0:
 			inst.temporary_uses -= 1
 			item.kind = "layer"
+		elif inst.uid == slab_uid:
+			slab_kind = Relics.consume_slab(self, inst)
+		if slab_kind == "layer":
+			item.kind = "layer"
+		elif slab_kind == "exhausted":
+			# 沉重石板：次数用尽，本场移出循环（回收、回放都拿不回来），下场恢复
+			removed_this_battle.append(inst)
+			board.cells[physical_index] = null
+		elif item.kind in ["pinned", "layer"]:
+			pass
 		elif has_ability("linger_chance") and rng.randf() < 0.5:
 			item.kind = "retained"
 			_log("流连：保留原位【%s】" % "".join(inst.glyph_list()))
@@ -1431,6 +1473,9 @@ func begin_player_turn(draw: bool = true) -> void:
 		if has_ability("gravity_always"):
 			apply_gravity()
 			_log("重力：回合开局下落")
+		# 遗物：光洁检查后补字，再按获得顺序发动重力类遗物
+		Relics.after_turn_draw(self)
+		Relics.apply_gravity_relics(self)
 	abilities.erase("split_mind")
 	abilities.erase("profit_share")
 	abilities.erase("inject_bounty")
@@ -1482,13 +1527,23 @@ func end_player_turn() -> void:
 			add_energy(gained)
 			_log("蓄热：热度 -%d，储能 +%d" % [cooled, gained])
 
+	# 化肥：回合结束、敌人行动前繁殖
+	Relics.breed(self)
 	_log("玩家结束回合")
+	var blitz := blitz_turn > 0 and turn == blitz_turn
 	for e in enemies:
 		if not e.is_alive():
+			continue
+		if blitz:
+			# 闪电战：所有敌人跳过这一次行动（意图顺延，和停火一样推进招式）
+			e.move_index += 1
+			_log("闪电战：%s 这一回合不行动" % e.display_name)
 			continue
 		_enemy_act(e)
 		if not player.is_alive():
 			break
+	if blitz:
+		blitz_turn = 0
 	abilities.erase("retaliate_once") # 未遇到敌方攻击时也在本回合结束失效。
 
 	# 持续能力：护甲（把部分临挡转持久盾）

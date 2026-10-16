@@ -358,6 +358,51 @@ static func install() -> void:
 		for g in counts.keys():
 			out.append("  %s ×%d" % [g, counts[g]])
 		return out)
+	register("relic", "遗物：/relic（列出）| /relic 名字或id（得到）| /relic - 名字或id（移除）| /relic all", func(a):
+		if a.is_empty():
+			var out: Array = ["已有：" + ("、".join(GameState.relics.map(func(r): return Relics.name_of(r))) if not GameState.relics.is_empty() else "无")]
+			for id in Relics.DEFS:
+				out.append("%s　%s　[%s]" % [id, Relics.text(id), Relics.AFFINITY[id]])
+			return out
+		var drop: bool = a[0] == "-"
+		var key: String = a[1] if drop and a.size() > 1 else a[0]
+		var ids: Array = Relics.DEFS.keys() if key == "all" else Relics.DEFS.keys().filter(func(id): return id == key or Relics.name_of(id) == key)
+		if ids.is_empty():
+			return ["没有遗物「%s」，/relic 查看全部" % key]
+		var done: Array = []
+		for id in ids:
+			if drop:
+				if GameState.remove_relic(id): done.append(Relics.name_of(id))
+			elif GameState.add_relic(id):
+				done.append(Relics.name_of(id))
+				if Relics.needs_bind(id) and not GameState.deck.is_empty() and not GameState.relic_binds.has(id):
+					GameState.bind_relic(id, GameState.deck[0].id())
+		var s = Router.current
+		if s != null and s.has_method("refresh"): s.call("refresh")
+		_refresh()
+		return [("移除：" if drop else "得到：") + ("、".join(done) if not done.is_empty() else "无变化（绑定类自动绑字袋第一枚；战斗中改动下一场生效）")])
+	register("tray", "远征字匣放字：/tray 火热强", func(a):
+		var ex: Expedition = GameState.expedition
+		if ex == null or a.is_empty(): return ["用法：在远征地图里 /tray 火热强"]
+		for g in "".join(a):
+			if Database.get_character_by_glyph(g) != null: ex.tray.append(g)
+		var s = Router.current
+		if s != null and s.has_method("refresh"): s.call("refresh")
+		return ["字匣：" + "".join(ex.tray)])
+	register("forge", "远征：在当前位置打开熔炉面板（测试许愿）", func(_a):
+		var ex: Expedition = GameState.expedition
+		if ex == null: return ["只在远征地图里可用"]
+		ex.push_panel({"kind": "forge", "k": ex.pos})
+		var s = Router.current
+		if s != null and s.has_method("refresh"): s.call("refresh")
+		return ["熔炉已打开：在字匣点 2～3 个字"])
+	register("shop", "远征：在当前位置打开商店面板", func(_a):
+		var ex: Expedition = GameState.expedition
+		if ex == null: return ["只在远征地图里可用"]
+		ex.push_panel({"kind": "shop"})
+		var s = Router.current
+		if s != null and s.has_method("refresh"): s.call("refresh")
+		return ["商店已打开"])
 	register("add", "加字：/add 字 [n]", func(a):
 		var g := _glyph(a, 0)
 		var cd: CharacterData = Database.get_character_by_glyph(g)

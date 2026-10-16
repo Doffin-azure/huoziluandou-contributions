@@ -41,6 +41,16 @@ func _fresh(seed := 42) -> Expedition:
 	return ex
 
 
+## 首领刚起身、第 e 步、连续没走 miss 步时的走路概率
+func _fresh_chance(e: int, miss: int) -> float:
+	var ex := Expedition.start(1)
+	ex.stir = 0
+	ex.rise = 0
+	ex.t = e
+	ex.miss = miss
+	return ex.move_chance()
+
+
 ## 地图上第一个满足条件的格
 func _find(ex: Expedition, pred: Callable) -> int:
 	for k in MapGen.N:
@@ -141,6 +151,32 @@ func _test_start_and_move() -> void:
 	_ok(GameState.expedition == ex and GameState.deck_size() == 12 and ex.tray.is_empty() and ex.plate_n == 2 and ex.ink == Expedition.START_INK, "开局：字袋 12、字匣空、版面 2×2")
 	_ok(ex.themes.size() == 4 and ex.m.tn == ex.themes[0] and ex.explored.has(ex.m.start), "三幕主题不重复；起点可见")
 	_ok(not ex.explored.has(ex.m.lair), "首领巢穴藏在迷雾里")
+	_ok(not ex.boss_revealed(), "开局看不见首领棋子")
+	# 首领巢穴：最外一圈的随机空地，离起点沿路 ≥ 6 步，不贴着大赏 / 休息点 / 商店 / 精英
+	var rim_ok := 0
+	var lairs := {}
+	for s in 60:
+		var lm := MapGen.generate(3000 + s * 7, MapGen.THEME_ORDER[s % 4])
+		if lm.is_empty():
+			continue
+		var lk: int = lm.lair
+		lairs[lk] = true
+		var pd := MapGen.bfs(MapGen.mask_of(func(x): return lm.ink[x] == 0 and not lm.obst.has(x) and not (lm.mech.has(x) and lm.mech[x].kind == "gate")), lm.start)
+		var good: bool = MapGen.is_rim(lk) and pd[lk] >= MapGen.LAIR_MIN_PATH and lm.node.get(lk, {}).get("t", "") == "巢" \
+			and lm.node.keys().filter(func(x): return lm.node[x].t == "巢").size() == 1 \
+			and not lm.node.keys().any(func(x): return lm.node[x].t in ["大", "休", "市", "险"] and MapGen.man(x, lk) < 3) \
+			and not lm.get("terr", {}).has(lk) and MapGen._reach_ok(lm, lm.get("terr", {}))
+		if good:
+			rim_ok += 1
+	_ok(rim_ok == 60, "首领巢穴都在最外一圈、走得到、不贴着奖励（%d/60）" % rim_ok)
+	var sides := {}
+	for lk in lairs:
+		var lp := MapGen.rc(lk)
+		sides["上" if lp.x == 0 else ("下" if lp.x == MapGen.H - 1 else ("左" if lp.y == 0 else "右"))] = true
+	_ok(lairs.size() >= 15 and sides.size() >= 3, "首领巢穴位置随机：60 张图里有 %d 个不同位置，分布在 %s" % [lairs.size(), sides.keys()])
+	var g1 := MapGen.generate(4242, "墨池")
+	var g2 := MapGen.generate(4242, "墨池")
+	_ok(g1.lair == g2.lair, "同一种子首领位置一样")
 	var nb := _find(ex, func(k): return ex.can_step(k) and ex.mech_at(k).is_empty() and not ex.m.obst.has(k) and not ex.m.get("terr", {}).has(k))
 	ex.move(nb)
 	_ok(ex.pos == nb and ex.t == 1, "走一步，时间 +1")
@@ -202,6 +238,58 @@ func _test_boss() -> void:
 	_ok(ex.fight.get("kind", "") == "boss" and ex.fight.caught, "被追上 → 首领战")
 	var pk: int = ex.m.pockets[0].b
 	_ok(ex.location_debuff(pk) == "先手", "在奖励凹槽里被追上：首领先手")
+	# 首领走路：伪随机。基线 0.35，每步 +0.05；没走就累计（基线 × 连续没走数+1），走了回基线
+	ex = _fresh(13)
+	_ok(ex.move_chance() == 0.0, "首领没起身：不会走")
+	ex.stir = 0
+	ex.rise = 0
+	ex.t = 0
+	ex.miss = 0
+	_ok(is_equal_approx(ex.move_base(), 0.35) and is_equal_approx(ex.move_chance(), 0.35), "起身那一步：概率 35%")
+	ex.t = 4
+	_ok(is_equal_approx(ex.move_base(), 0.55), "起身后第 4 步：基线 0.35 + 4×0.05 = 55%")
+	ex.miss = 1
+	_ok(is_equal_approx(ex.move_chance(), 1.0), "基线 55%，上一步没走：累计到 100%（封顶）")
+	ex.t = 0
+	ex.miss = 2
+	_ok(is_equal_approx(ex.move_chance(), 1.0) and is_equal_approx(_fresh_chance(0, 1), 0.70), "基线 35%：没走 1 步 → 70%，没走 2 步 → 100%")
+	_set_words(ex, ["冷却"])
+	ex.t = 4
+	ex.miss = 0
+	_ok(is_equal_approx(ex.move_base(), 0.45), "冷却：基线增长减半（第 4 步 45%）")
+	_set_words(ex, [])
+	# 真跑：起身后 tick，走了 miss 归零，没走 miss +1；首领在远处不会追上
+	var moves := 0
+	var resets_ok := true
+	var total := 0
+	for s in 30:
+		ex = _fresh(500 + s)
+		ex.stir = 0
+		ex.rise = 0
+		ex.halt_done = true
+		ex.boss = ex.m.lair
+		for i in 6:
+			var before_miss := ex.miss
+			var before := ex.boss
+			var p := ex.move_chance()
+			ex.tick()
+			total += 1
+			if ex.boss != before:
+				moves += 1
+				if ex.miss != 0: resets_ok = false
+			elif ex.miss != before_miss + 1 and p < 1.0:
+				resets_ok = false
+	_ok(resets_ok, "走了就回基线（miss=0），没走就累计（miss+1）")
+	_ok(moves > total * 0.45 and moves < total * 0.85, "前 6 步首领约一半多的步数在动：%d/%d" % [moves, total])
+	var e1 := _fresh(77)
+	var e2 := _fresh(77)
+	for x in [e1, e2]:
+		x.stir = 0
+		x.rise = 0
+		x.halt_done = true
+		for i in 8:
+			x.tick()
+	_ok(e1.boss == e2.boss and e1.miss == e2.miss, "同一种子首领走法一样")
 	var mp := MapGen.generate(11, "墨池")
 	ex.m = mp
 	var paper := _find(ex, func(k): return ex.mech_at(k).get("g", "") == "纸")
@@ -368,7 +456,8 @@ func _test_loot_rest_shop() -> void:
 	_set_words(ex, ["回购"])
 	_ok(ex.buyback_offers().size() == 1 and ex.price(ex.buyback_offers()[0]) == 7, "回购：丢掉的字半价买回")
 	# 熔炉
-	ex.tray = ["火", "热"]
+	# 和任何遗物都不相关的两个字：一定熔成稀有字（许愿见 relic_test）
+	ex.tray = ["冷", "冷"]
 	ex.push_panel({"kind": "forge", "k": 0})
 	_set_words(ex, ["炼金"])
 	gold = GameState.gold
@@ -554,13 +643,15 @@ func _test_screens() -> void:
 	_ok(screen._map_grid.get_child_count() == MapGen.N and screen._plate_grid.get_child_count() == 4, "远征地图 12×8 + 版面 2×2")
 	_ok(screen._legend_box != null and screen._legend_box.is_inside_tree(), "页面里有图样说明（颜色、敌人、机关）")
 	_ok(screen._boss_bar_label.text.contains("沉睡"), "地图上方的首领提示条：沉睡")
+	await get_tree().process_frame
+	_ok(not screen._boss_piece.visible, "首领沉睡且不在视野里：棋子不显示")
 	ex.stir = ex.t
 	ex.rise = ex.t
 	ex.alerts.append(["首领起身了", "测试"])
 	screen.refresh()
 	_ok(screen._boss_bar_label.text.contains("正在追你") and screen._alert_open, "首领追来：提示条显示距离，并弹窗")
 	await get_tree().process_frame
-	_ok(screen._boss_piece.position == screen._cell_origin(ex.boss) and screen._boss_glyph.text == ex.m.TH.boss, "首领是地图上的一枚棋子，摆在它所在的格")
+	_ok(screen._boss_piece.position == screen._cell_origin(ex.boss) and screen._boss_glyph.text == ex.m.TH.boss and screen._boss_piece.visible, "首领被惊动后显示：一枚棋子，摆在它所在的格")
 	var from := ex.boss
 	for i in 30:
 		if ex.tick():
@@ -661,6 +752,7 @@ func _test_autoplay() -> void:
 						ex.leave_panel()
 				"event": ex.choose_event(rng.randf() < 0.5)
 				"seal_swap": ex.swap_seal(0)
+				"relic_bind": ex.bind_relic(GameState.deck[0].id())
 				"act_end": ex.next_act()
 				_:
 					if not ex.tray.is_empty() and rng.randf() < 0.3:

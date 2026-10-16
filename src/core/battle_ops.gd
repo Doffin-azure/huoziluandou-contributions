@@ -209,6 +209,26 @@ static func apply_gravity(b: BattleState) -> void:
 				b.board.set_cell(x, y, null)
 
 
+## 向上重力：每列向上压缩（仓鼠轮用）；固定的字不动。
+static func apply_gravity_up(b: BattleState) -> void:
+	for x in b.board.size:
+		var column: Array = []
+		for y in b.board.size:
+			var c := b.board.get_cell(x, y)
+			if c != null and not c.pinned:
+				column.append(c)
+		var idx := 0
+		for y in b.board.size:
+			var c2 := b.board.get_cell(x, y)
+			if c2 != null and c2.pinned:
+				continue
+			if idx < column.size():
+				b.board.set_cell(x, y, column[idx])
+				idx += 1
+			else:
+				b.board.set_cell(x, y, null)
+
+
 ## 横向重力：每行向左压缩（字靠左对齐）。
 static func apply_gravity_left(b: BattleState) -> void:
 	for y in b.board.size:

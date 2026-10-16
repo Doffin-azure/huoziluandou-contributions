@@ -9,7 +9,7 @@ const H := 8
 const N := W * H
 const DIRS := [Vector2i(0, 1), Vector2i(1, 0), Vector2i(0, -1), Vector2i(-1, 0)]
 const P := {"inkLo": 0.15, "inkHi": 0.20, "vision": 2, "wakeLo": 10, "wakeHi": 14, "buffer": 4, "v0": 0.5, "acc": 0.01,
-	"vmax": 1.0, "fightT": 2, "restT": 3, "ambT": 1, "maxDetour": 5, "minDeg": 2.7}
+	"vmax": 1.0, "p0": 0.35, "pGrow": 0.05, "fightT": 2, "restT": 3, "ambT": 1, "maxDetour": 5, "minDeg": 2.7}
 const INF := 1 << 30
 ## 主题：字池、明敌、首领字、两种机关。gate=周期开关，slow=多耗 1 步，slide=顺流滑行，stun=定住首领，flavor=只影响资源
 const THEME_ORDER := ["墨池", "熔铸坊", "潮汐渠", "雷池"]
@@ -19,7 +19,7 @@ const THEMES := {
 		{"g": "纸", "n": [4, 6], "kind": "slow", "color": "c9b88a", "desc": "吸墨纸：经过要多耗 1 步，首领不受影响"}]},
 	"熔铸坊": {"ink": "4a2f28", "glyphs": "火热炼铸金精重强", "foes": ["爆", "热", "甲"], "boss": "铸", "mech": [
 		{"g": "焰", "n": [3, 5], "kind": "flavor", "color": "d2542a", "desc": "烈焰格：可以走，每次经过气血 −3"},
-		{"g": "炉", "n": [1, 2], "kind": "flavor", "color": "8a3a1f", "desc": "熔炉：投两个字熔成一个稀有字，一次性"}]},
+		{"g": "炉", "n": [1, 2], "kind": "flavor", "color": "8a3a1f", "desc": "熔炉：投 2～3 个字许愿，相关的字越多越可能熔出遗物，否则熔成稀有字；一次性"}]},
 	"潮汐渠": {"ink": "2b3a45", "glyphs": "流回转清冷急分合", "foes": ["冷", "急", "流"], "boss": "潮", "mech": [
 		{"g": "流", "n": [2, 3], "kind": "slide", "color": "3d7fb0", "desc": "水流：顺着箭头滑出去，不耗步；首领不能用"},
 		{"g": "潮", "n": [2, 3], "kind": "gate", "cycle": [4, 4], "color": "5a7f9a", "desc": "涨潮格：开 4 步、淹 4 步，淹着时谁都过不去"}]},
@@ -145,6 +145,7 @@ static func shut(mc: Dictionary, t: int) -> bool:
 
 
 ## 首领速度，e = 起身后过了几步；acc_scale 用于「更漏」「冷却」
+## 只给生成器的初见模拟用（和 HTML 原型对齐，决定地图合不合格）；游戏里首领走不走见 Expedition.move_chance
 static func spd(e: int, acc_scale := 1.0) -> float:
 	return minf(P.vmax, P.v0 + P.acc * acc_scale * maxi(0, e))
 
@@ -695,10 +696,49 @@ static func generate(seed_value: int, theme_name := "随机") -> Dictionary:
 		var m := build(seed_value + i, theme_name)
 		if m.has("fail") or not m.pass:
 			continue
-		if assign_ambush(m):
+		if relocate_lair(m) and assign_ambush(m):
 			m["tries"] = i + 1
 			return m
 	return {}
+
+
+## 首领巢穴离起点至少几步（沿可走的路算）。起点总在地图中部偏左，太大会把左半圈排除掉
+const LAIR_MIN_PATH := 6
+
+
+## 地图最外一圈的格
+static func is_rim(k: int) -> bool:
+	var p := rc(k)
+	return p.x == 0 or p.y == 0 or p.x == H - 1 or p.y == W - 1
+
+
+## 首领巢穴改到最外一圈的随机空地（原型把它放在离起点最远处，玩家很快就能猜到）。
+## 条件：走得到；离起点至少 LAIR_MIN_PATH 步（沿路走）；不贴着大赏、休息点、商店；不压机关、墨障、散字、凹槽。
+## 用单独的随机数（只看种子），不影响原型的其余排布；一个合格的格都没有就换下一张图。
+static func relocate_lair(m: Dictionary) -> bool:
+	var R := Rng.new(int(m.seed) * 4099 + 29)
+	var mk := mask_of(func(k): return m.ink[k] == 0 and not m.obst.has(k) and not (m.mech.has(k) and m.mech[k].kind == "gate"))
+	var d := bfs(mk, m.start)
+	var keep_off: Array = []
+	for k in m.node:
+		if m.node[k].t in ["大", "休", "市", "险"]:
+			keep_off.append(k)
+	var cand: Array = []
+	for k in N:
+		if not is_rim(k) or m.ink[k] != 0 or m.pocket.has(k) or m.obst.has(k) or m.mech.has(k) or m.glyph.has(k):
+			continue
+		if k == m.start or (m.node.has(k) and m.node[k].t != "巢") or d[k] >= INF or d[k] < LAIR_MIN_PATH:
+			continue
+		if keep_off.any(func(x): return man(x, k) < 3):
+			continue
+		cand.append(k)
+	if cand.is_empty():
+		return false
+	var lair: int = cand[R.ri(cand.size())]
+	m.node.erase(m.lair)
+	m.node[lair] = {"t": "巢"}
+	m["lair"] = lair
+	return true
 
 
 ## v0.3 伏兵：领地 = 所在格 + 上下左右；领地里的小赏 / 谜 / 散字被「封」；

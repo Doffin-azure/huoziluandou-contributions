@@ -38,6 +38,10 @@ var custom_deck: Array = []
 
 ## 墨途远征的局内状态；经典冒险为 null
 var expedition: Expedition = null
+## 遗物（见 src/core/relics.gd）：按获得顺序；绑定类记永久实体 uid；计数器（发明蛋）
+var relics: Array = []
+var relic_binds: Dictionary = {}
+var relic_counters: Dictionary = {}
 
 
 func _ready() -> void:
@@ -51,6 +55,9 @@ func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> voi
 	rules = Database.rules
 	deck.clear()
 	expedition = null
+	relics.clear()
+	relic_binds.clear()
+	relic_counters.clear()
 	player_max_hp = rules.player_max_hp
 	player_hp = player_max_hp
 	gold = rules.starting_gold
@@ -89,6 +96,51 @@ func add_character(data: CharacterData, count: int = 1) -> void:
 	for i in count:
 		deck.append(CharInstance.new(data))
 	EventBus.deck_changed.emit()
+
+
+# ---------------------------------------------------------------- 遗物
+func has_relic(id: String) -> bool:
+	return relics.has(id)
+
+
+## 按获得顺序追加；重复获得无效。绑定类遗物另需 bind_relic。
+func add_relic(id: String) -> bool:
+	if relics.has(id) or not Relics.DEFS.has(id):
+		return false
+	relics.append(id)
+	Relics.on_pickup(id)
+	return true
+
+
+## 卖掉 / 失去：绑定和计数一起清掉（以后还能再得到）
+func remove_relic(id: String) -> bool:
+	if not relics.has(id):
+		return false
+	relics.erase(id)
+	relic_binds.erase(id)
+	relic_counters.erase(id)   # 「fireman_claimed」这类一局一次的标记不清
+	return true
+
+
+## 绑定到字袋里第一枚该字形、且没被别的遗物绑定的永久实体
+func bind_relic(id: String, glyph_id: String) -> bool:
+	if not relics.has(id):
+		return false
+	var bound: Array = relic_binds.values()
+	for c in deck:
+		if c.id() == glyph_id and not bound.has(c.uid):
+			relic_binds[id] = c.uid
+			return true
+	return false
+
+
+## 绑定的实体已不在字袋（被删、被熔）→ 返回 null，遗物暂时失效
+func relic_bound_inst(id: String) -> CharInstance:
+	var uid := int(relic_binds.get(id, -1))
+	for c in deck:
+		if c.uid == uid:
+			return c
+	return null
 
 
 ## 把战斗中收购得到的实体字永久加入字袋
@@ -133,13 +185,19 @@ func remove_by_uid(uid: int) -> bool:
 	return false
 
 
+## 同字形有多枚时，先删没被遗物绑定的那一枚
 func remove_character_id(id: String) -> bool:
+	var bound: Array = relic_binds.values()
+	var pick := -1
 	for i in deck.size():
 		if deck[i].id() == id:
-			deck.remove_at(i)
-			EventBus.deck_changed.emit()
-			return true
-	return false
+			if pick < 0 or (bound.has(deck[pick].uid) and not bound.has(deck[i].uid)):
+				pick = i
+	if pick < 0:
+		return false
+	deck.remove_at(pick)
+	EventBus.deck_changed.emit()
+	return true
 
 
 func add_gold(amount: int) -> void:
