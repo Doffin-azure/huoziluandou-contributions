@@ -425,8 +425,8 @@ func _test_loot_rest_shop() -> void:
 	var t0 := ex.t
 	ex.rest("heal")
 	_ok(GameState.player_hp == 38 and ex.t == t0 + 3, "休息治疗 30%（18 点），耗 3 步")
-	ex.seals = ["砚台"]
-	_ok(ex.rest_heal_amount() == 36, "砚台：治疗量翻倍")
+	ex.seals = ["蒲团"]
+	_ok(ex.rest_heal_amount() == 36, "蒲团：治疗量翻倍")
 	ex.seals = []
 	ex.push_panel({"kind": "rest"})
 	var id: String = GameState.deck[0].id()
@@ -538,9 +538,9 @@ func _test_battle_setup() -> void:
 	_ok(s.player.hp == hp and s.enemy_skip_turns == 0, "停火：首领第一回合不攻击")
 	_set_words(ex, [])
 	ex.act = 2
-	ex.seals = ["朱砂"]
+	ex.seals = ["朱笔"]
 	s = _battle(ex, boss)
-	_ok(s.enemies[0].status_stacks("strength") == 0 and s.enemies[0].persistent_block == 12, "朱砂：首领少一条词条（第二幕去掉力量）")
+	_ok(s.enemies[0].status_stacks("strength") == 0 and s.enemies[0].persistent_block == 12, "朱笔：首领少一条词条（第二幕去掉力量）")
 	ex.seals = []
 	ex.act = 1
 	boss.debuff = "先手"
@@ -608,7 +608,23 @@ func _test_finish_and_acts() -> void:
 	ex.spent = 30
 	ex.fight = {"kind": "boss", "k": ex.boss, "name": "首领", "g": "墨", "caught": false, "debuff": ""}
 	r = ex.finish_battle(true)
-	_ok(not r.reward and ex.panels.any(func(p): return p.kind == "act_end"), "击败首领：本幕结束，不走三选一")
+	_ok(not r.reward and ex.boss_down and not ex.panels.any(func(p): return p.kind == "act_end"), "击败首领：不走三选一，也不直接结束本幕")
+	_ok(not ex.awake() and not ex.can_confront() and not ex.boss_revealed() and ex.boss_path().is_empty(), "首领倒下：不再追击，棋子和路线都不显示")
+	_ok(ex.boss_status().contains("已败") and ex.alerts.size() == 1 and ex.alerts[0][0] == "首领已被击败", "首领倒下：状态改为已败，只弹「可以继续探索」的提示")
+	ex.alerts.clear()
+	var t_before := ex.t
+	var caught := false
+	for i in 30:
+		caught = ex.tick() or caught
+	_ok(not caught and ex.fight.is_empty() and ex.t == t_before + 30, "首领倒下后过 30 步也不会被追上")
+	var rest_k := _find(ex, func(k): return ex.m.node.get(k, {}).get("t", "") == "休")
+	if rest_k >= 0:
+		ex.pos = rest_k
+		ex.enter_cell()
+		_ok(ex.top_panel().get("kind", "") == "rest", "首领倒下后还能进休息点")
+		ex.panels.clear()
+	_ok(ex.can_finish_act() and ex.finish_act() and ex.top_panel().get("kind", "") == "act_end", "点「结束本幕」才进入幕间结算")
+	_ok(not ex.finish_act(), "幕间结算面板开着时不能重复结束")
 	_ok(ex.act_settlement() == [["利息", 5], ["投资返还", 6]], "幕间：利息 10%% / 投资返还 20%% %s" % [ex.act_settlement()])
 	_set_words(ex, ["利息", "复利投资"])
 	ex.act = 2
@@ -713,9 +729,16 @@ func _test_screens() -> void:
 		await get_tree().process_frame
 		if Router.current_path.contains("expedition_map_screen"):
 			break
-	_ok(Router.current_path.contains("expedition_map_screen") and ex.top_panel().get("kind", "") in ["act_end", "seal_swap"], "击败首领 → 回地图，弹出幕终结算")
-	Router.current._refresh_event()
-	_ok(Router.current._event_box.get_child_count() > 0, "幕终面板构建")
+	_ok(Router.current_path.contains("expedition_map_screen") and ex.boss_down and ex.top_panel().get("kind", "") in ["", "seal_swap"], "击败首领 → 回地图继续探索，不直接弹幕终")
+	var scr: Control = Router.current
+	ex.panels.clear()
+	scr.refresh()
+	_ok(scr._confront_btn.text == "结束本幕" and not scr._confront_btn.disabled, "首领倒下：按钮变成「结束本幕」")
+	scr._confront_btn.pressed.emit()
+	await get_tree().process_frame
+	_ok(ex.top_panel().get("kind", "") == "act_end", "点「结束本幕」弹出幕终结算")
+	scr._refresh_event()
+	_ok(scr._event_box.get_child_count() > 0, "幕终面板构建")
 
 
 ## 自动跑完整局：随机走、处理每种面板、每场战斗都真的建 BattleState 并套开场效果（战斗按胜利结算）
@@ -777,7 +800,9 @@ func _test_autoplay() -> void:
 						opts.sort_custom(func(a, b): return d[a] < d[b])
 						nx = opts[0]
 					ex.move(nx)
-					if ex.can_confront():
+					if ex.can_finish_act() and rng.randf() < 0.2:
+						ex.finish_act()
+					elif ex.can_confront():
 						ex.confront()
 		if ex.over and ex.won:
 			finished += 1

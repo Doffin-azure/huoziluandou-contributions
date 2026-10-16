@@ -462,8 +462,8 @@ func _test_out_of_battle() -> void:
 	var base := ex.rest_heal_amount()
 	GameState.relics.append("sleep")
 	_ok(ex.rest_heal_amount() == base + 20, "好好睡：远征休息点治疗 +20（%d → %d）" % [base, ex.rest_heal_amount()])
-	ex.seals = ["砚台"]
-	_ok(ex.rest_heal_amount() == base * 2 + 20, "好好睡 + 砚台：先翻倍再 +20")
+	ex.seals = ["蒲团"]
+	_ok(ex.rest_heal_amount() == base * 2 + 20, "好好睡 + 蒲团：先翻倍再 +20")
 	ex.seals = []
 	GameState.expedition = null
 	_reset()
@@ -656,7 +656,7 @@ func _test_expedition() -> void:
 	ex.panels.clear()
 	ex.fight = {"kind": "boss", "k": ex.boss, "name": "首领", "g": "墨", "caught": false, "debuff": ""}
 	ex.finish_battle(true)
-	_ok(ex.top_panel().get("kind", "") == "act_end", "首领：直接幕间结算")
+	_ok(ex.boss_down and ex.top_panel().is_empty(), "首领：不给遗物，回地图继续探索")
 	# 删掉绑定的字：提示失效，不报错
 	_reset(["slab"])
 	GameState.relic_binds["slab"] = GameState.deck[0].uid
