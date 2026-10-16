@@ -292,7 +292,16 @@ func _test_boss() -> void:
 	var ex := _fresh(9)
 	ex.t = ex.wake_time() - 1
 	ex.tick()
-	_ok(ex.stir != null and int(ex.rise) == ex.t + 4 and not ex.awake(), "到醒来时间被惊动，缓冲 4 步")
+	_ok(ex.stir != null and int(ex.rise) == ex.t + ex.buffer_steps() and not ex.awake() and ex.boss_revealed(), "到醒来时间被惊动，首领现身，缓冲 %d 步后起身" % ex.buffer_steps())
+	var wakes := {}
+	var bufs := {}
+	var in_range := true
+	for sd in range(1, 41):
+		var gm := MapGen.generate(sd * 17)
+		wakes[int(gm.wake)] = true
+		bufs[int(gm.buffer)] = true
+		in_range = in_range and int(gm.wake) >= 7 and int(gm.wake) <= 10 and int(gm.buffer) >= 7 and int(gm.buffer) <= 10
+	_ok(in_range and wakes.size() >= 3 and bufs.size() >= 3, "首领第 7～10 步惊动、再过 7～10 步起身（40 张图：惊动 %s，缓冲 %s）" % [wakes.keys(), bufs.keys()])
 	_ok(ex.alerts.size() == 1 and ex.alerts[0][0] == "首领被惊动了", "首领被惊动：弹窗提醒")
 	_set_words(ex, ["停息"])
 	_ok(ex.wake_time() == int(ex.m.wake) + 4, "停息：醒来推迟 4 步")

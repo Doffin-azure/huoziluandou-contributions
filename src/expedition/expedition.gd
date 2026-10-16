@@ -179,6 +179,11 @@ func awake() -> bool:
 	return not boss_down and rise != null and t >= rise
 
 
+## 惊动到起身的缓冲步数（每张图 7～10 步，见 MapGen.roll_wake）
+func buffer_steps() -> int:
+	return int(m.get("buffer", MapGen.P.buffer))
+
+
 func wake_time() -> int:
 	return int(m.wake) + (4 if has("停息") else 0)
 
@@ -238,7 +243,7 @@ func is_beacon(k: int) -> bool:
 
 
 # ---------------------------------------------------------------- 时间与首领
-## 过一步：首领到点 / 被大赏惊动 / 有人从巢穴 2 步内经过 → 惊动，缓冲 4 步后起身，沿最短路追
+## 过一步：首领到点 / 被大赏惊动 / 有人从巢穴 2 步内经过 → 惊动，缓冲 7～10 步后起身，沿最短路追
 ## 返回 true = 被追上
 func tick() -> bool:
 	t += 1
@@ -248,11 +253,11 @@ func tick() -> bool:
 		var near := MapGen.bfs(MapGen.mask_of(func(k): return can_enter(k) and not m.obst.has(k)), m.lair)[pos] <= 2
 		if t >= wake_time() or alarm or near:
 			stir = t
-			rise = t + MapGen.P.buffer
-			_log("首领被惊动了：%d 步后起身" % MapGen.P.buffer)
+			rise = t + buffer_steps()
+			_log("首领被惊动了：%d 步后起身" % buffer_steps())
 			var why := "你打开了大赏" if alarm else ("你从巢穴旁经过" if near else "它睡醒了")
 			alerts.append(["首领被惊动了", "%s。首领【%s】%d 步后起身，然后会沿最短路追你。
-地图上的红色【%s】就是它。" % [why, m.TH.boss, MapGen.P.buffer, m.TH.boss]])
+地图上的红色【%s】就是它。" % [why, m.TH.boss, buffer_steps(), m.TH.boss]])
 	if not awake():
 		return false
 	if not halt_done:

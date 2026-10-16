@@ -586,7 +586,7 @@ static func sim(m: Dictionary, mode: String, chase: bool, terr: Dictionary, slid
 			return false
 		if S.stir == null and (S.t >= m.wake or S.alarm or bfs(pass_mask(m, S.t), m.lair)[S.pos] <= 2):
 			S.stir = S.t
-			S.rise = S.t + P.buffer
+			S.rise = S.t + int(m.get("buffer", P.buffer))
 		if S.rise == null or S.t < S.rise:
 			return false
 		if S.stun > 0:
@@ -716,10 +716,24 @@ static func generate(seed_value: int, theme_name := "随机") -> Dictionary:
 		var m := build(seed_value + i, theme_name)
 		if m.has("fail") or not m.pass:
 			continue
+		roll_wake(m)
 		if relocate_lair(m) and place_movers(m) and assign_ambush(m):
 			m["tries"] = i + 1
 			return m
 	return {}
+
+
+## 游戏里首领的节奏：第 7～10 步被惊动（这时首领棋子出现在地图上），再过 7～10 步起身开追。
+## 原型（gen_proto / build 里的初筛）仍用 P.wakeLo～wakeHi 和 P.buffer，地图对照测试不受影响。
+const WAKE_GAME := Vector2i(7, 10)
+const BUFFER_GAME := Vector2i(7, 10)
+
+
+## 用单独的随机数重抽醒来时间和缓冲，不动原型的随机序列
+static func roll_wake(m: Dictionary) -> void:
+	var R := Rng.new(int(m.seed) * 7919 + 13)
+	m["wake"] = WAKE_GAME.x + R.ri(WAKE_GAME.y - WAKE_GAME.x + 1)
+	m["buffer"] = BUFFER_GAME.x + R.ri(BUFFER_GAME.y - BUFFER_GAME.x + 1)
 
 
 ## 游戏里水流滑几格（「流速」另加，见 Expedition._slide）
