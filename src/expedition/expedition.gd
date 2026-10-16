@@ -31,7 +31,8 @@ const AFFIX_TEXT := {"armor": "护甲（持久盾）+%d", "shield": "开场护�
 const ELITE := "iron_seal"
 const FOE_ENEMY := ["ink_spirit", "ember_imp", "paper_guard", "rust_scribe", "bronze_seal"]
 ## 被追上的位置减益（机关格本身及上下左右）
-const SPOT_DEBUFF := {"纸": "少抽字", "泉": "污染字", "焰": "热度", "炉": "熔字", "流": "淹格", "潮": "淹格", "闸": "首领护盾", "桩": "首领护盾"}
+const SPOT_DEBUFF := {"纸": "少抽字", "泉": "污染字", "焰": "热度", "炉": "熔字", "流": "淹格", "潮": "淹格", "闸": "首领护盾", "桩": "首领护盾",
+	"渗": "污染字", "吊": "熔字", "线": "首领护盾"}
 const DEBUFF_TEXT := {"先手": "首领先手：第一回合首领先行动", "少抽字": "开局少抽 1 枚字", "污染字": "字袋混进 1 枚污染字（本场）",
 	"热度": "开局热度 +3", "熔字": "开局 1 枚字被熔掉（本场）", "淹格": "字盘 1 格被水淹，第一回合不能放字", "首领护盾": "首领开局护盾 +8"}
 
@@ -193,6 +194,11 @@ func can_enter(k: int) -> bool:
 	if m.ink[k] != 0:
 		return false
 	return not gate_shut(k, t) or has("电流过载")
+
+
+## 导线这一步通不通电（和电闸同相位；「停电」让电闸常开，导线也就常通）
+func mover_live(k: int, at_t: int) -> bool:
+	return has("停电") or MapGen.mover_live(mech_at(k), at_t)
 
 
 func boss_mask() -> PackedByteArray:
@@ -388,13 +394,27 @@ func _step_mech() -> int:
 			if int(used.get(pos, 0)) < 1:
 				used[pos] = 1
 				_slide(mc.dir)
+		"渗":
+			pos = mc.to
+			_log("渗墨点：从另一个渗墨点冒出来")
+		"吊":
+			if not used.has(pos):
+				used[pos] = 1
+				pos = mc.to
+				_log("吊钩：被吊过墨渍墙")
+		"线":
+			if mover_live(pos, t):
+				pos = mc.to
+				_log("导线通电：一下子到了另一头")
+			else:
+				_log("导线没电：等电闸开了再来")
 	return 0
 
 
 ## 水流：顺着箭头滑 3 格（流速 +2），撞墙停；不耗步
 func _slide(dir: Vector2i) -> void:
 	var p := MapGen.rc(pos)
-	var n := 3 + (2 if has("流速") else 0)
+	var n := MapGen.SLIDE_N + (2 if has("流速") else 0)
 	for i in n:
 		var q: Vector2i = p + dir
 		if not MapGen.inb(q.x, q.y) or not can_enter(MapGen.kk(q.x, q.y)) or m.obst.has(MapGen.kk(q.x, q.y)):
