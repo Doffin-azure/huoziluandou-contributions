@@ -17,14 +17,14 @@ const REST_T := 3
 ## 印章：效果 / 主要来源
 const SEALS := {
 	"镇纸": ["每场战斗少掉 4 点血", "精英"], "夜灯": ["视野 +1 格", "大赏"], "更漏": ["首领走路概率增长得更慢", "大赏"],
-	"拓本": ["打开任何赏都多一个选项", "大赏"], "闲章": ["被「封」的奖励会显示伏兵的位置", "精英"],
-	"朱砂": ["首领战开场，首领少一条词条", "首领"], "砚台": ["休息点的治疗量翻倍", "精英"],
+	"拓本": ["打开任何赏都多一个选项", "大赏"], "印鉴": ["被「封」的奖励会显示伏兵的位置", "精英"],
+	"朱笔": ["首领战开场，首领少一条词条", "首领"], "蒲团": ["休息点的治疗量翻倍", "精英"],
 	"活字盒": ["字匣 +2 格", "大赏"], "宽版": ["版面立刻扩成 3×3（一局只能有一次）", "首领"],
 }
 ## 三幕首领：借用的敌人资源（数值沿用 resources/enemies），名字随主题
 const BOSS := {1: "boss_word_demon", 2: "boss_lead_plate", 3: "boss_chaos_press"}
 const BOSS_NAME := {"墨池": "墨渊", "熔铸坊": "铸印魔", "潮汐渠": "潮伯", "雷池": "雷公"}
-## 首领词条（逐幕加强）：破甲 / 破防 / 朱砂 可以削掉
+## 首领词条（逐幕加强）：破甲 / 破防 / 朱笔 可以削掉
 const BOSS_AFFIX := {1: [["armor", 8], ["shield", 6]], 2: [["armor", 12], ["shield", 8], ["strength", 1]],
 	3: [["armor", 16], ["shield", 10], ["strength", 2]]}
 const AFFIX_TEXT := {"armor": "护甲（持久盾）+%d", "shield": "开场护盾 +%d", "strength": "力量 +%d"}
@@ -59,6 +59,7 @@ var miss := 0                   ## 首领起身后连续没走的步数（伪随
 var stun := 0
 var alarm := false
 var halt_done := false          ## 急停已触发
+var boss_down := false          ## 本幕首领已被击败：不再追击，可以继续探索，随时结束本幕
 var rush_left := 5              ## 急速剩余步数
 var half_step := 0.0
 var ink := START_INK
@@ -125,6 +126,7 @@ func load_act(n: int) -> void:
 	stun = 0
 	alarm = false
 	halt_done = false
+	boss_down = false
 	rush_left = 5
 	half_step = 0.0
 	flip_used = false
@@ -174,7 +176,7 @@ func acc_scale() -> float:
 
 
 func awake() -> bool:
-	return rise != null and t >= rise
+	return not boss_down and rise != null and t >= rise
 
 
 func wake_time() -> int:
@@ -240,6 +242,8 @@ func is_beacon(k: int) -> bool:
 ## 返回 true = 被追上
 func tick() -> bool:
 	t += 1
+	if boss_down:
+		return false
 	if stir == null:
 		var near := MapGen.bfs(MapGen.mask_of(func(k): return can_enter(k) and not m.obst.has(k)), m.lair)[pos] <= 2
 		if t >= wake_time() or alarm or near:
@@ -481,11 +485,11 @@ func ambush_index_at(k: int) -> int:
 	return -1
 
 
-## 伏兵位置是否已知：情报揭示，或「闲章」（被封的奖励会显示伏兵的位置）
+## 伏兵位置是否已知：情报揭示，或「印鉴」（被封的奖励会显示伏兵的位置）
 func revealed_amb_at(k: int) -> bool:
 	var ambs: Array = m.get("ambush", [])
 	for i in ambs.size():
-		if ambs[i].k == k and not amb_done.has(i) and (revealed_amb.has(i) or has_seal("闲章")):
+		if ambs[i].k == k and not amb_done.has(i) and (revealed_amb.has(i) or has_seal("印鉴")):
 			return true
 	return false
 
@@ -769,7 +773,7 @@ func roll_seal(source: String) -> String:
 # ---------------------------------------------------------------- 休息点
 ## 治疗 / 删字 / 修饰 三选一，耗 3 步，每个休息点只能用一次；清洗额外清 1 枚污染字
 func rest_heal_amount() -> int:
-	return int(round(GameState.player_max_hp * 0.3)) * (2 if has_seal("砚台") else 1) + Relics.rest_bonus()
+	return int(round(GameState.player_max_hp * 0.3)) * (2 if has_seal("蒲团") else 1) + Relics.rest_bonus()
 
 
 func rest(choice: String, glyph_id := "") -> bool:
@@ -1072,7 +1076,7 @@ func refresh_active() -> void:
 # ---------------------------------------------------------------- 首领：主动迎战 / 超能力 / 幕间
 ## 主动迎战：首领醒着且在 2 步内，或站在巢穴旁；不吃位置减益
 func can_confront() -> bool:
-	if busy():
+	if busy() or boss_down:
 		return false
 	var d := MapGen.bfs(boss_mask(), boss)[pos]
 	return d <= 2
@@ -1133,16 +1137,33 @@ func boss_path(n := 6) -> Array:
 ## 首领状态（界面用）：睡着不报确切时间；惊动后倒计时；追击时报距离
 ## 首领棋子是否显示在地图上：被惊动以后，或者它所在的格在视野里 / 去过
 func boss_revealed() -> bool:
+	if boss_down:
+		return false
 	return stir != null or visible.has(boss) or explored.has(boss)
 
 
 func boss_status() -> String:
+	if boss_down:
+		return "首领已败 · 可以继续探索"
 	if stir == null:
 		return "首领沉睡"
 	if not awake():
 		return "首领惊动 · %d 步后起身" % (int(rise) - t)
 	var d := MapGen.bfs(boss_mask(), boss)[pos]
 	return "首领追来 · 相距 %d 步%s" % [d, "（被定住 %d 步）" % stun if stun > 0 else ""]
+
+
+## 打赢首领后，玩家自己决定什么时候结束本幕（进入幕间结算）
+func can_finish_act() -> bool:
+	return boss_down and not busy()
+
+
+func finish_act() -> bool:
+	if not can_finish_act():
+		return false
+	push_panel({"kind": "act_end"})
+	_log("第 %d 幕完成" % act)
+	return true
 
 
 ## 幕间结算：利息（复利投资逐幕翻倍）+ 投资返还（再投资提高到 50%）
@@ -1266,12 +1287,12 @@ func apply_battle_setup(state: BattleState) -> void:
 			state._enemy_act(e, true)
 
 
-## 首领词条：朱砂少一条；破甲护甲 −8；破防失去全部护盾；停火第一回合不攻击；被追上吃位置减益
+## 首领词条：朱笔少一条；破甲护甲 −8；破防失去全部护盾；停火第一回合不攻击；被追上吃位置减益
 func _boss_setup(state: BattleState, e: Combatant) -> void:
 	var affixes: Array = BOSS_AFFIX[act].duplicate(true)
-	if has_seal("朱砂") and not affixes.is_empty():
+	if has_seal("朱笔") and not affixes.is_empty():
 		var cut: Array = affixes.pop_back()
-		state._log("朱砂：首领少一条词条（%s）" % (AFFIX_TEXT[cut[0]] % cut[1]))
+		state._log("朱笔：首领少一条词条（%s）" % (AFFIX_TEXT[cut[0]] % cut[1]))
 	for a in affixes:
 		var v: int = a[1]
 		match a[0]:
@@ -1367,8 +1388,13 @@ func finish_battle(victory: bool) -> Dictionary:
 			var s := roll_seal("首领")
 			if not s.is_empty():
 				add_seal(s)
-			push_panel({"kind": "act_end"})
-			_log("击败首领%s，第 %d 幕完成" % [f.name, act])
+			boss_down = true
+			stun = 0
+			boss_trail.clear()
+			alerts.clear()   ## 战前排队的惊动 / 起身提示已经过时
+			_log("击败首领%s：可以继续探索，准备好了就结束本幕" % f.name)
+			alerts.append(["首领已被击败", "首领【%s】倒下了，不会再追你。
+剩下的赏、商店、休息点都还在，可以慢慢拿完；准备好了，点「结束本幕」进入幕间结算。" % m.TH.boss])
 			return {"reward": false}
 		"ambush":
 			amb_done[int(f.amb)] = true

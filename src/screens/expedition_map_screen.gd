@@ -122,7 +122,7 @@ func _build_header() -> Control:
 	_power_btn = _ghost("超能力", func(): ex.use_power())
 	_power_btn.tooltip_text = "每幕一次：首领起身后把它定住 6 步"
 	row.add_child(_power_btn)
-	_confront_btn = _ghost("迎战首领", func(): ex.confront())
+	_confront_btn = _ghost("迎战首领", func(): ex.finish_act() if ex.boss_down else ex.confront())
 	_confront_btn.tooltip_text = "首领在 2 步内时可以主动迎战，不吃位置减益"
 	row.add_child(_confront_btn)
 	var deck := _ghost("字袋", _open_deck)
@@ -232,7 +232,10 @@ func refresh() -> void:
 func _refresh_boss_bar() -> void:
 	var color := Palette.INK_SOFT
 	var text := "首领【%s】在巢穴里沉睡，没有在追你" % ex.m.TH.boss
-	if ex.stir != null and not ex.awake():
+	if ex.boss_down:
+		color = Palette.JADE
+		text = "首领【%s】已被击败 · 剩下的东西可以慢慢拿，准备好了点「结束本幕」" % ex.m.TH.boss
+	elif ex.stir != null and not ex.awake():
 		color = Palette.GOLD_DK
 		text = "首领【%s】被惊动了！%d 步后起身追你" % [ex.m.TH.boss, int(ex.rise) - ex.t]
 	elif ex.awake():
@@ -270,7 +273,9 @@ func _on_stats_changed() -> void:
 	_seal_label.tooltip_text = "\n".join(ex.seals.map(func(s): return "%s：%s" % [s, Expedition.SEALS[s][0]]))
 	_relic_label.text = "遗物：" + ("、".join(GameState.relics.map(func(r): return Relics.name_of(r))) if not GameState.relics.is_empty() else "无")
 	_relic_label.tooltip_text = "\n".join(GameState.relics.map(func(r): return Relics.text(r) + _bind_note(r)))
-	_confront_btn.disabled = not ex.can_confront()
+	_confront_btn.text = "结束本幕" if ex.boss_down else "迎战首领"
+	_confront_btn.tooltip_text = "进入幕间结算；剩下没拿的东西会留在这一幕" if ex.boss_down else "首领在 2 步内时可以主动迎战，不吃位置减益"
+	_confront_btn.disabled = not (ex.can_finish_act() if ex.boss_down else ex.can_confront())
 	_power_btn.visible = ex.has("超能力")
 	_wish_btn.disabled = not ex.can_wish()
 	_wish_btn.text = "许愿机（本幕已用）" if ex.wish_used else "许愿机"
@@ -543,7 +548,7 @@ func _event_fight() -> void:
 				notes.append("防护：开场 +6 护盾。")
 		"boss":
 			var affixes: Array = Expedition.BOSS_AFFIX[ex.act].map(func(a): return Expedition.AFFIX_TEXT[a[0]] % a[1])
-			notes.append("首领词条：" + "、".join(affixes) + ("（朱砂：少一条）" if ex.has_seal("朱砂") else ""))
+			notes.append("首领词条：" + "、".join(affixes) + ("（朱笔：少一条）" if ex.has_seal("朱笔") else ""))
 			if not str(f.get("debuff", "")).is_empty():
 				notes.append("被追上的位置：" + Expedition.DEBUFF_TEXT[f.debuff])
 			elif f.get("caught", false) and ex.has("反超"):
