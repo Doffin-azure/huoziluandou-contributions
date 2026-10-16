@@ -338,6 +338,9 @@ func _map_cell(k: int) -> Button:
 			if mc.kind == "gate" and ex.gate_shut(k, ex.t):
 				bg = bg.darkened(0.45)
 				tip = "关着 · "
+			elif mc.kind == "wire" and not ex.mover_live(k, ex.t):
+				bg = bg.darkened(0.45)
+				tip = "没电 · "
 			tip += mc.desc
 		elif m.obst.has(k):
 			bg = Color(NODE_COLOR["障"])
@@ -361,6 +364,10 @@ func _map_cell(k: int) -> Button:
 			tip = "散字【%s】" % m.glyph[k] + ("：被%s看守" % gd if not gd.is_empty() else "：走过去就拾")
 			if not gd.is_empty():
 				fg = Palette.INK_FAINT
+		elif m.get("wire_path", []).has(k):
+			fg = Color(MapGen.MOVERS["雷池"].color)
+			text = "·"
+			tip = "导线从这里经过（只是连线，踩两头才会传送）"
 		if ex.sealed(k) and (not o.is_empty() or m.glyph.has(k)) and not ex.taken.has(k):
 			text = "封"
 			fg = Palette.VERMILION
@@ -850,7 +857,7 @@ func _build_legend() -> Control:
 			[th.boss, Palette.VERMILION.darkened(0.45), Palette.GOLD, "首领棋子 · 惊动（金边，角标倒计时）"],
 			[th.boss, Palette.VERMILION, Palette.PAPER, "首领棋子 · 追击（白边，前方虚点 = 要走的路）"],
 		]],
-		["本幕机关 · " + ex.m.tn, th.mech.map(func(mc): return [mc.g, Color(mc.color), Palette.PAPER, mc.desc])],
+		["本幕机关 · " + ex.m.tn, (th.mech + ([MapGen.MOVERS[ex.m.tn]] if MapGen.MOVERS.has(ex.m.tn) else [])).map(func(mc): return [mc.g, Color(mc.color), Palette.PAPER, mc.desc])],
 		["玩家与版面", [
 			["●", Palette.PAPER_DARK, Palette.VERMILION, "你（朱红粗框）"],
 			["", Palette.PAPER_DARK, Palette.GOLD_DK, "金框 = 下一步能走的格"],

@@ -22,6 +22,7 @@ func _ok(condition: bool, description: String) -> void:
 func _run() -> void:
 	_test_parity()
 	_test_generate()
+	_test_movers()
 	_test_lexicon()
 	_test_start_and_move()
 	_test_boss()
@@ -66,6 +67,80 @@ func _set_words(ex: Expedition, words: Array) -> void:
 
 
 # ---------------------------------------------------------------- 地图生成
+## 远距离移动机关：每个主题都有；位置规则 + 游戏里的效果
+func _test_movers() -> void:
+	var why := ""
+	for tn in MapGen.THEME_ORDER:
+		for s in [3, 17, 29, 41, 55, 68]:
+			var m := MapGen.generate(s, tn)
+			if m.is_empty():
+				why = "%s/%d 生成失败" % [tn, s]
+				continue
+			var mv: Array = m.mech.keys().filter(func(k): return m.mech[k].kind in ["warp", "hoist", "wire", "slide"])
+			var n_by := {"warp": 2, "wire": 2}
+			var kind: String = "slide" if tn == "潮汐渠" else MapGen.MOVERS[tn].kind
+			var count := mv.filter(func(k): return m.mech[k].kind == kind).size()
+			if (kind in n_by and count != n_by[kind]) or count < 2 or count > 3:
+				why = "%s/%d %s 有 %d 个" % [tn, s, kind, count]
+			var mouth := {}
+			for p in m.pockets:
+				mouth[p.o] = true
+			var walk := MapGen.mask_of(func(k): return m.ink[k] == 0 and not (m.mech.has(k) and m.mech[k].kind == "gate"))
+			for k in mv:
+				var mc: Dictionary = m.mech[k]
+				if not mc.has("to"):
+					continue
+				var to: int = mc.to
+				var bad: bool = m.ink[to] != 0 or m.pocket.has(to) or mouth.has(to) or m.node.has(to) or m.obst.has(to) 					or m.get("terr", {}).has(to) or m.get("terr", {}).has(k) or to == m.start or MapGen.man(to, m.lair) < 3
+				if bad:
+					why = "%s/%d 落点 %d 压住了禁区" % [tn, s, to]
+				var d := MapGen.bfs(walk, k)[to]
+				var need: int = {"warp": 8, "hoist": 4, "wire": MapGen.man(k, to) + 3}[mc.kind]
+				if d < need or d >= MapGen.INF:
+					why = "%s/%d %s 不值得用：走路 %d 步" % [tn, s, mc.g, d]
+				if mc.kind in ["warp", "wire"] and m.mech.get(to, {}).get("to", -1) != k:
+					why = "%s/%d %s 不成对" % [tn, s, mc.g]
+	_ok(why.is_empty(), "每个主题都有远距离移动机关：数量对、成对、值得用、落点不压起点 / 凹槽 / 内容 / 伏兵 / 巢穴旁 %s" % why)
+	# 游戏里的效果
+	var ex := _fresh(7)
+	ex.m = MapGen.generate(17, "墨池")
+	var a := _find(ex, func(k): return ex.mech_at(k).get("g", "") == "渗")
+	ex.pos = a
+	_ok(ex._step_mech() == 0 and ex.pos == ex.m.mech[a].to, "渗墨点：传到另一个，不耗步")
+	ex.pos = ex.m.mech[a].to
+	ex._step_mech()
+	_ok(ex.pos == a, "渗墨点：双向，可反复用")
+	ex.m = MapGen.generate(17, "熔铸坊")
+	var h := _find(ex, func(k): return ex.mech_at(k).get("g", "") == "吊")
+	var hd: Vector2i = ex.m.mech[h].dir
+	var over: Vector2i = MapGen.rc(h) + hd
+	ex.used.clear()
+	ex.pos = h
+	ex._step_mech()
+	_ok(ex.pos == ex.m.mech[h].to and ex.m.ink[MapGen.kk(over.x, over.y)] != 0, "吊钩：吊过箭头前面的墨渍墙")
+	ex.pos = h
+	ex._step_mech()
+	_ok(ex.pos == h, "吊钩：一次性")
+	ex.m = MapGen.generate(17, "雷池")
+	_set_words(ex, [])
+	var w := _find(ex, func(k): return ex.mech_at(k).get("g", "") == "线")
+	ex.pos = w
+	ex.t = 0
+	ex._step_mech()
+	_ok(ex.pos == ex.m.mech[w].to, "导线：电闸开着的步通电，到另一头")
+	ex.pos = w
+	ex.t = 4
+	ex._step_mech()
+	_ok(ex.pos == w, "导线：电闸关着的步没电，原地不动")
+	_set_words(ex, ["停电"])
+	ex._step_mech()
+	_ok(ex.pos == ex.m.mech[w].to, "停电：导线一直通电")
+	_ok(not ex.m.get("wire_path", []).is_empty(), "导线：有画出来的连线")
+	# 首领不能用：首领的可走掩码里机关只看开关，不会因为机关跳格
+	var bm := ex.boss_mask()
+	_ok(MapGen.step_toward(bm, w, ex.m.mech[w].to) != ex.m.mech[w].to or MapGen.man(w, ex.m.mech[w].to) == 1, "首领不能用导线")
+
+
 func _test_parity() -> void:
 	var ref: Array = JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/mapgen_proto.json"))
 	var same := 0
@@ -217,7 +292,16 @@ func _test_boss() -> void:
 	var ex := _fresh(9)
 	ex.t = ex.wake_time() - 1
 	ex.tick()
-	_ok(ex.stir != null and int(ex.rise) == ex.t + 4 and not ex.awake(), "到醒来时间被惊动，缓冲 4 步")
+	_ok(ex.stir != null and int(ex.rise) == ex.t + ex.buffer_steps() and not ex.awake() and ex.boss_revealed(), "到醒来时间被惊动，首领现身，缓冲 %d 步后起身" % ex.buffer_steps())
+	var wakes := {}
+	var bufs := {}
+	var in_range := true
+	for sd in range(1, 41):
+		var gm := MapGen.generate(sd * 17)
+		wakes[int(gm.wake)] = true
+		bufs[int(gm.buffer)] = true
+		in_range = in_range and int(gm.wake) >= 7 and int(gm.wake) <= 10 and int(gm.buffer) >= 7 and int(gm.buffer) <= 10
+	_ok(in_range and wakes.size() >= 3 and bufs.size() >= 3, "首领第 7～10 步惊动、再过 7～10 步起身（40 张图：惊动 %s，缓冲 %s）" % [wakes.keys(), bufs.keys()])
 	_ok(ex.alerts.size() == 1 and ex.alerts[0][0] == "首领被惊动了", "首领被惊动：弹窗提醒")
 	_set_words(ex, ["停息"])
 	_ok(ex.wake_time() == int(ex.m.wake) + 4, "停息：醒来推迟 4 步")
