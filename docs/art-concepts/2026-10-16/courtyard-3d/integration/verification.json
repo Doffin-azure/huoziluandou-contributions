@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-16",
+  "branch": "feat/title-3d-sample",
+  "engine": "Godot 4.7.2",
+  "entry": "res://scenes/main.tscn",
+  "images": {
+    "01-title-desktop.png": [
+      1920,
+      1080
+    ],
+    "02-title-mobile.png": [
+      960,
+      432
+    ],
+    "03-entry-camera.png": [
+      1920,
+      1080
+    ],
+    "04-original-map.png": [
+      1920,
+      1080
+    ],
+    "05-original-battle.png": [
+      1920,
+      1080
+    ]
+  },
+  "checks": {
+    "native_menu": {
+      "passed": 19,
+      "failed": 0,
+      "stderr_empty": true
+    },
+    "native_flow": {
+      "passed": 27,
+      "failed": 0,
+      "stderr_empty": true
+    },
+    "native_art": {
+      "passed": 33,
+      "failed": 0,
+      "stderr_empty": true
+    },
+    "headless_flow_after_graph_camera_fix": {
+      "passed": 27,
+      "failed": 0
+    },
+    "headless_intent_regression": {
+      "passed": 49,
+      "failed": 0
+    }
+  },
+  "source_sha256": {
+    "src/screens/title_screen.gd": "46dd7279fc4807ceffeab30af292a001373b3262903376a773856fd669d78dec",
+    "src/screens/screen_base.gd": "bfea335026bc7a7b4c6f76970bfa28ad9a29633c718587f7635d4fb4a52191e3",
+    "src/screens/main.gd": "9e62785bd730e8653b0d5d4cf33050141cd0b72b08daeddb414b1cfcef2d5bed",
+    "src/study/study_stage.gd": "b72ba7a06db71ce1803aedcc2bd4dbefcfe0318ca6008cd36bdfd86d367fb416",
+    "src/title/courtyard_view.gd": "10bb04647805add9e783eac672fdfed6046f5eb0cb4a38e393dbf26d41ad410f"
+  },
+  "assets": "res://assets/title/courtyard/materials/",
+  "notes": [
+    "The final graph background camera reset was also verified in the final native menu run and headless flow run.",
+    "Existing native flow screenshots include the original study map and battle, retained outside the new title.",
+    "No SaveManager on this branch; save/resume remains on the unmerged feat/study-battle-ui branch.",
+    "No commit or push performed."
+  ]
+}

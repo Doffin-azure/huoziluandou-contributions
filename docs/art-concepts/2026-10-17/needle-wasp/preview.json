@@ -1,0 +1,25 @@
+{
+  "id": "needle_wasp_concept",
+  "name": "连针蜂",
+  "glyph": "蜂",
+  "hp": 34,
+  "shield": 0,
+  "attack": 3,
+  "hits": 3,
+  "image": "res://docs/art-concepts/2026-10-17/needle-wasp/v01.png",
+  "output": "res://docs/art-concepts/2026-10-17/needle-wasp/v01-battle.png",
+  "hover": true,
+  "animation_id": "needle_wasp",
+  "animation_output": "res://docs/art-concepts/2026-10-17/needle-wasp/",
+  "capture_directory": "res://shots/needle-wasp-animation/",
+  "animation_clips": [
+    {"id":"idle","title":"待机 · 持续扇翅","length":1.2,"key":0.0},
+    {"id":"sting_a","title":"三连点刺 · 一","length":0.50,"key":0.16},
+    {"id":"sting_b","title":"三连点刺 · 二","length":0.45,"key":0.13},
+    {"id":"sting_c","title":"三连点刺 · 三","length":0.50,"key":0.15},
+    {"id":"charge","title":"蓄势 · 卷腹悬停","length":1.0,"key":0.7},
+    {"id":"heavy","title":"重刺 · 甩腹送针","length":1.25,"key":0.48},
+    {"id":"hit","title":"受击 · 尾部延迟回摆","length":0.6,"key":0.13},
+    {"id":"death","title":"退场 · 收翅坠落","length":1.3,"key":0.65}
+  ]
+}

@@ -1,0 +1,25 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.3.289 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS normal project entry opens the courtyard title
+PASS all existing title actions retained without review controls
+PASS title rendering leaves gameplay RNG untouched
+PASS keyboard focus starts on the primary action
+PASS capture title-production-desktop
+PASS library button opens the real collection overlay
+PASS modal prevents underlying start, settings and custom actions
+PASS ESC closes collection and unlocks the menu
+PASS settings button opens shared production settings
+PASS live reduced-motion preference pauses scenery and hides falling petals
+PASS restoring motion resumes scenery
+PASS 960x432 landscape keeps every action visible with 48-pixel touch targets
+PASS capture title-production-mobile
+PASS custom deck button opens the existing builder
+PASS leaving title releases scenery and its settings subscription
+PASS glyph graph action still uses the existing route
+PASS glyph graph keeps its original room background camera
+PASS title art stays consistent when the battle theme changes
+PASS closing main cleans the active screen, router host and persistent study
+[title_menu_test] PASS=19 FAIL=0

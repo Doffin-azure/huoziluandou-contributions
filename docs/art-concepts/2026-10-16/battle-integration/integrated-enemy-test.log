@@ -1,0 +1,119 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.3.289 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+  ✓ bronze_seal 绑定自己的攻击画稿
+  ✓ bronze_seal 八个姿势轮廓有效且等比适配
+  ✓ bronze_seal 待机和姿势采样不消耗规则随机数
+  ✓ 攻击后恢复输入
+  ✓ bronze_seal 印击：真实伤害保持 10 × 1
+  ✓ bronze_seal 每次实际命中发出独立材质轨迹
+  ✓ bronze_seal 每次实际命中有独立发力，防御不冒充攻击
+  ✓ bronze_seal 回收后回到待机并清理演出上下文
+  ✓ bronze_seal 手机尺寸姿势仍然有效
+  ✓ bronze_seal 减少动效恢复原姿态
+  ✓ bronze_seal 击败后停止待机
+  ✓ iron_seal 绑定自己的攻击画稿
+  ✓ iron_seal 八个姿势轮廓有效且等比适配
+  ✓ iron_seal 待机和姿势采样不消耗规则随机数
+  ✓ 攻击后恢复输入
+  ✓ iron_seal 重压：真实伤害保持 7 × 1
+  ✓ iron_seal 每次实际命中发出独立材质轨迹
+  ✓ iron_seal 每次实际命中有独立发力，防御不冒充攻击
+  ✓ iron_seal 回收后回到待机并清理演出上下文
+  ✓ iron_seal 手机尺寸姿势仍然有效
+  ✓ iron_seal 减少动效恢复原姿态
+  ✓ iron_seal 击败后停止待机
+  ✓ iron_seal 绑定自己的攻击画稿
+  ✓ iron_seal 八个姿势轮廓有效且等比适配
+  ✓ 攻击后恢复输入
+  ✓ iron_seal 横扫：真实伤害保持 11 × 1
+  ✓ iron_seal 每次实际命中发出独立材质轨迹
+  ✓ iron_seal 每次实际命中有独立发力，防御不冒充攻击
+  ✓ iron_seal 回收后回到待机并清理演出上下文
+  ✓ paper_guard 绑定自己的攻击画稿
+  ✓ paper_guard 八个姿势轮廓有效且等比适配
+  ✓ paper_guard 待机和姿势采样不消耗规则随机数
+  ✓ 攻击后恢复输入
+  ✓ paper_guard 割：真实伤害保持 9 × 1
+  ✓ paper_guard 每次实际命中发出独立材质轨迹
+  ✓ paper_guard 每次实际命中有独立发力，防御不冒充攻击
+  ✓ paper_guard 回收后回到待机并清理演出上下文
+  ✓ paper_guard 手机尺寸姿势仍然有效
+  ✓ paper_guard 减少动效恢复原姿态
+  ✓ paper_guard 击败后停止待机
+  ✓ rust_scribe 绑定自己的攻击画稿
+  ✓ rust_scribe 八个姿势轮廓有效且等比适配
+  ✓ rust_scribe 待机和姿势采样不消耗规则随机数
+  ✓ 攻击后恢复输入
+  ✓ rust_scribe 刺：真实伤害保持 8 × 1
+  ✓ rust_scribe 每次实际命中发出独立材质轨迹
+  ✓ rust_scribe 每次实际命中有独立发力，防御不冒充攻击
+  ✓ rust_scribe 回收后回到待机并清理演出上下文
+  ✓ rust_scribe 手机尺寸姿势仍然有效
+  ✓ rust_scribe 减少动效恢复原姿态
+  ✓ rust_scribe 击败后停止待机
+  ✓ ember_imp 绑定自己的攻击画稿
+  ✓ ember_imp 八个姿势轮廓有效且等比适配
+  ✓ ember_imp 连击姿势轮廓有效
+  ✓ ember_imp 待机和姿势采样不消耗规则随机数
+  ✓ 攻击后恢复输入
+  ✓ ember_imp 连焰：真实伤害保持 4 × 2
+  ✓ ember_imp 每次实际命中发出独立材质轨迹
+  ✓ ember_imp 每次实际命中有独立发力，防御不冒充攻击
+  ✓ ember_imp 回收后回到待机并清理演出上下文
+  ✓ ember_imp 手机尺寸姿势仍然有效
+  ✓ ember_imp 减少动效恢复原姿态
+  ✓ ember_imp 击败后停止待机
+  ✓ boss_lead_plate 绑定自己的攻击画稿
+  ✓ boss_lead_plate 八个姿势轮廓有效且等比适配
+  ✓ boss_lead_plate 待机和姿势采样不消耗规则随机数
+  ✓ 攻击后恢复输入
+  ✓ boss_lead_plate 压印：真实伤害保持 10 × 1
+  ✓ boss_lead_plate 每次实际命中发出独立材质轨迹
+  ✓ boss_lead_plate 每次实际命中有独立发力，防御不冒充攻击
+  ✓ boss_lead_plate 回收后回到待机并清理演出上下文
+  ✓ boss_lead_plate 手机尺寸姿势仍然有效
+  ✓ boss_lead_plate 减少动效恢复原姿态
+  ✓ boss_lead_plate 击败后停止待机
+  ✓ boss_lead_plate 绑定自己的攻击画稿
+  ✓ boss_lead_plate 八个姿势轮廓有效且等比适配
+  ✓ boss_lead_plate 连击姿势轮廓有效
+  ✓ 攻击后恢复输入
+  ✓ boss_lead_plate 连铸：真实伤害保持 6 × 2
+  ✓ boss_lead_plate 每次实际命中发出独立材质轨迹
+  ✓ boss_lead_plate 每次实际命中有独立发力，防御不冒充攻击
+  ✓ boss_lead_plate 回收后回到待机并清理演出上下文
+  ✓ boss_word_demon 绑定自己的攻击画稿
+  ✓ boss_word_demon 八个姿势轮廓有效且等比适配
+  ✓ boss_word_demon 待机和姿势采样不消耗规则随机数
+  ✓ 攻击后恢复输入
+  ✓ boss_word_demon 撕字：真实伤害保持 9 × 1
+  ✓ boss_word_demon 每次实际命中发出独立材质轨迹
+  ✓ boss_word_demon 每次实际命中有独立发力，防御不冒充攻击
+  ✓ boss_word_demon 回收后回到待机并清理演出上下文
+  ✓ boss_word_demon 手机尺寸姿势仍然有效
+  ✓ boss_word_demon 减少动效恢复原姿态
+  ✓ boss_word_demon 击败后停止待机
+  ✓ boss_chaos_press 绑定自己的攻击画稿
+  ✓ boss_chaos_press 八个姿势轮廓有效且等比适配
+  ✓ boss_chaos_press 待机和姿势采样不消耗规则随机数
+  ✓ 攻击后恢复输入
+  ✓ boss_chaos_press 吞字：真实伤害保持 13 × 1
+  ✓ boss_chaos_press 每次实际命中发出独立材质轨迹
+  ✓ boss_chaos_press 每次实际命中有独立发力，防御不冒充攻击
+  ✓ boss_chaos_press 回收后回到待机并清理演出上下文
+  ✓ boss_chaos_press 手机尺寸姿势仍然有效
+  ✓ boss_chaos_press 减少动效恢复原姿态
+  ✓ boss_chaos_press 击败后停止待机
+  ✓ boss_chaos_press 绑定自己的攻击画稿
+  ✓ boss_chaos_press 八个姿势轮廓有效且等比适配
+  ✓ boss_chaos_press 连击姿势轮廓有效
+  ✓ 攻击后恢复输入
+  ✓ boss_chaos_press 乱版：真实伤害保持 7 × 3
+  ✓ boss_chaos_press 每次实际命中发出独立材质轨迹
+  ✓ boss_chaos_press 每次实际命中有独立发力，防御不冒充攻击
+  ✓ boss_chaos_press 回收后回到待机并清理演出上下文
+  ✓ 八只敌人的 PNG 均逐字节保留
+ENEMY ATTACK ANIMATION: 113 passed, 0 failed

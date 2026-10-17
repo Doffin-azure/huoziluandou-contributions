@@ -28,6 +28,8 @@ var battle_table: BattleTableScene
 var _study_nodes: Array[Node3D] = []
 var _environment: Environment
 var _fill: OmniLight3D
+var _display: TextureRect
+var _illustrated_backdrop: TextureRect
 
 
 func _ready() -> void:
@@ -43,12 +45,21 @@ func _ready() -> void:
 	viewport.positional_shadow_atlas_size = 1024
 	add_child(viewport)
 	var display := TextureRect.new()
+	_display = display
 	display.texture = viewport.get_texture()
 	display.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	display.stretch_mode = TextureRect.STRETCH_SCALE
 	display.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	display.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(display)
+	_illustrated_backdrop = TextureRect.new()
+	_illustrated_backdrop.texture = TaopunkArt.background()
+	_illustrated_backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_illustrated_backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_illustrated_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_illustrated_backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_illustrated_backdrop.hide()
+	add_child(_illustrated_backdrop)
 	_world = Node3D.new()
 	viewport.add_child(_world)
 	_make_materials()
@@ -348,10 +359,22 @@ func _build_lighting() -> void:
 
 
 func set_screen(path: String) -> void:
+	# Title and journey pages own their backgrounds. Render the old world only for battle.
+	if not path.ends_with("/battle_screen.gd"):
+		_battle_mode = false
+		show_room()
+		if not path.ends_with("/title_screen.gd") and not path.contains("glyph_graph_screen"):
+			_apply_camera(1)
+		hide()
+		viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
+		return
 	_battle_mode = path.contains("battle_screen")
 	for study_node in _study_nodes:
 		study_node.visible = not _battle_mode
-	battle_table.visible = _battle_mode
+	var illustrated := _battle_mode and Palette.STYLE_ID == "taopunk"
+	battle_table.visible = _battle_mode and not illustrated
+	_illustrated_backdrop.visible = illustrated
+	_display.visible = not illustrated
 	if _battle_mode:
 		_sun.look_at_from_position(Vector3(-7, 4.8, -4), Vector3(0, 1.4, 0), Vector3.UP)
 		_sun.light_color = Color("fff1d6")
@@ -381,13 +404,11 @@ func set_screen(path: String) -> void:
 		_environment.ssao_intensity = 1.4
 		_fill.light_energy = 0.15
 	_desk_sheet.visible = not _battle_mode
-	visible = Palette.STYLE_ID == "paper"
-	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if visible else SubViewport.UPDATE_DISABLED
+	visible = Palette.STYLE_ID in ["paper", "taopunk"]
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if visible and not illustrated else SubViewport.UPDATE_DISABLED
 	if not visible:
 		return
-	if path.contains("title_screen"):
-		show_room()
-	elif not path.contains("glyph_graph_screen"):
+	if not path.contains("glyph_graph_screen"):
 		if _camera_tween == null or not _camera_tween.is_running():
 			_apply_camera(1)
 
@@ -433,7 +454,7 @@ func _apply_camera(value: float) -> void:
 
 
 func shared_table_active() -> bool:
-	return visible and _battle_mode and battle_table != null
+	return visible and _battle_mode and battle_table != null and Palette.STYLE_ID == "paper"
 
 
 func table_point(canvas_point: Vector2, height: float) -> Vector3:

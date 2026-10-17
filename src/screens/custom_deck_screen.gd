@@ -12,7 +12,7 @@ var _total_label: Label
 var _start_btn: Button
 var _tiles: Dictionary = {}      ## glyph -> Control（字块）
 var _count_labels: Dictionary = {} ## glyph -> Label
-var _tile_bgs: Dictionary = {}   ## glyph -> ColorRect
+var _tile_bgs: Dictionary = {}   ## glyph -> Panel
 
 
 func build(root: Control) -> void:
@@ -25,9 +25,8 @@ func build(root: Control) -> void:
 			return a.rarity < b.rarity
 		return a.glyph < b.glyph)
 
-	var main := Ink.vbox(0)
-	main.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.add_child(main)
+	var main := JourneyStyle.page(root)
+
 	main.add_child(_header())
 
 	var scroll := ScrollContainer.new()
@@ -43,15 +42,18 @@ func build(root: Control) -> void:
 	_grid.add_theme_constant_override("v_separation", 10)
 	pad.add_child(_grid)
 
-	var center := CenterContainer.new()
-	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_grid.add_child(center)
 
 	for c in _pool:
 		_grid.add_child(_make_tile(c))
 
 	main.add_child(_footer())
 	_refresh()
+	_grid.resized.connect(_layout_grid)
+	_layout_grid.call_deferred()
+
+
+func _layout_grid() -> void:
+	_grid.columns = maxi(1, int((_grid.size.x + 12) / (88 * JourneyStyle.touch_scale(self) + 12)))
 
 
 func _header() -> Control:
@@ -63,7 +65,7 @@ func _header() -> Control:
 	row.add_child(Ink.h2("自定义构筑"))
 	row.add_child(Ink.label("左键加字 · 右键减字　单字上限 %d · 总数上限 %d" % [MAX_PER_GLYPH, MAX_TOTAL], "Muted"))
 	row.add_child(Ink.expander())
-	_total_label = Ink.label("", "Stat", Palette.GOLD_DK)
+	_total_label = Ink.label("", "Stat", JourneyStyle.GOLD)
 	row.add_child(_total_label)
 	var back := Ink.button("返回标题")
 	back.theme_type_variation = "GhostButton"
@@ -81,11 +83,11 @@ func _footer() -> Control:
 	row.add_child(Ink.expander())
 	var clear := Ink.button("清空")
 	clear.theme_type_variation = "GhostButton"
-	clear.custom_minimum_size = Vector2(90, 44)
+	clear.custom_minimum_size = Vector2(90, 48 * JourneyStyle.touch_scale(self))
 	clear.pressed.connect(_on_clear)
 	row.add_child(clear)
 	_start_btn = Ink.button("以此字袋开始冒险", true)
-	_start_btn.custom_minimum_size = Vector2(240, 44)
+	_start_btn.custom_minimum_size = Vector2(240, 48 * JourneyStyle.touch_scale(self))
 	_start_btn.pressed.connect(_on_start)
 	row.add_child(_start_btn)
 	return panel
@@ -93,26 +95,26 @@ func _footer() -> Control:
 
 func _make_tile(c: CharacterData) -> Control:
 	var holder := Control.new()
-	holder.custom_minimum_size = Vector2(88, 88)
+	holder.custom_minimum_size = Vector2(88, 88) * JourneyStyle.touch_scale(self)
+	holder.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	holder.mouse_filter = Control.MOUSE_FILTER_STOP
-	var bg := ColorRect.new()
+	var bg := Panel.new()
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var mat := Ink.make_wood_material()
-	mat.set_shader_parameter("tile_size", Vector2(88, 88))
-	mat.set_shader_parameter("corner_radius", 10.0)
-	bg.material = mat
+	bg.add_theme_stylebox_override("panel", JourneyStyle.frame("paper", 8))
 	holder.add_child(bg)
-	var gl := Ink.label(c.glyph, "", Palette.INK)
+	var gl := Ink.label(c.glyph, "", JourneyStyle.DARK_TEXT)
 	gl.set_anchors_preset(Control.PRESET_FULL_RECT)
 	gl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	gl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	gl.add_theme_font_size_override("font_size", 40)
+	gl.add_theme_font_size_override("font_size", int(40 * JourneyStyle.touch_scale(self)))
+	gl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	holder.add_child(gl)
-	var cnt := Ink.label("", "Muted", Palette.VERMILION)
+	var cnt := Ink.label("", "Muted", JourneyStyle.TEXT)
 	cnt.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	cnt.position = Vector2(-26, -24)
 	cnt.add_theme_font_size_override("font_size", 18)
+	cnt.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	holder.add_child(cnt)
 	holder.tooltip_text = "%s　%s" % [c.glyph, c.description]
 	holder.gui_input.connect(_on_tile_input.bind(c))
@@ -170,8 +172,10 @@ func _refresh() -> void:
 		var lab: Label = _count_labels[glyph]
 		lab.text = "×%d" % c if c > 0 else ""
 		lab.visible = c > 0
-		var bg: ColorRect = _tile_bgs[glyph]
-		bg.modulate = Color(1, 0.85, 0.7) if c > 0 else Color.WHITE
+		var bg: Panel = _tile_bgs[glyph]
+		bg.add_theme_stylebox_override("panel", JourneyStyle.frame("primary" if c > 0 else "paper", 8))
+		var gl: Label = _tiles[glyph].get_child(1)
+		gl.add_theme_color_override("font_color", JourneyStyle.TEXT if c > 0 else JourneyStyle.DARK_TEXT)
 	_total_label.text = "已选 %d / %d" % [n, MAX_TOTAL]
 	if _start_btn != null:
 		_start_btn.disabled = n == 0

@@ -1,0 +1,13 @@
+# 纸壳兵单体 v01
+
+工具：内置 image_gen.imagegen。参考：`assets/taopunk/ink_guardian.png`，仅作画法参考，未引用被否定的二十只概念板。
+
+状态：等待用户评审，不作为定稿，不替换运行素材。本轮针对统一动漫眼的问题，采用无眼白的墨点眼，并用缩肩、探头和宽纸甲表现姿态。原图只复制保存，未后期编辑。
+
+## 实际提示词
+
+```text
+Use case: stylized-concept. Create ONE standalone full-body concept of 纸壳兵, a humble uncanny paper-armored foot soldier for a hand-drawn Chinese movable-type battle game. Portrait composition, entire figure and feet visible, large on plain quiet pale gray background, no text, no inset poses. Input image is the approved 墨灵 and is a PAINTING / INK DRAWING reference only: match its restrained flat pigment shapes, hand-drawn thin uneven contours, selected broken internal lines, deep teal shadow masses and limited warm ochre/ivory/red palette. Do not copy its mask, horns, halo, cape or ribbons.
+Character: a small wiry soot-ink body almost swallowed by an oversized thick ivory PAPER SHELL. One broad gently bowed rectangular chest surface, side flaps curling around ribs, two simple folded shoulder covers, one visibly droops lower than the other. The shell feels like thick sheets fastened into protection, not intricate origami or metal armor. Slim dark arms with simple mittenlike fingers, narrow bent legs and blunt little feet. One paper forearm guard, other forearm bare. Weight is slightly backward, one knee bent and one foot hesitantly forward; shoulders tucked, head cautiously peeking over the collar: solemn, awkward guard duty, not angry or heroic. Small head tucked low beneath a low collapsed folded-paper cap, NOT tall pointed hat. Face is a small unmarked warm ivory paper surface partly shadowed by brim. MOST IMPORTANT eyes: only TWO TINY UNEQUAL BLUNT BLACK INK DOTS / puncture marks low on face. No eye whites, no iris, no eyebrows, no eyeliner, no almond-shaped or slanted anime eyes, no glowing eyes, no nose or mouth. The face is a quiet little object; character comes from posture and proportions. One short faded cinnabar tie secures the shell at side, no hanging ornaments or writing.
+Paint with the approved image's confident art-directed hand-drawn quality. Broad flat ivory shell, continuous matte dark teal limbs, just a few clear warm-gray hard-edged cast shadows under shoulder/collar. Paper folds only at actual construction edges; smooth curved limbs, NO random triangular planes or faceted shading. No repetitive cracks, crumpled texture, all-over grain, metallic highlights, gradient rendering, 3D, low-poly, glossy vector finish, cute chibi mascot or stock anime face. Let most surfaces remain unmarked. This is a single focused character painting for eye-design and flat-paint style review, not a sheet of many characters.
+```

@@ -1,0 +1,119 @@
+{
+  "license": "CC0-1.0",
+  "license_url": "https://polyhaven.com/license",
+  "retrieved": "2026-10-16",
+  "resolution": "1k",
+  "files": [
+    {
+      "asset": "weathered_planks",
+      "kind": "diffuse",
+      "file": "weathered_planks_diffuse.jpg",
+      "size": 599581,
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/weathered_planks/weathered_planks_diff_1k.jpg",
+      "md5": "5d7c9e7088bfa54490ba03ba15b660d8"
+    },
+    {
+      "asset": "weathered_planks",
+      "kind": "nor_gl",
+      "file": "weathered_planks_nor_gl.jpg",
+      "size": 681552,
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/weathered_planks/weathered_planks_nor_gl_1k.jpg",
+      "md5": "119541f6b143f21f0a6e9774e9208905"
+    },
+    {
+      "asset": "weathered_planks",
+      "kind": "rough",
+      "file": "weathered_planks_rough.jpg",
+      "size": 218802,
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/weathered_planks/weathered_planks_rough_1k.jpg",
+      "md5": "4ca50b076e1fc58f6862a5b039a7d5c9"
+    },
+    {
+      "asset": "slate_floor",
+      "kind": "diffuse",
+      "file": "slate_floor_diffuse.jpg",
+      "size": 707276,
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/slate_floor/slate_floor_diff_1k.jpg",
+      "md5": "33760bd0e0668f1ff92086a6cd9c38af"
+    },
+    {
+      "asset": "slate_floor",
+      "kind": "nor_gl",
+      "file": "slate_floor_nor_gl.jpg",
+      "size": 812262,
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/slate_floor/slate_floor_nor_gl_1k.jpg",
+      "md5": "254a48926b0bbc6cf2266586e943e90e"
+    },
+    {
+      "asset": "slate_floor",
+      "kind": "rough",
+      "file": "slate_floor_rough.jpg",
+      "size": 802557,
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/slate_floor/slate_floor_rough_1k.jpg",
+      "md5": "829bae26caaeb4a7a8bee3905cff5270"
+    },
+    {
+      "asset": "white_plaster_rough_01",
+      "kind": "diffuse",
+      "file": "white_plaster_rough_01_diffuse.jpg",
+      "size": 628421,
+      "md5": "c0964b0628920619f0364f19f2d9973d",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/white_plaster_rough_01/white_plaster_rough_01_diff_1k.jpg"
+    },
+    {
+      "asset": "white_plaster_rough_01",
+      "kind": "nor_gl",
+      "file": "white_plaster_rough_01_nor_gl.jpg",
+      "size": 384190,
+      "md5": "a45f7354cab5014e5167e63ddbf9c571",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/white_plaster_rough_01/white_plaster_rough_01_nor_gl_1k.jpg"
+    },
+    {
+      "asset": "white_plaster_rough_01",
+      "kind": "rough",
+      "file": "white_plaster_rough_01_rough.jpg",
+      "size": 594450,
+      "md5": "6a4f00696f958e42ad7bf3b1d48794d5",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/white_plaster_rough_01/white_plaster_rough_01_rough_1k.jpg"
+    },
+    {
+      "asset": "roof_slates_02",
+      "kind": "diffuse",
+      "file": "roof_slates_02_diffuse.jpg",
+      "size": 515626,
+      "md5": "d7683ac63f6d46159790186f2e19919f",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/roof_slates_02/roof_slates_02_diff_1k.jpg"
+    },
+    {
+      "asset": "roof_slates_02",
+      "kind": "nor_gl",
+      "file": "roof_slates_02_nor_gl.jpg",
+      "size": 763206,
+      "md5": "e661093ac3305df7de9159ad07ef5f75",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/roof_slates_02/roof_slates_02_nor_gl_1k.jpg"
+    },
+    {
+      "asset": "roof_slates_02",
+      "kind": "rough",
+      "file": "roof_slates_02_rough.jpg",
+      "size": 307076,
+      "md5": "90922aa9a6fe1bd6b6fc59548e476705",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/roof_slates_02/roof_slates_02_rough_1k.jpg"
+    },
+    {
+      "asset": "overcast_soil_puresky",
+      "kind": "sky",
+      "file": "overcast_soil_puresky_sky.hdr",
+      "size": 1195816,
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/overcast_soil_puresky_1k.hdr",
+      "md5": "7fbca6264f4618a787092b9e1679a578"
+    }
+  ],
+  "source_pages": [
+    "https://polyhaven.com/a/overcast_soil_puresky",
+    "https://polyhaven.com/a/roof_slates_02",
+    "https://polyhaven.com/a/slate_floor",
+    "https://polyhaven.com/a/weathered_planks",
+    "https://polyhaven.com/a/white_plaster_rough_01"
+  ]
+}

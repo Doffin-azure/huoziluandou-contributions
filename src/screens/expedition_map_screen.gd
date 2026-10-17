@@ -4,8 +4,8 @@ extends ScreenBase
 
 const MAP_CELL := 40
 const PLATE_CELL := 46
-const NODE_COLOR := {"起": "221f1a", "大": "c2581f", "中": "a8792a", "小": "c79a4a", "休": "3f7a63", "市": "8a6a1f", "谜": "4a5a8a",
-	"敌": "6b3d5a", "险": "8a2f5e", "巢": "b23a2e", "障": "6a5a4a"}
+const NODE_COLOR := {"起": "23434a", "大": "a24a37", "中": "90703e", "小": "77613e", "休": "315b59", "市": "81693d", "谜": "3e5960",
+	"敌": "7a3934", "险": "8b3631", "巢": "a54136", "障": "424f4c"}
 const NODE_TEXT := {"大": "赏", "中": "赏", "小": "赏", "险": "甲"}
 const NODE_TIP := {"起": "起点", "大": "大赏：打开会立刻惊动首领", "中": "中赏", "小": "小赏", "休": "休息点：治疗 / 删字 / 修饰 三选一，耗 3 步",
 	"市": "商店", "谜": "谜：风险换资源", "敌": "明敌：身边的散字被它看守", "险": "守口精英", "巢": "首领巢穴"}
@@ -37,12 +37,24 @@ var _path_layer: BossPath
 var _boss_tween: Tween
 var _boss_shown := -1
 var _legend_box: Control
+var _mobile := false
+var _map_cell_size := MAP_CELL
+var _plate_cell_size := PLATE_CELL
+var _map_scroll: ScrollContainer
+var _log_panel: PanelContainer
+var _mobile_tabs
+const FOG := Color("142b33")
+const WALL := Color("203b43")
 
 
 func build(root: Control) -> void:
 	ex = GameState.expedition
 	if ex == null:
 		ex = Expedition.start()
+	_mobile = JourneyStyle.touch_scale(self) > 1.1
+	if _mobile:
+		_map_cell_size = int(ceil(48 * JourneyStyle.touch_scale(self)))
+		_plate_cell_size = _map_cell_size
 	var main := Ink.vbox(10)
 	var frame := Ink.margin(64 if is_instance_valid(Router.study_stage) and Router.study_stage.visible else 16)
 	frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -53,17 +65,35 @@ func build(root: Control) -> void:
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main.add_child(body)
 	body.add_child(_build_left())
-	body.add_child(_build_middle())
-	var right := Ink.vbox(8)
-	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	right.add_child(_build_right())
-	_legend_box = _build_legend()
-	right.add_child(_legend_box)
-	body.add_child(right)
+	var middle := _build_middle()
+	var right := _build_event_column()
+	if _mobile:
+		_mobile_tabs = preload("res://src/ui/journey/journey_tabs.gd").new()
+		_mobile_tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		body.add_child(_mobile_tabs)
+		_mobile_tabs.add_tab("行旅", right)
+		_mobile_tabs.add_tab("字阵", middle)
+		_mobile_tabs.add_tab("战报", _log_panel)
+	else:
+		body.add_child(middle)
+		body.add_child(right)
 	EventBus.gold_changed.connect(_on_stats_changed.unbind(1))
 	EventBus.hp_changed.connect(_on_stats_changed.unbind(2))
 	EventBus.deck_changed.connect(_on_stats_changed)
 	refresh()
+
+
+func _build_event_column() -> Control:
+	var right := Ink.vbox(8)
+	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right.add_child(_build_right())
+	var legend_toggle := JourneyStyle.button("行旅图例", func(): _legend_box.visible = not _legend_box.visible)
+	right.add_child(legend_toggle)
+	_legend_box = _build_legend()
+	_legend_box.custom_minimum_size.y = 220
+	_legend_box.hide()
+	right.add_child(_legend_box)
+	return right
 
 
 func _exit_tree() -> void:
@@ -93,12 +123,14 @@ func _build_header() -> Control:
 	var row := Ink.hbox(16)
 	pad.add_child(row)
 	var left := Ink.vbox(2)
+	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_title_label = Ink.h2("")
+	_title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	left.add_child(_title_label)
-	_boss_label = Ink.label("", "", Palette.VERMILION)
+	_boss_label = JourneyStyle.label("", "Muted", JourneyStyle.RED)
+	_boss_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	left.add_child(_boss_label)
 	row.add_child(left)
-	row.add_child(Ink.expander())
 	var hp_wrap := Ink.vbox(2)
 	hp_wrap.custom_minimum_size.x = 170
 	hp_wrap.add_child(Ink.label("气血", "Muted"))
@@ -106,20 +138,24 @@ func _build_header() -> Control:
 	hp_wrap.add_child(_hp_bar)
 	row.add_child(hp_wrap)
 	var stats := Ink.vbox(2)
-	_stat_label = Ink.label("", "", Palette.INK)
+	_stat_label = JourneyStyle.label("")
 	stats.add_child(_stat_label)
-	_seal_label = Ink.label("", "", Palette.GOLD_DK)
+	_seal_label = JourneyStyle.label("", "", JourneyStyle.GOLD)
 	stats.add_child(_seal_label)
 	row.add_child(stats)
 	_power_btn = _ghost("超能力", func(): ex.use_power())
 	_power_btn.tooltip_text = "每幕一次：首领起身后把它定住 6 步"
+	_power_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_power_btn)
 	_confront_btn = _ghost("迎战首领", func(): ex.confront())
 	_confront_btn.tooltip_text = "首领在 2 步内时可以主动迎战，不吃位置减益"
+	_confront_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_confront_btn)
 	var deck := _ghost("字袋", _open_deck)
+	deck.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(deck)
-	var home := _ghost("返回标题", func(): goto("res://src/screens/title_screen.gd"))
+	var home := JourneyStyle.button("菜单", func(): PauseMenu.open())
+	home.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(home)
 	return panel
 
@@ -128,15 +164,24 @@ func _build_left() -> Control:
 	var col := Ink.vbox(8)
 	_boss_bar = PanelContainer.new()
 	_boss_bar_label = Ink.label("", "", Palette.PAPER)
-	_boss_bar_label.add_theme_font_size_override("font_size", 17)
+	_boss_bar_label.add_theme_font_size_override("font_size", int(17 * JourneyStyle.touch_scale(self)))
+	_boss_bar_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var bar_pad := Ink.margin(6)
 	bar_pad.add_child(_boss_bar_label)
 	_boss_bar.add_child(bar_pad)
 	col.add_child(_boss_bar)
 	# 地图格 + 上面一层：首领棋子和它接下来要走的路
 	var stack := Control.new()
-	stack.custom_minimum_size = Vector2(MapGen.W * (MAP_CELL + 2) - 2, MapGen.H * (MAP_CELL + 2) - 2)
-	col.add_child(stack)
+	stack.custom_minimum_size = Vector2(MapGen.W * (_map_cell_size + 2) - 2, MapGen.H * (_map_cell_size + 2) - 2)
+	if _mobile:
+		_map_scroll = ScrollContainer.new()
+		_map_scroll.custom_minimum_size.x = stack.custom_minimum_size.x
+		_map_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		_map_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		_map_scroll.add_child(stack)
+		col.add_child(_map_scroll)
+	else:
+		col.add_child(stack)
 	_map_grid = GridContainer.new()
 	_map_grid.columns = MapGen.W
 	_map_grid.add_theme_constant_override("h_separation", 2)
@@ -149,6 +194,7 @@ func _build_left() -> Control:
 	_boss_piece = _build_boss_piece()
 	stack.add_child(_boss_piece)
 	var log_panel := Ink.panel("PanelInset")
+	_log_panel = log_panel
 	log_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -156,28 +202,30 @@ func _build_left() -> Control:
 	_log_box = Ink.vbox(1)
 	_log_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_log_box)
-	col.add_child(log_panel)
+	if not _mobile: col.add_child(log_panel)
 	return col
 
 
 func _build_middle() -> Control:
+	var panel := Ink.panel("PanelInset")
 	var col := Ink.vbox(6)
-	col.custom_minimum_size.x = 4 * (PLATE_CELL + 3) + 20
-	col.add_child(Ink.label("版面 · 每行每列取最长的词谱词", "", Palette.INK_SOFT))
+	panel.add_child(col)
+	col.custom_minimum_size.x = 4 * (_plate_cell_size + 3) + 20
+	col.add_child(Ink.caption("版面 · 每行每列取最长的词谱词"))
 	_plate_grid = GridContainer.new()
 	_plate_grid.add_theme_constant_override("h_separation", 3)
 	_plate_grid.add_theme_constant_override("v_separation", 3)
 	col.add_child(_plate_grid)
 	_words_box = Ink.vbox(1)
 	col.add_child(_words_box)
-	col.add_child(Ink.label("字匣 · 选字后点版面空格放下", "", Palette.INK_SOFT))
+	col.add_child(Ink.caption("字匣 · 选字后点版面空格放下"))
 	_tray_row = HFlowContainer.new()
 	_tray_row.add_theme_constant_override("h_separation", 4)
 	_tray_row.add_theme_constant_override("v_separation", 4)
 	col.add_child(_tray_row)
 	_tray_actions = Ink.hbox(6)
 	col.add_child(_tray_actions)
-	return col
+	return panel
 
 
 func _build_right() -> Control:
@@ -200,7 +248,7 @@ func _open_deck() -> void:
 	var chars: Array = []
 	var counts := GameState.glyph_counts()
 	for id in counts:
-		var cd: CharacterData = Database.get_character(id)
+		var cd: CharacterData = Database.get_character_by_glyph(id)
 		if cd != null:
 			chars.append(cd)
 	viewer.setup({"title": "字袋", "subtitle": "%d / %d 枚 · 战斗时从这里抽字" % [GameState.deck_size(), Expedition.DECK_CAP], "characters": chars, "counts": counts})
@@ -218,6 +266,13 @@ func refresh() -> void:
 	_refresh_boss_bar()
 	_show_alert()
 	_refresh_boss_piece()
+	if _mobile: _focus_map_position.call_deferred()
+
+
+func _focus_map_position() -> void:
+	await get_tree().process_frame
+	if not is_inside_tree() or _map_grid.get_child_count() <= ex.pos: return
+	_map_scroll.ensure_control_visible(_map_grid.get_child(ex.pos))
 
 
 ## 地图上方的首领提示条：沉睡 / 惊动倒计时 / 追击距离，颜色随危险程度变
@@ -233,7 +288,7 @@ func _refresh_boss_bar() -> void:
 		text = "首领【%s】正在追你 · 相距 %d 步%s · 地图上红色的【%s】" % [ex.m.TH.boss, d, "（被定住 %d 步）" % ex.stun if ex.stun > 0 else "", ex.m.TH.boss]
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = color
-	sb.set_corner_radius_all(4)
+	sb.set_corner_radius_all(0)
 	_boss_bar.add_theme_stylebox_override("panel", sb)
 	_boss_bar_label.text = text
 
@@ -253,9 +308,9 @@ func _show_alert() -> void:
 func _on_stats_changed() -> void:
 	if not is_instance_valid(_hp_bar):
 		return
-	_title_label.text = "墨途远征 · 第 %d 幕 · %s" % [ex.act, ex.m.tn]
-	_boss_label.text = "%s　·　第 %d 步" % [ex.boss_status(), ex.t]
-	_hp_bar.setup_bar(GameState.player_hp, GameState.player_max_hp, Palette.HP)
+	_title_label.text = "墨途远征" if _mobile else "墨途远征 · 第 %d 幕 · %s" % [ex.act, ex.m.tn]
+	_boss_label.text = "第 %d 幕 · %s · %d 步" % [ex.act, ex.m.tn, ex.t] if _mobile else "%s　·　第 %d 步" % [ex.boss_status(), ex.t]
+	_hp_bar.setup_bar(GameState.player_hp, GameState.player_max_hp, JourneyStyle.RED)
 	_stat_label.text = "墨 %d　❖ %d　字袋 %d/%d" % [ex.ink, GameState.gold, GameState.deck_size(), Expedition.DECK_CAP]
 	_seal_label.text = "印章：" + ("、".join(ex.seals) if not ex.seals.is_empty() else "无")
 	_seal_label.tooltip_text = "\n".join(ex.seals.map(func(s): return "%s：%s" % [s, Expedition.SEALS[s][0]]))
@@ -276,7 +331,7 @@ func _cell(text: String, size: int, bg: Color, fg: Color, border: Color, border_
 		sb.bg_color = bg.lightened(0.08) if state == "hover" else bg
 		sb.border_color = border
 		sb.set_border_width_all(border_w)
-		sb.set_corner_radius_all(3)
+		sb.set_corner_radius_all(0)
 		b.add_theme_stylebox_override(state, sb)
 	for color_name in ["font_color", "font_hover_color", "font_pressed_color", "font_disabled_color"]:
 		b.add_theme_color_override(color_name, fg)
@@ -299,21 +354,21 @@ func _map_cell(k: int) -> Button:
 	var text := ""
 	var tip := ""
 	if not seen:
-		bg = Palette.INK_SOFT.darkened(0.35)
+		bg = FOG
 		if ex.is_beacon(k):
 			var tp: String = m.node[k].t
 			text = "★"
 			fg = Color(NODE_COLOR[tp]).lightened(0.4)
 			tip = "隔着迷雾发光：" + NODE_TIP.get(tp, tp)
 	elif m.ink[k] != 0:
-		bg = Color(m.TH.ink)
+		bg = WALL
 	else:
 		if m.pocket.has(k):
 			bg = Color("efd9a8")
 		var mc: Dictionary = ex.mech_at(k)
 		var o: Dictionary = m.node.get(k, {})
 		if not mc.is_empty():
-			bg = Color(mc.color)
+			bg = Color("496564")
 			fg = Palette.PAPER
 			text = mc.g + ({Vector2i(0, 1): "→", Vector2i(1, 0): "↓", Vector2i(0, -1): "←", Vector2i(-1, 0): "↑"}.get(mc.get("dir", Vector2i.ZERO), ""))
 			if mc.kind == "gate" and ex.gate_shut(k, ex.t):
@@ -364,7 +419,7 @@ func _map_cell(k: int) -> Button:
 		fg = Palette.VERMILION_DK
 		text = "✕"
 		tip = "已击退的伏兵"
-	var border := Palette.BORDER_SOFT
+	var border := JourneyStyle.EDGE
 	var bw := 1
 	if ex.can_step(k):
 		border = Palette.GOLD_DK
@@ -375,7 +430,7 @@ func _map_cell(k: int) -> Button:
 		if text.is_empty():
 			text = "●"
 			fg = Palette.VERMILION
-	var b := _cell(text, MAP_CELL, bg, fg, border, bw)
+	var b := _cell(text, _map_cell_size, bg, fg, border, bw)
 	b.tooltip_text = tip
 	b.pressed.connect(_on_map_cell.bind(k))
 	return b
@@ -393,7 +448,7 @@ func _refresh_plate() -> void:
 		child.queue_free()
 	_plate_grid.columns = ex.plate_n
 	var cells: Dictionary = Lexicon.scan(ex.plate).cells
-	var size := PLATE_CELL if ex.plate_n <= 3 else PLATE_CELL - 8
+	var size := _plate_cell_size if _mobile or ex.plate_n <= 3 else _plate_cell_size - 8
 	for r in ex.plate_n:
 		for c in ex.plate_n:
 			var p := Vector2i(r, c)
@@ -409,7 +464,7 @@ func _refresh_plate() -> void:
 	if ex.active.is_empty():
 		_words_box.add_child(Ink.caption("还没有生效的词。2×2 最多凑出 3 个词，例如「加速 / 急停」。"))
 	for w in ex.active:
-		var l := Ink.label("「%s」%s" % [w, Lexicon.WORDS[w][1]], "", Palette.JADE.darkened(0.25))
+		var l := Ink.label("「%s」%s" % [w, Lexicon.WORDS[w][1]], "", JourneyStyle.GOLD)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size.x = 200
 		_words_box.add_child(l)
@@ -437,11 +492,11 @@ func _refresh_tray() -> void:
 	var forging: bool = ex.top_panel().get("kind", "") == "forge"
 	for i in ex.tray.size():
 		var on: bool = (_sel == i) if not forging else _forge_sel.has(i)
-		var b := _cell(ex.tray[i], 38, Palette.VERMILION if on else Palette.SURFACE_RAISED, Palette.PAPER if on else Palette.INK, Palette.BORDER_SOFT)
+		var b := _cell(ex.tray[i], _map_cell_size if _mobile else 38, Palette.VERMILION if on else Palette.SURFACE_RAISED, Palette.PAPER if on else Palette.INK, Palette.BORDER_SOFT)
 		b.pressed.connect(_on_tray.bind(i))
 		_tray_row.add_child(b)
 	for i in range(ex.tray.size(), ex.tray_cap()):
-		var empty := _cell("", 38, Palette.PAPER_DARK, Palette.INK, Palette.BORDER_SOFT)
+		var empty := _cell("", _map_cell_size if _mobile else 38, Palette.PAPER_DARK, Palette.INK, Palette.BORDER_SOFT)
 		empty.disabled = true
 		_tray_row.add_child(empty)
 	if _sel >= 0 and not ex.busy():
@@ -642,7 +697,7 @@ func _pick_deck(title: String, done: Callable) -> void:
 	var counts := GameState.glyph_counts()
 	var chars: Array = []
 	for id in counts:
-		var cd: CharacterData = Database.get_character(id)
+		var cd: CharacterData = Database.get_character_by_glyph(id)
 		if cd != null:
 			chars.append(cd)
 	var overlay := CollectionOverlay.new()
@@ -669,31 +724,31 @@ class BossPath extends Control:
 
 func _cell_center(k: int) -> Vector2:
 	var p := MapGen.rc(k)
-	return Vector2(p.y * (MAP_CELL + 2) + MAP_CELL / 2.0, p.x * (MAP_CELL + 2) + MAP_CELL / 2.0)
+	return Vector2(p.y * (_map_cell_size + 2) + _map_cell_size / 2.0, p.x * (_map_cell_size + 2) + _map_cell_size / 2.0)
 
 
 func _cell_origin(k: int) -> Vector2:
-	return _cell_center(k) - Vector2(MAP_CELL, MAP_CELL) / 2.0
+	return _cell_center(k) - Vector2(_map_cell_size, _map_cell_size) / 2.0
 
 
 func _build_boss_piece() -> PanelContainer:
 	var piece := PanelContainer.new()
-	piece.custom_minimum_size = Vector2(MAP_CELL, MAP_CELL)
-	piece.size = Vector2(MAP_CELL, MAP_CELL)
+	piece.custom_minimum_size = Vector2(_map_cell_size, _map_cell_size)
+	piece.size = Vector2(_map_cell_size, _map_cell_size)
 	piece.mouse_filter = Control.MOUSE_FILTER_PASS
-	piece.pivot_offset = Vector2(MAP_CELL, MAP_CELL) / 2.0
+	piece.pivot_offset = Vector2(_map_cell_size, _map_cell_size) / 2.0
 	_boss_glyph = Label.new()
 	_boss_glyph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_boss_glyph.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_boss_glyph.add_theme_font_size_override("font_size", 24)
+	_boss_glyph.add_theme_font_size_override("font_size", int(24 * JourneyStyle.touch_scale(self)))
 	_boss_glyph.add_theme_color_override("font_color", Palette.PAPER)
 	piece.add_child(_boss_glyph)
 	_boss_badge = Label.new()
-	_boss_badge.add_theme_font_size_override("font_size", 12)
+	_boss_badge.add_theme_font_size_override("font_size", int(12 * JourneyStyle.touch_scale(self)))
 	_boss_badge.add_theme_color_override("font_color", Palette.PAPER)
 	_boss_badge.add_theme_color_override("font_outline_color", Palette.INK)
 	_boss_badge.add_theme_constant_override("outline_size", 4)
-	_boss_badge.position = Vector2(MAP_CELL - 14, -8)
+	_boss_badge.position = Vector2(_map_cell_size - 14, -8)
 	piece.add_child(_boss_badge)
 	return piece
 
@@ -704,7 +759,7 @@ func _refresh_boss_piece() -> void:
 	var awake := ex.awake()
 	var stirred := ex.stir != null and not awake
 	var sb := StyleBoxFlat.new()
-	sb.set_corner_radius_all(MAP_CELL / 2)
+	sb.set_corner_radius_all(_map_cell_size / 2)
 	sb.bg_color = Palette.VERMILION if awake else Palette.VERMILION.darkened(0.45)
 	sb.border_color = Palette.GOLD if stirred else (Palette.PAPER if awake else Palette.INK)
 	sb.set_border_width_all(3)
@@ -746,7 +801,7 @@ func _build_legend() -> Control:
 	var outer := Ink.vbox(4)
 	outer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(outer)
-	outer.add_child(Ink.label("图样说明（临时 · 给美术对照，美化后可删）", "", Palette.GOLD_DK))
+	outer.add_child(JourneyStyle.label("行旅图例", "", JourneyStyle.GOLD))
 	var col := GridContainer.new()
 	col.columns = 2
 	col.add_theme_constant_override("h_separation", 10)
@@ -756,8 +811,8 @@ func _build_legend() -> Control:
 	var th: Dictionary = ex.m.TH
 	var groups := [
 		["地形", [
-			["", Palette.INK_SOFT.darkened(0.35), Palette.PAPER, "迷雾（没去过）"],
-			["", Color(th.ink), Palette.PAPER, "墨渍（墙，随主题变色）"],
+			["", FOG, Palette.PAPER, "迷雾（没去过）"],
+			["", WALL, Palette.PAPER, "墨渍（墙，随主题变色）"],
 			["", Palette.PAPER_DARK, Palette.INK, "空地"],
 			["", Palette.PAPER_DARK.lerp(Palette.PAPER_SHADE, 0.35), Palette.INK, "去过但不在视野里"],
 			["", Color("efd9a8"), Palette.INK, "奖励凹槽（死路）"],
@@ -772,7 +827,7 @@ func _build_legend() -> Control:
 			["市", Color(NODE_COLOR["市"]), Palette.PAPER, "商店"],
 			["谜", Color(NODE_COLOR["谜"]), Palette.PAPER, "谜"],
 			["火", Color("e9d6ad"), Palette.INK, "散字（被看守时字变淡）"],
-			["★", Palette.INK_SOFT.darkened(0.35), Color(NODE_COLOR["大"]).lightened(0.4), "引导点（隔着迷雾发光）"],
+			["★", FOG, Color(NODE_COLOR["大"]).lightened(0.4), "引导点（隔着迷雾发光）"],
 		]],
 		["敌人", [
 			[th.foes[0], Color(NODE_COLOR["敌"]), Palette.PAPER, "明敌（字 = 敌字，随主题）"],
@@ -786,7 +841,7 @@ func _build_legend() -> Control:
 			[th.boss, Palette.VERMILION.darkened(0.45), Palette.GOLD, "首领棋子 · 惊动（金边，角标倒计时）"],
 			[th.boss, Palette.VERMILION, Palette.PAPER, "首领棋子 · 追击（白边，前方虚点 = 要走的路）"],
 		]],
-		["本幕机关 · " + ex.m.tn, th.mech.map(func(mc): return [mc.g, Color(mc.color), Palette.PAPER, mc.desc])],
+		["本幕机关 · " + ex.m.tn, th.mech.map(func(mc): return [mc.g, Color("496564"), Palette.PAPER, mc.desc])],
 		["玩家与版面", [
 			["●", Palette.PAPER_DARK, Palette.VERMILION, "你（朱红粗框）"],
 			["", Palette.PAPER_DARK, Palette.GOLD_DK, "金框 = 下一步能走的格"],
@@ -797,7 +852,7 @@ func _build_legend() -> Control:
 	for g in groups:
 		if col.get_child_count() % 2 == 1:
 			col.add_child(Control.new())
-		col.add_child(Ink.label(g[0], "", Palette.INK_SOFT))
+		col.add_child(Ink.label(g[0], "", JourneyStyle.MUTED))
 		col.add_child(Control.new())
 		for item in g[1]:
 			col.add_child(_legend_row(item[0], item[1], item[2], item[3]))
@@ -811,7 +866,7 @@ func _legend_row(glyph: String, bg: Color, fg: Color, desc: String) -> Control:
 	row.add_child(chip)
 	chip.custom_minimum_size = Vector2(24, 24)
 	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var l := Ink.caption("%s · #%s" % [desc, bg.to_html(false)])
+	var l := Ink.caption(desc)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.custom_minimum_size.x = 150
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL

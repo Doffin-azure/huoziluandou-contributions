@@ -54,11 +54,12 @@ func _shot(name: String) -> void:
 
 
 func _wait_for_map() -> void:
-	var frames := 0
-	while Router.current_path.contains("title_screen") and frames < 180:
-		await get_tree().process_frame
-		frames += 1
+	# The transition is timed in seconds; uncapped headless frames are not a clock.
+	var deadline := Time.get_ticks_msec() + 6000
+	while Router.current_path.contains("title_screen") and Time.get_ticks_msec() < deadline:
+		await get_tree().create_timer(0.01).timeout
 	_ok(Router.current_path.contains("map_screen"), "镜头过渡结束后进入地图")
+	if not Router.current_path.contains("map_screen"): get_tree().quit(1)
 
 
 func _run() -> void:
@@ -68,11 +69,14 @@ func _run() -> void:
 	add_child(main)
 	await _frames(15)
 	_stage = Router.study_stage
-	_ok(is_instance_valid(_stage) and is_instance_valid(_stage.camera), "真实主场景创建独立 3D 书房和相机")
-	_ok(_stage._sun.shadow_enabled and _stage._trees.size() == 2, "窗外树木与投影光源存在")
+	var courtyard: Node3D = Router.current._courtyard.stage
+	_ok(is_instance_valid(courtyard) and courtyard.camera.current, "正式主场景创建独立 3D 庭院与相机")
+	_ok(not _stage.visible and _stage.viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED, "标题显示庭院时停用旧书房渲染")
+	_ok(courtyard.atmosphere.petals.multimesh.instance_count == 112, "正式标题包含落花与环境动画")
+	_ok(Router.current._courtyard.viewport.size.x <= 1920 and Router.current._courtyard.viewport.size.y <= 1080, "正式标题限制独立视口分辨率")
 	_ok(GameState.rng.state == rng_state, "场景建模和树影不使用游戏随机数")
-	_ok(_stage.camera_blend == 0, "标题页从书房全景开始")
-	await _shot("study-room-live")
+	_ok(courtyard.inspection == 0, "标题页从庭院全景开始")
+	await _shot("courtyard-title-live")
 	var title: Control = Router.current
 	title._open_settings()
 	await _frames()
@@ -87,10 +91,11 @@ func _run() -> void:
 	title._on_start()
 	_ok(title._starting and _started == 0, "连点开始只启动一次过渡，未提前重置冒险")
 	await get_tree().create_timer(0.65).timeout
-	_ok(_stage.camera_blend > 0 and _stage.camera_blend < 1, "真实相机在两端之间连续推进")
-	await _shot("study-push-live")
+	_ok(courtyard.inspection > 0 and courtyard.inspection < 1, "庭院相机在两端之间连续推进")
+	await _shot("courtyard-entry-live")
 	await _wait_for_map()
 	await _frames()
+	_ok(not is_instance_valid(courtyard), "进入地图后释放标题庭院与镜像视口")
 	_ok(_started == 1 and GameState.node_index == 1, "只创建一次冒险并保留首个地图节点")
 	_ok(is_equal_approx(_stage.camera_blend, 1), "进入地图后相机精确落在桌面机位")
 	PauseMenu.open()
@@ -115,17 +120,20 @@ func _run() -> void:
 	await _shot("study-desk-battle-live")
 	Router.goto("res://src/screens/title_screen.gd")
 	await _frames()
-	_ok(_stage.camera_blend == 0, "返回标题恢复书房全景")
+	courtyard = Router.current._courtyard.stage
+	_ok(courtyard.inspection == 0 and not _stage.visible, "返回标题重建庭院全景并停用旧书房")
 	title = Router.current
 	title._on_start()
 	await _frames()
 	title._cancel_entry()
-	await get_tree().create_timer(1.55).timeout
+	await get_tree().create_timer(2.10).timeout
 	_ok(Router.current_path.contains("title_screen") and _started == 1, "取消入场后定时器不会再跳地图或重置冒险")
-	_ok(_stage.camera_blend == 0 and title._menu.modulate.a == 1, "取消后恢复相机和菜单")
+	_ok(courtyard.inspection == 0 and title._menu.modulate.a == 1, "取消后恢复庭院相机和菜单")
 	Settings.reduced_motion = true
+	Settings.changed.emit()
+	_ok(not courtyard.atmosphere.motion_enabled and not courtyard.atmosphere.petals.visible, "正式减少动效设置暂停环境并隐藏落花")
 	title._on_start()
-	_ok(_stage.camera_blend == 1, "减少动效时相机直接切到桌面")
+	_ok(courtyard.inspection == 1, "减少动效时庭院相机直接切到入场机位")
 	await _wait_for_map()
 	_ok(_started == 2, "减少动效仍只创建一次冒险")
 	Router.goto("res://src/screens/title_screen.gd")
@@ -133,9 +141,16 @@ func _run() -> void:
 	title = Router.current
 	title._on_start()
 	Router.goto("res://src/screens/glyph_graph_screen.gd")
-	await _frames(8)
+	await get_tree().create_timer(2.10).timeout
 	_ok(Router.current_path.contains("glyph_graph_screen"), "中途切屏不会被旧开始定时器跳回地图")
+	Router.goto("res://src/screens/title_screen.gd")
+	await _frames()
+	title = Router.current
+	title._on_expedition()
+	await _wait_for_map()
+	_ok(Router.current_path.contains("expedition_map_screen") and GameState.expedition != null and _started == 3, "墨途远征入口仍创建一次远征并打开原地图")
 	Settings.reduced_motion = _saved_motion
+	Settings.changed.emit()
 	Settings.visual_style = _saved_style
 	Ink.apply_style(GameStyle.get_style(_saved_style))
 	main.queue_free()

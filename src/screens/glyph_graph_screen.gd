@@ -6,15 +6,14 @@ var _detail: VBoxContainer
 var _stats: Label
 var _scope := "all"
 var _built := false
+var _scope_buttons: Array[Button] = []
 
 
 func build(root: Control) -> void:
-	var main := Ink.vbox(0)
-	main.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.add_child(main)
+	var main := JourneyStyle.page(root)
 	main.add_child(_build_header())
 
-	var body := Ink.hbox(0)
+	var body := Ink.hbox(18)
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main.add_child(body)
 
@@ -41,18 +40,18 @@ func _build_header() -> Control:
 	var row := Ink.hbox(10)
 	pad.add_child(row)
 	row.add_child(Ink.h2("字网图谱"))
-	row.add_child(Ink.label("有向边 A→B = 词中 A 紧接 B", "Muted"))
+
 	row.add_child(Ink.spacer(10, false))
-	_add_scope_btn(row, "全部 105", "all")
-	_add_scope_btn(row, "已实现 82", "implemented")
-	_add_scope_btn(row, "初始 9 字", "starter")
+	_add_scope_btn(row, "全部字", "all")
+	_add_scope_btn(row, "可用字", "implemented")
+	_add_scope_btn(row, "初始字", "starter")
 	row.add_child(Ink.expander())
 	_stats = Ink.label("", "Muted")
 	_stats.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(_stats)
 	var back := Ink.button("返回标题")
 	back.theme_type_variation = "GhostButton"
-	back.custom_minimum_size = Vector2(110, 34)
+	back.custom_minimum_size = Vector2(110, 48 * JourneyStyle.touch_scale(self))
 	back.pressed.connect(func(): goto("res://src/screens/title_screen.gd"))
 	row.add_child(back)
 	return panel
@@ -60,8 +59,11 @@ func _build_header() -> Control:
 
 func _add_scope_btn(row: Control, text: String, scope: String) -> void:
 	var b := Ink.button(text)
-	b.custom_minimum_size = Vector2(104, 34)
-	b.add_theme_font_size_override("font_size", 15)
+	b.set_meta("scope", scope)
+	b.theme_type_variation = "PrimaryButton" if _scope == scope else "GhostButton"
+	_scope_buttons.append(b)
+	b.custom_minimum_size = Vector2(104, 48 * JourneyStyle.touch_scale(self))
+	b.add_theme_font_size_override("font_size", int(15 * JourneyStyle.touch_scale(self)))
 	b.pressed.connect(func(): _set_scope(scope))
 	row.add_child(b)
 
@@ -91,10 +93,10 @@ func _legend() -> Control:
 	grid.columns = 2
 	grid.add_theme_constant_override("h_separation", 10)
 	var items := [
-		["攻击", Color("8c2a20")], ["防御", Palette.BLOCK],
-		["流转", Palette.INDIGO], ["储能", Palette.GOLD],
-		["热度", Color("c9662e")], ["经济", Palette.JADE],
-		["空间", Palette.PLUM], ["敌方", Palette.INK_FAINT],
+		["攻击", Color("944a3e")], ["防御", Color("43666b")],
+		["流转", Color("577779")], ["储能", JourneyStyle.GOLD],
+		["热度", JourneyStyle.RED], ["经济", Color("5b7c70")],
+		["空间", Color("80734f")], ["敌方", JourneyStyle.EDGE],
 	]
 	for it in items:
 		var row := Ink.hbox(5)
@@ -120,6 +122,8 @@ func _on_view_resized() -> void:
 
 func _set_scope(scope: String) -> void:
 	_scope = scope
+	for button in _scope_buttons:
+		button.theme_type_variation = "PrimaryButton" if button.get_meta("scope") == scope else "GhostButton"
 	if _built:
 		_refresh()
 

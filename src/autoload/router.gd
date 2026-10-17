@@ -13,6 +13,7 @@ func goto(screen_path: String, params: Dictionary = {}) -> void:
 		return
 	if current != null and is_instance_valid(current):
 		current.queue_free()
+	Ink.apply_pending_style()
 	var script: GDScript = load(screen_path)
 	if script == null:
 		push_error("[Router] 找不到屏幕脚本: %s" % screen_path)

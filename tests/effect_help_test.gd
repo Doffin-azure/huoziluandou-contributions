@@ -109,7 +109,9 @@ func _run() -> void:
 	var outside := InputEventMouseButton.new()
 	outside.button_index = MOUSE_BUTTON_LEFT
 	outside.pressed = true
-	outside.position = get_viewport_rect().size - Vector2(5, 5)
+	# Help cards have a 12px viewport inset. The lower right corner can be
+	# covered after deliberately moving a wide card onto the illustrated board.
+	outside.position = Vector2(5, 5)
 	label._input(outside)
 	_check(label._cards.is_empty() and not EffectText.blocks_pointer(get_viewport(), cell_point), "点击外部关闭浮层并恢复棋盘点击")
 	label.meta_clicked.emit("term:counter")

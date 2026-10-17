@@ -14,12 +14,13 @@ func setup(p_cfg: Dictionary) -> void:
 
 
 func _ready() -> void:
+	JourneyStyle.apply(self)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build()
 
 
 func _build() -> void:
-	var hud_scale := clampf(get_viewport_rect().size.y / maxf(1, DisplayServer.window_get_size().y), 1.0, 1.85) if cfg.get("hud_details", false) else 1.0
+	var hud_scale := clampf(get_viewport_rect().size.y / maxf(1, DisplayServer.window_get_size().y), 1.0, 1.85)
 	var dim := ColorRect.new()
 	dim.color = Color(0.07, 0.06, 0.05, 0.66)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -31,7 +32,7 @@ func _build() -> void:
 	add_child(center)
 
 	var panel := Ink.panel("PanelCard")
-	panel.custom_minimum_size = Vector2(460, 0)
+	panel.custom_minimum_size = Vector2(minf(520 * hud_scale, get_viewport_rect().size.x - 48), 0)
 	center.add_child(panel)
 
 	var pad := Ink.margin(24)
@@ -65,9 +66,9 @@ func _build() -> void:
 	for i in options.size():
 		var opt: Dictionary = options[i]
 		var btn := Ink.button(str(opt.get("text", "选项 %d" % (i + 1))), bool(opt.get("primary", false)))
-		if cfg.get("hud_details", false):
-			btn.custom_minimum_size.y = 48 * hud_scale
-			btn.add_theme_font_size_override("font_size", int(20 * hud_scale))
+		btn.focus_mode = Control.FOCUS_ALL
+		btn.custom_minimum_size.y = 48 * hud_scale
+		btn.add_theme_font_size_override("font_size", int(20 * hud_scale))
 		if opt.has("disabled"):
 			btn.disabled = bool(opt["disabled"])
 		btn.pressed.connect(_on_choose.bind(i))

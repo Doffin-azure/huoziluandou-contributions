@@ -14,10 +14,17 @@ var _trail := 0.0
 var _initialized := false
 var _front_tween: Tween
 var _trail_tween: Tween
+var _journey := false
 
 
 func _ready() -> void:
 	custom_minimum_size.y = 24
+	_journey = JourneyStyle.is_active(self)
+	if _journey:
+		var factor := JourneyStyle.touch_scale(self)
+		custom_minimum_size.y = 24 * factor
+		font_size = int(15 * factor)
+		bg_color = JourneyStyle.INK
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
@@ -67,7 +74,7 @@ func _draw() -> void:
 	sb.set_corner_radius_all(3)
 	draw_style_box(sb, Rect2(Vector2.ZERO, size))
 	if _trail > _ratio:
-		sb.bg_color = Palette.GOLD.darkened(0.15)
+		sb.bg_color = (JourneyStyle.GOLD if _journey else Palette.GOLD).darkened(0.15)
 		draw_style_box(sb, Rect2(Vector2.ZERO, Vector2(size.x * _trail, size.y)))
 	if _ratio > 0.0:
 		sb.bg_color = bar_color
@@ -75,4 +82,4 @@ func _draw() -> void:
 	if show_text:
 		var font: Font = Ink.serif
 		var baseline := (size.y + font.get_ascent(font_size) - font.get_descent(font_size)) * 0.5
-		draw_string(font, Vector2(0, baseline), label_text, HORIZONTAL_ALIGNMENT_CENTER, size.x, font_size, Palette.PAPER)
+		draw_string(font, Vector2(0, baseline), label_text, HORIZONTAL_ALIGNMENT_CENTER, size.x, font_size, JourneyStyle.TEXT if _journey else Palette.PAPER)

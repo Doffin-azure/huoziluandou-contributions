@@ -94,29 +94,30 @@ func _sum(d: Dictionary) -> int:
 
 func _node_color(cd: CharacterData) -> Color:
 	if cd == null:
-		return Palette.INK_FAINT
+		return JourneyStyle.EDGE
 	var t: Array = cd.tags
 	if t.has("heat"):
-		return Color("c9662e")
+		return JourneyStyle.RED
 	if t.has("energy"):
-		return Palette.GOLD
+		return JourneyStyle.GOLD
 	if t.has("economy"):
-		return Palette.JADE
+		return Color("5b7c70")
 	if t.has("defense"):
-		return Palette.BLOCK
+		return Color("43666b")
 	if t.has("flow"):
-		return Palette.INDIGO
+		return Color("577779")
 	if t.has("space"):
-		return Palette.PLUM
+		return Color("80734f")
 	if t.has("attack"):
-		return Palette.VERMILION_DK
+		return Color("944a3e")
 	if t.has("enemy"):
-		return Palette.INK_FAINT
-	return Palette.INK_SOFT
+		return JourneyStyle.EDGE
+	return JourneyStyle.EDGE
 
 
 func _compute_layout() -> void:
-	var n := nodes.size()
+	var connected: Array = nodes.filter(func(nd): return int(nd.out) + int(nd["in"]) > 0)
+	var n := connected.size()
 	if n <= 1:
 		return
 	var area: float = max(1.0, size.x) * max(1.0, size.y)
@@ -126,19 +127,19 @@ func _compute_layout() -> void:
 	var temp: float = size.x * 0.18 if size.x > 10.0 else 120.0
 	for iter in ITERATIONS:
 		var disp: Dictionary = {}
-		for nd in nodes:
+		for nd in connected:
 			disp[nd["glyph"]] = Vector2.ZERO
 		# 斥力
 		for a_i in n:
 			for b_i in range(a_i + 1, n):
-				var va: Vector2 = nodes[a_i]["pos"]
-				var vb: Vector2 = nodes[b_i]["pos"]
+				var va: Vector2 = connected[a_i]["pos"]
+				var vb: Vector2 = connected[b_i]["pos"]
 				var delta: Vector2 = va - vb
 				var d: float = max(0.01, delta.length())
 				var force: float = k * k / d
 				var dir: Vector2 = delta / d
-				disp[nodes[a_i]["glyph"]] += dir * force
-				disp[nodes[b_i]["glyph"]] -= dir * force
+				disp[connected[a_i]["glyph"]] += dir * force
+				disp[connected[b_i]["glyph"]] -= dir * force
 		# 引力
 		for e in edges:
 			var va2: Vector2 = _index[e["a"]]["pos"]
@@ -149,7 +150,9 @@ func _compute_layout() -> void:
 			var dir2: Vector2 = delta2 / d2
 			disp[e["a"]] -= dir2 * force2
 			disp[e["b"]] += dir2 * force2
-		for nd2 in nodes:
+		for nd2 in connected:
+			# Keep disconnected word families in the same visual field.
+			disp[nd2["glyph"]] -= (nd2["pos"] - size * 0.5) * 1.2
 			var d3: Vector2 = disp[nd2["glyph"]]
 			var len: float = max(0.01, d3.length())
 			nd2["pos"] += d3 / len * min(len, temp)
@@ -158,17 +161,37 @@ func _compute_layout() -> void:
 
 
 func _fit_to_canvas() -> void:
+	if size.x <= MARGIN * 2 or size.y <= MARGIN * 2: return
+	var connected: Array = nodes.filter(func(nd): return int(nd.out) + int(nd["in"]) > 0)
+	var isolated: Array = nodes.filter(func(nd): return int(nd.out) + int(nd["in"]) == 0)
 	var min_p := Vector2(1e9, 1e9)
 	var max_p := Vector2(-1e9, -1e9)
-	for nd in nodes:
+	for nd in connected:
 		min_p = min_p.min(nd["pos"])
 		max_p = max_p.max(nd["pos"])
 	var span: Vector2 = max_p - min_p
-	var avail: Vector2 = size - Vector2(MARGIN, MARGIN) * 2.0
-	var scale: float = min(avail.x / max(1.0, span.x), avail.y / max(1.0, span.y))
-	scale = min(scale, 1.6)
-	for nd2 in nodes:
-		nd2["pos"] = (nd2["pos"] - min_p) * scale + Vector2(MARGIN, MARGIN)
+	var avail: Vector2 = size - Vector2(MARGIN, MARGIN) * 2.0 - Vector2(0, 42 if not isolated.is_empty() else 0)
+	var fit := minf(avail.x / maxf(1, span.x), avail.y / maxf(1, span.y))
+	var offset := Vector2(MARGIN, MARGIN) + (avail - span * fit) * 0.5
+	for nd2 in connected:
+		nd2["pos"] = (nd2["pos"] - min_p) * fit + offset
+	for index in isolated.size():
+		isolated[index]["pos"] = Vector2(MARGIN + index * 48, size.y - 30)
+	# Packing is a presentation pass; degrees, edges and selectable glyphs stay intact.
+	for iteration in 64:
+		for i in nodes.size():
+			for j in range(i + 1, nodes.size()):
+				var delta: Vector2 = nodes[j].pos - nodes[i].pos
+				var distance := delta.length()
+				var clearance: float = nodes[i].radius + nodes[j].radius + 5
+				if distance >= clearance: continue
+				var direction := delta / distance if distance > 0.01 else Vector2.RIGHT.rotated(i)
+				var push := direction * (clearance - distance) * 0.5
+				nodes[i].pos -= push
+				nodes[j].pos += push
+		for nd in nodes:
+			var inset: float = nd.radius + 8
+			nd.pos = Vector2(clampf(nd.pos.x, inset, size.x - inset), clampf(nd.pos.y, inset, size.y - inset))
 
 
 func _draw() -> void:
@@ -185,7 +208,7 @@ func _draw() -> void:
 		var end: Vector2 = pb - dir * (b["radius"] + 2.0)
 		var hl: bool = selected == e["a"] or selected == e["b"]
 		var alpha: float = clampf(0.18 + e["w"] * 0.18, 0.15, 0.85)
-		var col: Color = Palette.VERMILION if hl else Palette.INK_SOFT
+		var col: Color = JourneyStyle.RED if hl else JourneyStyle.EDGE
 		col.a = alpha if not hl else 0.9
 		draw_line(start, end, col, 2.5 if hl else 1.4, true)
 		# 箭头

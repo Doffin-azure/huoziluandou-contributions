@@ -1,0 +1,126 @@
+[
+	{
+		"canvas": [
+			396.666656494141,
+			209.333343505859
+		],
+		"fitting": "cover_cropped_portrait",
+		"id": "ink_spirit",
+		"idle_extent": [
+			396.666656494141,
+			317.446502685547
+		]
+	},
+	{
+		"canvas": [
+			396.666656494141,
+			209.333343505859
+		],
+		"fitting": "contain_all_attack_poses",
+		"id": "bronze_seal",
+		"idle_extent": [
+			290.255126953125,
+			186.386489868164
+		],
+		"idle_height_fraction": 0.890381277758299,
+		"idle_width_fraction": 0.73173563293292
+	},
+	{
+		"canvas": [
+			396.666687011719,
+			209.333343505859
+		],
+		"fitting": "contain_all_attack_poses",
+		"id": "iron_seal",
+		"idle_extent": [
+			223.75032043457,
+			172.970108032227
+		],
+		"idle_height_fraction": 0.826290284841244,
+		"idle_width_fraction": 0.56407640913884
+	},
+	{
+		"canvas": [
+			396.666656494141,
+			209.333343505859
+		],
+		"fitting": "contain_all_attack_poses",
+		"id": "paper_guard",
+		"idle_extent": [
+			241.90950012207,
+			190.180419921875
+		],
+		"idle_height_fraction": 0.908505146560905,
+		"idle_width_fraction": 0.60985589830045
+	},
+	{
+		"canvas": [
+			396.666656494141,
+			209.333343505859
+		],
+		"fitting": "contain_all_attack_poses",
+		"id": "rust_scribe",
+		"idle_extent": [
+			249.336791992188,
+			162.808959960938
+		],
+		"idle_height_fraction": 0.777749770935944,
+		"idle_width_fraction": 0.628580163999417
+	},
+	{
+		"canvas": [
+			396.666687011719,
+			209.333343505859
+		],
+		"fitting": "contain_all_attack_poses",
+		"id": "ember_imp",
+		"idle_extent": [
+			206.434051513672,
+			171.350433349609
+		],
+		"idle_height_fraction": 0.818552985777983,
+		"idle_width_fraction": 0.520421951913429
+	},
+	{
+		"canvas": [
+			396.666656494141,
+			209.333312988281
+		],
+		"fitting": "contain_all_attack_poses",
+		"id": "boss_lead_plate",
+		"idle_extent": [
+			244.930999755859,
+			192.112899780273
+		],
+		"idle_height_fraction": 0.917736871584449,
+		"idle_width_fraction": 0.61747312446333
+	},
+	{
+		"canvas": [
+			396.666656494141,
+			209.333312988281
+		],
+		"fitting": "contain_all_attack_poses",
+		"id": "boss_word_demon",
+		"idle_extent": [
+			262.88916015625,
+			192.575485229492
+		],
+		"idle_height_fraction": 0.919946674900582,
+		"idle_width_fraction": 0.662745798902644
+	},
+	{
+		"canvas": [
+			396.666687011719,
+			209.333312988281
+		],
+		"fitting": "contain_all_attack_poses",
+		"id": "boss_chaos_press",
+		"idle_extent": [
+			253.372085571289,
+			144.406219482422
+		],
+		"idle_height_fraction": 0.689838695145984,
+		"idle_width_fraction": 0.638753124140731
+	}
+]

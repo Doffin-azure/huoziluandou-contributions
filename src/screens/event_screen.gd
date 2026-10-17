@@ -76,7 +76,7 @@ func build(root: Control) -> void:
 	_page.add_child(_art)
 	_copy = Ink.vbox(14)
 	_page.add_child(_copy)
-	_eyebrow = Ink.label("行旅 · 事件", "Muted", Palette.INK_FAINT)
+	_eyebrow = Ink.label("行旅 · 事件", "Muted", JourneyStyle.GOLD)
 	_copy.add_child(_eyebrow)
 	_title = Ink.h2(_event.title)
 	_copy.add_child(_title)
@@ -88,15 +88,15 @@ func build(root: Control) -> void:
 		var opt: Dictionary = _event.options[i]
 		var b := Ink.button("", bool(opt.get("primary", false)))
 		b.tooltip_text = opt.text
-		var label := Ink.label(opt.text, "", Palette.PAPER if opt.get("primary", false) else Palette.INK)
+		var label := Ink.label(opt.text, "", JourneyStyle.TEXT)
 		label.add_theme_font_override("font", Ink.serif)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		b.add_child(label)
-		b.button_down.connect(func(): label.add_theme_color_override("font_color", Palette.PAPER))
-		b.button_up.connect(func(): label.add_theme_color_override("font_color", Palette.PAPER if opt.get("primary", false) else Palette.INK))
+		b.button_down.connect(func(): label.add_theme_color_override("font_color", JourneyStyle.TEXT))
+		b.button_up.connect(func(): label.add_theme_color_override("font_color", JourneyStyle.TEXT))
 		b.pressed.connect(_choose.bind(i))
 		_copy.add_child(b)
 		_buttons.append(b)

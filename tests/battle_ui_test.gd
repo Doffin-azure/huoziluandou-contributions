@@ -268,7 +268,7 @@ func _run() -> void:
 	emulated.pressed = true
 	board.tiles[0]._on_gui_input(emulated)
 	_ok(board.path == selected, "模拟鼠标事件不会重复触屏选择")
-	_ok(_screen._end_btn.position.x < board.position.x and _screen._preview_panel.position.x > board.position.x, "手机布局分开放置结束回合与出字")
+	_ok(_screen._end_btn.position.x >= board.get_rect().end.x and _screen._preview_panel.get_rect().end.x <= board.position.x and not _screen._end_btn.get_global_rect().intersects(_screen._selection_actions.get_global_rect()), "手机词效在左、结束回合在右，与字盘下方出字操作分开")
 	_ok(_screen._confirm_btn.custom_minimum_size.y >= 48, "手机主操作有至少 48 逻辑像素的触控区域")
 	await _shot("battle-mobile-live")
 	if _capture:

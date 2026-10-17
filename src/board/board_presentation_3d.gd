@@ -42,7 +42,7 @@ func _ready() -> void:
 	_world = Node3D.new()
 	viewport.add_child(_world)
 	_atlas = load("res://assets/battle/type_faces_atlas.png")
-	_face_shader = load("res://src/shaders/type_face.gdshader")
+	_face_shader = load("res://src/shaders/type_face_illustrated.gdshader" if Palette.STYLE_ID == "taopunk" else "res://src/shaders/type_face.gdshader")
 	var wood := StandardMaterial3D.new()
 	wood.albedo_texture = load("res://assets/study/walnut_albedo.png")
 	wood.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
@@ -54,6 +54,16 @@ func _ready() -> void:
 	var floor_material: StandardMaterial3D = wood.duplicate()
 	floor_material.albedo_color = Color("685242")
 	_floor = floor_material
+	if Palette.STYLE_ID == "taopunk":
+		wood.albedo_texture = null
+		wood.albedo_color = Color("3a2e1d")
+		wood.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		frame.albedo_texture = null
+		frame.albedo_color = Palette.GOLD_DK
+		frame.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		floor_material.albedo_texture = null
+		floor_material.albedo_color = Color("111b1a")
+		floor_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	if is_instance_valid(Router.study_stage) and Router.study_stage.shared_table_active():
 		_shared_stage = Router.study_stage
 		_wood = _shared_stage.battle_table.wood_material(Color("b19b7e"), Vector3(0.96, 0.18, 0.96), 0.24)
@@ -104,6 +114,7 @@ func _ready() -> void:
 	_sun.shadow_normal_bias = 0.20
 	_world.add_child(_sun)
 	resized.connect(_resize_viewport)
+	Ink.board_font_changed.connect(_refresh_font)
 	_resize_viewport()
 
 
@@ -113,6 +124,14 @@ func _resize_viewport() -> void:
 	var pixel_scale := maxf(1, float(DisplayServer.window_get_size().x) / maxf(1, get_viewport_rect().size.x))
 	var side := int(clampf(size.x * pixel_scale, 320, 960))
 	viewport.size = Vector2i(side, side)
+
+
+func set_illustrated_framing(value: bool) -> void:
+	camera.size = grid_size * PITCH + (1.0 if value else 0.65)
+	for child in get_children():
+		if child is BronzeFrame:
+			child.illustrated_framing = value
+			child.queue_redraw()
 
 
 func _mesh(parent: Node3D, mesh: Mesh, position: Vector3, material: Material) -> MeshInstance3D:
@@ -148,7 +167,7 @@ func set_tiles(tiles: Array) -> void:
 		_world.add_child(_tray)
 	var side := grid_size * PITCH + 0.46
 	_box(_tray, Vector3(0, -0.115, 0), Vector3(side, 0.19, side), _floor, 0.028)
-	for axis in 2:
+	for axis in (0 if Palette.STYLE_ID == "taopunk" else 2):
 		for sign_value in [-1.0, 1.0]:
 			var position := Vector3.ZERO
 			position[axis * 2] = (side - 0.25) * 0.5 * sign_value
@@ -165,6 +184,8 @@ func set_tiles(tiles: Array) -> void:
 			_box(_tray, inset, Vector3(side - 0.26, 0.040, 0.045) if axis == 1 else Vector3(0.045, 0.040, side - 0.26), _frame, 0.008)
 	for tile in tiles:
 		actors.append(_make_actor(tile))
+	if Palette.STYLE_ID == "taopunk":
+		add_child(BronzeFrame.new())
 	_sync_shared_layout()
 	_sync_tiles()
 
@@ -178,7 +199,7 @@ func _label(parent: Node3D, position: Vector3, color: Color, font_size: int, pix
 	label.modulate = color
 	label.rotation_degrees.x = -90
 	label.position = position
-	label.shaded = true
+	label.shaded = Palette.STYLE_ID != "taopunk"
 	parent.add_child(label)
 	return label
 
@@ -204,6 +225,7 @@ func _make_actor(tile: TileView) -> Dictionary:
 	face_mesh.size = Vector2(0.905, 0.905)
 	_mesh(root, face_mesh, Vector3(0, FACE_Y, 0), material)
 	var glyph := _label(root, Vector3(0, FACE_Y + 0.012, 0), Color("211c16"), 110, 0.0059)
+	glyph.font = Ink.board_font
 	var badges := _label(root, Vector3(0.10, FACE_Y + 0.014, -0.33), Palette.VERMILION_DK, 40, 0.0032)
 	var uses := _label(root, Vector3(0.29, FACE_Y + 0.016, 0.33), Palette.GOLD_DK, 40, 0.0034)
 	var border := Node3D.new()
@@ -342,3 +364,7 @@ func _exit_tree() -> void:
 	# 共享场景中的字盘仍由该控件拥有；切屏时主动释放，避免留下模型。
 	if is_instance_valid(_shared_stage) and is_instance_valid(_tray):
 		_tray.queue_free()
+
+
+func _refresh_font() -> void:
+	for actor in actors: actor.glyph.font = Ink.board_font

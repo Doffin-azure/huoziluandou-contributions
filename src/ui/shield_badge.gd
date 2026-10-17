@@ -20,6 +20,10 @@ func _draw() -> void:
 		points.append(origin + point * side)
 	var color := Palette.INK.lightened(0.12) if is_hovered() else Palette.INK
 	draw_colored_polygon(points, color)
+	if Palette.STYLE_ID == "taopunk":
+		var outer := points.duplicate()
+		outer.append(points[0])
+		draw_polyline(outer, Color("cbb987"), maxf(1, ui_scale), true)
 	if persistent:
 		var rim := PackedVector2Array()
 		for point in points: rim.append(origin + Vector2.ONE * side * 0.5 + (point - origin - Vector2.ONE * side * 0.5) * 0.84)

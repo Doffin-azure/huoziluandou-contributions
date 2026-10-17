@@ -1,149 +1,105 @@
 extends PanelContainer
 class_name CharCard
-## 展示一枚实体字的卡片（奖励/商店/字袋界面都用它）。
-## 想改卡面样式，只改这个文件。
-
+## Shared glyph specimen: paper face, dark frame and restrained rarity notches.
 signal clicked
 signal hovered
 
 var character: CharacterData
 var compact := false
 var selected := false
-
-var _tile: Control
-var _tile_rect: ColorRect
-var _tile_glyph: Label
-var _wood: ShaderMaterial
-var _title: Label
+var _glyph: Label
 var _desc: Label
-var _tags: HBoxContainer
-var _base_style: StyleBoxFlat
+var _title: Label
+var _tags: Label
+var _rank: Label
+var _hover := false
+var _motion: Tween
 
 
 func setup(p_character: CharacterData, p_compact := false) -> void:
 	character = p_character
 	compact = p_compact
+	if is_node_ready(): _apply()
 
 
 func _ready() -> void:
-	theme_type_variation = "PanelCard"
-	_base_style = (get_theme_stylebox("panel") as StyleBoxFlat).duplicate()
-	add_theme_stylebox_override("panel", _base_style)
+	JourneyStyle.apply(self)
+	custom_minimum_size = custom_minimum_size.max(Vector2(220, 314) if not compact else Vector2(280, 100))
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	if not compact:
-		custom_minimum_size = Vector2(196, 268)
-	else:
-		custom_minimum_size = Vector2(280, 74)
-	_build()
+	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	focus_mode = Control.FOCUS_ALL
+	var mobile := JourneyStyle.touch_scale(self) > 1.1
+	var col := Ink.vbox(8 if mobile else 12)
+	add_child(col)
+	var face := PanelContainer.new()
+	face.add_theme_stylebox_override("panel", JourneyStyle.frame("paper", 10))
+	face.custom_minimum_size.y = (96 if mobile else 124) if not compact else 60
+	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(face)
+	_glyph = Ink.label("", "", JourneyStyle.DARK_TEXT)
+	_glyph.add_theme_font_override("font", Ink.serif)
+	_glyph.add_theme_font_size_override("font_size", (64 if mobile else 76) if not compact else 40)
+	_glyph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	face.add_child(_glyph)
+	var row := Ink.hbox(8)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(row)
+	_title = JourneyStyle.label("", "Subheading")
+	row.add_child(_title)
+	row.add_child(Ink.expander())
+	_rank = JourneyStyle.label("", "Muted", JourneyStyle.GOLD)
+	_rank.add_theme_font_size_override("font_size", 11)
+	row.add_child(_rank)
+	_desc = JourneyStyle.label("")
+	_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_desc.add_theme_font_size_override("font_size", int(17 * JourneyStyle.touch_scale(self)))
+	_desc.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_desc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(_desc)
+	_tags = JourneyStyle.label("", "Muted", JourneyStyle.GOLD)
+	_tags.add_theme_font_size_override("font_size", int(14 * JourneyStyle.touch_scale(self)))
+	col.add_child(_tags)
+	for child in [_title, _tags, _rank]: child.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_apply()
 	gui_input.connect(_on_gui_input)
-	mouse_entered.connect(func(): hovered.emit())
+	mouse_entered.connect(func(): _hover = true; _update_frame(); hovered.emit())
+	mouse_exited.connect(func(): _hover = false; _update_frame())
+	focus_entered.connect(_update_frame)
+	focus_exited.connect(_update_frame)
 	resized.connect(func(): pivot_offset = size * 0.5)
 
 
-func _build() -> void:
-	var pad := MarginContainer.new()
-	pad.add_theme_constant_override("margin_left", 12)
-	pad.add_theme_constant_override("margin_right", 12)
-	pad.add_theme_constant_override("margin_top", 12)
-	pad.add_theme_constant_override("margin_bottom", 12)
-	add_child(pad)
-
-	if compact:
-		var row := Ink.hbox(12)
-		pad.add_child(row)
-		_tile = _make_tile(Vector2(52, 52), 30)
-		row.add_child(_tile)
-		var col := Ink.vbox(2)
-		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		col.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		_title = Ink.label("", "Subheading")
-		_desc = Ink.caption("")
-		_tags = Ink.hbox(4)
-		col.add_child(_title)
-		col.add_child(_desc)
-		col.add_child(_tags)
-		row.add_child(col)
-	else:
-		var col2 := Ink.vbox(8)
-		pad.add_child(col2)
-		var center := CenterContainer.new()
-		_tile = _make_tile(Vector2(96, 96), 56)
-		center.add_child(_tile)
-		col2.add_child(center)
-		_title = Ink.label("", "Subheading")
-		_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		col2.add_child(_title)
-		_desc = Ink.caption("")
-		_desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_desc.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		col2.add_child(_desc)
-		_tags = Ink.hbox(4)
-		_tags.alignment = BoxContainer.ALIGNMENT_CENTER
-		col2.add_child(_tags)
-
-
-func _make_tile(tile_size: Vector2, font_size: int) -> Control:
-	var holder := Control.new()
-	holder.custom_minimum_size = tile_size
-	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_tile_rect = ColorRect.new()
-	_tile_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_tile_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_wood = Ink.make_wood_material()
-	_wood.set_shader_parameter("tile_size", tile_size)
-	_wood.set_shader_parameter("corner_radius", 8.0)
-	_tile_rect.material = _wood
-	holder.add_child(_tile_rect)
-	_tile_glyph = Ink.label("", "", Palette.INK)
-	_tile_glyph.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_tile_glyph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_tile_glyph.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_tile_glyph.add_theme_font_size_override("font_size", font_size)
-	_tile_glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	holder.add_child(_tile_glyph)
-	return holder
-
-
 func _apply() -> void:
-	if character == null:
-		return
-	_tile_glyph.text = character.glyph
-	_title.text = character.glyph + ("  " + character.pinyin if not character.pinyin.is_empty() else "")
+	if character == null: return
+	_glyph.text = character.glyph
+	_title.text = character.pinyin if not character.pinyin.is_empty() else character.glyph
 	_desc.text = character.description
-	for c in _tags.get_children():
-		c.queue_free()
-	for tag in character.tags:
-		var chip := Ink.label(Palette.tag_label(tag), "Muted")
-		chip.add_theme_font_size_override("font_size", 13)
-		chip.add_theme_color_override("font_color", Palette.INK_SOFT)
-		_tags.add_child(chip)
-	set_selected(selected)
+	_rank.text = "◆".repeat(clampi(character.rarity + 1, 1, 4))
+	var tags: PackedStringArray = []
+	for tag in character.tags: tags.append({"energy": "储能", "flow": "流转"}.get(tag, Palette.tag_label(tag)))
+	_tags.text = " · ".join(tags)
+	_update_frame()
 
 
 func set_selected(value: bool) -> void:
 	selected = value
-	if not is_inside_tree():
-		return
-	var col := Palette.rarity_color(character.rarity if character else 0)
-	var sb := _current_style()
-	sb.border_color = Palette.GOLD if value else col
-	sb.set_border_width_all(3 if value else 2)
-	if value:
-		sb.bg_color = Palette.PAPER_WARM
+	if is_node_ready(): _update_frame()
 
 
-func _current_style() -> StyleBoxFlat:
-	return _base_style
+func _update_frame() -> void:
+	add_theme_stylebox_override("panel", JourneyStyle.frame("selected" if selected or has_focus() else ("hover" if _hover else "card"), 18))
 
 
 func _on_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+	if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or event.is_action_pressed("ui_accept"):
 		clicked.emit()
 		accept_event()
 
 
 func play_focus() -> void:
-	var tw := create_tween()
-	tw.tween_property(self, "scale", Vector2(1.06, 1.06), 0.08)
-	tw.tween_property(self, "scale", Vector2.ONE, 0.08)
+	if Settings.reduced_motion: return
+	if _motion != null: _motion.kill()
+	_motion = create_tween()
+	_motion.tween_property(self, "scale", Vector2(1.025, 1.025), 0.08)
+	_motion.tween_property(self, "scale", Vector2.ONE, 0.12)

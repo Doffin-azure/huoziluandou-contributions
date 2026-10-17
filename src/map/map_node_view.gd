@@ -11,14 +11,8 @@ var state: int = State.LOCKED
 var _pulse := 0.0
 
 static func type_color(t: int) -> Color:
-	match t:
-		MapNodeData.Type.BOSS: return Palette.VERMILION
-		MapNodeData.Type.ELITE: return Palette.PLUM
-		MapNodeData.Type.SHOP: return Palette.GOLD
-		MapNodeData.Type.REST: return Palette.JADE
-		MapNodeData.Type.EVENT: return Palette.INDIGO
-		MapNodeData.Type.FORK: return Palette.GOLD_DK
-		_: return Palette.INK_SOFT
+	return JourneyStyle.RED if t in [MapNodeData.Type.BATTLE, MapNodeData.Type.ELITE, MapNodeData.Type.BOSS] else JourneyStyle.GOLD
+
 
 
 static func type_glyph(t: int) -> String:
@@ -35,13 +29,17 @@ static func type_glyph(t: int) -> String:
 
 func setup(p_node: MapNodeData) -> void:
 	node = p_node
-	custom_minimum_size = Vector2(96, 96)
+	custom_minimum_size = Vector2(96, 112)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
 
 func _ready() -> void:
+	focus_mode = Control.FOCUS_ALL
+	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	gui_input.connect(_on_gui_input)
-	mouse_entered.connect(func(): _scale_to(1.12))
+	focus_entered.connect(queue_redraw)
+	focus_exited.connect(queue_redraw)
+	mouse_entered.connect(func(): _scale_to(1.035))
 	mouse_exited.connect(func(): _scale_to(1.0))
 	pivot_offset = size * 0.5
 	resized.connect(func(): pivot_offset = size * 0.5)
@@ -49,50 +47,52 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if state == State.AVAILABLE or state == State.OFFER:
+	if not Settings.reduced_motion and (state == State.AVAILABLE or state == State.OFFER):
 		_pulse = fmod(_pulse + delta, TAU)
 		queue_redraw()
 
 
 func _on_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+	if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or event.is_action_pressed("ui_accept"):
 		if state == State.AVAILABLE or state == State.OFFER:
 			pressed.emit()
+			accept_event()
 
 
 func _scale_to(s: float) -> void:
+	if Settings.reduced_motion: return
 	var tw := create_tween()
 	tw.tween_property(self, "scale", Vector2(s, s), 0.08)
 
 
 func _draw() -> void:
-	var c := size * 0.5
-	var r: float = minf(size.x, size.y) * 0.34
-	var col := type_color(node.type if node else 0)
-	var dim := state == State.LOCKED
-
-	if state == State.AVAILABLE or state == State.OFFER:
-		var glow := 0.5 + 0.5 * sin(_pulse)
-		draw_circle(c, r + 6 + glow * 4.0, Color(col.r, col.g, col.b, 0.18 + 0.12 * glow))
-		draw_arc(c, r + 5, 0, TAU, 48, Color(Palette.GOLD.r, Palette.GOLD.g, Palette.GOLD.b, 0.8), 2.0, true)
-
-	var fill := col
-	if dim:
-		fill = Color(0.55, 0.53, 0.49, 0.5)
-	draw_circle(c, r, fill)
-	draw_arc(c, r - 2, 0, TAU, 48, Palette.PAPER * Color(1, 1, 1, 0.55 if not dim else 0.3), 1.5, true)
-
-	if state == State.COMPLETED:
-		draw_circle(c, r - 6, Color(0.1, 0.09, 0.08, 0.35))
-
-	var fs := int(r * 1.1)
+	var c := Vector2(size.x * 0.5, size.y * 0.42)
+	var active := state in [State.AVAILABLE, State.OFFER]
+	var done := state == State.COMPLETED
+	var r := minf(size.x * 0.40, size.y * 0.35)
+	var outline := JourneyStyle.GOLD if active or done else JourneyStyle.EDGE
+	var fill := JourneyStyle.INK if not active else Color("873c34")
+	var points := PackedVector2Array()
+	for i in 8:
+		points.append(c + Vector2.from_angle(PI / 8.0 + TAU * i / 8.0) * r)
+	draw_colored_polygon(points, fill)
+	var closed := points.duplicate()
+	closed.append(points[0])
+	draw_polyline(closed, outline, 2 if active else 1, true)
+	var inner := PackedVector2Array()
+	for point in points: inner.append(c + (point - c) * 0.84)
+	inner.append(inner[0])
+	draw_polyline(inner, Color(outline, 0.45), 1, true)
+	if active:
+		var intensity := 0.45 if Settings.reduced_motion else 0.45 + 0.2 * sin(_pulse * 2)
+		draw_arc(c, r + 7, -PI * 0.77, -PI * 0.23, 24, Color(JourneyStyle.GOLD, intensity), 2, true)
+		draw_arc(c, r + 7, PI * 0.23, PI * 0.77, 24, Color(JourneyStyle.GOLD, intensity), 2, true)
+	if has_focus(): draw_rect(Rect2(Vector2.ONE * 2, size - Vector2.ONE * 4), JourneyStyle.GOLD, false, 1)
 	var font: Font = Ink.serif
-	var g := type_glyph(node.type if node else 0)
-	var tw2 := font.get_string_size(g, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-	var ascent := font.get_ascent(fs)
-	var text_col := Palette.PAPER if not dim else Color(0.85, 0.84, 0.8, 0.7)
-	draw_string(font, Vector2(c.x - tw2 * 0.5, c.y + ascent * 0.5 - fs * 0.08), g,
-		HORIZONTAL_ALIGNMENT_LEFT, -1, fs, text_col)
-
-	if state == State.COMPLETED:
-		draw_string(font, Vector2(c.x - 8, c.y + r + 18), "✓", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Palette.JADE)
+	var glyph := type_glyph(node.type if node else 0)
+	var fs := 34
+	var width := font.get_string_size(glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	draw_string(font, Vector2(c.x - width * 0.5, c.y + font.get_ascent(fs) * 0.35), glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, JourneyStyle.TEXT if active or done else JourneyStyle.MUTED)
+	var caption := "已行" if done else ("当前" if active else "%02d" % (node.order if node else 0))
+	var small_width := font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+	draw_string(font, Vector2(c.x - small_width * 0.5, size.y - 3), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, outline)

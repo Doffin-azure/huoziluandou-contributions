@@ -156,7 +156,13 @@ func _run() -> void:
 	_screen._board_view._sync_selection()
 	await _frames()
 	var allowed := [Palette.INK, Palette.VERMILION_DK, Palette.GOLD_DK]
-	_ok(_screen._player_status._buttons.all(func(button): return button.get_child(0).ink in allowed), "能力仅使用墨黑、朱砂或旧金，层数不依靠多种颜色区分")
+	var status_inks := [Color("e9debd"), Color("eca18d"), Color("dcc48e")] if Palette.STYLE_ID == "taopunk" else allowed
+	_ok(_screen._player_status._buttons.all(func(button): return button.get_child(0).ink in status_inks), "状态沿用三色层级，并按所在表面适配明暗")
+	if Palette.STYLE_ID == "taopunk":
+		_ok(_screen._player_status._buttons.all(func(button):
+			var surface: StyleBoxFlat = button.get_theme_stylebox("normal")
+			var foreground: Color = button.get_child(0).ink
+			return surface.bg_color.a == 1 and _contrast(foreground, surface.bg_color) >= 4.5), "状态自带不透明底牌，所有图形相对底色对比度至少 4.5:1")
 	_ok(Database.characters.values().all(func(data): return GlyphVfxProfile.for_glyph(data.glyph).color in allowed), "出字图标与粒子沿用相同三色")
 	_ok(battle.rng.state == rng_before and battle.player.hp == hp_before and unit.move_index == index_before, "意图查看不影响随机数、生命或行动索引")
 	await _shot("ink-symbol-battle-desktop")
@@ -231,3 +237,9 @@ func _gallery(unit: Combatant) -> void:
 	await _shot("ink-symbol-intent-gallery")
 	page.queue_free()
 	await _frames()
+
+
+func _contrast(a: Color, b: Color) -> float:
+	var x := a.srgb_to_linear().get_luminance()
+	var y := b.srgb_to_linear().get_luminance()
+	return (maxf(x, y) + 0.05) / (minf(x, y) + 0.05)

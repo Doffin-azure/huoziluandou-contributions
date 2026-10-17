@@ -17,15 +17,7 @@ func build(root: Control) -> void:
 		# 没有幕数据时给一个占位
 		act = ActData.new()
 
-	var main := Ink.vbox(0)
-	if is_instance_valid(Router.study_stage) and Router.study_stage.visible:
-		var frame := Ink.margin(64)
-		frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		root.add_child(frame)
-		frame.add_child(main)
-	else:
-		main.set_anchors_preset(Control.PRESET_FULL_RECT)
-		root.add_child(main)
+	var main := JourneyStyle.page(root)
 
 	main.add_child(_build_header())
 
@@ -47,36 +39,28 @@ func build(root: Control) -> void:
 
 
 func _build_header() -> Control:
-	var panel := Ink.panel("PanelInset")
-	var pad := Ink.margin(12)
-	panel.add_child(pad)
 	var row := Ink.hbox(18)
-	pad.add_child(row)
-
-	var title := Ink.h2("%s · %s" % [act.title, act.theme if not act.theme.is_empty() else ""])
-	row.add_child(title)
-	row.add_child(Ink.expander())
 
 	var hp_wrap := Ink.vbox(2)
 	hp_wrap.custom_minimum_size.x = 190
 	hp_wrap.add_child(Ink.label("气血", "Muted"))
 	var bar := StatBar.new()
-	bar.setup_bar(GameState.player_hp, GameState.player_max_hp, Palette.HP)
+	bar.setup_bar(GameState.player_hp, GameState.player_max_hp, JourneyStyle.RED)
 	hp_wrap.add_child(bar)
 	row.add_child(hp_wrap)
 
-	var gold := Ink.label("❖ %d" % GameState.gold, "Stat", Palette.GOLD_DK)
+	var gold := Ink.label("❖ %d" % GameState.gold, "Stat", JourneyStyle.GOLD)
 	_gold_label = gold
 	row.add_child(gold)
 
 	var deck_btn := Ink.button("字袋 (%d)" % GameState.deck_size())
-	deck_btn.custom_minimum_size = Vector2(120, 38)
+	deck_btn.custom_minimum_size = Vector2(120, 48 * JourneyStyle.touch_scale(self))
 	deck_btn.pressed.connect(_open_deck)
 	row.add_child(deck_btn)
 	_deck_btn = deck_btn
 
 	var menu_btn := Ink.button("菜单")
-	menu_btn.custom_minimum_size = Vector2(76, 38)
+	menu_btn.custom_minimum_size = Vector2(76, 48 * JourneyStyle.touch_scale(self))
 	menu_btn.theme_type_variation = "GhostButton"
 	menu_btn.pressed.connect(func(): PauseMenu.open())
 	row.add_child(menu_btn)
@@ -85,7 +69,7 @@ func _build_header() -> Control:
 	EventBus.gold_changed.connect(_on_gold_changed)
 	EventBus.hp_changed.connect(_on_hp_changed)
 	EventBus.deck_changed.connect(_on_deck_changed)
-	return panel
+	return JourneyStyle.heading(act.title, act.theme, row)
 
 
 func _exit_tree() -> void:
@@ -104,7 +88,7 @@ func _on_gold_changed(v: int) -> void:
 
 func _on_hp_changed(hp: int, mx: int) -> void:
 	if is_instance_valid(_hp_bar):
-		_hp_bar.setup_bar(hp, mx, Palette.HP)
+		_hp_bar.setup_bar(hp, mx, JourneyStyle.RED)
 
 
 func _on_deck_changed() -> void:
@@ -118,12 +102,12 @@ func _build_footer() -> Control:
 	panel.add_child(pad)
 	var row := Ink.hbox(12)
 	pad.add_child(row)
-	var hint := Ink.label("点击当前节点推进冒险　·　每幕 8 节点：3 普通战 / 事件 / 商店 / 岔路 / 休整 / 首领", "Muted")
+	var hint := Ink.label("朱砂标记为当前节点 · 沿途择字，抵达首领", "Muted")
 	row.add_child(hint)
 	row.add_child(Ink.expander())
 	var home := Ink.button("返回标题")
 	home.theme_type_variation = "GhostButton"
-	home.custom_minimum_size = Vector2(110, 34)
+	home.custom_minimum_size = Vector2(110, 48 * JourneyStyle.touch_scale(self))
 	home.pressed.connect(func(): goto("res://src/screens/title_screen.gd"))
 	row.add_child(home)
 	return panel
@@ -221,7 +205,7 @@ func _open_deck() -> void:
 	var counts := GameState.glyph_counts()
 	var chars: Array = []
 	for id in counts.keys():
-		var cd: CharacterData = Database.get_character(id)
+		var cd: CharacterData = Database.get_character_by_glyph(id)
 		if cd != null:
 			chars.append(cd)
 	var overlay := CollectionOverlay.new()

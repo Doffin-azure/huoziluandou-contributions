@@ -8,6 +8,31 @@ var _ui_scale := 1.0
 const MAX_GLYPH_EFFECTS := 10
 
 
+func enemy_attack(style: String, from: Vector2, to: Vector2) -> void:
+	if Settings.reduced_motion: return
+	var effect := EnemyAttackEffect.new()
+	effect.attack_style = style
+	effect.phase = "attack"
+	effect.duration = 0.14
+	effect.scale = Vector2.ONE * _ui_scale
+	effect.origin = from / _ui_scale
+	effect.destination = to / _ui_scale
+	add_child(effect)
+
+
+func enemy_ink(phase: String, from: Vector2, to: Vector2, glyph := "", delay := 0.0) -> void:
+	if Settings.reduced_motion: return
+	var effect := EnemyInkEffect.new()
+	effect.phase = phase
+	effect.scale = Vector2.ONE * _ui_scale
+	effect.origin = from / _ui_scale
+	effect.destination = to / _ui_scale
+	effect.glyph = glyph
+	effect.delay = delay
+	effect.duration = {"attack": 0.14, "charge": 0.4, "pollution": 0.34, "land": 0.22}.get(phase, 0.22)
+	add_child(effect)
+
+
 func set_ui_scale(value: float) -> void:
 	_ui_scale = value
 

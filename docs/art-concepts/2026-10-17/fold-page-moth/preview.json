@@ -1,0 +1,12 @@
+{
+  "id": "fold_page_moth_concept",
+  "name": "折页蛾",
+  "glyph": "蛾",
+  "hp": 32,
+  "shield": 0,
+  "attack": 7,
+  "hits": 1,
+  "image": "res://docs/art-concepts/2026-10-17/fold-page-moth/v01.png",
+  "output": "res://docs/art-concepts/2026-10-17/fold-page-moth/v01-battle.png",
+  "hover": true
+}

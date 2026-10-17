@@ -1,6 +1,7 @@
 extends HBoxContainer
 class_name DefenseDisplay
 ## 只承接血条防御数值；不混入状态、能力或游戏规则。
+signal details_requested(title: String, body: String, scroll_body: bool)
 var block := 0
 var persistent_block := 0
 var is_player := true
@@ -61,10 +62,5 @@ func _description(id: String) -> String:
 
 
 func _show_details(id: String) -> void:
-	var host: Node = Router.current
-	if host == null or not host.has_method("_mount_overlay") or bool(host.get("_busy")) or int(host.get("_modal_count")) > 0:
-		return
 	var value := block if id == "block" else persistent_block
-	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "%s · %d 点" % [_title(id), value], "body": _description(id), "hud_details": true, "options": [{"text": "返回战斗", "primary": true}]})
-	host._mount_overlay(overlay)
+	details_requested.emit("%s · %d 点" % [_title(id), value], _description(id), false)

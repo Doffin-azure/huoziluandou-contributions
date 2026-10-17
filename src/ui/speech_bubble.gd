@@ -16,6 +16,7 @@ var _context_text := ""
 var _source_word: WordData
 var ui_scale := 1.0
 var compact := false
+var illustrated_scale := 0.0
 
 
 func _ready() -> void:
@@ -65,7 +66,7 @@ func _rule() -> HSeparator:
 func set_context(text: String) -> void:
 	_context_text = text
 	if _context != null:
-		_context.text = text.replace("\n", " · ").replace("污染代价：", "污染：") if compact else text
+		_context.text = text.replace("\n", " · ").replace("污染代价：", "污染：") if compact or illustrated_scale > 0 else text
 
 
 func set_state(s: int) -> void:
@@ -127,5 +128,16 @@ func set_ui_scale(value: float, is_compact := false) -> void:
 	body.add_theme_font_size_override("bold_font_size", int(minf(27, (18 if compact else 23) * value)))
 	_caption.add_theme_font_size_override("font_size", int(minf(24, (15 if compact else 19) * value)))
 	_context.add_theme_font_size_override("font_size", int(minf(23, (15 if compact else 19) * value)))
-	body.set_effect_text(_effect_text, int(minf(29, (20 if compact else 26) * ui_scale)), _source_word)
+	var number_size := int(minf(29, (20 if compact else 26) * ui_scale))
+	if illustrated_scale > 0:
+		var unit := illustrated_scale
+		_column.add_theme_constant_override("separation", int(4 * unit))
+		title.add_theme_font_size_override("font_size", int((64 if title.text.length() <= 2 else 46) * unit))
+		body.add_theme_font_size_override("normal_font_size", int(30 * unit))
+		body.add_theme_font_size_override("bold_font_size", int(30 * unit))
+		body.add_theme_constant_override("line_separation", int(-3 * unit))
+		_caption.add_theme_font_size_override("font_size", int(26 * unit))
+		_context.add_theme_font_size_override("font_size", int(26 * unit))
+		number_size = int(34 * unit)
+	body.set_effect_text(_effect_text, number_size, _source_word)
 	set_context(_context_text)

@@ -1,0 +1,35 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS reward screen builds
+PASS shop screen builds
+PASS rest screen builds
+PASS event screen builds
+PASS map screen builds
+PASS custom_deck screen builds
+PASS expedition_map screen builds
+PASS glyph_graph screen builds
+PASS word collection retains readable linked rule descriptions
+PASS journey rule popover explicitly retains ivory text across CanvasLayer
+PASS ESC closes the menu even after a button receives keyboard focus
+PASS presentation preserves reward offers, shop prices, event choice and RNG states
+PASS reward selection adds one glyph and advances one node
+PASS shop purchase retains the exact price and glyph
+PASS shop glyph picker contains owned glyphs rather than the entire database
+PASS an explicitly empty collection does not fall back to the full database
+PASS insufficient funds cannot buy a glyph
+PASS battle theme setting does not recreate the shop or reroll its offers
+PASS rest healing is unchanged
+PASS reward phone buttons remain within horizontal bounds
+PASS reward phone actions retain 48px height
+PASS phone reward retains three readable glyphs
+PASS shop phone buttons remain within horizontal bounds
+PASS shop phone actions retain 48px height
+PASS rest phone buttons remain within horizontal bounds
+PASS rest phone actions retain 48px height
+PASS map phone buttons remain within horizontal bounds
+PASS custom_deck phone buttons remain within horizontal bounds
+PASS glyph_graph phone buttons remain within horizontal bounds
+PASS phone collection reflows columns and respects the supplied deck
+[journey_ui_test] PASS=30 FAIL=0

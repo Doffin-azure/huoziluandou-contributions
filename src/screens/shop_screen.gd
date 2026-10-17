@@ -3,56 +3,38 @@ extends ScreenBase
 
 var node: MapNodeData
 var _offers: Array = []       ## [{kind, character, price}]
-var _grid: GridContainer
-var _gold_label: Label
-var _cards_root: Control
+var _showcase: Control
+var _hud: Control
+var _cards: Array[GlyphOffer] = []
+var _selected := 0
+var _busy := false
 var _pending_offer_index := -1
 var _pending_kind := ""
 
 
+func has_scene_background() -> bool:
+	return true
+
+
 func build(root: Control) -> void:
+	JourneyStyle.apply(self)
 	node = params.get("node", null)
 	_offers = _roll_offers()
-
-	var main := Ink.vbox(0)
-	main.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.add_child(main)
-	main.add_child(_header())
-
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	main.add_child(scroll)
-	var pad := Ink.margin(20)
-	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(pad)
-	_cards_root = Control.new()
-	_cards_root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	pad.add_child(_cards_root)
-	_grid = GridContainer.new()
-	_grid.columns = 4
-	_grid.add_theme_constant_override("h_separation", 16)
-	_grid.add_theme_constant_override("v_separation", 16)
-	_cards_root.add_child(_grid)
-
+	for i in _offers.size(): _offers[i]["display_slot"] = i
+	_showcase = preload("res://src/ui/object_stage/object_stage_view.gd").new()
+	_showcase.mode = "shop"
+	root.add_child(_showcase)
+	_hud = preload("res://src/ui/object_stage/object_hud.gd").new()
+	_hud.heading = "市集 · 字肆"
+	_hud.instruction = "柜上择字，印台整备。"
+	_hud.action_text = "购入"
+	_hud.secondary_text = "离开市集"
+	_hud.on_action = _purchase_selected
+	_hud.on_secondary = _leave
+	root.add_child(_hud)
+	_showcase.layout_changed.connect(_layout_offers)
 	_refresh()
 
-
-func _header() -> Control:
-	var panel := Ink.panel("PanelInset")
-	var pad := Ink.margin(12)
-	panel.add_child(pad)
-	var row := Ink.hbox(16)
-	pad.add_child(row)
-	row.add_child(Ink.h2("市集 · 笔墨铺"))
-	row.add_child(Ink.label("可购买单字、复制已有字、指定删字、治疗。", "Muted"))
-	row.add_child(Ink.expander())
-	_gold_label = Ink.label("❖ %d" % GameState.gold, "Stat", Palette.GOLD_DK)
-	row.add_child(_gold_label)
-	var leave := Ink.button("离开市集")
-	leave.pressed.connect(_leave)
-	row.add_child(leave)
-	return panel
 
 
 func _roll_offers() -> Array:
@@ -78,53 +60,64 @@ func _roll_offers() -> Array:
 
 
 func _refresh() -> void:
-	for c in _grid.get_children():
-		c.queue_free()
-	_gold_label.text = "❖ %d" % GameState.gold
+	_showcase.stage.clear_objects()
+	for card in _cards:
+		card.get_parent().remove_child(card)
+		card.queue_free()
+	_cards.clear()
+	_hud.status_label.text = "金币 %d" % GameState.gold
 	for i in _offers.size():
-		_grid.add_child(_make_offer_cell(_offers[i], i))
+		var item: Dictionary = _offers[i]
+		var ch: CharacterData = item.character
+		var glyph: String = ch.glyph if ch != null else {"remove": "删", "copy": "拓", "heal": "息"}[item.kind]
+		_showcase.stage.add_object(glyph, int(item.display_slot), ch.rarity if ch != null else 0, ch == null)
+		var card := GlyphOffer.new()
+		card.character = ch
+		card.caption = "%d 金" % item.price
+		card.clicked.connect(_inspect.bind(i))
+		card.hovered.connect(_inspect.bind(i))
+		content.add_child(card)
+		_cards.append(card)
+	_selected = clampi(_selected, 0, maxi(0, _offers.size() - 1))
+	_layout_offers.call_deferred()
+	_inspect(_selected)
 
 
-func _make_offer_cell(offer: Dictionary, index: int) -> Control:
-	var cell := Ink.vbox(6)
-	cell.custom_minimum_size.x = 210
-
-	match offer.kind:
-		"buy_char":
-			var card := CharCard.new()
-			card.setup(offer.character)
-			cell.add_child(card)
-		"remove":
-			cell.add_child(_service_card("删字", "从字袋中永久移除一枚字。让字袋更精炼。", Palette.PLUM))
-		"copy":
-			cell.add_child(_service_card("复制", "复制字袋中的一枚字，提高抽中密度。", Palette.INDIGO))
-		"heal":
-			cell.add_child(_service_card("治疗", "回复 %d 点气血。" % _heal_amount(), Palette.JADE))
-
-	var afford := GameState.gold >= int(offer.price)
-	var btn := Ink.button("❖ %d" % offer.price, afford)
-	btn.disabled = not afford
-	btn.pressed.connect(_buy.bind(index))
-	cell.add_child(btn)
-	return cell
+func _layout_offers() -> void:
+	for i in _cards.size():
+		var rect: Rect2 = _showcase.object_rect(i, _offers[i].kind != "buy_char")
+		_cards[i].position = rect.position
+		_cards[i].size = rect.size
 
 
-func _service_card(title: String, desc: String, color: Color) -> Control:
-	var panel := Ink.panel("PanelCard")
-	panel.custom_minimum_size = Vector2(196, 268)
-	var pad := Ink.margin(16)
-	panel.add_child(pad)
-	var col := Ink.vbox(10)
-	pad.add_child(col)
-	col.add_child(Ink.spacer(24))
-	var t := Ink.label(title, "Title", color)
-	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	col.add_child(t)
-	var d := Ink.body(desc)
-	d.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	d.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	col.add_child(d)
-	return panel
+func _inspect(index: int) -> void:
+	if _busy or _offers.is_empty(): return
+	_selected = index
+	for i in _cards.size(): _cards[i].set_selected(i == index)
+	_showcase.stage.select_object(index)
+	var item: Dictionary = _offers[index]
+	var ch: CharacterData = item.character
+	var title: String = ch.glyph if ch != null else {"remove": "删字", "copy": "复制", "heal": "调息"}[item.kind]
+	var body: String = ch.description if ch != null else {"remove": "从字袋中永久移除一枚字。", "copy": "复制字袋中的一枚字。", "heal": "回复 %d 点气血。" % _heal_amount()}[item.kind]
+	_hud.set_detail(title + "  ·  " + str(item.price) + " 金币", body)
+	_hud.action_button.text = "金币不足" if GameState.gold < int(item.price) else "购入 · %d 金币" % item.price
+	_hud.action_button.disabled = GameState.gold < int(item.price)
+
+
+func _purchase_selected() -> void:
+	if _busy or _offers.is_empty() or GameState.gold < int(_offers[_selected].price): return
+	var index := _selected
+	if Settings.reduced_motion or _offers[index].kind != "buy_char":
+		_buy(index)
+		return
+	_busy = true
+	_hud.action_button.disabled = true
+	_hud.secondary_button.disabled = true
+	_showcase.stage.take(index)
+	create_tween().tween_interval(0.24).finished.connect(func():
+		_busy = false
+		_hud.secondary_button.disabled = false
+		_buy(index))
 
 
 func _heal_amount() -> int:
@@ -173,7 +166,7 @@ func _choose_char(title: String) -> void:
 	var counts := GameState.glyph_counts()
 	var chars: Array = []
 	for id in counts.keys():
-		var cd: CharacterData = Database.get_character(id)
+		var cd: CharacterData = Database.get_character_by_glyph(id)
 		if cd != null:
 			chars.append(cd)
 	var overlay := CollectionOverlay.new()

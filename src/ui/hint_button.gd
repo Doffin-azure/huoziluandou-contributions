@@ -1,5 +1,18 @@
 extends Button
 class_name HintButton
-## 悬停说明共享纸底、墨字和换行宽度，不继承引擎默认的深色提示框。
+## Shared readable hints and touch targets, scoped to the owning screen's skin.
+func _ready() -> void:
+	if JourneyStyle.is_active(self):
+		custom_minimum_size.y = maxf(custom_minimum_size.y, 48 * JourneyStyle.touch_scale(self))
+		focus_mode = Control.FOCUS_ALL
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+
+
 func _make_custom_tooltip(for_text: String) -> Object:
+	if JourneyStyle.is_active(self):
+		var hint := JourneyStyle.label(for_text)
+		hint.theme = JourneyStyle.get_theme()
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		hint.custom_minimum_size.x = minf(420, get_viewport_rect().size.x - 48)
+		return hint
 	return Ink.tooltip(for_text)

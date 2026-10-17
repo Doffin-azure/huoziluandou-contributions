@@ -97,3 +97,7 @@ func _load_deck_file(path: String) -> Array:
 
 func _exit_tree() -> void:
 	Router.study_stage = null
+	if Router.host == self:
+		Router.host = null
+		Router.current = null
+		Router.current_path = ""

@@ -1,6 +1,7 @@
 extends HBoxContainer
 class_name StatusStrip
 ## 图形能力符号：只常驻图形和层数，名称与说明放进悬停/点击详情。
+signal details_requested(title: String, body: String, scroll_body: bool)
 var entries: Array = []
 var _ui_scale := 1.0
 var _signature := ""
@@ -29,7 +30,7 @@ func _rebuild() -> void:
 		return
 	var cell := 36.0 * _ui_scale
 	var capacity := maxi(1, int(size.x / (cell + 4)))
-	var signature := str(entries) + str(capacity) + str(_ui_scale)
+	var signature := str(entries) + str(capacity) + str(_ui_scale) + Palette.STYLE_ID
 	if signature == _signature:
 		return
 	_signature = signature
@@ -70,21 +71,42 @@ func _rebuild() -> void:
 
 
 func _badge(symbol: String, cell: float, color: Color) -> Button:
+	var illustrated := Palette.STYLE_ID == "taopunk"
+	var icon_color := color
+	if illustrated:
+		icon_color = Color("e9debd")
+		if color == Palette.VERMILION_DK: icon_color = Color("eca18d")
+		elif color == Palette.GOLD_DK: icon_color = Color("dcc48e")
 	var button := Ink.button("")
 	button.custom_minimum_size = Vector2(cell, cell)
 	button.add_theme_font_override("font", Ink.serif)
 	button.add_theme_font_size_override("font_size", int(19 * _ui_scale))
-	button.add_theme_color_override("font_color", color.darkened(0.18))
+	button.add_theme_color_override("font_color", icon_color)
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color.TRANSPARENT
-	style.border_color = Color(Palette.INK_SOFT, 0.0)
+	style.bg_color = Color("122b2d") if illustrated else Color.TRANSPARENT
+	style.border_color = Color("7b795c") if illustrated else Color.TRANSPARENT
+	if illustrated: style.set_border_width_all(1)
 	style.set_corner_radius_all(2)
 	style.set_content_margin_all(0)
 	button.add_theme_stylebox_override("normal", style)
+	if illustrated:
+		var hover: StyleBoxFlat = style.duplicate()
+		hover.bg_color = Color("274143")
+		hover.border_color = Color("cbb987")
+		button.add_theme_stylebox_override("hover", hover)
+		var pressed: StyleBoxFlat = style.duplicate()
+		pressed.bg_color = Color("0b1e20")
+		button.add_theme_stylebox_override("pressed", pressed)
+		var focus: StyleBoxFlat = style.duplicate()
+		focus.bg_color = Color.TRANSPARENT
+		focus.border_color = Color("e9debd")
+		focus.set_border_width_all(2)
+		button.add_theme_stylebox_override("focus", focus)
+		button.add_theme_stylebox_override("disabled", style)
 	add_child(button)
 	var icon := BattleSymbol.new()
 	icon.symbol = symbol
-	icon.ink = color
+	icon.ink = icon_color
 	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	icon.offset_left = cell * 0.12
 	icon.offset_top = cell * 0.12
@@ -109,24 +131,11 @@ func anchor_for(id: String) -> Vector2:
 
 
 func _show_entry(entry: Dictionary) -> void:
-	var host: Node = Router.current
-	if host == null or not host.has_method("_mount_overlay") or bool(host.get("_busy")) or int(host.get("_modal_count")) > 0:
-		return
-	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "%s · %d %s" % [entry.name, entry.stacks, entry.get("unit", "层")], "body": entry.description, "hud_details": true, "scroll_body": true, "options": [{"text": "返回战斗", "primary": true}]})
-	host._mount_overlay(overlay)
+	details_requested.emit("%s · %d %s" % [entry.name, entry.stacks, entry.get("unit", "层")], str(entry.description), true)
 
 
 func _show_details() -> void:
-	var host: Node = Router.current
-	if host != null and host.has_method("_mount_overlay") and (bool(host.get("_busy")) or int(host.get("_modal_count")) > 0):
-		return
-	var overlay := ChoiceOverlay.new()
 	var lines: Array[String] = []
 	for entry in entries:
 		lines.append("【%s】%d %s\n%s" % [entry.name, entry.stacks, entry.get("unit", "层"), entry.description])
-	overlay.setup({"title": "状态与能力", "body": "\n\n".join(lines), "hud_details": true, "scroll_body": true, "options": [{"text": "返回战斗", "primary": true}]})
-	if host != null and host.has_method("_mount_overlay"):
-		host._mount_overlay(overlay)
-	else:
-		add_child(overlay)
+	details_requested.emit("状态与能力", "\n\n".join(lines), true)

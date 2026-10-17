@@ -1,0 +1,24 @@
+{
+  "id": "fold_page_moth_concept",
+  "name": "折页蛾",
+  "glyph": "蛾",
+  "hp": 32,
+  "shield": 0,
+  "attack": 7,
+  "hits": 1,
+  "image": "res://docs/art-concepts/2026-10-17/fold-page-moth/v02.png",
+  "output": "res://docs/art-concepts/2026-10-17/fold-page-moth/v02-battle.png",
+  "hover": true,
+  "animation_id": "fold_page_moth",
+  "animation_output": "res://docs/art-concepts/2026-10-17/fold-page-moth/",
+  "capture_directory": "res://shots/fold-page-moth-animation/",
+  "capture_fps": 24,
+  "animation_clips": [
+    {"id":"idle","title":"待机 · 双页缓缓开合","length":3.0,"key":0.75},
+    {"id":"mark","title":"折页 · 一角内卷","length":1.2,"key":0.55},
+    {"id":"fold_attack","title":"折页攻击 · 双页拍合","length":1.2,"key":0.50},
+    {"id":"attack","title":"攻击 · 快合快开","length":1.0,"key":0.34},
+    {"id":"hit","title":"受击 · 纸页错开回弹","length":0.6,"key":0.06},
+    {"id":"death","title":"退场 · 收页飘落","length":1.2,"key":0.70}
+  ]
+}

@@ -1,8 +1,9 @@
 extends RefCounted
 class_name GameStyle
 ## 视觉风格令牌。切换风格 = 换一套令牌 + 背景/字块材质 + 主题。
-## 目前两套：
-##   paper —— 宣纸 / 木活字 / 朱印（默认）
+## 风格：
+##   taopunk —— 青铜绘卷：手绘青绿 / 青铜机关 / 朱红（当前定稿）
+##   paper —— 宣纸 / 木活字 / 朱印（旧版可选）
 ##   neon  —— 墨芯：深蓝科技 / 玻璃面板 / 发光字块（大模型概念）
 ## 新增风格：照抄一个 static func，再在 Palette.apply 与 Ink 里接线即可。
 
@@ -49,8 +50,41 @@ var SHADOW := Color(0.08, 0.06, 0.04, 0.45)
 
 static func get_style(style_id: String) -> GameStyle:
 	match style_id:
+		"taopunk": return taopunk()
 		"neon": return neon()
 		_: return paper()
+
+
+static func taopunk() -> GameStyle:
+	var s := paper()
+	s.id = "taopunk"
+	s.name = "青铜绘卷"
+	s.bg_kind = "taopunk"
+	s.tile_kind = "bronze"
+	s.PAPER = Color("e8d9b7")
+	s.PAPER_WARM = Color("dfcd9f")
+	s.PAPER_DARK = Color("cbb98f")
+	s.PAPER_SHADE = Color("af9a70")
+	s.INK = Color("171f1d")
+	s.INK_SOFT = Color("343d33")
+	s.INK_FAINT = Color("73654b")
+	s.VERMILION = Color("a93630")
+	s.VERMILION_DK = Color("802822")
+	s.GOLD = Color("b98c3e")
+	s.GOLD_DK = Color("785925")
+	s.WOOD = Color("1f4946")
+	s.WOOD_LIGHT = Color("49716a")
+	s.WOOD_DARK = Color("102e30")
+	s.PANEL_DARK = Color("132527")
+	s.STAGE = Color("10353b")
+	s.STAGE_EDGE = s.GOLD_DK
+	s.BG_TOP = Color("103f49")
+	s.BG_BOTTOM = Color("0c2028")
+	s.HP = s.VERMILION
+	s.BORDER = s.INK
+	s.BORDER_SOFT = s.GOLD_DK
+	s.corner_bonus = -4
+	return s
 
 
 static func paper() -> GameStyle:
