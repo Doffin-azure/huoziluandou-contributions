@@ -1,11 +1,14 @@
 extends Node
 ## Ink —— 全局“美术工具箱”。
 ## 所有界面都用 Ink.xxx() 组装；改一处即全局换皮。
-## 风格由 GameStyle 令牌驱动，可运行时切换（宣纸 / 墨芯）。
+## 风格由 GameStyle 令牌驱动（青铜绘卷 / 宣纸 / 墨芯）；战斗中换肤延后至离开页面。
 
 var theme: Theme
 var serif: Font
 var sans: Font
+var board_font: Font
+var pending_style := ""
+signal board_font_changed
 var style: GameStyle
 
 var _paper_shader: Shader
@@ -16,8 +19,10 @@ var _tile_neon_shader: Shader
 
 func _ready() -> void:
 	_load_fonts()
+	_reload_board_font(Settings.board_font_path)
+	Settings.board_font_changed.connect(_reload_board_font)
 	_load_shaders()
-	var sid := "paper"
+	var sid := "taopunk"
 	if Settings != null and "visual_style" in Settings:
 		sid = Settings.visual_style
 	apply_style(GameStyle.get_style(sid))
@@ -30,6 +35,12 @@ func apply_style(new_style: GameStyle) -> void:
 	theme = _build_theme()
 	if get_tree() != null:
 		get_tree().root.theme = theme
+
+
+func apply_pending_style() -> void:
+	if pending_style.is_empty(): return
+	apply_style(GameStyle.get_style(pending_style))
+	pending_style = ""
 
 
 func _load_fonts() -> void:
@@ -58,6 +69,12 @@ func _load_shaders() -> void:
 	_bg_neon_shader = load("res://src/shaders/bg_neon.gdshader")
 	_wood_shader = load("res://src/shaders/wood.gdshader")
 	_tile_neon_shader = load("res://src/shaders/tile_neon.gdshader")
+
+
+func _reload_board_font(path: String) -> void:
+	var loaded := BoardTypography.load_font(path, serif)
+	board_font = loaded if loaded != null else serif
+	board_font_changed.emit()
 
 
 # ---------------------------------------------------------------- 主题构建

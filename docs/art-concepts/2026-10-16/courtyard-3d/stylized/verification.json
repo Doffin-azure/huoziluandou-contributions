@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-16",
+  "branch": "feat/title-3d-sample",
+  "engine": "Godot 4.7.2",
+  "renderer": "Forward+ / Vulkan / RTX 4060 Laptop",
+  "images": {
+    "01-title.png": [
+      1920,
+      1080
+    ],
+    "02-courtyard.png": [
+      2880,
+      1620
+    ],
+    "03-detail.png": [
+      1920,
+      1080
+    ]
+  },
+  "image_source": "Native viewport captures, no image generation or retouching",
+  "native_checks": {
+    "passed": 23,
+    "failed": 0,
+    "stderr_empty": true
+  },
+  "style": {
+    "material_model": "three authored pigments, real directional shadows, no specular or normal maps",
+    "contours": "selective geometry hulls plus masked screen depth/normal lines",
+    "water": "live half-resolution mirror camera, no SSR or reflection probe",
+    "sky": "painted teal gradient, textured ivory disk",
+    "architecture_parts": 2053,
+    "scene_triangles": 281818
+  },
+  "known_limits": [
+    "Procedural foliage and mountains still need authored shapes",
+    "Only desktop Forward+ reviewed; mobile performance not validated",
+    "Portable GLB still contains the original authoring materials, not this Godot shading pipeline"
+  ],
+  "baseline_exit_warning": "The prior seven Texture RID shutdown warning did not recur under this configuration; its cause in the previous configuration remains unproven.",
+  "scope": "Standalone sample. Formal title screen, battle UI, gameplay and saves unchanged. No commit or push."
+}

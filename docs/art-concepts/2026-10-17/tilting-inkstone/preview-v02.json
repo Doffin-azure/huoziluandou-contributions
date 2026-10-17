@@ -1,0 +1,12 @@
+{
+  "id": "tilting_inkstone_concept",
+  "name": "倾砚",
+  "glyph": "砚",
+  "hp": 34,
+  "shield": 0,
+  "attack": 7,
+  "hits": 1,
+  "image": "res://docs/art-concepts/2026-10-17/tilting-inkstone/v02.png",
+  "output": "res://docs/art-concepts/2026-10-17/tilting-inkstone/v02-battle.png",
+  "hover": false
+}

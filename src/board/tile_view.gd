@@ -31,6 +31,7 @@ func _init() -> void:
 
 func _ready() -> void:
 	_build()
+	Ink.board_font_changed.connect(_refresh_font)
 	resized.connect(_resize_visual)
 	_resize_visual()
 	_refresh()
@@ -58,7 +59,7 @@ func _build() -> void:
 	_face.material = _wood_mat
 	_visual.add_child(_face)
 	_glyph = Ink.label("", "", Palette.INK)
-	_glyph.add_theme_font_override("font", Ink.serif)
+	_glyph.add_theme_font_override("font", Ink.board_font)
 	_glyph.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_glyph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_glyph.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -239,3 +240,7 @@ func enter(offset: Vector2, fresh: bool, delay: float) -> void:
 	_motion.tween_property(_visual, "position", Vector2.ZERO, 0.18).set_delay(delay).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_motion.tween_property(_visual, "scale", Vector2.ONE, 0.18).set_delay(delay).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_motion.tween_property(_visual, "modulate:a", 1.0, 0.13).set_delay(delay)
+
+
+func _refresh_font() -> void:
+	_glyph.add_theme_font_override("font", Ink.board_font)

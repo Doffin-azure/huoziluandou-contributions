@@ -52,7 +52,7 @@ func _build() -> void:
 	tray.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	tray.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(tray)
-	if Palette.STYLE_ID == "paper":
+	if Palette.STYLE_ID in ["paper", "taopunk"]:
 		tray.hide()
 		_presentation = BoardPresentation3D.new()
 		add_child(_presentation)

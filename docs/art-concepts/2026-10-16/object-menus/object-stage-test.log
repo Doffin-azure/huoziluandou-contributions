@@ -1,0 +1,27 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.3.289 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS four-option reward creates four actual 3D specimens
+PASS specimens use their own 3D world and camera
+PASS inspection retains complete rules without consuming RNG
+PASS inspection physically lifts the selected specimen
+PASS capture reward-four
+PASS claim animation locks actions without premature or double settlement
+PASS claim pulls the specimen toward the player
+PASS claim settles once and returns to the existing route
+PASS leaving the reward releases its 3D stage
+PASS service seals explain the original shop services
+PASS purchase waits for the pickup and rejects duplicate presses
+PASS purchase charges the exact original price once
+PASS remaining goods retain their counter positions
+PASS live reduced motion stops the lantern
+PASS restoring motion resumes the lantern
+PASS reward physical picking bounds fit the phone and retain 48px targets
+PASS reward price labels do not overlap the primary action
+PASS capture reward-phone
+PASS shop physical picking bounds fit the phone and retain 48px targets
+PASS shop price labels do not overlap the primary action
+PASS capture shop-phone
+[object_stage_test] PASS=21 FAIL=0

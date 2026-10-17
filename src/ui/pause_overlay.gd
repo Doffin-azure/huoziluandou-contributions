@@ -12,6 +12,7 @@ var _ui_scale := 0.0
 
 
 func _ready() -> void:
+	JourneyStyle.apply(self)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_main_layer = Control.new()
 	_main_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

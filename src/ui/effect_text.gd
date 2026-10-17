@@ -12,6 +12,10 @@ var _away := 0.0
 var _viewport_size := Vector2.ZERO
 
 
+func _ready() -> void:
+	if JourneyStyle.is_active(self): text = _journey_links(text)
+
+
 func _init() -> void:
 	bbcode_enabled = true
 	fit_content = true
@@ -31,9 +35,19 @@ func set_effect_text(value: String, number_size := 0, source_word: WordData = nu
 		close_help()
 	_plain = value
 	_source_word = source_word
-	text = EffectGlossary.format_text(value, number_size)
+	text = _format(value, number_size)
 	if source_word != null and EffectGlossary.brief(source_word) != source_word.describe():
 		text += "\n[font_size=%d]%s[/font_size]" % [mini(get_theme_font_size("normal_font_size"), 16), EffectGlossary.link("完整词效", "word:" + source_word.word)]
+	if JourneyStyle.is_active(self): text = _journey_links(text)
+
+
+func _format(value: String, number_size := 0, exclude := "") -> String:
+	var formatted := EffectGlossary.format_text(value, number_size, exclude)
+	return _journey_links(formatted) if JourneyStyle.is_active(self) else formatted
+
+
+func _journey_links(value: String) -> String:
+	return value.replace(Palette.INDIGO.to_html(false), JourneyStyle.GOLD.to_html(false)).replace(Palette.VERMILION_DK.to_html(false), "e5977e")
 
 
 func _on_link_entered(meta: Variant, depth: int) -> void:
@@ -84,18 +98,24 @@ func open_entry(meta: String, depth := 0) -> void:
 	var width := minf(380.0 * help_scale, _viewport_size.x - 24.0)
 	var card := Ink.panel("PanelCard")
 	# CanvasLayer 不继承 Control 的主题链，浮层需显式使用当前游戏主题。
-	card.theme = Ink.theme
+	var journey := JourneyStyle.is_active(self)
+	card.theme = JourneyStyle.get_theme() if journey else Ink.theme
 	card.name = "EffectHelp"
 	card.set_meta("entry", meta)
 	card.custom_minimum_size.x = width
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
-	var style := (Ink.theme.get_stylebox("panel", "PanelCard") as StyleBoxFlat).duplicate()
-	style.bg_color = Palette.PAPER
-	style.border_color = Palette.INDIGO
-	style.set_border_width_all(1)
+	var style: StyleBox
+	if journey:
+		style = JourneyStyle.frame("panel", 10 * help_scale)
+	else:
+		var paper := (Ink.theme.get_stylebox("panel", "PanelCard") as StyleBoxFlat).duplicate()
+		paper.bg_color = Palette.PAPER
+		paper.border_color = Palette.INDIGO
+		paper.set_border_width_all(1)
+		paper.shadow_color = Palette.SHADOW
+		paper.shadow_size = 8
+		style = paper
 	style.set_content_margin_all(10 * help_scale)
-	style.shadow_color = Palette.SHADOW
-	style.shadow_size = 8
 	card.add_theme_stylebox_override("panel", style)
 	_layer.add_child(card)
 	_cards.append(card)
@@ -103,7 +123,7 @@ func open_entry(meta: String, depth := 0) -> void:
 	card.add_child(col)
 	var head := Ink.hbox(8)
 	col.add_child(head)
-	var title := Ink.label(str(info.title), "Subheading", Palette.INDIGO)
+	var title := Ink.label(str(info.title), "Subheading", JourneyStyle.GOLD if journey else Palette.INDIGO)
 	title.add_theme_font_size_override("font_size", int(20 * help_scale))
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -124,7 +144,7 @@ func open_entry(meta: String, depth := 0) -> void:
 	description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	description.mouse_filter = Control.MOUSE_FILTER_STOP
 	description.add_theme_font_size_override("normal_font_size", int(18 * help_scale))
-	description.text = EffectGlossary.format_text(str(info.text), 0, meta)
+	description.text = _format(str(info.text), 0, meta)
 	description.meta_hover_started.connect(_on_link_entered.bind(depth + 1))
 	description.meta_hover_ended.connect(_on_link_exited.bind(depth + 1))
 	description.meta_clicked.connect(_on_link_clicked.bind(depth + 1))

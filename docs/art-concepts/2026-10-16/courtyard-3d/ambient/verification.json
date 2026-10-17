@@ -1,0 +1,60 @@
+{
+  "engine": "Godot 4.7.2",
+  "renderer": "Forward+ / Vulkan / RTX 4060 Laptop",
+  "date": "2026-10-16",
+  "branch": "feat/title-3d-sample",
+  "native_checks": {
+    "passed": 33,
+    "failed": 0,
+    "stderr_empty": true
+  },
+  "capture_checks": {
+    "frames": 60,
+    "fps": 10,
+    "duration_ms": 6000,
+    "gif_size": [
+      960,
+      540
+    ],
+    "stderr_empty": true,
+    "frame_0_to_30_rgb_mean_difference": [
+      0.9440006510416666,
+      0.4109375,
+      0.29785373263888887
+    ]
+  },
+  "images": {
+    "01-title.png": [
+      1920,
+      1080
+    ],
+    "02-courtyard.png": [
+      2880,
+      1620
+    ],
+    "03-detail.png": [
+      1920,
+      1080
+    ],
+    "04-frozen-mist.png": [
+      1920,
+      1080
+    ],
+    "05-frozen-no-mist.png": [
+      1920,
+      1080
+    ]
+  },
+  "ambient": {
+    "fog": "Two animated native FogVolumes; global density zero; sky affect zero; pool base density 0.052, distant density 0.020",
+    "petals": "112 curved opaque double-sided instances, one MultiMesh, fixed bounded looping tracks, no node spawning",
+    "wind": "Shared shader clock; anchored tree sway; full lantern assemblies and outlines rotate around suspension pivots",
+    "controls": "F2 panel: mist strength 0..1.5 and pause/resume environment motion"
+  },
+  "limits": [
+    "Desktop Forward+ only; mobile volumetric fog fallback not implemented",
+    "Ambient petals have depth occlusion but no physics collisions or persistent ground accumulation",
+    "GIF is a quantized downscaled native capture, not a performance benchmark or seamless loop"
+  ],
+  "scope": "Standalone sample only; formal title screen, battle UI, StudyStage, gameplay and save data unchanged; no commit or push"
+}

@@ -1,6 +1,7 @@
 extends Button
 class_name EnemyIntent
 ## 只读意图：常驻形状与数值，完整名称和说明通过悬停/点击查看。
+signal details_requested(title: String, body: String, scroll_body: bool)
 var entries: Array = []
 var _move: EnemyMoveData
 var _unit: Combatant
@@ -125,8 +126,5 @@ func _details() -> String:
 
 
 func _show_details() -> void:
-	var host: Node = Router.current
-	if host == null or not host.has_method("_mount_overlay") or bool(host.get("_busy")) or int(host.get("_modal_count")) > 0 or entries.is_empty(): return
-	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "敌方意图", "body": _details(), "hud_details": true, "scroll_body": true, "options": [{"text": "返回战斗", "primary": true}]})
-	host._mount_overlay(overlay)
+	if not entries.is_empty():
+		details_requested.emit("敌方意图", _details(), true)

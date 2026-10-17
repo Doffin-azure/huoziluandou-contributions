@@ -1,6 +1,6 @@
 extends Control
 class_name ScreenBase
-## 所有全屏界面的基类：自动铺宣纸底 + 提供 content 容器。
+## 全屏基类：行旅皮肤 / 独立场景背景 / 战斗背景，以及内容容器。
 
 var params: Dictionary = {}
 var content: Control
@@ -14,7 +14,19 @@ func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	var world_backed := is_instance_valid(Router.study_stage) and Router.study_stage.visible
 	var path: String = get_script().resource_path
-	if not world_backed or (not path.contains("title_screen") and not path.contains("battle_screen")):
+	var journey := not has_scene_background() and not path.ends_with("/battle_screen.gd")
+	if journey:
+		JourneyStyle.apply(self)
+		add_child(preload("res://src/ui/journey/journey_backdrop.gd").new())
+	elif path.ends_with("/battle_screen.gd") and Palette.STYLE_ID == "taopunk" and not world_backed:
+		var backdrop := TextureRect.new()
+		backdrop.texture = TaopunkArt.background()
+		backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(backdrop)
+	elif not has_scene_background() and (not world_backed or (not path.contains("title_screen") and not path.contains("battle_screen"))):
 		var paper := Ink.paper_layer()
 		if world_backed:
 			var material := ShaderMaterial.new()
@@ -30,6 +42,10 @@ func _ready() -> void:
 
 
 ## 子类重写
+func has_scene_background() -> bool:
+	return false
+
+
 func build(_root: Control) -> void:
 	pass
 

@@ -1,6 +1,8 @@
 extends HBoxContainer
 class_name ResourceStrip
 ## 资源只常驻符号和数值；说明通过悬停/点击访问。
+signal details_requested(title: String, body: String, scroll_body: bool)
+signal activated(id: String)
 var entries: Array = []
 var _items: Dictionary = {}
 var _scale := 1.0
@@ -72,6 +74,8 @@ func _rebuild() -> void:
 		value.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(value)
 		button.custom_minimum_size.x = row.get_combined_minimum_size().x + 8 * _scale
+		if entry.get("action", false):
+			button.custom_minimum_size.x = maxf(button.custom_minimum_size.x, 48 * _scale)
 		button.resized.connect(func():
 			row.position = (button.size - row.get_combined_minimum_size()) * 0.5
 			row.size = row.get_combined_minimum_size())
@@ -79,9 +83,7 @@ func _rebuild() -> void:
 
 
 func _show_entry(entry: Dictionary) -> void:
-	var host: Node = Router.current
-	if host == null or not host.has_method("_mount_overlay") or bool(host.get("_busy")) or int(host.get("_modal_count")) > 0:
+	if entry.get("action", false):
+		activated.emit(str(entry.id))
 		return
-	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": entry.title, "body": entry.description, "hud_details": true, "scroll_body": true, "options": [{"text": "返回战斗", "primary": true}]})
-	host._mount_overlay(overlay)
+	details_requested.emit(str(entry.title), str(entry.description), true)

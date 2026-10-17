@@ -75,6 +75,8 @@ var _active_fx_profile: Dictionary = {}
 var _modal_count := 0
 var _compact := false
 var _events: Array[Dictionary] = []
+var _pending_enemy_action: Dictionary = {}
+var _enemy_attack_context: Dictionary = {}
 var _feedback_watches: Array = []
 var _confirm_motion: Tween
 var _confirm_ink: ShaderMaterial
@@ -118,15 +120,19 @@ func build(root: Control) -> void:
 	_enemy_panel.add_child(_enemy_row)
 	_enemy_paper = ArtPaper.new()
 	_enemy_paper.tilt = 1.2
+	_enemy_paper.open_scene = true
 	root.add_child(_enemy_paper)
 	root.add_child(_enemy_panel)
 	root.move_child(_player_panel, _enemy_panel.get_index())
 	_footer = _build_bottombar()
 	root.add_child(_footer)
+	for source in [_player_status, _player_defense, _gold_strip, _pile_label]:
+		source.details_requested.connect(_show_hud_details)
+	_pile_label.activated.connect(_open_pile)
 	_end_btn = Ink.button("结束回合")
 	_end_btn.add_theme_font_size_override("font_size", 22)
 	var end_style := StyleBoxFlat.new()
-	end_style.bg_color = Palette.PANEL_DARK
+	end_style.bg_color = Color("24231e") if Palette.STYLE_ID == "taopunk" else Palette.PANEL_DARK
 	end_style.border_color = Palette.GOLD_DK
 	end_style.set_border_width_all(1)
 	end_style.set_corner_radius_all(4)
@@ -241,6 +247,7 @@ func _make_enemy_card(i: int, e: Combatant) -> EnemyView:
 	view.setup(i, e)
 	view.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	view.clicked.connect(_on_enemy_clicked)
+	view.details_requested.connect(_show_hud_details)
 	_watch_combatant(e)
 	return view
 
@@ -259,6 +266,7 @@ func _build_left() -> Control:
 	_confirm_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_confirm_btn.add_theme_font_size_override("font_size", 28)
 	_confirm_btn.disabled = true
+	_confirm_btn.add_theme_color_override("font_disabled_color", Palette.INK_SOFT)
 	_confirm_btn.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
 	_confirm_btn.add_theme_stylebox_override("hover", StyleBoxEmpty.new())
 	_confirm_btn.add_theme_stylebox_override("pressed", StyleBoxEmpty.new())
@@ -270,6 +278,8 @@ func _build_left() -> Control:
 	_confirm_ink = ShaderMaterial.new()
 	_confirm_ink.shader = load("res://src/shaders/seal_button.gdshader")
 	_confirm_ink.set_shader_parameter("seal_color", Palette.VERMILION)
+	_confirm_ink.set_shader_parameter("disabled_color", Palette.PAPER_DARK)
+	_confirm_ink.set_shader_parameter("illustrated", Palette.STYLE_ID == "taopunk")
 	stamp.material = _confirm_ink
 	_confirm_btn.add_child(stamp)
 	_confirm_btn.mouse_entered.connect(func(): _confirm_ink.set_shader_parameter("hovered", true))
@@ -360,9 +370,7 @@ func _refresh_all(animate_board := false) -> void:
 	_refresh_piles()
 	_turn_label.text = "回合 %d" % battle.turn
 	_turn_label.mouse_filter = Control.MOUSE_FILTER_PASS
-	_turn_label.tooltip_text = ("遗物：
-" + "
-".join(battle.relics.map(func(r): return Relics.text(r)))) if not battle.relics.is_empty() else ""
+	_turn_label.tooltip_text = ("遗物：\n" + "\n".join(battle.relics.map(func(r): return Relics.text(r)))) if not battle.relics.is_empty() else ""
 	_board_view.rebuild(animate_board)
 	_update_input()
 	_layout()
@@ -420,8 +428,8 @@ func _refresh_piles() -> void:
 	if _pile_label == null:
 		return
 	_pile_label.set_entries([
-		{"id": "bag", "title": "字袋", "value": battle.bag.size(), "color": Palette.INK_SOFT, "description": "字袋中剩余 %d 枚字，盘面现有 %d 枚。" % [battle.bag.size(), battle.board.fill_count()]},
-		{"id": "discard", "title": "弃字堆", "value": battle.discard.size(), "color": Palette.INK_SOFT, "description": "弃字堆中有 %d 枚字。" % battle.discard.size()}])
+		{"id": "bag", "title": "抽牌堆", "action": true, "value": battle.bag.size(), "color": Palette.INK_SOFT, "description": "点击查看剩余 %d 枚字，不显示抽取顺序。" % battle.bag.size()},
+		{"id": "discard", "title": "弃牌堆", "action": true, "value": battle.discard.size(), "color": Palette.INK_SOFT, "description": "点击查看已弃置的 %d 枚字。" % battle.discard.size()}])
 
 
 func _on_log(text: String) -> void:
@@ -1698,8 +1706,20 @@ func _layout() -> void:
 		return
 	var w := size.x
 	var h := size.y
-	_compact = bool(params.get("touch_layout", false)) or DisplayServer.is_touchscreen_available() or w / maxf(1.0, h) >= 1.95 or w < 1100
-	var ui_scale := clampf(h / maxf(1, DisplayServer.window_get_size().y), 1.0, 1.85) if _compact else 1.0
+	var illustrated_desktop := (Palette.STYLE_ID == "taopunk" and w >= 1100
+		and get_window().size.y > 540 and not DisplayServer.is_touchscreen_available()
+		and not bool(params.get("touch_layout", false)))
+	_compact = (bool(params.get("touch_layout", false)) or DisplayServer.is_touchscreen_available()
+		or w / maxf(1.0, h) >= 1.95 or w < 1100 or get_window().size.y <= 540
+		or Palette.STYLE_ID == "taopunk")
+	var ui_scale := BattleTouchLayout.unit_for(size, get_window().size) if _compact else 1.0
+	if Palette.STYLE_ID == "taopunk" and get_window().size.y > 540:
+		ui_scale = maxf(1.2, ui_scale)
+	var touch := BattleTouchLayout.measure(size, ui_scale, not _player_status.entries.is_empty()) if _compact else {}
+	if illustrated_desktop:
+		touch = TaopunkBattleLayout.measure(size, not _player_status.entries.is_empty())
+		# 既有紧凑组件保留行为；桌面采用定稿自己的字号和构图比例。
+		ui_scale = touch.scale * 1.55
 	var margin := 24.0
 	var top := 88.0 if not _compact else maxf(66.0, 54 * ui_scale)
 	var footer := maxf(70.0, 48 * ui_scale + 22)
@@ -1707,8 +1727,15 @@ func _layout() -> void:
 	var side := minf(h - top - footer - action_h - 22, w * 0.44)
 	var column := (w - side) * 0.5 - margin * 2
 	var board_x := (w - side) * 0.5
+	if _compact:
+		side = touch.board.size.x
+		board_x = touch.board.position.x
+		column = touch.column
 	_topbar.position = Vector2(margin, 12)
 	_topbar.size = Vector2(w - margin * 2, top - 12)
+	if _compact:
+		_topbar.position = touch.topbar.position
+		_topbar.size = touch.topbar.size
 	_topbar.get_node("Title").hide()
 	_topbar.get_node("Title").position = Vector2(320, 0)
 	_topbar.get_node("Title").size = Vector2(150, 36)
@@ -1724,25 +1751,28 @@ func _layout() -> void:
 	_menu_btn.add_theme_font_size_override("font_size", int(minf(34, 20 * ui_scale)))
 	_gold_strip.set_ui_scale(ui_scale, _compact and _gold_strip.entries.size() > 1)
 	var gold_width := _gold_strip.get_combined_minimum_size().x
-	_gold_strip.position = Vector2(_menu_btn.position.x - gold_width - 28, 0) if not _compact else Vector2(0, 0)
+	_gold_strip.position = Vector2(_menu_btn.position.x - gold_width - (8 * ui_scale if _compact else 28), 0)
 	_gold_strip.size = Vector2(gold_width, 48 * ui_scale)
 	if _compact:
-		_turn_label.position = Vector2(gold_width + 18 * ui_scale, 12 * ui_scale)
-		_turn_label.size = Vector2(minf(90 * ui_scale, _menu_btn.position.x - _turn_label.position.x - 12 * ui_scale), 24 * ui_scale)
-	_topbar.get_node("Rule").position = Vector2(0, top - 14)
-	_topbar.get_node("Rule").size = Vector2(w - margin * 2, 1)
+		var turn_x := maxf(board_x, touch.player.end.x + 6 * ui_scale) - _topbar.position.x
+		_turn_label.position = Vector2(turn_x, 12 * ui_scale)
+		_turn_label.size = Vector2(maxf(0, minf(80 * ui_scale, _gold_strip.position.x - turn_x - 6 * ui_scale)), 24 * ui_scale)
+		_turn_label.visible = _turn_label.size.x >= 48 * ui_scale
+	_topbar.get_node("Rule").position = Vector2(0, _topbar.size.y - 1)
+	_topbar.get_node("Rule").size = Vector2(_topbar.size.x, 1)
 	_board_view.position = Vector2(board_x, top + 12)
 	_board_view.size = Vector2(side, side)
 	var right_x := board_x + side + margin
 	if _compact:
-		_player_panel.position = Vector2(margin, top + 12)
-		_player_panel.size = Vector2(column, (96 if not _player_status.entries.is_empty() else 44) * ui_scale)
-		_enemy_panel.position = Vector2(margin, _player_panel.position.y + _player_panel.size.y + 6 * ui_scale)
-		_enemy_panel.size = Vector2(column, top + side + 12 - _enemy_panel.position.y)
-		_preview_panel.position = Vector2(right_x, top + 12)
-		_preview_panel.size = Vector2(column, side)
-		_end_btn.position = Vector2(margin, top + side + 22)
-		_end_btn.size = Vector2(column, 48 * ui_scale)
+		_board_view.position = touch.board.position
+		_player_panel.position = touch.player.position
+		_player_panel.size = touch.player.size
+		_enemy_panel.position = touch.enemy.position
+		_enemy_panel.size = touch.enemy.size
+		_preview_panel.position = touch.preview.position
+		_preview_panel.size = touch.preview.size
+		_end_btn.position = touch.end.position
+		_end_btn.size = touch.end.size
 	else:
 		_player_panel.position = Vector2(margin + 8, 12)
 		_player_panel.size = Vector2(460, 76)
@@ -1760,7 +1790,7 @@ func _layout() -> void:
 	var hp_x := maxf(0, defense_width - 3 * ui_scale)
 	_player_hp.position = Vector2(hp_x, 8 * ui_scale)
 	_player_hp.custom_minimum_size.y = 0
-	_player_hp.size = Vector2(column - hp_x if _compact else 220, 32 * ui_scale)
+	_player_hp.size = Vector2(_player_panel.size.x - hp_x if _compact else 220, 32 * ui_scale)
 	_hp_icon.position = _player_hp.position + Vector2(8, 6) * ui_scale
 	_hp_icon.size = Vector2.ONE * 20 * ui_scale
 	_hp_icon.ink = Palette.PAPER
@@ -1773,17 +1803,21 @@ func _layout() -> void:
 		hp_font -= 1
 		_player_hp_value.add_theme_font_size_override("font_size", hp_font)
 	var status_x := _player_hp.position.x + _player_hp.size.x + 24
-	_player_status.position = Vector2(0, 48 * ui_scale) if _compact else Vector2(status_x, 6)
+	_player_status.position = Vector2(0, 54 * ui_scale) if _compact else Vector2(status_x, 6)
 	_player_status.size = Vector2(column if _compact else maxf(36, _topbar.position.x + _gold_strip.position.x - _player_panel.position.x - status_x - 24), (48 if _compact else 36) * ui_scale)
 	_player_status.set_ui_scale(ui_scale * (4.0 / 3.0 if _compact else 1.0))
 	_player_status.visible = not _player_status.entries.is_empty()
-	_bubble.set_ui_scale(ui_scale, _compact)
-	var paper_pad := 22.0 if _compact else 26.0
+	_bubble.illustrated_scale = touch.scale if illustrated_desktop else 0.0
+	_bubble.set_ui_scale(ui_scale, _compact and not illustrated_desktop)
+	var paper_pad := 22.0 * ui_scale if _compact else 26.0
 	var paper_height := _preview_panel.size.y
 	_bubble.position = Vector2(paper_pad, paper_pad)
 	_bubble.size = Vector2(column - paper_pad * 2, paper_height - paper_pad * 2)
 	_selection_actions.position = Vector2(board_x + side * 0.12, _board_view.position.y + side + 10)
 	_selection_actions.size = Vector2(side * 0.76, action_h)
+	if _compact:
+		_selection_actions.position = touch.actions.position
+		_selection_actions.size = touch.actions.size
 	_confirm_btn.custom_minimum_size.x = 0
 	_clear_btn.custom_minimum_size.x = 64 * ui_scale
 	_confirm_btn.custom_minimum_size.y = action_h
@@ -1793,18 +1827,21 @@ func _layout() -> void:
 	_end_btn.add_theme_font_size_override("font_size", int(22 * ui_scale))
 	_footer.position = Vector2(margin, h - footer + 10)
 	_footer.size = Vector2(w - margin * 2, footer - 10)
+	if _compact:
+		_footer.position = touch.footer.position
+		_footer.size = touch.footer.size
+	_footer.get_node("Rule").visible = not _compact
 	_footer.get_node("Rule").size = Vector2(w - margin * 2, 1)
 	_hint.visible = not _compact
 	_hint.position = Vector2(8, 6)
 	_hint.size = Vector2(w - 260, 22)
 	_pile_label.set_ui_scale(ui_scale, true)
-	_pile_label.position = Vector2(8, 30 if not _compact else 14)
-	_pile_label.size = Vector2(_pile_label.get_combined_minimum_size().x, 24 * ui_scale)
+	_pile_label.position = Vector2(8, 30) if not _compact else Vector2(6 * ui_scale, 0)
+	_pile_label.size = Vector2(_pile_label.get_combined_minimum_size().x, (48 if _compact else 24) * ui_scale)
 	_enemy_paper.position = _enemy_panel.position - Vector2(12, 8)
 	_enemy_paper.size = _enemy_panel.size + Vector2(24, 16)
+	_enemy_paper.open_scene = _enemy_widgets.size() == 1
 	if _compact:
-		_enemy_paper.position = _player_panel.position - Vector2(12, 8)
-		_enemy_paper.size.y = _enemy_panel.position.y + _enemy_panel.size.y + 8 - _enemy_paper.position.y
 		_enemy_paper.tilt = 0.0
 		_enemy_paper._place_sheet()
 	else:
@@ -1812,11 +1849,24 @@ func _layout() -> void:
 		_enemy_paper._place_sheet()
 	_enemy_panel.position += Vector2(14, 0 if _compact else 16)
 	_enemy_panel.size -= Vector2(28, 0 if _compact else 32)
+	if Palette.STYLE_ID == "taopunk" and not illustrated_desktop:
+		_enemy_panel.position += Vector2(14, 10) * ui_scale
+		_enemy_panel.size -= Vector2(28, 10) * ui_scale
 	for widget in _enemy_widgets:
+		widget.illustrated_scale = 0.0
 		widget.ui_scale = ui_scale
+		widget.show_compact_portrait = _compact and _enemy_widgets.size() == 1
 		widget.set_compact(_compact or _enemy_widgets.size() > 1)
-		widget.custom_minimum_size.y = (156 if not widget._status.entries.is_empty() else 112) * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
+		if widget.show_compact_portrait:
+			# ScrollContainer 按整数分配空间，避免取整差产生一条无内容可滚的滚动条。
+			widget.custom_minimum_size.y = floorf(_enemy_panel.size.y) - 1
+		else:
+			widget.custom_minimum_size.y = (156 if not widget._status.entries.is_empty() else 112) * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
 	_board_view._layout()
+	if Palette.STYLE_ID == "taopunk":
+		_board_view._presentation.set_illustrated_framing(illustrated_desktop)
+	if illustrated_desktop:
+		_layout_illustrated_desktop(touch)
 	if _effects != null:
 		_effects.set_ui_scale(ui_scale)
 
@@ -2000,8 +2050,11 @@ func _board_effect_point(play: Dictionary, span_override := 0) -> Vector2:
 
 func _on_enemy_acting(enemy: Combatant, move: EnemyMoveData) -> void:
 	if _collecting:
+		_finish_enemy_action_capture()
 		_active_fx_profile = GlyphVfxProfile.for_glyph("")
-		_events.append({"kind": "enemy_action", "target": enemy, "move": move})
+		_pending_enemy_action = {"kind": "enemy_action", "target": enemy, "move": move,
+			"before": EnemyActionCapture.board_snapshot(battle.board)}
+		_events.append(_pending_enemy_action)
 
 
 func _view_for(target: Combatant) -> Control:
@@ -2012,6 +2065,7 @@ func _view_for(target: Combatant) -> Control:
 
 
 func _replay_feedback() -> bool:
+	_finish_enemy_action_capture()
 	for event in _events:
 		if event.kind == "cast":
 			var destination: Vector2 = event.destination
@@ -2023,13 +2077,14 @@ func _replay_feedback() -> bool:
 			continue
 		var view := _view_for(event.target)
 		if event.kind == "enemy_action":
-			if view is EnemyView:
-				view.anticipate()
 			var move: EnemyMoveData = event.move
 			_bubble.set_text(event.target.display_name, move.title + " · " + move.intent_text(), SpeechBubble.State.PREVIEW)
-			if not await _wait_step(0.12 if not Settings.reduced_motion else 0.04):
-				return false
+			if not await _replay_enemy_action(view, event): return false
 			continue
+		var strike_timing: Dictionary = {}
+		if event.kind == "damage" and not _enemy_attack_context.is_empty() and int(_enemy_attack_context.remaining) > 0:
+			strike_timing = await _replay_enemy_strike(event)
+			if _exiting: return false
 		var point := _effects.point_of(view)
 		var profile: Dictionary = event.get("profile", GlyphVfxProfile.for_glyph(""))
 		var radius := 16.0 if event.target.is_player else 42.0
@@ -2076,7 +2131,11 @@ func _replay_feedback() -> bool:
 				_effects.glyph_impact(GlyphVfxProfile.feedback(profile, "heal"), point, radius)
 		if not await _wait_step(0.16 if not Settings.reduced_motion else 0.045):
 			return false
+		if not strike_timing.is_empty() and int(_enemy_attack_context.remaining) == 0 and not Settings.reduced_motion:
+			var recovery: float = maxf(0.01, float(strike_timing.duration) - float(strike_timing.release) - 0.30)
+			if not await _wait_step(recovery): return false
 	_events.clear()
+	_enemy_attack_context.clear()
 	return true
 
 
@@ -2133,3 +2192,153 @@ func _gravity_in_play(result: Dictionary) -> bool:
 		if effect.handler in ["gravity", "gravity_left", "gravity_right", "gravity_damage"]:
 			return true
 	return false
+
+
+func _layout_illustrated_desktop(layout: Dictionary) -> void:
+	var unit: float = layout.scale
+	_topbar.get_node("Rule").hide()
+	_menu_btn.position = Vector2(_topbar.size.x - 140 * unit, -4 * unit)
+	_menu_btn.custom_minimum_size = Vector2(140, 80) * unit
+	_menu_btn.size = _menu_btn.custom_minimum_size
+	_menu_btn.add_theme_font_size_override("font_size", int(34 * unit))
+	_gold_strip.set_ui_scale(1.5 * unit, false)
+	var gold_width := maxf(100 * unit, _gold_strip.get_combined_minimum_size().x)
+	_gold_strip.position = Vector2(_menu_btn.position.x - gold_width - 8 * unit, 0)
+	_gold_strip.size = Vector2(gold_width, 76 * unit)
+	_turn_label.position = Vector2(550, 0) * unit
+	_turn_label.size = Vector2(150, 76) * unit
+	_turn_label.add_theme_font_size_override("font_size", int(30 * unit))
+	_turn_label.show()
+	_player_hp.position.y = 7 * unit
+	_player_hp.size.y = 58 * unit
+	_player_defense.position.y = _player_hp.position.y + (_player_hp.size.y - _player_defense.cell_size) * 0.5
+	_hp_icon.position = _player_hp.position + Vector2(14, 15) * unit
+	_hp_icon.size = Vector2.ONE * 30 * unit
+	_player_hp_value.position = _player_hp.position + Vector2(58, -7) * unit
+	_player_hp_value.size = Vector2(_player_hp.size.x - 66 * unit, 76 * unit)
+	_player_hp_value.add_theme_font_size_override("font_size", int(48 * unit))
+	_player_status.position = layout.status.position - _player_panel.position
+	_player_status.size = layout.status.size
+	var pad := Vector2(42, 24) * unit
+	_bubble.position = pad
+	_bubble.size = _preview_panel.size - pad * 2
+	_bubble.set_ui_scale(1.28 * unit, false)
+	_clear_btn.custom_minimum_size.x = 140 * unit
+	for button in [_confirm_btn, _clear_btn, _end_btn]:
+		button.custom_minimum_size.y = 86 * unit
+		button.add_theme_font_size_override("font_size", int((40 if button != _clear_btn else 32) * unit))
+	_selection_actions.add_theme_constant_override("separation", int(16 * unit))
+	_selection_actions.size = layout.actions.size
+	_end_btn.size = layout.end.size
+	_pile_label.set_ui_scale(1.6 * unit, true)
+	_pile_label.position = Vector2(24, 7) * unit
+	_pile_label.size.y = 72 * unit
+	_enemy_paper.position = layout.enemy.position - Vector2(18, 12) * unit
+	_enemy_paper.size = layout.enemy.size + Vector2(36, 20) * unit
+	_enemy_panel.position = layout.enemy.position + Vector2(24, 0) * unit
+	_enemy_panel.size = layout.enemy.size - Vector2(48, 0) * unit
+	for widget in _enemy_widgets:
+		widget.illustrated_scale = unit if _enemy_widgets.size() == 1 else 0.0
+		widget.custom_minimum_size.y = floorf(_enemy_panel.size.y) - 1 if _enemy_widgets.size() == 1 else 180 * unit
+		widget._layout()
+
+
+
+
+func _finish_enemy_action_capture() -> void:
+	if _pending_enemy_action.is_empty(): return
+	_pending_enemy_action["injected"] = EnemyActionCapture.injected(_pending_enemy_action.before, EnemyActionCapture.board_snapshot(battle.board))
+	_pending_enemy_action.erase("before")
+	_pending_enemy_action = {}
+
+
+
+
+func _replay_enemy_action(view: Control, event: Dictionary) -> bool:
+	var move: EnemyMoveData = event.move
+	_enemy_attack_context.clear()
+	if view is EnemyView and view.has_attack_actor() and move.kind in [EnemyMoveData.Kind.ATTACK, EnemyMoveData.Kind.ATTACK_BLOCK, EnemyMoveData.Kind.MULTI]:
+		_enemy_attack_context = {"view": view, "move": move, "style": view.attack_effect(),
+			"index": 0, "remaining": move.hits if move.kind == EnemyMoveData.Kind.MULTI else 1}
+		return true
+	var timing := {"release": 0.12, "duration": 0.22}
+	if view is EnemyView: timing = view.play_action(move)
+	var guardian: bool = event.target.enemy_data != null and event.target.enemy_data.id == "ink_spirit" and Palette.STYLE_ID == "taopunk" and view is EnemyView
+	var injecting := move.kind == EnemyMoveData.Kind.INJECT
+	if guardian and injecting and not Settings.reduced_motion:
+		var source: Vector2 = _effects.get_global_transform().affine_inverse() * view.action_origin()
+		_effects.enemy_ink("charge", source, source)
+	if not await _wait_step(float(timing.release) if not Settings.reduced_motion else 0.04): return false
+	if guardian and not Settings.reduced_motion:
+		var source: Vector2 = _effects.get_global_transform().affine_inverse() * view.action_origin()
+		if injecting:
+			var additions: Array = event.get("injected", [])
+			for i in additions.size():
+				var item: Dictionary = additions[i]
+				var tile: Control = _board_view.tiles[battle.board.from_xy(item.cell)]
+				_effects.enemy_ink("pollution", source, _effects.point_of(tile), item.glyph, i * 0.06)
+			if not additions.is_empty():
+				if not await _wait_step(0.34 + maxf(0, additions.size() - 1) * 0.06): return false
+				for item in additions:
+					var inst: CharInstance = battle.board.get_xy(item.cell)
+					if inst != null and inst.uid == item.uid:
+						var tile: TileView = _board_view.tiles[battle.board.from_xy(item.cell)]
+						tile.set_instance(inst)
+						tile.enter(Vector2(0, -4), true, 0)
+						_effects.enemy_ink("land", source, _effects.point_of(tile))
+			else:
+				_effects.number("未注入", source, Palette.INK_SOFT)
+			# 完成施法回收，再更新下一回合的意图，避免直接截断动作。
+			if not await _wait_step(maxf(0.04, float(timing.duration) - float(timing.release) - (0.34 if not additions.is_empty() else 0.0))): return false
+		elif move.kind in [EnemyMoveData.Kind.ATTACK, EnemyMoveData.Kind.ATTACK_BLOCK, EnemyMoveData.Kind.MULTI]:
+			# 精分等规则可能改变伤害对象；从已捕获的真实伤害事件确定终点。
+			var target: Control = _player_hp_value
+			var start := _events.find(event)
+			for i in range(start + 1, _events.size()):
+				if _events[i].kind == "enemy_action": break
+				if _events[i].kind == "damage":
+					target = _view_for(_events[i].target)
+					if _events[i].target.is_player: target = _player_hp_value
+					break
+			_effects.enemy_ink("attack", source, _effects.point_of(target))
+			if not await _wait_step(0.14): return false
+	if move.kind == EnemyMoveData.Kind.SPECIAL and not Settings.reduced_motion:
+		# Non-damaging actions have no damage event to wait for their recovery.
+		if not await _wait_step(maxf(0.01,float(timing.duration) - float(timing.release))): return false
+	return true
+
+
+
+
+func _replay_enemy_strike(event: Dictionary) -> Dictionary:
+	var attacker: EnemyView = _enemy_attack_context.view
+	var timing := attacker.play_attack_hit(_enemy_attack_context.move, int(_enemy_attack_context.index))
+	_enemy_attack_context.index += 1
+	_enemy_attack_context.remaining -= 1
+	if not await _wait_step(float(timing.get("release", 0.04))): return timing
+	if Settings.reduced_motion: return timing
+	var source: Vector2 = _effects.get_global_transform().affine_inverse() * attacker.action_origin()
+	var target: Vector2 = _effects.point_of(_player_hp_value) if event.target.is_player else _effects.get_global_transform().affine_inverse() * _view_for(event.target).impact_point()
+	_effects.enemy_attack(_enemy_attack_context.style, source, target)
+	await _wait_step(0.14)
+	return timing
+
+
+
+
+func _open_pile(id: String) -> void:
+	if _busy or _finished or _modal_count > 0 or id not in ["bag", "discard"]:
+		return
+	var overlay := BattlePileOverlay.new()
+	overlay.setup("抽牌堆" if id == "bag" else "弃牌堆", battle.bag if id == "bag" else battle.discard)
+	_mount_overlay(overlay)
+
+
+
+
+func _show_hud_details(title: String, body: String, scroll_body: bool) -> void:
+	if _busy or _modal_count > 0:
+		return
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": title, "body": body, "hud_details": true, "scroll_body": scroll_body, "options": [{"text": "返回战斗", "primary": true}]})
+	_mount_overlay(overlay)

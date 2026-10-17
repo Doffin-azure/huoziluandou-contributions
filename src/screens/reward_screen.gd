@@ -4,57 +4,78 @@ extends ScreenBase
 var node: MapNodeData
 var _options: Array = []
 var _expedition := false   ## 墨途远征：选中的字进字匣，回远征地图
+var _cards: Array[GlyphOffer] = []
+var _showcase: Control
+var _hud: Control
+var _selected := 0
+var _busy := false
+
+
+func has_scene_background() -> bool:
+	return true
 
 
 func build(root: Control) -> void:
+	JourneyStyle.apply(self)
 	node = params.get("node", null)
 	_expedition = params.get("expedition", false) and GameState.expedition != null
 	var is_boss := node != null and node.type == MapNodeData.Type.BOSS
 	_options = _roll_options(is_boss, int(params.get("count", 3)))
+	_showcase = preload("res://src/ui/object_stage/object_stage_view.gd").new()
+	_showcase.mode = "reward"
+	_showcase.reward_count = _options.size()
+	root.add_child(_showcase)
+	_hud = preload("res://src/ui/object_stage/object_hud.gd").new()
+	_hud.heading = "幕末 · 馈赠" if is_boss else "战后 · 择字"
+	_hud.instruction = "选择字匣中的一枚活字，收入字袋。"
+	_hud.status = "气血 %d / %d    金币 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
+	_hud.action_text = "收入字匣" if _expedition else "收入字袋"
+	_hud.secondary_text = "收下这幕的馈赠" if is_boss else "跳过 · 获得 8 金币"
+	_hud.on_action = _accept_pick
+	_hud.on_secondary = _on_skip
+	root.add_child(_hud)
+	for i in _options.size():
+		var ch: CharacterData = _options[i]
+		_showcase.stage.add_object(ch.glyph, i, ch.rarity)
+		var offer := GlyphOffer.new()
+		offer.character = ch
+		offer.caption = "%02d   %s" % [i + 1, ch.glyph]
+		offer.clicked.connect(_inspect.bind(i))
+		offer.hovered.connect(_inspect.bind(i))
+		root.add_child(offer)
+		_cards.append(offer)
+	_showcase.layout_changed.connect(_layout_cards)
+	_layout_cards.call_deferred()
+	_inspect(0)
+	_showcase.stage.open_case()
 
-	var main := Ink.vbox(0)
-	main.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.add_child(main)
-	main.add_child(_header(is_boss))
 
-	var center := CenterContainer.new()
-	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	main.add_child(center)
-	var col := Ink.vbox(18)
-	center.add_child(col)
+func _layout_cards() -> void:
+	for i in _cards.size():
+		var rect: Rect2 = _showcase.object_rect(i)
+		_cards[i].position = rect.position
+		_cards[i].size = rect.size
 
-	var row := Ink.hbox(20)
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	col.add_child(row)
-	for opt in _options:
-		var card := CharCard.new()
-		card.setup(_with_hint(opt))
-		card.clicked.connect(_on_pick.bind(opt))
-		row.add_child(card)
 
-	if not is_boss:
-		var skip := Ink.button("跳过，拿走 8 金币")
-		skip.theme_type_variation = "GhostButton"
-		skip.pressed.connect(_on_skip)
-		col.add_child(skip)
+func _inspect(index: int) -> void:
+	if _busy or index < 0 or index >= _options.size(): return
+	_selected = index
+	for i in _cards.size(): _cards[i].set_selected(i == index)
+	_showcase.stage.select_object(index)
+	var ch: CharacterData = _options[index]
+	_hud.set_detail("%s  ·  %s" % [ch.glyph, ch.pinyin], _with_hint(ch).description)
+
+
+func _accept_pick() -> void:
+	if _busy or _options.is_empty(): return
+	_busy = true
+	_hud.action_button.disabled = true
+	_hud.secondary_button.disabled = true
+	if Settings.reduced_motion:
+		_on_pick(_options[_selected])
 	else:
-		var skip2 := Ink.button("收下这幕的馈赠")
-		skip2.theme_type_variation = "GhostButton"
-		skip2.pressed.connect(_on_skip)
-		col.add_child(skip2)
-
-
-func _header(is_boss: bool) -> Control:
-	var panel := Ink.panel("PanelInset")
-	var pad := Ink.margin(14)
-	panel.add_child(pad)
-	var row := Ink.hbox(16)
-	pad.add_child(row)
-	row.add_child(Ink.h2("幕末大奖" if is_boss else "战利品"))
-	row.add_child(Ink.label("选择一枚字（先进字匣，满了进字袋），或放弃以换取金币。" if _expedition else "选择一枚实体字加入字袋，或放弃以换取金币。", "Muted"))
-	row.add_child(Ink.expander())
-	row.add_child(Ink.label("血 %d/%d　❖ %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold], "Muted"))
-	return panel
+		_showcase.stage.take(_selected)
+		create_tween().tween_interval(0.24).finished.connect(func(): _on_pick(_options[_selected]))
 
 
 func _roll_options(is_boss: bool, count := 3) -> Array:

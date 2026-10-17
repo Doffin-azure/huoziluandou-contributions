@@ -19,10 +19,10 @@ func _draw() -> void:
 		var a: Vector2 = points[i]
 		var b: Vector2 = points[i + 1]
 		var done := i < completed_upto
-		var base := Palette.INK_SOFT if done else Palette.INK_FAINT
+		var base := JourneyStyle.GOLD if done else JourneyStyle.EDGE
 		var alpha := 0.75 if done else 0.28
 		draw_line(a, b, Color(base.r, base.g, base.b, alpha * 0.5), 9.0, true)
 		if done:
-			draw_line(a, b, Color(0.2, 0.18, 0.15, 0.85), 4.0, true)
+			draw_line(a, b, JourneyStyle.GOLD, 4.0, true)
 		else:
 			draw_dashed_line(a, b, Color(base.r, base.g, base.b, 0.4), 3.0, 12.0, true)

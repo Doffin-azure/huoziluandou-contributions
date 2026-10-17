@@ -1,0 +1,35 @@
+{
+  "engine": "Godot 4.7.2",
+  "renderer": "Forward+ / Vulkan",
+  "date": "2026-10-16",
+  "branch": "feat/title-3d-sample",
+  "images": {
+    "01-title.png": [
+      1920,
+      1080
+    ],
+    "02-courtyard.png": [
+      2880,
+      1620
+    ],
+    "03-detail.png": [
+      1920,
+      1080
+    ]
+  },
+  "native_sample_checks": {
+    "passed": 19,
+    "failed": 0
+  },
+  "existing_intent_regression": {
+    "passed": 49,
+    "failed": 0
+  },
+  "model": {
+    "architectural_parts": 2053,
+    "triangles": 281818,
+    "glb_bytes": 61816944
+  },
+  "known_issue": "Native sample process shutdown reports 7 Texture RID leaks; cause not yet identified.",
+  "scope": "Independent review sample; formal title screen and StudyStage unchanged; not committed or pushed."
+}

@@ -1,0 +1,13 @@
+{
+  "courtyard_backdrop.png": {
+    "source": "docs/art-concepts/2026-10-16/courtyard-3d/ambient/02-courtyard.png",
+    "method": "Unmodified native Godot viewport capture of this project courtyard",
+    "scene": "res://src/title/courtyard/courtyard_stage.tscn"
+  },
+  "frame_*.svg": {
+    "method": "Authored SVG geometry and flat pigments; project-native UI assets"
+  },
+  "slider_grab.svg": {
+    "method": "Authored SVG geometry; project-native slider control"
+  }
+}

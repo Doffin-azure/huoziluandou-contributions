@@ -19,6 +19,7 @@ func setup(p_cfg: Dictionary) -> void:
 
 
 func _ready() -> void:
+	JourneyStyle.apply(self)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_counts = cfg.get("counts", {})
 	_build()
@@ -27,7 +28,7 @@ func _ready() -> void:
 
 func _build() -> void:
 	var dim := ColorRect.new()
-	dim.color = Color(0.08, 0.06, 0.05, 0.62)
+	dim.color = Color(0.02, 0.07, 0.09, 0.88)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	dim.gui_input.connect(_on_dim_input)
@@ -60,7 +61,7 @@ func _build() -> void:
 	head.add_child(Ink.expander())
 	var close := Ink.button("关闭")
 	close.theme_type_variation = "GhostButton"
-	close.custom_minimum_size = Vector2(90, 36)
+	close.custom_minimum_size = Vector2(90, 48 * JourneyStyle.touch_scale(self))
 	close.pressed.connect(_close)
 	head.add_child(close)
 
@@ -96,11 +97,14 @@ func _build() -> void:
 
 	_populate_chars()
 	_populate_words()
+	_scroll.resized.connect(_layout_columns)
+	_layout_columns.call_deferred()
 
 
 func _add_tab(text: String, mode: String) -> void:
 	var b := Ink.button(text)
-	b.custom_minimum_size = Vector2(110, 36)
+	b.set_meta("tab", mode)
+	b.custom_minimum_size = Vector2(110, 48 * JourneyStyle.touch_scale(self))
 	b.pressed.connect(func(): _show_tab(mode))
 	_tab_bar.add_child(b)
 
@@ -109,11 +113,13 @@ func _show_tab(mode: String) -> void:
 	_mode = mode
 	_grid.visible = mode == "chars"
 	_word_grid.visible = mode == "words"
+	for button in _tab_bar.get_children():
+		button.theme_type_variation = "PrimaryButton" if button.get_meta("tab") == mode else "GhostButton"
 
 
 func _populate_chars() -> void:
 	var list: Array = cfg.get("characters", [])
-	if list.is_empty():
+	if list.is_empty() and not cfg.has("characters"):
 		# 默认展示全部字库（排除污染物）
 		for c in Database.characters.values():
 			if not c.is_pollution and not c.pending_design and not c.tags.has("enemy"):
@@ -122,7 +128,7 @@ func _populate_chars() -> void:
 	for ch in list:
 		var card := CharCard.new()
 		card.setup(ch)
-		var cnt := int(_counts.get(ch.id, 0))
+		var cnt := int(_counts.get(ch.glyph, _counts.get(ch.id, 0)))
 		if cnt > 0:
 			# 若来自字袋，把份数显示在描述里
 			var wrapped: CharacterData = ch.duplicate()
@@ -155,18 +161,13 @@ func _populate_words() -> void:
 		holder.add_child(inner)
 		var top := Ink.hbox(8)
 		inner.add_child(top)
-		var t := Ink.label(w.glyph_string(), "Subheading", Palette.rarity_color(3 if w.priority.begins_with("P1") else 2))
+		var t := Ink.label(w.glyph_string(), "Subheading", JourneyStyle.GOLD)
 		top.add_child(t)
 		top.add_child(Ink.expander())
-		if w.implemented:
-			top.add_child(Ink.label("已实现", "Muted", Palette.JADE))
-		else:
-			top.add_child(Ink.label("待定", "Muted", Palette.INK_FAINT))
-		var meta := Ink.label("[%s] %s%s" % [w.group, w.priority, "　P25已接入" if w.p25_implemented else ""], "Muted")
-		meta.add_theme_font_size_override("font_size", 12)
+		var meta := JourneyStyle.label(w.group, "Muted")
 		inner.add_child(meta)
 		var d := EffectText.new()
-		d.add_theme_font_size_override("normal_font_size", 14)
+		d.add_theme_font_size_override("normal_font_size", 17)
 		d.set_effect_text(EffectGlossary.brief(w), 0, w)
 		inner.add_child(d)
 		_word_grid.add_child(holder)
@@ -177,7 +178,17 @@ func _close() -> void:
 	queue_free()
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("cancel_selection"):
 		_close()
 		get_viewport().set_input_as_handled()
+
+
+func _layout_columns() -> void:
+	if _scroll == null: return
+	var width := maxf(1, _scroll.size.x - 16)
+	var factor := JourneyStyle.touch_scale(self)
+	_grid.columns = maxi(1, int((width + 12) / (220 * factor + 12)))
+	_word_grid.columns = maxi(1, int((width + 10) / (280 * factor + 10)))
+	for grid in [_grid, _word_grid]:
+		for item in grid.get_children(): item.size_flags_horizontal = Control.SIZE_EXPAND_FILL

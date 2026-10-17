@@ -4,11 +4,12 @@ class_name SettingsOverlay
 
 signal closed
 
-var _style_row: HBoxContainer
+var _style_row: VBoxContainer
 var _panel: PanelContainer
 
 
 func _ready() -> void:
+	JourneyStyle.apply(self)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build()
 	resized.connect(_layout)
@@ -34,24 +35,34 @@ func _build() -> void:
 	var panel := Ink.panel("PanelCard")
 	_panel = panel
 	center.add_child(panel)
+	var shell := Ink.vbox(12)
+	panel.add_child(shell)
+	var header := Ink.hbox(16)
+	header.add_child(Ink.h2("设置"))
+	header.add_child(Ink.expander())
+	var close := JourneyStyle.button("关闭", func(): closed.emit(); queue_free())
+	close.custom_minimum_size.y = 48 * JourneyStyle.touch_scale(self)
+	header.add_child(close)
+	shell.add_child(header)
 	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	panel.add_child(scroll)
+	shell.add_child(scroll)
 	var pad := Ink.margin(24)
 	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(pad)
 	var col := Ink.vbox(14)
 	pad.add_child(col)
 
-	col.add_child(Ink.h2("设置"))
 	col.add_child(Ink.hline())
 
-	# ---- 视觉风格 ----
-	col.add_child(Ink.label("视觉风格", "Subheading"))
-	col.add_child(Ink.caption("切换整套界面风格：宣纸活字（传统）↔ 墨芯（大模型 / 科技）。战斗内切换下一场生效。"))
-	_style_row = Ink.hbox(10)
+	# ---- 战斗字盘 ----
+	col.add_child(Ink.label("战斗字盘", "Subheading"))
+	col.add_child(Ink.caption("切换战斗字盘的显示风格，下场战斗生效。行旅界面保持墨青与朱砂配色。"))
+	_style_row = Ink.vbox(8)
 	col.add_child(_style_row)
 	_build_style_buttons()
+	col.add_child(BoardFontPicker.new())
 
 	col.add_child(Ink.hline())
 
@@ -64,7 +75,8 @@ func _build() -> void:
 	left.add_child(Ink.caption("开启：拖动连词后松手立刻结算（节奏快）。\n关闭：松手只保留选择，按「出字」或回车 / 空格确认（节奏从容）。"))
 	row.add_child(left)
 	var toggle := Ink.button(_toggle_text())
-	toggle.custom_minimum_size = Vector2(96, 44)
+	toggle.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	toggle.custom_minimum_size = Vector2(96, 48 * JourneyStyle.touch_scale(self))
 	toggle.pressed.connect(_on_toggle.bind(toggle))
 	row.add_child(toggle)
 
@@ -74,7 +86,7 @@ func _build() -> void:
 	motion_row.add_child(Ink.label("减少动效", "Subheading"))
 	motion_row.add_child(Ink.expander())
 	var motion := Ink.button("开" if Settings.reduced_motion else "关")
-	motion.custom_minimum_size = Vector2(96, 48)
+	motion.custom_minimum_size = Vector2(96, 48 * JourneyStyle.touch_scale(self))
 	motion.pressed.connect(func():
 		Settings.set_reduced_motion(not Settings.reduced_motion)
 		motion.text = "开" if Settings.reduced_motion else "关")
@@ -93,21 +105,16 @@ func _build() -> void:
 	audio_row.add_child(volume)
 	col.add_child(audio_row)
 
-	var close := Ink.button("关闭", true)
-	close.pressed.connect(func():
-		closed.emit()
-		queue_free())
-	col.add_child(close)
 
 
 func _build_style_buttons() -> void:
 	for c in _style_row.get_children():
 		c.queue_free()
-	var options := [["paper", "宣纸活字"], ["neon", "墨芯 · 大模型"]]
+	var options := [["taopunk", "青铜绘卷"], ["paper", "宣纸活字"], ["neon", "墨芯 · 大模型"]]
 	for opt in options:
-		var active: bool = Palette.STYLE_ID == opt[0]
+		var active: bool = Settings.visual_style == opt[0]
 		var b := Ink.button(opt[1] + ("　✓" if active else ""), active)
-		b.custom_minimum_size = Vector2(180, 44)
+		b.custom_minimum_size = Vector2(180, 48 * JourneyStyle.touch_scale(self))
 		b.disabled = active
 		b.pressed.connect(_set_style.bind(opt[0]))
 		_style_row.add_child(b)
@@ -124,13 +131,13 @@ func _on_toggle(btn: Button) -> void:
 
 func _set_style(style_id: String) -> void:
 	Settings.set_visual_style(style_id)
-	Ink.apply_style(GameStyle.get_style(style_id))
-	# 重建当前界面以套用新配色（战斗界面保持不重建，避免丢失战斗状态）
-	var path := Router.current_path
-	if not path.is_empty() and not path.contains("battle_screen"):
-		Router.goto(path)
+	if Router.current_path.ends_with("/battle_screen.gd"):
+		Ink.pending_style = style_id
 	else:
-		_build_style_buttons()
+		Ink.apply_style(GameStyle.get_style(style_id))
+		Ink.pending_style = ""
+	# Journey pages own their theme. Rebuilding them would reroll rewards and shops.
+	_build_style_buttons()
 
 
 func _input(event: InputEvent) -> void:

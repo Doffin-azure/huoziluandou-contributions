@@ -2,10 +2,13 @@ extends Control
 class_name EnemyView
 ## 敌人视图长期复用；受击只动墨团，战况文字保持稳定。
 signal clicked(index)
+signal details_requested(title: String, body: String, scroll_body: bool)
 var index := 0
 var combatant: Combatant
 var compact := false
 var ui_scale := 1.0
+var show_compact_portrait := false
+var illustrated_scale := 0.0
 var _heading: Label
 var _name: Label
 var _hp: StatBar
@@ -37,10 +40,13 @@ func _ready() -> void:
 	_defense = DefenseDisplay.new()
 	_defense.is_player = false
 	_status = StatusStrip.new()
+	for source in [_intent, _defense, _status]:
+		source.details_requested.connect(details_requested.emit)
 	_status_rule = Ink.hline()
 	_portrait = Control.new()
 	_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_visual = InkSpirit.new()
+	_visual.enemy_id = combatant.enemy_data.id if combatant != null and combatant.enemy_data != null else ""
 	_visual.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_portrait.add_child(_visual)
 	for item in [_heading, _name, _hp, _hp_number, _defense, _portrait, _intent, _status_rule, _status]:
@@ -113,7 +119,18 @@ func _layout() -> void:
 		_intent.position.y = 48 * factor
 		_intent.size.y = EnemyIntent.ROW_HEIGHT * factor
 		_status.position.y = 116 * factor
+		if show_compact_portrait:
+			art_top = (156 if _status.visible else 116) * factor
+			art_side = minf(w, maxf(0, size.y - art_top - 4 * factor))
+			_portrait.visible = art_side >= 48 * factor
+			_portrait.position = Vector2((w - art_side) * 0.5, art_top)
+			_portrait.size = Vector2.ONE * art_side
 	_defense.set_cell_size((24.0 if compact else 36.0) * factor)
+	if Palette.STYLE_ID == "taopunk" and (not compact or show_compact_portrait):
+		_portrait.clip_contents = true
+		_portrait.position = Vector2(0, art_top)
+		var bottom := 44.0 * factor if not compact and _status.visible else 4.0 * factor
+		_portrait.size = Vector2(w, maxf(0, size.y - art_top - bottom))
 	var defense_width := _defense.display_width()
 	_defense.position = Vector2(0, _hp.position.y + (_hp.size.y - _defense.cell_size) * 0.5)
 	_defense.size = Vector2(defense_width, _defense.cell_size)
@@ -122,6 +139,40 @@ func _layout() -> void:
 	_status_rule.visible = _status.visible
 	_status_rule.position = Vector2(0, _status.position.y - 4 * factor)
 	_status_rule.size = Vector2(w, 1)
+	if illustrated_scale > 0.0 and Palette.STYLE_ID == "taopunk":
+		_layout_illustrated(illustrated_scale)
+
+
+func _layout_illustrated(unit: float) -> void:
+	var w := size.x
+	_heading.hide()
+	_name.position = Vector2.ZERO
+	_name.size = Vector2(w, 48 * unit)
+	_name.add_theme_font_size_override("font_size", int(40 * unit))
+	var number_width := 120 * unit
+	_hp.position = Vector2(0, 54 * unit)
+	_hp.size = Vector2(w - number_width - 12 * unit, 21 * unit)
+	_hp_number.position = Vector2(w - number_width, 44 * unit)
+	_hp_number.size = Vector2(number_width, 40 * unit)
+	_hp_number.add_theme_font_size_override("font_size", int(28 * unit))
+	_intent.position = Vector2(0, 88 * unit)
+	_intent.size = Vector2(w, 88 * unit)
+	_intent.set_ui_scale(1.5 * unit)
+	_status.position = Vector2(0, 180 * unit)
+	_status.size = Vector2(w, 42 * unit)
+	_status.set_ui_scale(unit)
+	_status_rule.position.y = _status.position.y - 2 * unit
+	var art_y := (220 if _status.visible else 174) * unit
+	_portrait.show()
+	_portrait.position = Vector2(-20 * unit, art_y)
+	_portrait.size = Vector2(w + 40 * unit, maxf(0, size.y - art_y))
+	_portrait.clip_contents = true
+	_defense.set_cell_size(32 * unit)
+	var defense_width := _defense.display_width()
+	_defense.position = Vector2(0, _hp.position.y + (_hp.size.y - _defense.cell_size) * 0.5)
+	_defense.size = Vector2(defense_width, _defense.cell_size)
+	_hp.position.x = maxf(0, defense_width - 2 * unit)
+	_hp.size.x -= _hp.position.x
 
 
 func refresh(animate := true) -> void:
@@ -129,6 +180,8 @@ func refresh(animate := true) -> void:
 		return
 	var ed: EnemyData = combatant.enemy_data
 	_visual.glyph = ed.glyph if ed != null else "敌"
+	_visual.enemy_id = ed.id if ed != null else ""
+	_visual.set_defeated(not combatant.is_alive())
 	_visual.queue_redraw()
 	_name.text = combatant.display_name
 	_hp.setup_bar(combatant.hp, combatant.max_hp, Palette.HP, "", animate)
@@ -139,7 +192,7 @@ func refresh(animate := true) -> void:
 	if not combatant.is_alive():
 		_heading.text = "已击败"
 		_intent.set_move(null, combatant)
-		_visual.modulate.a = 0.18
+		if not _visual.has_character_actor(): _visual.modulate.a = 0.18
 
 
 func set_intent(move: EnemyMoveData) -> void:
@@ -152,16 +205,18 @@ func set_targeted(value: bool) -> void:
 
 
 func impact_point() -> Vector2:
-	return _hp.get_global_rect().get_center() if compact else _portrait.get_global_rect().get_center()
+	return _portrait.get_global_rect().get_center() if _portrait.visible else _hp.get_global_rect().get_center()
 
 
 func apply_feedback(event: Dictionary) -> void:
 	if event.has("hp"):
 		_hp.setup_bar(int(event.hp), int(event.max_hp), Palette.HP)
 		_hp_number.text = "%d / %d" % [int(event.hp), int(event.max_hp)]
+		_visual.set_defeated(int(event.hp) <= 0)
 	if event.has("block"):
 		_defense.set_values(int(event.block), int(event.persistent_block))
 		_layout()
+	if _visual.apply_character_feedback(event): return
 	if Settings.reduced_motion:
 		return
 	if _motion != null:
@@ -194,3 +249,26 @@ func anticipate() -> void:
 	_motion = create_tween()
 	_motion.tween_property(_visual, "scale", Vector2(1.035, 1.035), 0.10)
 	_motion.tween_property(_visual, "scale", Vector2.ONE, 0.12)
+
+
+func play_action(move: EnemyMoveData) -> Dictionary:
+	var timing := _visual.play_action(move)
+	if not timing.is_empty(): return timing
+	anticipate()
+	return {"release": 0.12, "duration": 0.22}
+
+
+func action_origin() -> Vector2:
+	return _visual.action_origin()
+
+
+func has_attack_actor() -> bool:
+	return _visual.has_attack_actor()
+
+
+func attack_effect() -> String:
+	return _visual.attack_effect()
+
+
+func play_attack_hit(move: EnemyMoveData, hit_index: int) -> Dictionary:
+	return _visual.play_attack_hit(move, hit_index)
