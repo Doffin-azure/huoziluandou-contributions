@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_h8uj7"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_31n4m"]
+
+[sub_resource type="Resource" id="Resource_oop4d"]
+script = ExtResource("1_h8uj7")
+title = "折页"
+description = "循环行动：折页 → 扑击"
+damage = 8
+mechanic_action = "fold"
+
+[sub_resource type="Resource" id="Resource_7twhv"]
+script = ExtResource("1_h8uj7")
+title = "扑击"
+description = "循环行动：折页 → 扑击"
+damage = 7
+
+[resource]
+script = ExtResource("2_31n4m")
+id = "fold_moth"
+name = "折页蛾"
+glyph = "折"
+description = "折页前标记一枚非固定己方原实体。该字成功组词、单打或被玩家效果移出盘面，折页为5；未处理为8。通过组词解除时，额外对怪物造成3机制伤害。仅换位置不解除；原实体组词后因额外使用留盘也算完成。"
+max_hp = 32
+mechanic = "fold"
+moves = Array[ExtResource("1_h8uj7")]([SubResource("Resource_oop4d"), SubResource("Resource_7twhv")])

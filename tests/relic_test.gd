@@ -195,15 +195,13 @@ func _test_opening_defense() -> void:
 	_reset(["barrier"])
 	var ex := Expedition.start(5)
 	GameState.relics.append("barrier")
-	ex.active = {"护盾": []}
 	ex.fight = {"kind": "foe", "k": 0, "g": "爆", "name": "明敌"}
 	var s := BattleState.new(Database.rules)
 	s.start(GameState.make_battle_deck(), [_enemy_data()], 7)
 	ex.apply_battle_setup(s)
-	_ok(s.player.block == 14, "屏障 + 远征「护盾」：10 + 4 = 14 叠加（%d）" % s.player.block)
+	_ok(s.player.block == 10, "远征屏障开场10，没有版面叠加（%d）" % s.player.block)
 	# 伏兵先手：屏障能挡住开场突袭
 	ex.fight = {"kind": "ambush", "k": 0, "amb": 0, "g": "伏", "name": "伏兵"}
-	ex.active = {}
 	s = BattleState.new(Database.rules)
 	s.start(GameState.make_battle_deck(), [_enemy_data(8)], 7)
 	ex.apply_battle_setup(s)
@@ -491,127 +489,30 @@ func _test_out_of_battle() -> void:
 	_ok(not GameState.add_relic("egg"), "同一件遗物不能重复获得")
 
 
-# ---------------------------------------------------------------- 远征接入：熔炉许愿 + 商店
-func _forge_with(ex: Expedition, gs: Array) -> String:
-	var before: Array = GameState.relics.duplicate()
-	ex.tray = gs.duplicate()
-	ex.panels = [{"kind": "forge", "k": ex.pos}]
-	ex.forge(0, 1, 2 if gs.size() > 2 else -1)
-	for id in GameState.relics:
-		if not before.has(id):
-			return id
-	return ""
-
-
+# ---------------------------------------------------------------- 远征接入：开赏遗物 + 商店 + 普通熔炉
 func _test_expedition() -> void:
-	# 名字、相关字：只用拿得到的字；每件至少和另一件共用一个字（合成表重叠）
 	_reset()
 	var ex := Expedition.start(11)
-	var pool := {}
-	for cd in ex.reward_pool():
-		pool[cd.glyph] = true
-	var bad: Array = []
-	for id in Relics.AFFINITY:
-		for g in Relics.AFFINITY[id]:
-			if not pool.has(g):
-				bad.append("%s:%s" % [id, g])
-	_ok(bad.is_empty(), "相关字都在奖励字池里，地图上拿得到 %s" % [bad])
-	var lonely: Array = Relics.AFFINITY.keys().filter(func(id): return not Relics.AFFINITY.keys().any(func(o): return o != id and Array(Relics.AFFINITY[id].split("")).any(func(g): return Relics.related(o, g))))
-	_ok(lonely.is_empty(), "每件遗物的相关字都和别的遗物有重叠 %s" % [lonely])
-	var clash: Array = Relics.DEFS.keys().filter(func(id): return Database.words.values().any(func(w): return w.word == Relics.name_of(id)) or Lexicon.WORDS.has(Relics.name_of(id)) or Expedition.SEALS.has(Relics.name_of(id)))
-	_ok(clash.is_empty(), "遗物名不和战斗词、词谱词、印章重名 %s" % [clash])
-	# 概率：相关字越多越高；不相关不出；已有的不再出
-	var o0 := Relics.wish_chance(["冷", "冷"], [])
-	var o1 := Relics.wish_chance(["击", "冷"], [])
-	var o2 := Relics.wish_chance(["击", "强"], [])
-	var o3 := Relics.wish_chance(["击", "强", "力"], [])
-	_ok(o0 < o1 and o1 < o2 and o2 < o3 and o3 <= 0.91, "许愿：相关字 0→1→2→3 个，机会 %.2f → %.2f → %.2f → %.2f" % [o0, o1, o2, o3])
-	_ok(Relics.wish_odds(["击", "强", "力"], [])[0].id == "strike", "许愿：击强力 最可能出「刻刀」")
-	var fire: Array = Relics.wish_odds(["火", "热"], []).map(func(c): return c.id)
-	_ok(fire.has("fireman") and fire.has("skyfire"), "许愿：【火】【热】同时关联「火种」「天火」（重叠）%s" % [fire])
-	_ok(not Relics.wish_odds(["火", "热"], ["fireman"]).any(func(c): return c.id == "fireman"), "许愿：已经有的遗物不会再出")
-	_ok(Relics.wish_odds(["冷", "冷"], []).is_empty(), "许愿：和遗物都不相关 → 只会熔成稀有字")
-	# 真熔：同一种子可复现；熔出遗物就不再给稀有字
-	var got := 0
-	var glyph_out := 0
-	for seed in 40:
-		_reset()
-		ex = Expedition.start(100 + seed)
-		var deck_n := GameState.deck_size()
-		var id := _forge_with(ex, ["击", "强", "力"])
-		if not id.is_empty():
-			got += 1
-			if not Relics.AFFINITY[id].contains("击") and not Relics.AFFINITY[id].contains("强") and not Relics.AFFINITY[id].contains("力"):
-				got = -999
-			if ex.tray.size() + GameState.deck_size() - deck_n > (4 if id == "fireman" else 0):
-				got = -999
-		elif ex.tray.size() == 1:
-			glyph_out += 1
-	_ok(got >= 28 and got <= 40 and got + glyph_out == 40, "熔炉：投 3 个相关字，40 次里 %d 次出遗物（约 90%%），其余熔成稀有字" % got)
-	got = 0
-	for seed in 40:
-		_reset()
-		ex = Expedition.start(200 + seed)
-		if not _forge_with(ex, ["冷", "冷"]).is_empty():
-			got += 1
-	_ok(got == 0, "熔炉：投不相关的字从不出遗物")
-	_reset()
-	ex = Expedition.start(5)
-	var r1 := _forge_with(ex, ["火", "热", "炼"])
-	_reset()
-	ex = Expedition.start(5)
-	_ok(_forge_with(ex, ["火", "热", "炼"]) == r1, "熔炉：同一种子结果一样（遗物用自己的随机数）")
-	# 熔出绑定类 → 弹选字
-	_reset()
-	ex = Expedition.start(9)
-	ex.tray = ["重", "载", "甲"]
-	ex.panels = [{"kind": "forge", "k": ex.pos}]
-	for i in 30:
-		ex.relic_rng.seed = i
-		GameState.relics.clear()
-		ex.tray = ["重", "载", "甲"]
-		ex.panels = [{"kind": "forge", "k": ex.pos}]
-		ex.forge(0, 1, 2)
-		if GameState.has_relic("slab"):
-			break
-	_ok(GameState.has_relic("slab") and ex.top_panel().get("kind", "") == "relic_bind", "熔出「压字石」：接着弹选字")
-	_ok(ex.bind_relic(GameState.deck[0].id()) and GameState.relic_bound_inst("slab") != null, "绑在字袋里一枚实体上")
-	# 熔炉的旧行为：选错参数不吞字
-	ex.tray = ["火", "热"]
-	ex.panels = [{"kind": "forge", "k": ex.pos}]
-	_ok(not ex.forge(0, 0) and ex.tray.size() == 2, "熔炉：同一个字点两次不算")
-	GameState.expedition = null
-
-	# 随身许愿机：开局就有，每幕一次，任何地方都能开
-	_reset()
-	ex = Expedition.start(31)
-	ex.tray = ["火"]
-	_ok(not ex.can_wish(), "许愿机：字匣不到 2 个字时不能开")
-	ex.tray = ["冷", "冷"]
-	_ok(ex.can_wish() and ex.open_wish() and ex.top_panel().get("wish", false), "许愿机：开局就带着，地图上随时能打开")
-	ex.leave_panel()
-	_ok(ex.can_wish() and ex.tray.size() == 2, "许愿机：打开再关掉不算用掉，字也不少")
-	ex.open_wish()
-	_ok(ex.forge(0, 1) and ex.wish_used and not ex.can_wish(), "许愿机：许过一次，本幕不能再用")
-	_ok(ex.tray.size() == 1, "许愿机：不相关的字照旧熔成一个稀有字")
-	ex.tray = ["火", "热"]
-	_ok(not ex.open_wish(), "许愿机：同一幕第二次打不开")
-	ex.fight = {"kind": "foe", "k": 0, "g": "爆", "name": "明敌"}
-	_ok(not ex.can_wish(), "许愿机：战斗、面板打开时不能用")
-	ex.fight = {}
-	ex.load_act(2)
-	_ok(ex.can_wish(), "许愿机：进下一幕重新可用")
-	var hits := 0
-	for seed in 30:
-		_reset()
-		ex = Expedition.start(700 + seed)
-		ex.tray = ["电", "充", "蓄"]
-		ex.open_wish()
-		ex.forge(0, 1, 2)
-		if GameState.has_relic("powerbank"):
-			hits += 1
-	_ok(hits >= 12, "许愿机：投【电】【充】【蓄】，30 次里 %d 次熔出「蓄电瓶」（同熔炉概率）" % hits)
-	_ok(not ex.used.has(-1) or ex.used.get(-1, 0) <= 1, "许愿机不占地图上熔炉的使用次数")
+	_ok(not ex.has_method("can_wish") and not ex.has_method("open_wish"), "许愿机入口与逻辑已删除")
+	_ok(ex.loot_relic_pool("小").is_empty() and ex.loot_relic_pool("中").size() == 12 and ex.loot_relic_pool("大").size() == 15, "中赏12件、大赏15件遗物候选，小赏不投放")
+	var clash: Array = Relics.DEFS.keys().filter(func(id): return Database.words.values().any(func(w): return w.word == Relics.name_of(id)) or Expedition.SEALS.has(Relics.name_of(id)))
+	_ok(clash.is_empty(), "遗物名与战斗词、印章不冲突")
+	# 奖励选择复用拾取与绑定流程。
+	ex.panels = [{"kind":"loot","tier":"大","options":[{"kind":"relic","relic":"slab"}]}]
+	ex.choose_loot(0)
+	_ok(GameState.has_relic("slab") and ex.top_panel().get("kind", "") == "relic_bind", "开赏获得压字石后自动弹绑定")
+	_ok(ex.bind_relic(GameState.deck[0].id()) and GameState.relic_bound_inst("slab") != null, "奖励遗物能绑定字袋实体")
+	_ok(not ex.loot_relic_pool("大").has("slab"), "已拥有遗物不再进入奖励池")
+	ex.m = MapGen.generate(17, "熔铸坊")
+	for k in ex.m.mech:
+		if ex.m.mech[k].g == "炉": ex.pos = k; break
+	ex.tray = ["击","强","力"]
+	ex.panels = [{"kind":"forge","k":ex.pos}]
+	var before: Array = GameState.relics.duplicate()
+	_ok(not ex.forge(0,0) and ex.tray.size() == 3, "熔炉重复选同一字不吞字")
+	_ok(ex.forge(0,1) and GameState.relics == before and ex.tray.size() == 2, "原相关字现在仅换字，不合成遗物")
+	ex.panels = [{"kind":"forge","k":ex.pos}]
+	_ok(not ex.forge(0,1), "同一熔炉不能反复使用")
 	GameState.expedition = null
 
 	# 商店：每家一件遗物；买、卖半价；卖掉以后还能再得到
@@ -633,7 +534,7 @@ func _test_expedition() -> void:
 	var gold := GameState.gold
 	_ok(ex.sell_relic(rid) and not GameState.has_relic(rid) and GameState.gold == gold + Relics.sell_price(rid), "商店：卖掉遗物拿一半价钱（❖ +%d）" % Relics.sell_price(rid))
 	_ok(not GameState.relic_binds.has(rid), "卖掉后绑定一起清掉")
-	_ok(Relics.wish_odds(Array(Relics.AFFINITY[rid].split("")), GameState.relics).any(func(c): return c.id == rid), "卖掉的遗物以后还能再熔出来")
+	_ok(ex.loot_relic_pool("大").has(rid), "卖掉的遗物以后还能从大赏获得")
 	ex.panels.clear()
 	_ok(not ex.sell_relic("strike"), "不在商店里不能卖")
 	# 遗物货架不打乱原来商店的货
@@ -656,7 +557,7 @@ func _test_expedition() -> void:
 	ex.panels.clear()
 	ex.fight = {"kind": "boss", "k": ex.boss, "name": "首领", "g": "墨", "caught": false, "debuff": ""}
 	ex.finish_battle(true)
-	_ok(ex.boss_down and ex.top_panel().is_empty(), "首领：不给遗物，回地图继续探索")
+	_ok(ex.boss_down and ex.panels.any(func(p): return p.kind == "act_end"), "首领：不给遗物，自动封层结算")
 	# 删掉绑定的字：提示失效，不报错
 	_reset(["slab"])
 	GameState.relic_binds["slab"] = GameState.deck[0].uid

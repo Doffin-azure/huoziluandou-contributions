@@ -14,6 +14,8 @@ var status_data: Dictionary = {}   ## 状态的目标独立数据（如灼烧伤
 var is_player: bool = false
 var enemy_data: EnemyData = null
 var move_index: int = 0
+## 本次主动出字中的最大单段真实生命损失；由BattleState在结算前清零。
+var largest_hp_hit: int = 0
 
 # --- 玩家本场比赛资源 ---
 var energy: int = 0
@@ -85,6 +87,7 @@ func take_damage(amount: int) -> int:
 		heart_power_triggered += 1
 		dmg = 0
 	hp = max(0, hp - dmg)
+	largest_hp_hit = maxi(largest_hp_hit, before_hp - hp)
 	if dmg > 0:
 		EventBus.damage_dealt.emit(is_player, dmg)
 	feedback.emit({"kind": "damage", "hp": hp, "max_hp": max_hp,
@@ -103,6 +106,12 @@ func heal(amount: int) -> void:
 func add_block(amount: int) -> void:
 	if no_block_turns > 0:
 		return   # 冷心：不能获得防御
+	if amount > 0 and status_data.has("first_shield_discount"):
+		amount = maxi(0, amount - int(status_data.first_shield_discount))
+		status_data.erase("first_shield_discount")
+	if amount > 0 and bool(status_data.get("first_shield_cancel", false)):
+		amount = 0
+		status_data.erase("first_shield_cancel")
 	var before := block
 	block = max(0, block + amount)
 	if block != before:

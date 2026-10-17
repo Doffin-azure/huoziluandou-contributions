@@ -9,6 +9,8 @@ func _ready() -> void:
 
 
 func _make_custom_tooltip(for_text: String) -> Object:
+	# 引擎也会对没有提示文字的按钮调用此方法；返回空节点仍会画出面板。
+	if for_text.strip_edges().is_empty(): return null
 	if JourneyStyle.is_active(self):
 		var hint := JourneyStyle.label(for_text)
 		hint.theme = JourneyStyle.get_theme()

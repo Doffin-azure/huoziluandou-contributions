@@ -18,6 +18,7 @@ enum Kind { ATTACK, BLOCK, ATTACK_BLOCK, BUFF, DEBUFF, MULTI, INJECT, SPECIAL }
 ## 注入时附带的污染（PollutionData.id）：rush / block / scorch
 @export var pollution_id: String = ""
 @export var heal: int = 0
+@export var mechanic_action: String = ""
 
 
 func intent_text() -> String:

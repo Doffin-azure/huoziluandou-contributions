@@ -48,6 +48,7 @@ func _initialize() -> void:
 	_build_words_from_ledger()
 	_build_extra_words()
 	_build_enemies()
+	EnemyRoster.save_enemies()
 	_build_acts()
 	_build_starter_deck()
 	_build_rules()
@@ -926,39 +927,7 @@ func _typed_nodes(list: Array) -> Array[MapNodeData]:
 	return out
 
 func _build_acts() -> void:
-	var T := MapNodeDataS.Type
-	var battles := {
-		1: ["ink_spirit", "paper_guard", "ember_imp"],
-		2: ["rust_scribe", "bronze_seal", "paper_guard"],
-		3: ["ember_imp", "rust_scribe", "bronze_seal"],
-	}
-	var elites := {1: "iron_seal", 2: "bronze_seal", 3: "iron_seal"}
-	var bosses := {1: "boss_word_demon", 2: "boss_lead_plate", 3: "boss_chaos_press"}
-	var titles := {1: "第一幕 · 起步", 2: "第二幕 · 成型", 3: "第三幕 · 兑现"}
-	var themes := {
-		1: "从少量高连通字开始，确立主方向。",
-		2: "从一个词扩展到联动体系，敌人开始污染盘面。",
-		3: "在压力下完成联动与收尾。",
-	}
-	for act_i in [1, 2, 3]:
-		var act: ActData = ActDataS.new()
-		act.index = act_i
-		act.title = titles[act_i]
-		act.theme = themes[act_i]
-		var pool: Array = []
-		for eid in battles[act_i]:
-			pool.append(Database_enemy(eid))
-		var nodes: Array = []
-		nodes.append(_node(1, T.BATTLE, "初试", "教授组词与单字的取舍", [pool[0]]))
-		nodes.append(_node(2, T.BATTLE, "第二条线", "提供第一条新联动", [pool[1]]))
-		nodes.append(_node(3, T.EVENT, "途中小憩", "叙事与风险、资源取舍", []))
-		nodes.append(_node(4, T.BATTLE, "机制之敌", "开始应对机制性敌人", [pool[2]]))
-		nodes.append(_node(5, T.SHOP, "市集", "购字、复制、删字或治疗", []))
-		nodes.append(_node(6, T.FORK, "岔路", "精英（高收益）或事件（较安全）", [Database_enemy(elites[act_i])], true))
-		nodes.append(_node(7, T.REST, "休整", "治疗 / 删字 / 修饰，三选一", []))
-		nodes.append(_node(8, T.BOSS, "幕末首领", "验证整套构筑", [Database_enemy(bosses[act_i])]))
-		act.nodes = _typed_nodes(nodes)
-		_save(act, "%s/acts/act_%d.tres" % [RES, act_i])
+	EnemyRoster.save_acts()
 
 
 # ---------------------------------------------------------------- 初始字袋 / 规则

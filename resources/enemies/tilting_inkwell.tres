@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_m60qo"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_565ls"]
+
+[sub_resource type="Resource" id="Resource_dyq4g"]
+script = ExtResource("1_m60qo")
+kind = 7
+title = "左倾"
+description = "循环行动：左倾 → 溅墨 → 旋砚 → 溅墨"
+damage = 0
+mechanic_action = "gravity"
+
+[sub_resource type="Resource" id="Resource_ob7u2"]
+script = ExtResource("1_m60qo")
+title = "溅墨"
+description = "循环行动：左倾 → 溅墨 → 旋砚 → 溅墨"
+damage = 7
+
+[sub_resource type="Resource" id="Resource_2obpb"]
+script = ExtResource("1_m60qo")
+kind = 7
+title = "旋砚"
+description = "循环行动：左倾 → 溅墨 → 旋砚 → 溅墨"
+damage = 0
+mechanic_action = "rotate"
+
+[sub_resource type="Resource" id="Resource_scs6l"]
+script = ExtResource("1_m60qo")
+title = "溅墨"
+description = "循环行动：左倾 → 溅墨 → 旋砚 → 溅墨"
+damage = 7
+
+[resource]
+script = ExtResource("2_565ls")
+id = "tilting_inkwell"
+name = "倾砚"
+glyph = "倾"
+description = "方向与旋转区域提前显示。重力只压缩该方向的空隙，不打乱相对顺序；固定字不移动，旋转遇固定字时整次跳过。没有额外的重击加成。"
+max_hp = 34
+mechanic = "tilt"
+moves = Array[ExtResource("1_m60qo")]([SubResource("Resource_dyq4g"), SubResource("Resource_ob7u2"), SubResource("Resource_2obpb"), SubResource("Resource_scs6l")])

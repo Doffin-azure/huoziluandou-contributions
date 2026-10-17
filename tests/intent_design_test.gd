@@ -53,7 +53,9 @@ func _run() -> void:
 		add_child(stage)
 		Router.study_stage = stage
 	Router.host = self
-	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7})
+	var fixture := MapNodeData.new()
+	fixture.enemies.append(Database.get_enemy("ink_spirit"))
+	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7, "node": fixture})
 	await _frames(8)
 	_screen = Router.current
 	var battle: BattleState = _screen.battle

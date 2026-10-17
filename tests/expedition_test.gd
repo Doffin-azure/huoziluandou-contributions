@@ -1,5 +1,5 @@
 extends Node
-## 墨途远征 v0.3：地图生成对照原型 / 伏兵领地约束 / 词谱 / 迷雾与首领追逐 / 拾字与字匣 / 赏 / 休息 / 商店 /
+## 墨途远征 v0.3：地图生成对照原型 / 伏兵领地约束 / 无版面构筑 / 迷雾与首领追逐 / 拾字与字匣 / 赏 / 休息 / 商店 /
 ## 战斗开场效果 / 战后与幕间 / 界面往返
 
 var _pass := 0
@@ -23,11 +23,10 @@ func _run() -> void:
 	_test_parity()
 	_test_generate()
 	_test_movers()
-	_test_lexicon()
+	_test_no_layout()
 	_test_start_and_move()
 	_test_boss()
 	_test_glyphs_and_tray()
-	_test_plate()
 	_test_loot_rest_shop()
 	_test_battle_setup()
 	_test_finish_and_acts()
@@ -58,12 +57,6 @@ func _find(ex: Expedition, pred: Callable) -> int:
 		if pred.call(k):
 			return k
 	return -1
-
-
-func _set_words(ex: Expedition, words: Array) -> void:
-	ex.active = {}
-	for w in words:
-		ex.active[w] = []
 
 
 # ---------------------------------------------------------------- 地图生成
@@ -122,7 +115,6 @@ func _test_movers() -> void:
 	ex._step_mech()
 	_ok(ex.pos == h, "吊钩：一次性")
 	ex.m = MapGen.generate(17, "雷池")
-	_set_words(ex, [])
 	var w := _find(ex, func(k): return ex.mech_at(k).get("g", "") == "线")
 	ex.pos = w
 	ex.t = 0
@@ -132,9 +124,6 @@ func _test_movers() -> void:
 	ex.t = 4
 	ex._step_mech()
 	_ok(ex.pos == w, "导线：电闸关着的步没电，原地不动")
-	_set_words(ex, ["停电"])
-	ex._step_mech()
-	_ok(ex.pos == ex.m.mech[w].to, "停电：导线一直通电")
 	_ok(not ex.m.get("wire_path", []).is_empty(), "导线：有画出来的连线")
 	# 首领不能用：首领的可走掩码里机关只看开关，不会因为机关跳格
 	var bm := ex.boss_mask()
@@ -206,14 +195,13 @@ func _test_generate() -> void:
 	_ok(ok_all, "伏兵领地：3～6 个、各封 1～2 个奖励、不重叠、不盖禁区、可绕开；初见模拟 45%%～75%% %s" % why)
 
 
-func _test_lexicon() -> void:
-	var w2: Dictionary = Lexicon.scan([["加", "速"], ["急", "停"]]).words
-	_ok(w2.has("加速") and w2.has("急停") and w2.has("加急") and w2.size() == 3, "2×2「加速 / 急停」= 加速、急停、加急 %s" % [w2.keys()])
-	var w3: Dictionary = Lexicon.scan([["加", "急", ""], ["速", "停", "火"], ["", "精", "力"]]).words
-	_ok(w3.size() == 6 and w3.has("停火") and w3.has("火力") and w3.has("精力"), "3×3「加急· / 速停火 / ·精力」6 个词全部生效 %s" % [w3.keys()])
-	_ok(Lexicon.longest_in(["复", "利", "投", "资"]).w == "复利投资", "每条线只取最长的词谱词")
-	_ok(Lexicon.scan([["防", "火"], ["防", "火"]]).words.size() == 1, "同一个词摆两遍也只生效一次")
-	_ok(Lexicon.WORDS.size() == 61, "词谱 61 个词")
+func _test_no_layout() -> void:
+	var ex := _fresh(3)
+	var names := ex.get_property_list().map(func(p): return p.name)
+	_ok(not names.has("plate") and not names.has("active"), "远征不再存储版面和词谱效果")
+	_ok(not ex.has_method("place") and not ex.has_method("refresh_active") and not ex.has_method("use_power"), "移除摆字、词谱和探索超能力入口")
+	_ok(not Expedition.SEALS.has("宽版") and Expedition.SEALS.has("字印"), "首领奖励替换为有效的字印")
+	_ok(Database.get_word_by_glyphs(["加", "速"]) != null, "战斗组词库保留")
 
 
 func _test_start_and_move() -> void:
@@ -223,7 +211,7 @@ func _test_start_and_move() -> void:
 	var main_deck := GameState.glyph_counts()
 	ex = _fresh()
 	_ok(ex_deck == main_deck, "远征的战斗字袋 = 标准主线默认起始字袋（v03）")
-	_ok(GameState.expedition == ex and GameState.deck_size() == 12 and ex.tray.is_empty() and ex.plate_n == 2 and ex.ink == Expedition.START_INK, "开局：字袋 12、字匣空、版面 2×2")
+	_ok(GameState.expedition == ex and GameState.deck_size() == 12 and ex.tray.is_empty() and ex.ink == Expedition.START_INK, "开局：字袋 12、字匣空、墨4")
 	_ok(ex.themes.size() == 4 and ex.m.tn == ex.themes[0] and ex.explored.has(ex.m.start), "三幕主题不重复；起点可见")
 	_ok(not ex.explored.has(ex.m.lair), "首领巢穴藏在迷雾里")
 	_ok(not ex.boss_revealed(), "开局看不见首领棋子")
@@ -270,22 +258,19 @@ func _test_start_and_move() -> void:
 	ex.pos = _find(ex, func(k): return ex.mech_at(k).get("g", "") == "焰")
 	ex._step_mech()
 	_ok(GameState.player_hp == hp - 3, "烈焰格：气血 −3")
-	_set_words(ex, ["防火"])
 	ex._step_mech()
-	_ok(GameState.player_hp == hp - 3, "防火：烈焰格不掉血")
+	_ok(GameState.player_hp == hp - 6, "再次踩烈焰仍扣3，没有探索免伤词谱")
 	ex.m = MapGen.generate(11, "墨池")
-	_set_words(ex, [])
 	ex.pos = _find(ex, func(k): return ex.mech_at(k).get("g", "") == "纸")
 	_ok(ex._step_mech() == 1, "吸墨纸：多耗 1 步")
-	_set_words(ex, ["清流"])
-	_ok(ex._step_mech() == 0, "清流：吸墨纸不再多耗步")
+	_ok(ex._step_mech() == 1, "吸墨纸额外耗步始终有效")
 	ex.pos = _find(ex, func(k): return ex.mech_at(k).get("g", "") == "泉")
 	var ink := ex.ink
 	ex._step_mech()
 	ex._step_mech()
 	_ok(ex.ink == ink + 3, "墨泉：补 3 墨，一次性")
-	_set_words(ex, ["开灯"])
-	_ok(ex.vision() == 3, "开灯：视野 +1")
+	ex.seals = ["夜灯"]
+	_ok(ex.vision() == 3, "夜灯：视野 +1")
 
 
 func _test_boss() -> void:
@@ -300,17 +285,14 @@ func _test_boss() -> void:
 		var gm := MapGen.generate(sd * 17)
 		wakes[int(gm.wake)] = true
 		bufs[int(gm.buffer)] = true
-		in_range = in_range and int(gm.wake) >= 7 and int(gm.wake) <= 10 and int(gm.buffer) >= 7 and int(gm.buffer) <= 10
-	_ok(in_range and wakes.size() >= 3 and bufs.size() >= 3, "首领第 7～10 步惊动、再过 7～10 步起身（40 张图：惊动 %s，缓冲 %s）" % [wakes.keys(), bufs.keys()])
+		in_range = in_range and int(gm.wake) >= 8 and int(gm.wake) <= 11 and int(gm.buffer) >= 7 and int(gm.buffer) <= 10
+	_ok(in_range and wakes.size() >= 3 and bufs.size() >= 3, "首领第 8～11 步惊动、再过 7～10 步起身（40 张图：惊动 %s，缓冲 %s）" % [wakes.keys(), bufs.keys()])
 	_ok(ex.alerts.size() == 1 and ex.alerts[0][0] == "首领被惊动了", "首领被惊动：弹窗提醒")
-	_set_words(ex, ["停息"])
-	_ok(ex.wake_time() == int(ex.m.wake) + 4, "停息：醒来推迟 4 步")
-	_set_words(ex, ["急停"])
+	_ok(ex.wake_time() == int(ex.m.wake), "没有词谱延迟自然惊动")
 	ex.t = int(ex.rise) - 1
 	ex.tick()
-	_ok(ex.awake() and ex.stun == 1, "急停：起身后先原地停 2 步")
+	_ok(ex.awake() and ex.stun == 0, "首领起身正常行动，无词谱急停")
 	_ok(ex.alerts.size() == 2 and ex.alerts[1][0] == "首领起身了", "首领起身：再弹一次提醒")
-	_set_words(ex, [])
 	ex.stun = 0
 	var caught := false
 	for i in 200:
@@ -337,11 +319,10 @@ func _test_boss() -> void:
 	ex.t = 0
 	ex.miss = 2
 	_ok(is_equal_approx(ex.move_chance(), 1.0) and is_equal_approx(_fresh_chance(0, 1), 0.70), "基线 35%：没走 1 步 → 70%，没走 2 步 → 100%")
-	_set_words(ex, ["冷却"])
+	ex.seals = ["更漏"]
 	ex.t = 4
 	ex.miss = 0
-	_ok(is_equal_approx(ex.move_base(), 0.45), "冷却：基线增长减半（第 4 步 45%）")
-	_set_words(ex, [])
+	_ok(is_equal_approx(ex.move_base(), 0.45), "更漏：基线增长减半（第 4 步 45%）")
 	# 真跑：起身后 tick，走了 miss 归零，没走 miss +1；首领在远处不会追上
 	var moves := 0
 	var resets_ok := true
@@ -379,21 +360,8 @@ func _test_boss() -> void:
 	var paper := _find(ex, func(k): return ex.mech_at(k).get("g", "") == "纸")
 	_ok(ex.location_debuff(paper) == "少抽字", "吸墨纸旁被追上：少抽 1 枚字")
 	ex.pos = paper
-	_set_words(ex, ["反超"])
-	_ok(ex._boss_encounter(true).debuff == "", "反超：被追上也不吃位置减益")
+	_ok(ex._boss_encounter(true).debuff == "少抽字", "被追上保留位置减益")
 	_ok(ex._boss_encounter(false).debuff == "", "主动迎战不吃位置减益")
-	ex = _fresh(9)
-	ex.stir = 0
-	ex.rise = 0
-	_set_words(ex, ["反转"])
-	ex.boss = _find(ex, func(k): return MapGen.man(k, ex.pos) == 1 and ex.m.ink[k] == 0)
-	ex._caught()
-	_ok(ex.fight.is_empty() and ex.flip_used and MapGen.bfs(ex.boss_mask(), ex.boss)[ex.pos] > 1, "反转：把首领推回去，不开战（每幕一次）")
-	ex._caught()
-	_ok(not ex.fight.is_empty(), "反转用过后再被追上就开战")
-	ex.fight = {}
-	_set_words(ex, ["超能力"])
-	_ok(ex.use_power() and ex.stun >= 6 and not ex.use_power(), "超能力：定住首领 6 步，每幕一次")
 
 
 func _test_glyphs_and_tray() -> void:
@@ -413,64 +381,28 @@ func _test_glyphs_and_tray() -> void:
 	var free := _find(ex, func(k): return ex.m.glyph.has(k) and not ex.taken.has(k) and not ex.sealed(k) and ex.guard_of(k).is_empty())
 	ex.pos = free
 	_ok(not ex.pickup() and ex.tray.size() == 6, "字匣 6 格，满了不能再拾字")
-	_set_words(ex, ["收放"])
-	_ok(ex.tray_cap() == 7, "收放：字匣 +1")
+	_ok(ex.tray_cap() == 6, "基础字匣6格")
 	ex.seals = ["活字盒"]
-	_ok(ex.tray_cap() == 9, "活字盒：字匣 +2")
+	_ok(ex.tray_cap() == 8, "活字盒：字匣 +2")
 	ex.seals = []
-	_set_words(ex, [])
 	ex.gain_glyph("电")
 	_ok(GameState.deck_size() == 13, "字匣满了，发的字直接进字袋")
 	_ok(ex.tray_to_deck(0) and GameState.deck_size() == 14 and ex.tray.size() == 5, "字匣 → 字袋")
 	ex.discard(0)
 	_ok(ex.buyback == ["火"] and ex.tray.size() == 4, "丢字进回购清单")
-	_set_words(ex, ["转化"])
-	ex.discard(0, true)
-	_ok(ex.tray.size() == 4 and ex.tray[-1] != "火", "转化：丢字换一个同系统的随机字")
-	_set_words(ex, ["重复"])
 	ex.tray.clear()
-	ex.repeat_used = false
 	var g2 := _find(ex, func(k): return ex.m.glyph.has(k) and not ex.taken.has(k) and not ex.sealed(k) and ex.guard_of(k).is_empty())
 	ex.pos = g2
 	ex.pickup()
-	_ok(ex.tray.size() == 2 and ex.tray[0] == ex.tray[1], "重复：每幕第一个拾到的字多复制一枚")
-
-
-func _test_plate() -> void:
-	var ex := _fresh(3)
-	ex.tray = ["加", "速", "急", "停"]
-	ex.place(0, Vector2i(0, 0))
-	ex.place(0, Vector2i(0, 1))
-	ex.place(0, Vector2i(1, 0))
-	ex.place(0, Vector2i(1, 1))
-	_ok(ex.has("加速") and ex.has("急停") and ex.has("加急") and ex.tray.is_empty(), "版面放字免费，词一拼出来就生效")
-	var t0 := ex.t
-	ex.take_back(Vector2i(1, 1))
-	_ok(not ex.has("急停") and ex.t == t0 + 1 and ex.tray == ["停"], "取字耗 1 步，词拆开效果立刻消失")
-	ex.plate = [["收", "回"], ["停", ""]]
-	ex.refresh_active()
-	ex.tray.clear()
-	ex.take_back(Vector2i(1, 0))
-	_ok(ex.has("收回") and ex.t == t0 + 1 and ex.tray == ["停"], "收回：取字不耗步")
-	var mx := GameState.player_max_hp
-	ex.plate = [["精", "力"], ["", ""]]
-	ex.refresh_active()
-	_ok(GameState.player_max_hp == mx + 8, "精力：最大气血 +8")
-	ex.plate = [["精", ""], ["", ""]]
-	ex.refresh_active()
-	_ok(GameState.player_max_hp == mx, "拆掉精力，上限回落")
-	ex._take_seal("宽版")
-	_ok(ex.plate_n == 3 and ex.plate[0][0] == "精" and ex.wide_used, "宽版：版面扩成 3×3，原有的字保留")
+	_ok(ex.tray.size() == 1, "散字只拾一枚，没有词谱复制")
 
 
 func _test_loot_rest_shop() -> void:
 	var ex := _fresh(4)
 	_ok(ex.loot_options("小").size() == 2 and ex.loot_options("中").size() == 3 and ex.loot_options("大").size() == 3, "小赏二选一、中赏 / 大赏三选一")
-	_set_words(ex, ["重金"])
 	ex.seals = ["拓本"]
-	_ok(ex.loot_options("大").size() == 5 and ex.loot_options("小").size() == 3, "重金：大赏多一个；拓本：所有赏多一个")
+	_ok(ex.loot_options("大").size() == 4 and ex.loot_options("小").size() == 3, "拓本：所有赏只多一个")
 	ex.seals = []
-	_set_words(ex, [])
 	var owned := ex.owned_glyphs()
 	var all_ok := true
 	for i in 30:
@@ -514,9 +446,8 @@ func _test_loot_rest_shop() -> void:
 	ex.seals = []
 	ex.push_panel({"kind": "rest"})
 	var id: String = GameState.deck[0].id()
-	_set_words(ex, ["精金"])
 	ex.rest("gild", id)
-	_ok(GameState.deck.filter(func(c): return c.gilded).size() == 2, "修饰镀金；精金额外镀一枚")
+	_ok(GameState.deck.filter(func(c): return c.gilded).size() == 1, "修饰只镀金一枚")
 	GameState.add_character(Database.get_character("pollution"))
 	ex.push_panel({"kind": "rest"})
 	var n := GameState.deck_size()
@@ -527,25 +458,24 @@ func _test_loot_rest_shop() -> void:
 	var offers := ex.shop_offers()
 	_ok(offers == ex.shop_offers(), "同一家商店的货不会重摇")
 	var o: Dictionary = offers[0]
-	_set_words(ex, ["收购", "投币"])
 	var cost := ex.price(o)
-	_ok(cost == int(ceil(o.base * 0.7)), "收购：买字 7 折")
+	_ok(cost == o.base, "买字按标价支付")
 	GameState.gold = 100
 	ex.buy(0)
-	_ok(GameState.gold == 100 - cost + 1 and ex.spent == cost, "投币：每买一样返 1 金币")
-	_set_words(ex, ["合资"])
+	_ok(GameState.gold == 100 - cost, "购买只扣款，无词谱返利")
 	var rm: Dictionary = offers.filter(func(x): return x.kind == "remove")[0]
-	_ok(ex.price(rm) == rm.base - 5, "合资：删字 −5")
+	_ok(ex.price(rm) == rm.base, "删字按标价支付")
 	ex.buyback = ["火"]
-	_set_words(ex, ["回购"])
 	_ok(ex.buyback_offers().size() == 1 and ex.price(ex.buyback_offers()[0]) == 7, "回购：丢掉的字半价买回")
 	# 熔炉
-	# 和任何遗物都不相关的两个字：一定熔成稀有字（许愿见 relic_test）
+	# 地图熔炉：两枚字换一枚稀有字
 	ex.tray = ["冷", "冷"]
-	ex.push_panel({"kind": "forge", "k": 0})
-	_set_words(ex, ["炼金"])
+	ex.m = MapGen.generate(17, "熔铸坊")
+	for k in ex.m.mech:
+		if ex.m.mech[k].g == "炉": ex.pos = k; break
+	ex.push_panel({"kind": "forge", "k": ex.pos})
 	gold = GameState.gold
-	_ok(ex.forge(0, 1) and ex.tray.size() == 1 and Database.get_character_by_glyph(ex.tray[0]).rarity >= 2 and GameState.gold == gold + 4, "熔炉：两个字熔成一个稀有字；炼金 +4")
+	_ok(ex.forge(0, 1) and ex.tray.size() == 1 and Database.get_character_by_glyph(ex.tray[0]).rarity >= 2 and GameState.gold == gold, "熔炉：两字熔成一枚稀有字，无额外金币")
 
 
 func _battle(ex: Expedition, f: Dictionary) -> BattleState:
@@ -566,80 +496,29 @@ func _deck_conserved(state: BattleState) -> bool:
 
 func _test_battle_setup() -> void:
 	var ex := _fresh(6)
-	var foe := {"kind": "foe", "k": 10, "g": "爆", "name": "明敌"}
-	ex.fight = foe
-	var node := ex.battle_node()
-	_ok(node.enemies[0].glyph == "爆" and Database.get_enemy(node.enemies[0].id).glyph != "爆", "敌人资源复制后换成地图敌字，不改原资源")
-	_set_words(ex, ["护盾", "护甲", "蓄能", "蓄力", "重击", "火力"])
-	var s := _battle(ex, foe)
-	var e: Combatant = s.enemies[0]
-	_ok(s.player.block == 4 and s.player.persistent_block == 2 and s.player.energy == 2, "护盾 +4 / 护甲 +2 持久盾 / 蓄能 +2 储能")
-	_ok(s.ability_value("force_once") == 4 and s.pierce_once, "蓄力：首个词伤害 +4；重击：首次攻击无视护盾")
-	_ok(e.hp == e.max_hp - 4, "火力：开场先对敌人造成 4 点伤害")
-	_ok(_deck_conserved(s), "开场效果不吞字袋里的字")
-	e.add_block(10)
-	var before := e.hp
-	s.deal_damage(e, 5)
-	_ok(e.hp < before and e.block == 10 and not s.pierce_once, "重击：这一击穿过护盾，护盾保留")
-	_set_words(ex, ["重甲", "加急", "蓄冷", "清热", "防御力"])
-	s = _battle(ex, foe)
-	var on_board := s.board.cells.filter(func(c): return c != null).size()
-	_ok(s.player.block == 8 and s.player.heat_capacity == Database.rules.heat_capacity + 3 and s.player.permanent_damage_reduction == 1, "重甲 +8 护盾 / 蓄冷 热容 +3 / 防御力 受伤 −1")
-	_ok(on_board == Database.rules.opening_draw, "重甲少抽 1 枚、加急多抽 1 枚，互相抵消")
-	_ok(_deck_conserved(s), "少抽的字放回字袋")
-	# 伏兵
-	_set_words(ex, [])
-	var hp := GameState.player_hp
-	s = _battle(ex, {"kind": "ambush", "k": 0, "amb": 0, "name": "伏兵", "g": ""})
-	_ok(s.enemies[0].move_index == 1, "伏兵突袭：敌人在你第一回合之前先动手")
-	_set_words(ex, ["反击"])
-	s = _battle(ex, {"kind": "ambush", "k": 0, "amb": 0, "name": "伏兵", "g": ""})
-	_ok(s.enemies[0].move_index == 0, "反击：遭遇伏兵由你先手")
-	_set_words(ex, [])
-	var amb_f := {"kind": "ambush", "k": 0, "amb": 0, "name": "伏兵", "g": ""}
-	s = _battle(ex, amb_f)
-	var loss0: int = GameState.player_hp - s.player.hp
-	_set_words(ex, ["防护"])
-	s = _battle(ex, amb_f)
-	var loss1: int = GameState.player_hp - s.player.hp
-	_ok(loss1 == maxi(0, loss0 - 6) and s.player.block == maxi(0, 6 - loss0), "防护：伏兵战 +6 护盾，先挡突袭（突袭伤害 %d → %d）" % [loss0, loss1])
-	_set_words(ex, ["回防"])
-	s = _battle(ex, amb_f)
-	_ok(s.player.turn_damage_halve and GameState.player_hp - s.player.hp <= loss0, "回防：第一回合（含突袭）敌人伤害减半")
-	GameState.player_hp = hp
-	# 首领
-	_set_words(ex, ["电击"])
-	var boss := {"kind": "boss", "k": ex.boss, "name": "首领", "g": ex.m.TH.boss, "caught": false, "debuff": ""}
-	s = _battle(ex, boss)
-	e = s.enemies[0]
-	_ok(e.persistent_block == 8 and e.block == 6 and e.hp == e.max_hp - 6, "第一幕首领词条：护甲 8、护盾 6；电击：首领战开场先造成 6 点伤害（在词条之前结算）")
-	_set_words(ex, ["破甲", "破防", "停火"])
-	s = _battle(ex, boss)
-	e = s.enemies[0]
-	_ok(e.persistent_block == 0 and e.block == 0 and s.enemy_skip_turns == 1, "破甲护甲 −8 / 破防失去全部护盾 / 停火")
-	hp = s.player.hp
-	s.end_player_turn()
-	_ok(s.player.hp == hp and s.enemy_skip_turns == 0, "停火：首领第一回合不攻击")
-	_set_words(ex, [])
-	ex.act = 2
+	var foe := {"kind": "foe", "k": 10, "g": "纸", "name": "明敌"}
+	var b := _battle(ex, foe)
+	_ok(b.player.block == 0 and b.player.persistent_block == 0 and b.player.energy == 0, "开场无遗留的版面盾、持久盾或储能")
+	_ok(_deck_conserved(b), "开场字实体守恒")
+	var occupied := b.board.cells.filter(func(c): return c != null).size()
+	ex.seals = ["字印"]
+	b = _battle(ex, foe)
+	_ok(b.board.cells.filter(func(c): return c != null).size() == occupied + 1 and _deck_conserved(b), "字印多抽1枚，实体守恒")
 	ex.seals = ["朱笔"]
-	s = _battle(ex, boss)
-	_ok(s.enemies[0].status_stacks("strength") == 0 and s.enemies[0].persistent_block == 12, "朱笔：首领少一条词条（第二幕去掉力量）")
-	ex.seals = []
-	ex.act = 1
-	boss.debuff = "先手"
-	s = _battle(ex, boss)
-	_ok(s.enemies[0].move_index == 1, "位置减益·先手：首领在你第一回合之前行动")
-	boss.debuff = "热度"
-	s = _battle(ex, boss)
-	_ok(s.player.heat == 3, "位置减益·熔铸坊烈焰格旁：开局热度 +3")
-	boss.debuff = "首领护盾"
-	s = _battle(ex, boss)
-	_ok(s.enemies[0].block == 14, "位置减益·雷池：首领护盾 +8")
-	boss.debuff = "污染字"
-	s = _battle(ex, boss)
-	_ok(s.bag.any(func(c): return c.data.is_pollution and c.temporary), "位置减益·墨泉旁：字袋混进 1 枚本场污染字")
-	_ok(not GameState.deck.any(func(c): return c.data.is_pollution), "本场污染字不进永久字袋")
+	b = _battle(ex, {"kind":"boss", "k":ex.boss, "name":"首领", "debuff":""})
+	_ok(b.enemies[0].max_hp == 82 and b.enemies[0].hp == 82 and b.enemy_skip_turns == 0, "朱笔仅降低首领生命6，无隐藏跳行动")
+	for debuff in ["少抽字", "污染字", "热度", "熔字", "淹格", "首领护盾", "先手"]:
+		b = _battle(ex, {"kind":"boss", "k":ex.boss, "name":"首领", "debuff":debuff})
+		match debuff:
+			"少抽字", "淹格": _ok(b.board.cells.filter(func(c): return c != null).size() == occupied - 1 and _deck_conserved(b), debuff + "少一枚开场字，字仍在袋中")
+			"污染字": _ok(b.bag.any(func(c): return c.temporary and c.data.is_pollution), "污染字仅本场注入")
+			"热度": _ok(b.player.heat == 3, "位置热度+3")
+			"熔字": _ok(b.removed_this_battle.size() == 1, "位置熔字仅本场移除")
+			"首领护盾": _ok(b.enemies[0].block == 8, "位置首领盾+8")
+			"先手": _ok(b.enemies[0].move_index == 1, "位置先手推进真实招式")
+	ex.seals.clear()
+	b = _battle(ex, {"kind":"ambush", "k":10, "name":"伏兵", "amb":0})
+	_ok(b.enemies[0].move_index == 1, "伏兵先行动一次")
 
 
 func _test_finish_and_acts() -> void:
@@ -648,17 +527,12 @@ func _test_finish_and_acts() -> void:
 	ex.pos = foe_k
 	ex.enter_cell()
 	_ok(ex.fight.get("kind", "") == "foe", "踩上明敌进入战斗")
-	_set_words(ex, ["金币", "充能"])
 	var gold := GameState.gold
 	var ink := ex.ink
 	var t0 := ex.t
 	var r := ex.finish_battle(true)
 	_ok(r.reward and r.count == 3 and ex.taken.has(foe_k), "战胜明敌：去战后三选一")
-	_ok(GameState.gold == gold + 2 and ex.ink == ink + 1 and ex.t >= t0 + 2, "金币 +2 / 充能回 1 墨 / 打仗花 2 步")
-	_set_words(ex, ["分流"])
-	ex.fight = {"kind": "foe", "k": foe_k, "g": "爆", "name": "明敌"}
-	_ok(ex.finish_battle(true).count == 4, "分流：战后四选一")
-	_set_words(ex, [])
+	_ok(GameState.gold == gold + 2 and ex.ink == ink + 1 and ex.t >= t0 + 2, "基础战后金币+2、回墨1、耗2步")
 	# 伏兵：打赢后领地里的奖励解封
 	var amb: Dictionary = ex.m.ambush[0]
 	var sealed_k: int = amb.sealed[0]
@@ -674,10 +548,9 @@ func _test_finish_and_acts() -> void:
 	ex.panels.clear()
 	# 精英给印章
 	ex.fight = {"kind": "elite", "k": _find(ex, func(k): return ex.m.node.has(k) and ex.m.node[k].t == "险"), "g": "甲", "name": "守口精英"}
-	_set_words(ex, ["铸币"])
 	gold = GameState.gold
 	ex.finish_battle(true)
-	_ok(ex.seals.size() == 1 and Expedition.SEALS[ex.seals[0]][1] == "精英" and GameState.gold == gold + 5, "精英：掉一枚印章；铸币 +5")
+	_ok(ex.seals.size() == 1 and Expedition.SEALS[ex.seals[0]][1] == "精英" and GameState.gold == gold + 4, "精英：印章+金币4")
 	# 镇纸
 	ex.seals = ["镇纸"]
 	GameState.player_hp = 50
@@ -687,40 +560,31 @@ func _test_finish_and_acts() -> void:
 	ex.seals = []
 	# 首领 → 幕终 → 下一幕
 	ex.panels.clear()
-	_set_words(ex, ["利息", "投资"])
 	GameState.gold = 50
-	ex.spent = 30
 	ex.fight = {"kind": "boss", "k": ex.boss, "name": "首领", "g": "墨", "caught": false, "debuff": ""}
 	r = ex.finish_battle(true)
-	_ok(not r.reward and ex.boss_down and not ex.panels.any(func(p): return p.kind == "act_end"), "击败首领：不走三选一，也不直接结束本幕")
-	_ok(not ex.awake() and not ex.can_confront() and not ex.boss_revealed() and ex.boss_path().is_empty(), "首领倒下：不再追击，棋子和路线都不显示")
-	_ok(ex.boss_status().contains("已败") and ex.alerts.size() == 1 and ex.alerts[0][0] == "首领已被击败", "首领倒下：状态改为已败，只弹「可以继续探索」的提示")
-	ex.alerts.clear()
+	_ok(not r.reward and ex.boss_down and ex.panels.any(func(p): return p.kind == "act_end"), "击败首领：自动进入幕间结算")
+	_ok(not ex.awake() and not ex.can_confront() and not ex.boss_revealed() and ex.boss_path().is_empty(), "首领倒下：不再追击，棋子和路线隐藏")
+	_ok(ex.boss_status().contains("封闭") and ex.alerts.is_empty(), "首领倒下：状态为封层，不弹继续探索提示")
 	var t_before := ex.t
 	var caught := false
-	for i in 30:
-		caught = ex.tick() or caught
-	_ok(not caught and ex.fight.is_empty() and ex.t == t_before + 30, "首领倒下后过 30 步也不会被追上")
+	for i in 30: caught = ex.tick() or caught
+	_ok(not caught and ex.fight.is_empty() and ex.t == t_before, "结算期间时间不推进")
 	var rest_k := _find(ex, func(k): return ex.m.node.get(k, {}).get("t", "") == "休")
 	if rest_k >= 0:
 		ex.pos = rest_k
 		ex.enter_cell()
-		_ok(ex.top_panel().get("kind", "") == "rest", "首领倒下后还能进休息点")
-		ex.panels.clear()
-	_ok(ex.can_finish_act() and ex.finish_act() and ex.top_panel().get("kind", "") == "act_end", "点「结束本幕」才进入幕间结算")
+		_ok(ex.top_panel().get("kind", "") != "rest", "首领倒下后不能再进休息点")
+	_ok(not ex.can_finish_act() and not ex.finish_act() and ex.panels.any(func(p): return p.kind == "act_end"), "自动结算不能重复压入幕终面板")
 	_ok(not ex.finish_act(), "幕间结算面板开着时不能重复结束")
-	_ok(ex.act_settlement() == [["利息", 5], ["投资返还", 6]], "幕间：利息 10%% / 投资返还 20%% %s" % [ex.act_settlement()])
-	_set_words(ex, ["利息", "复利投资"])
-	ex.act = 2
-	GameState.gold = 200
-	_ok(ex.act_settlement()[0][1] == 16, "复利投资：第二幕利息 20%（上限翻倍）")
+	_ok(not ex.has_method("act_settlement"), "幕间不再计算版面利息与投资")
 	ex.act = 1
 	ex.tray = ["火"]
 	while ex.top_panel().get("kind", "") != "act_end":
 		ex.pop_panel()
 	var th1: String = ex.m.tn
 	ex.next_act()
-	_ok(ex.act == 2 and ex.m.tn != th1 and ex.tray == ["火"] and ex.t == 0 and ex.stir == null, "进入第二幕：换主题、新地图，字匣 / 版面 / 印章带过去")
+	_ok(ex.act == 2 and ex.m.tn != th1 and ex.tray == ["火"] and ex.t == 0 and ex.stir == null, "进入第二幕：换主题、新地图，字匣 / 字袋 / 印章带过去")
 	ex.act = 3
 	ex.push_panel({"kind": "act_end"})
 	ex.next_act()
@@ -740,7 +604,7 @@ func _test_screens() -> void:
 	Router.goto("res://src/screens/expedition_map_screen.gd")
 	await get_tree().process_frame
 	var screen: Control = Router.current
-	_ok(screen._map_grid.get_child_count() == MapGen.N and screen._plate_grid.get_child_count() == 4, "远征地图 12×8 + 版面 2×2")
+	_ok(screen._map_grid.get_child_count() == MapGen.N and screen._build_box.get_child_count() >= 4, "远征地图12×8与构筑提示，不再显示版面")
 	_ok(screen._legend_box != null and screen._legend_box.is_inside_tree(), "页面里有图样说明（颜色、敌人、机关）")
 	_ok(screen._boss_bar_label.text.contains("沉睡"), "地图上方的首领提示条：沉睡")
 	await get_tree().process_frame
@@ -790,7 +654,7 @@ func _test_screens() -> void:
 	screen._start_battle()
 	await get_tree().process_frame
 	var bs: Control = Router.current
-	_ok(Router.current_path.contains("battle_screen") and bs._expedition and bs.battle.enemies[0].display_name == "明敌", "开战进入 4×4 战斗")
+	_ok(Router.current_path.contains("battle_screen") and bs._expedition and not bs.battle.enemies[0].enemy_data.mechanic.is_empty(), "开战进入 4×4 战斗")
 	bs.battle.enemies[0].hp = 0
 	bs._check_battle_over()
 	for i in 90:
@@ -813,14 +677,12 @@ func _test_screens() -> void:
 		await get_tree().process_frame
 		if Router.current_path.contains("expedition_map_screen"):
 			break
-	_ok(Router.current_path.contains("expedition_map_screen") and ex.boss_down and ex.top_panel().get("kind", "") in ["", "seal_swap"], "击败首领 → 回地图继续探索，不直接弹幕终")
+	_ok(Router.current_path.contains("expedition_map_screen") and ex.boss_down and ex.panels.any(func(p): return p.kind == "act_end"), "击败首领直接进入结算，印章替换可先处理")
 	var scr: Control = Router.current
-	ex.panels.clear()
+	if ex.top_panel().get("kind", "") == "seal_swap": ex.swap_seal(-1)
 	scr.refresh()
-	_ok(scr._confront_btn.text == "结束本幕" and not scr._confront_btn.disabled, "首领倒下：按钮变成「结束本幕」")
-	scr._confront_btn.pressed.emit()
-	await get_tree().process_frame
-	_ok(ex.top_panel().get("kind", "") == "act_end", "点「结束本幕」弹出幕终结算")
+	_ok(scr._confront_btn.text == "本层已结束" and scr._confront_btn.disabled, "封层后迎战/手动结幕按钮禁用")
+	_ok(ex.top_panel().get("kind", "") == "act_end" and not ex.can_step(MapGen.nbrs(ex.pos)[0]), "自动显示幕终结算且地图无法行走")
 	scr._refresh_event()
 	_ok(scr._event_box.get_child_count() > 0, "幕终面板构建")
 
@@ -863,15 +725,7 @@ func _test_autoplay() -> void:
 				"act_end": ex.next_act()
 				_:
 					if not ex.tray.is_empty() and rng.randf() < 0.3:
-						var empty := []
-						for r2 in ex.plate_n:
-							for c2 in ex.plate_n:
-								if str(ex.plate[r2][c2]).is_empty():
-									empty.append(Vector2i(r2, c2))
-						if not empty.is_empty():
-							ex.place(0, empty[0])
-						else:
-							ex.tray_to_deck(0)
+						if not ex.tray_to_deck(0): ex.discard(0)
 						continue
 					# 一半时间朝首领走（让每幕都能结束），一半随机探索
 					var opts: Array = MapGen.nbrs(ex.pos).filter(func(k): return ex.can_step(k))

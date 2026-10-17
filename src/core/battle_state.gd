@@ -88,6 +88,10 @@ var overdo_count: int = 0                ## 过分：本场已打出【过分】
 var _attack_sequence_depth := 0
 var _attack_sequence_bonus: Dictionary = {}
 var _resolving_play := false
+var monster_net_energy := 0
+var monster_paid := false
+var monster_entered: Dictionary = {}
+var _energy_spend_turn := -1
 
 func _init(p_rules: BattleRules) -> void:
 	rules = p_rules
@@ -174,11 +178,13 @@ func start(deck: Array, enemy_datas: Array, seed_value: int = -1) -> void:
 	for ed in enemy_datas:
 		var e := Combatant.new(ed.name, ed.max_hp, false)
 		e.enemy_data = ed
+		e.add_block(ed.initial_block)
 		enemies.append(e)
 	turn = 0
 	draw_to_board(Relics.opening_draw(rules, relics))
-	begin_player_turn(false)
+	begin_player_turn(false, false)
 	Relics.on_battle_start(self)
+	EnemyMechanics.begin_phase(self)
 
 func _shuffle(arr: Array) -> void:
 	for i in range(arr.size() - 1, 0, -1):
@@ -340,6 +346,8 @@ func spend_energy(amount: int) -> void:
 	if spent <= 0:
 		return
 	player.energy -= spent
+	monster_net_energy += spent
+	_energy_spend_turn = turn
 	last_energy_spent = spent
 	last_energy_refunded = 0
 	last_energy_half_claimed = false
@@ -353,6 +361,8 @@ func spend_energy(amount: int) -> void:
 		abilities.erase("energy_refund_once")
 		add_energy(refund)
 		last_energy_refunded += refund
+		if _energy_spend_turn == turn:
+			monster_net_energy -= refund
 		_log("复：本次实际消耗 %d 储能，返还 %d（仅一次）" % [spent, refund])
 
 func refund_half_energy() -> int:
@@ -361,14 +371,18 @@ func refund_half_energy() -> int:
 	last_energy_half_claimed = true
 	var refund := maxi(0, int(ceil(last_energy_spent / 2.0)) - last_energy_refunded)
 	last_energy_refunded += refund
+	if _energy_spend_turn == turn:
+		monster_net_energy -= refund
 	add_energy(refund)
 	return refund
 
 ## 只有离开盘面后重新补入才刷新精炼；普通移动始终使用 board.set_xy。
-func place_from_pool(pos: Vector2i, inst: CharInstance) -> void:
+func place_from_pool(pos: Vector2i, inst: CharInstance, counts_for_monster := true) -> void:
 	if inst.refined and not inst.temporary and not board.cells.has(inst):
 		inst.temporary_uses = maxi(inst.temporary_uses, 2)
 	board.set_xy(pos, inst)
+	if counts_for_monster and inst.is_player_owned() and not inst.temporary:
+		monster_entered[inst.uid] = true
 
 ## 超能力只消耗于实际能够产生收益的持续能力，不被普通出词空耗。
 func passive_multiplier(label: String, has_reward: bool = true) -> int:
@@ -644,6 +658,8 @@ func _execute_prepared_play(play: Dictionary, shared: Dictionary) -> Dictionary:
 	strike_active = prev
 	if result.get("ok", false) and relics.has("slab"):
 		Relics.slab_fall(self)
+		for e in alive_enemies():
+			EnemyMechanics.update_targets(self, e)
 	return result
 
 
@@ -798,6 +814,8 @@ func _execute_prepared_play_core(play: Dictionary, shared: Dictionary) -> Dictio
 		else:
 			post.append(e)
 
+	for enemy in enemies: enemy.largest_hp_hit = 0
+	var monster_eligible := monster_entered.duplicate()
 	var ctx0 := {
 		"battle": self,
 		"source": player,
@@ -997,6 +1015,7 @@ func _execute_prepared_play_core(play: Dictionary, shared: Dictionary) -> Dictio
 		for i in path.size():
 			if i < path_insts.size():
 				last_played_consumed.append({"inst": path_insts[i], "pos": path[i], "kind": consumed[i].kind})
+	EnemyMechanics.on_play(self, word, path_insts, consumed, monster_eligible)
 	_resolving_play = false
 	return result
 
@@ -1062,7 +1081,7 @@ func restore_reconnect_tiles() -> int:
 	for item in due:
 		var pos: Vector2i = item.pos
 		if board.in_bounds(pos.x, pos.y) and board.get_xy(pos) == null:
-			place_from_pool(pos, item.inst)
+			place_from_pool(pos, item.inst, false)
 			reconnect_pending.erase(item)
 			restored += 1
 	for item in due:
@@ -1071,7 +1090,7 @@ func restore_reconnect_tiles() -> int:
 		var empties := board.empty_indices()
 		if empties.is_empty():
 			break
-		place_from_pool(empties[0], item.inst)
+		place_from_pool(empties[0], item.inst, false)
 		reconnect_pending.erase(item)
 		restored += 1
 	if restored > 0:
@@ -1388,7 +1407,7 @@ func _apply_next_word_flags(word: WordData) -> void:
 		abilities.erase("next_free_word")
 		board.free_word_link = false
 
-func begin_player_turn(draw: bool = true) -> void:
+func begin_player_turn(draw: bool = true, open_monster_tasks: bool = true) -> void:
 	turn += 1
 	abilities.erase("double_next")
 	if temporary_heat_capacity > 0:
@@ -1483,6 +1502,11 @@ func begin_player_turn(draw: bool = true) -> void:
 	abilities.erase("double_next")
 	repeat_armed = has_ability("repeat")
 	_tick_player_statuses()
+	monster_net_energy = 0
+	monster_paid = false
+	monster_entered.clear()
+	if open_monster_tasks:
+		EnemyMechanics.begin_phase(self)
 	_log("—— 第 %d 回合 ——" % turn)
 	EventBus.turn_ended.emit(turn)
 
@@ -1542,6 +1566,7 @@ func end_player_turn() -> void:
 		_enemy_act(e)
 		if not player.is_alive():
 			break
+	EnemyMechanics.release_dead(self)
 	if blitz:
 		blitz_turn = 0
 	abilities.erase("retaliate_once") # 未遇到敌方攻击时也在本回合结束失效。
@@ -1591,7 +1616,11 @@ func _enemy_act(e: Combatant, opening := false) -> void:
 		e.move_index += 1
 		_log("停火：%s 这一回合不攻击" % e.display_name)
 		return
-	var mv: EnemyMoveData = ed.moves[e.move_index % ed.moves.size()]
+	var mv: EnemyMoveData = current_intent(e)
+	EnemyMechanics.before_action(self, e, mv)
+	if not e.is_alive() or not player.is_alive():
+		EnemyMechanics.release_dead(self)
+		return
 	enemy_acting.emit(e, mv)
 	e.move_index += 1
 	var immune := has_ability("ceasefire") and damage_dealt_this_turn <= 0
@@ -1636,7 +1665,9 @@ func _enemy_act(e: Combatant, opening := false) -> void:
 			var n := inject_enemy_glyphs(mv.inject_count, mv.pollution_id)
 			_log("%s 注入 %d 个污染字" % [e.display_name, n])
 		EnemyMoveData.Kind.SPECIAL:
-			pass
+			EnemyMechanics.special(self, e, mv)
+
+	EnemyMechanics.after_action(self, e, mv)
 
 	# 反只回应攻击自己的敌人；等完整多段行动结束，向该攻击者结算一次。
 	if not split and mv.kind in [EnemyMoveData.Kind.ATTACK, EnemyMoveData.Kind.MULTI, EnemyMoveData.Kind.ATTACK_BLOCK] and has_ability("retaliate_once") and player.is_alive():
@@ -1671,7 +1702,7 @@ func _enemy_act(e: Combatant, opening := false) -> void:
 func current_intent(e: Combatant) -> EnemyMoveData:
 	if e.enemy_data == null or e.enemy_data.moves.is_empty():
 		return null
-	return e.enemy_data.moves[e.move_index % e.enemy_data.moves.size()]
+	return EnemyMechanics.preview(self, e)
 
 func _log(text: String) -> void:
 	log.append(text)

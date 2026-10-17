@@ -251,7 +251,7 @@ func _apply_enter() -> Dictionary:
 
 func _start_battle(n: MapNodeData) -> void:
 	var ids: Array = []
-	for e in n.enemies:
+	for e in n.select_enemies(seed * 997 + GameState.act_index * 100 + GameState.node_index):
 		ids.append(e.id)
 	if ids.is_empty():
 		ids = ["ink_spirit"]

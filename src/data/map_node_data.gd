@@ -9,6 +9,7 @@ enum Type { BATTLE, EVENT, SHOP, ELITE, REST, BOSS, FORK }
 @export var type: Type = Type.BATTLE
 @export var title: String = ""
 @export_multiline var description: String = ""
+@export var enemy_pool: Array[EnemyData] = []  ## 候选单敌；不可当成多敌同时投放。
 @export var enemies: Array[EnemyData] = []      ## 战斗节点用
 @export var is_optional_branch: bool = false     ## 岔路（精英/事件）
 
@@ -27,3 +28,10 @@ func type_label() -> String:
 
 func is_combat() -> bool:
 	return type == Type.BATTLE or type == Type.ELITE or type == Type.BOSS
+
+
+func select_enemies(seed_value: int) -> Array:
+	if enemy_pool.is_empty(): return enemies
+	var pick := RandomNumberGenerator.new()
+	pick.seed = seed_value
+	return [enemy_pool[pick.randi_range(0, enemy_pool.size() - 1)]]

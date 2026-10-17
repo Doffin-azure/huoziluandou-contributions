@@ -362,7 +362,7 @@ static func install() -> void:
 		if a.is_empty():
 			var out: Array = ["已有：" + ("、".join(GameState.relics.map(func(r): return Relics.name_of(r))) if not GameState.relics.is_empty() else "无")]
 			for id in Relics.DEFS:
-				out.append("%s　%s　[%s]" % [id, Relics.text(id), Relics.AFFINITY[id]])
+				out.append("%s　%s　%d档" % [id, Relics.text(id), Relics.TIER[id]])
 			return out
 		var drop: bool = a[0] == "-"
 		var key: String = a[1] if drop and a.size() > 1 else a[0]
@@ -389,13 +389,13 @@ static func install() -> void:
 		var s = Router.current
 		if s != null and s.has_method("refresh"): s.call("refresh")
 		return ["字匣：" + "".join(ex.tray)])
-	register("forge", "远征：在当前位置打开熔炉面板（测试许愿）", func(_a):
+	register("forge", "远征：在当前位置打开熔炉面板（需站在熔炉上使用）", func(_a):
 		var ex: Expedition = GameState.expedition
 		if ex == null: return ["只在远征地图里可用"]
 		ex.push_panel({"kind": "forge", "k": ex.pos})
 		var s = Router.current
 		if s != null and s.has_method("refresh"): s.call("refresh")
-		return ["熔炉已打开：在字匣点 2～3 个字"])
+		return ["熔炉已打开：在字匣点两枚字"])
 	register("shop", "远征：在当前位置打开商店面板", func(_a):
 		var ex: Expedition = GameState.expedition
 		if ex == null: return ["只在远征地图里可用"]

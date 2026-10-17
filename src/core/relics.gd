@@ -26,20 +26,11 @@ const DEFS := {
 	"buckler": ["铜护板", "每场开局获得 4 持久盾", false],
 	"barrier": ["纸屏风", "每场开局获得 10 临时格挡（第一回合有效）", false],
 }
-## 许愿（熔炉）：每件遗物的「相关字」，可以互相重叠；只用奖励字池里拿得到的字
-const AFFINITY := {
-	"strike": "击强力破铸", "breach": "破洗化过反", "slab": "重载甲御力", "press": "加合放超连",
-	"sleep": "息心停清回", "clean": "清洗流护收", "wheel": "转左右回流重", "powerbank": "电充蓄能放",
-	"fireman": "火热炼爆", "fertilizer": "化分复再合", "skyfire": "火流热洗爆", "blitz": "急速电加停",
-	"egg": "收投资利再金", "buckler": "盾甲护金铸", "barrier": "防护御盾反",
-}
-## 档次：1 常见 / 2 少见 / 3 稀有。越稀有，许愿时权重越低、商店越贵
+## 档次：1 常见 / 2 少见 / 3 稀有。中赏最多2档，大赏包含3档；商店按档定价。
 const TIER := {
 	"strike": 2, "breach": 2, "slab": 3, "press": 3, "sleep": 1, "clean": 1, "wheel": 2, "powerbank": 1,
 	"fireman": 1, "fertilizer": 3, "skyfire": 2, "blitz": 2, "egg": 2, "buckler": 1, "barrier": 1,
 }
-## 投进去的字里，和某件遗物相关的字数 → 熔出遗物的总概率
-const WISH_CHANCE := {1: 0.25, 2: 0.6, 3: 0.9}
 const PRICE := {1: 35, 2: 50, 3: 70}
 const EGG_EVERY := 4
 const WHEEL_DIRS := ["up", "down", "left", "right"]
@@ -79,55 +70,6 @@ static func price(id: String) -> int:
 
 static func sell_price(id: String) -> int:
 	return int(price(id) / 2)
-
-
-## 一枚字和这件遗物相关吗
-static func related(id: String, g: String) -> bool:
-	return str(AFFINITY.get(id, "")).contains(g)
-
-
-## 许愿：投进去的字（可以重复）→ [{id, score, p}]，按概率从高到低；已有的遗物不会再出
-## 总概率看「最相关」那件有几个字对上；具体出哪件按 相关字数² / 档次 加权
-static func wish_odds(glyphs: Array, owned: Array) -> Array:
-	var cands: Array = []
-	var best := 0
-	var total_w := 0.0
-	for id in DEFS:
-		if owned.has(id):
-			continue
-		var score := 0
-		for g in glyphs:
-			if related(id, str(g)):
-				score += 1
-		if score > 0:
-			var w: float = float(score * score) / float(TIER[id])
-			cands.append({"id": id, "score": score, "w": w})
-			best = maxi(best, score)
-			total_w += w
-	if cands.is_empty():
-		return []
-	var chance: float = WISH_CHANCE[mini(best, 3)]
-	for c in cands:
-		c["p"] = chance * c.w / total_w
-	cands.sort_custom(func(x, y): return x.p > y.p)
-	return cands
-
-
-static func wish_chance(glyphs: Array, owned: Array) -> float:
-	var total := 0.0
-	for c in wish_odds(glyphs, owned):
-		total += c.p
-	return total
-
-
-## 掷一次：返回熔出的遗物 id；没熔出返回 ""
-static func wish_roll(glyphs: Array, owned: Array, rng: RandomNumberGenerator) -> String:
-	var roll := rng.randf()
-	for c in wish_odds(glyphs, owned):
-		if roll < c.p:
-			return c.id
-		roll -= c.p
-	return ""
 
 
 # ---------------------------------------------------------------- 战斗钩子

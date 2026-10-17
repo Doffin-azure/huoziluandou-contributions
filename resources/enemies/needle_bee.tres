@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_ck1lp"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_bo0sp"]
+
+[sub_resource type="Resource" id="Resource_7vgof"]
+script = ExtResource("1_ck1lp")
+kind = 5
+title = "连针"
+description = "循环行动：连针 → 蓄势 → 重刺"
+damage = 3
+hits = 3
+
+[sub_resource type="Resource" id="Resource_5fq31"]
+script = ExtResource("1_ck1lp")
+kind = 7
+title = "蓄势"
+description = "循环行动：连针 → 蓄势 → 重刺"
+damage = 0
+mechanic_action = "wait"
+
+[sub_resource type="Resource" id="Resource_gry6o"]
+script = ExtResource("1_ck1lp")
+title = "重刺"
+description = "循环行动：连针 → 蓄势 → 重刺"
+damage = 10
+
+[resource]
+script = ExtResource("2_bo0sp")
+id = "needle_bee"
+name = "连针蜂"
+glyph = "连"
+description = "三段小伤与单段重击交替。新版御只减下一次伤害2，不逐段生效；反单字在整次敌攻击结束后反击6一次，不逐段触发。提前建立的跨战防御力才逐段减1。"
+max_hp = 34
+mechanic = "bee"
+moves = Array[ExtResource("1_ck1lp")]([SubResource("Resource_7vgof"), SubResource("Resource_5fq31"), SubResource("Resource_gry6o")])

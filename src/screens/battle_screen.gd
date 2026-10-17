@@ -98,7 +98,7 @@ func build(root: Control) -> void:
 	if node == null:
 		node = MapNodeData.new()
 	battle = BattleState.new(Database.rules)
-	var enemy_datas: Array = node.enemies
+	var enemy_datas: Array = node.select_enemies(int(params.get("seed", GameState.battle_sequence * 997 + GameState.node_index)))
 	if enemy_datas.is_empty():
 		enemy_datas = [Database.get_enemy("ink_spirit")]
 	battle.start(GameState.make_battle_deck(), enemy_datas, int(params.get("seed", -1)))
@@ -394,6 +394,9 @@ func _refresh_enemies() -> void:
 
 
 func _refresh_intents() -> void:
+	_board_view.enemy_markers = EnemyMechanics.markers(battle)
+	_board_view.queue_redraw()
+	if _board_view._path_layer != null: _board_view._path_layer.queue_redraw()
 	if _target_index >= battle.enemies.size() or not battle.enemies[_target_index].is_alive():
 		var first := battle.first_alive_enemy()
 		_target_index = battle.enemies.find(first) if first != null else 0

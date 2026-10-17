@@ -23,6 +23,7 @@ var _dim_locked := true
 var _touch_index := -1
 var _last_pointer := Vector2.ZERO
 var _cancelled_drag_cell := Vector2i(-1, -1)
+var enemy_markers: Array = []
 var _path_layer: Control
 var _presentation: BoardPresentation3D
 
@@ -395,6 +396,19 @@ func _on_sync() -> void:
 
 
 func _draw_path() -> void:
+	for mark in enemy_markers:
+		var cell: Vector2i = mark.cell
+		if not board.in_bounds(cell.x, cell.y): continue
+		var tile: Control = tiles[board.from_xy(cell)]
+		var rect := Rect2(tile.position + Vector2(4, 4), tile.size - Vector2(8, 8))
+		var color := Color("2874a6") if mark.label == "蓝" else Palette.VERMILION
+		if _presentation != null and _presentation.has_projection():
+			var polygon := _presentation.cell_polygon(board.from_xy(cell))
+			polygon.append(polygon[0])
+			_path_layer.draw_polyline(polygon, color, 3.0, true)
+		else:
+			_path_layer.draw_rect(rect, color, false, 3.0)
+		_path_layer.draw_string(ThemeDB.fallback_font, rect.position + Vector2(6, 19), mark.label, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, color)
 	for cell in picked_cells:
 		_draw_pick_cell(cell)
 	if not pick_mode.is_empty():
