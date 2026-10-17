@@ -3,6 +3,7 @@ class_name SpeechBubble
 ## 纸面词效按阅读顺序自然排布；长说明滚动，不把目标推到纸张底部。
 enum State { IDLE, PREVIEW, RESULT, ERROR }
 
+var frame_details: Label
 var title: Label
 var body: EffectText
 var _caption: Label
@@ -50,6 +51,11 @@ func _ready() -> void:
 	_context.add_theme_font_override("font", Ink.serif)
 	_context.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_column.add_child(_context)
+	frame_details = Ink.label("", "", Palette.INK)
+	frame_details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_column.add_child(frame_details)
+	_column.move_child(frame_details, 1)
+	frame_details.hide()
 	set_ui_scale(ui_scale, compact)
 
 
@@ -128,6 +134,7 @@ func set_ui_scale(value: float, is_compact := false) -> void:
 	body.add_theme_font_size_override("bold_font_size", int(minf(27, (18 if compact else 23) * value)))
 	_caption.add_theme_font_size_override("font_size", int(minf(24, (15 if compact else 19) * value)))
 	_context.add_theme_font_size_override("font_size", int(minf(23, (15 if compact else 19) * value)))
+	frame_details.add_theme_font_size_override("font_size", int(clampf(17 * value, 14, 23)))
 	var number_size := int(minf(29, (20 if compact else 26) * ui_scale))
 	if illustrated_scale > 0:
 		var unit := illustrated_scale

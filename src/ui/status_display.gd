@@ -15,7 +15,7 @@ const ABILITY_NAMES := {
 	"heat_overload_bonus": "过热待触发",
 	"next_double_draw": "超速", "next_overfire": "过火", "electric_overload": "电流过载",
 	"fireproof": "防火", "blastproof": "防爆", "joint_funding": "合资", "profit_share": "分利",
-	"next_energy_bonus": "蓄力", "gravity_always": "重力", "compound_equity": "复利",
+	"next_energy_bonus": "蓄力", "gravity_always": "重力",
 	"ceasefire": "停火", "serial": "连载", "repeat_zero": "反复", "split_mind": "精分",
 	"vigor": "精力", "vigor_next": "精力待补", "auto_refill": "充电过热", "repeat": "重复",
 	"next_serial_bonus": "连载待发", "next_draw_bonus": "额外补字",
@@ -99,7 +99,7 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 				elif id == "guard_inject":
 					description = "下次敌方塞字减少 %d 个。" % value
 				elif id == "counter":
-					description = "已预留%d层反击；本回合所有敌人行动后，以剩余临时格挡+%d反击首个存活敌人一次。" % [value, value * 3]
+					description = "已预留%d层反击；本回合所有敌人行动后，以剩余临时格挡+%d反击首个存活敌人一次。" % [value, value * BattleBalance.i("counter_per_stack", 3)]
 				elif id == "next_energy_bonus" or id == "next_serial_bonus":
 					description = "下一次攻击每段额外造成 %d 伤害，跨回合保留至兑现。" % value
 				elif id == "next_draw_bonus":
@@ -107,7 +107,7 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 				elif id == "vigor_next":
 					description = "下回合基础补字额外+%d，在开局补字时兑现一次。" % value
 				elif id == "energy_regen":
-					description = "后续 %d 回合开局各获得 2 点储能。重复施放刷新持续时间，同回合不重复发放。" % value
+					description = "后续 %d 回合开局各获得 %d 点储能。重复施放刷新持续时间，同回合不重复发放。" % [value, BattleBalance.i("energy_regen", 2)]
 				elif id == "retaliate_once":
 					description = "本回合下一次受到敌方攻击后，向该攻击者反击 %d 伤（整次行动结束后，仅一次）。完全格挡也触发，污染掉血不触发。" % value
 				elif id == "energy_next_turn":
@@ -115,9 +115,9 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 				elif id == "payment_discount_once":
 					description = "本回合下一次字或词的金币费用 -%d，最低 0。支付成功后清除，免费或失败的支付不消耗。" % value
 				elif id == "combine_word_once":
-					description = "本回合下一次成功组词后获得 %d 临时格挡、%d 储能；仅一次。" % [2 * value, value]
+					description = "本回合下一次成功组词后获得 %d 临时格挡、%d 储能；仅一次。" % [BattleBalance.i("combine_block", 2) * value, BattleBalance.i("combine_energy", 1) * value]
 				elif id == "speed_word_once":
-					description = "本回合下一次成功组词后补 %d 字、热度 +%d；仅一次。" % [2 * value, value]
+					description = "本回合下一次成功组词后补 %d 字、热度 +%d；仅一次。" % [BattleBalance.i("speed_draw", 2) * value, BattleBalance.i("speed_heat", 1) * value]
 				elif id == "energy_refund_once":
 					description = "本回合下一次实际消耗储能时返还最多 %d 点，不超过实际消耗；仅一次。" % value
 				elif id == "solo_gain_once":
@@ -133,9 +133,9 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 				elif id == "heat_overload_bonus":
 					description = "本回合首次实际新增溢热污染后，下一次多字词额外补%d字。" % value
 				elif id == "strong_heart":
-					description = "本场心力已挡下%d次致命伤。每回合开始回复%d生命。" % [unit.heart_power_triggered, 2 + unit.heart_power_triggered]
+					description = "本场心力已挡下%d次致命伤。每回合开始回复%d生命。" % [unit.heart_power_triggered, BattleBalance.i("strong_heart_base", 2) + BattleBalance.i("heart_trigger_heal", 1) * unit.heart_power_triggered]
 				elif id == "serial":
-					description += "\n已累计%d次词，距离下次奖励还需%d次。" % [battle.serial_words, 3 - battle.serial_words % 3]
+					description += "\n已累计%d次词，距离下次奖励还需%d次。" % [battle.serial_words, BattleBalance.i("serial_interval", 3) - battle.serial_words % BattleBalance.i("serial_interval", 3)]
 				elif id == "repeat":
 					description += "\n" + ("本回合首次重演机会可用。" if battle.repeat_armed else "本回合无可用重演机会，下回合恢复。")
 				var layers := maxi(1, value) if id in LAYERED_ABILITIES else 1

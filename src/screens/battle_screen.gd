@@ -112,6 +112,7 @@ func build(root: Control) -> void:
 	root.add_child(_preview_panel)
 	_selection_actions.reparent(root)
 	_board_view = _build_center()
+	_board_view.tile_inspected.connect(_inspect_tile)
 	root.add_child(_board_view)
 	_enemy_panel = ScrollContainer.new()
 	_enemy_panel.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -410,10 +411,7 @@ func _refresh_player() -> void:
 	_player_status.set_entries(StatusDisplay.collect(battle.player, battle))
 	_show_defense(battle.player.block, battle.player.persistent_block)
 	var wallet: Array = [{"id": "gold", "title": "金币", "value": GameState.gold, "color": Palette.GOLD_DK, "description": "可用金币 %d，本战获得 %d。" % [GameState.gold, battle.gold_earned]}]
-	if battle.player.temp_funds > 0:
-		wallet.append({"id": "temp_funds", "title": "临时资金", "value": battle.player.temp_funds, "color": Palette.GOLD_DK, "description": "本回合可使用的临时资金。"})
-	if battle.player.equity > 0:
-		wallet.append({"id": "equity", "title": "股权", "value": battle.player.equity, "color": Palette.GOLD_DK, "description": "当前累计股权。"})
+
 	_gold_strip.set_entries(wallet)
 
 
@@ -453,6 +451,9 @@ func _on_log(text: String) -> void:
 
 # ---------------------------------------------------------------- 独立词效预览
 func _on_selection_changed(path: Array, glyphs: Array, word: WordData, preview_target: Dictionary = {}) -> void:
+	if path.is_empty():
+		_bubble.frame_details.text = ""
+		_bubble.frame_details.hide()
 	if preview_target.is_empty() and not path.is_empty() and _board_view.pick_mode.is_empty() and not _ready_action.is_empty() and not _ready_action.get("repeat_rotate", false):
 		if not battle.pending_reveal.is_empty():
 			battle.return_pending_reveal()
@@ -543,7 +544,7 @@ func _on_primary() -> void:
 		var rotating_at := _board_effect_point({"target": {"tile": battle.repeat_rotate_tile}, "effects": [], "path": []}, 2)
 		battle.do_repeat_rotate()
 		_effects.glyph_impact(GlyphVfxProfile.for_glyph("转"), rotating_at, 38)
-		if battle.repeat_rotate_count >= 3:
+		if battle.repeat_rotate_count >= BattleBalance.i("rotate_limit", 3):
 			battle.end_repeat_rotate()
 			_ready_action = {}
 			_on_log("转速：已转满 3 次，结束")
@@ -567,7 +568,7 @@ func _on_primary() -> void:
 	if battle.formation_mode and not battle.formation_queue.is_empty() and _board_view.path.is_empty():
 		_set_busy(true)
 		var count := battle.formation_queue.size()
-		var before := [battle.player.energy, battle.player.heat, GameState.gold, battle.player.temp_funds, battle.player.equity]
+		var before := [battle.player.energy, battle.player.heat, GameState.gold]
 		_events.clear()
 		_collecting = true
 		battle.resolve_formation()
@@ -659,7 +660,7 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 				_run_recover(path, _current_word.interaction)
 				return
 			"choose_glyph_gild":
-				_open_glyph_picker(path, "gild_glyph", GameState.glyph_counts(), "精金：选择要永久镀金的字")
+				_open_gild_picker(path)
 				return
 			"choose_discard_place":
 				_open_discard_place(path)
@@ -691,7 +692,7 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 	if not play_target.is_empty() or not needs_target:
 		# 规则层索引针对存活列表；HUD 索引针对固定敌人列表。
 		play_target["target_index"] = battle.alive_enemies().find(battle.enemies[_target_index]) if not battle.enemies.is_empty() else 0
-	var old_resources := [battle.player.energy, battle.player.heat, GameState.gold, battle.player.temp_funds, battle.player.equity]
+	var old_resources := [battle.player.energy, battle.player.heat, GameState.gold]
 	_events.clear()
 	_collecting = true
 	var result := battle.try_play(path, play_target)
@@ -754,7 +755,7 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 	if _handle_effect_requests():
 		return
 	# 转速：本词结算后保留「发动」，可继续旋转同一处（最多 3 次）；点「清除」即停下。
-	if battle.repeat_rotate_tile.x >= 0 and battle.repeat_rotate_count < 3:
+	if battle.repeat_rotate_tile.x >= 0 and battle.repeat_rotate_count < BattleBalance.i("rotate_limit", 3):
 		_ready_action = {"repeat_rotate": true, "path": [], "target": {}}
 		_update_input()
 		_check_battle_over()
@@ -870,7 +871,7 @@ func _on_tile_picked(pos: Vector2i) -> void:
 	if _recast_three_active:
 		var rc: CharInstance = battle.board.get_xy(pos)
 		if rc == null or rc.pinned or _pending_path.has(pos):
-			_on_log("%s：请选择施词以外的非固定字（%d/3）" % [_three_tiles_word, _recast_three_cells.size()])
+			_on_log("%s：请选择施词以外的非固定字（%d/%d）" % [_three_tiles_word, _recast_three_cells.size(), BattleBalance.i("recast_target_count", 3)])
 			return
 		for chosen in _recast_three_cells:
 			var inst := battle.board.get_xy(chosen)
@@ -878,7 +879,7 @@ func _on_tile_picked(pos: Vector2i) -> void:
 				return
 		_recast_three_cells.append(pos)
 		_board_view.picked_cells = _recast_three_cells.duplicate()
-		if _recast_three_cells.size() >= 3:
+		if _recast_three_cells.size() >= BattleBalance.i("recast_target_count", 3):
 			var rp := _pending_path
 			_recast_three_active = false
 			var cells := _recast_three_cells.duplicate()
@@ -1194,7 +1195,7 @@ func _choose_solo_throw(path: Array, target: Dictionary) -> bool:
 	var candidates := battle.solo_target_cells(inst, path[0])
 	if candidates.is_empty():
 		return false
-	var due := EffectUtil.discounted_cost(battle, 1)
+	var due := EffectUtil.discounted_cost(battle, BattleBalance.i("throw_cost", 1))
 	if EffectUtil.available(battle) < due or battle.solo_throw_destinations(inst, path[0]).is_empty():
 		_bubble.set_error("投：需要可用空格与 %d 金币支付额" % due)
 		return true
@@ -1222,7 +1223,7 @@ func _choose_word_transfer(path: Array, target: Dictionary) -> bool:
 	if cards.is_empty():
 		_on_commit(path, {"skip_transfer": true})
 		return true
-	if EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, 2):
+	if EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, BattleBalance.i("buy_cost", 2)):
 		_bubble.set_error("%s：需要 2 金币支付额" % word.word)
 		return true
 	var spaces := battle.board.empty_indices()
@@ -1261,7 +1262,7 @@ func _choose_solo_bag(path: Array, target: Dictionary) -> bool:
 	if cards.is_empty():
 		return false
 	var buying := source.data.solo_handler == "buy_bag_solo"
-	var due := EffectUtil.discounted_cost(battle, 2) if buying else 0
+	var due := EffectUtil.discounted_cost(battle, BattleBalance.i("buy_cost", 2)) if buying else 0
 	if buying and EffectUtil.available(battle) < due:
 		_bubble.set_error("购：支付额不足（需要 %d 金币支付额）" % due)
 		return true
@@ -1301,7 +1302,7 @@ func _choose_solo_bag(path: Array, target: Dictionary) -> bool:
 
 ## 放有储能时选择释放或普通攻击；选择/取消前保留字块和资源。
 func _choose_solo_release(path: Array, target: Dictionary) -> bool:
-	if target.has("release_energy") or path.size() != 1 or battle.player.energy < 1 or not battle.board.valid_path(path):
+	if target.has("release_energy") or path.size() != 1 or battle.player.energy < BattleBalance.i("release_cost", 1) or not battle.board.valid_path(path):
 		return false
 	var inst := battle.board.get_xy(path[0])
 	if inst == null or inst.word_only or inst.glyph_list().size() != 1 or inst.data.solo_handler != "solo_release":
@@ -1309,8 +1310,8 @@ func _choose_solo_release(path: Array, target: Dictionary) -> bool:
 	_solo_release_picker_active = true
 	var overlay := ChoiceOverlay.new()
 	overlay.setup({"title": "放：选择攻击方式", "body": "当前储能：%d" % battle.player.energy, "options": [
-		{"text": "消耗 1 储能，造成 8 伤害", "primary": true},
-		{"text": "不消耗储能，造成 2 伤害"},
+		{"text": "消耗 %d 储能，造成 %d 伤害" % [BattleBalance.i("release_cost", 1), BattleBalance.i("release_damage", 8)], "primary": true},
+		{"text": "不消耗储能，造成 %d 伤害" % inst.data.solo_effects[0].amount},
 		{"text": "取消"}]})
 	overlay.chose.connect(func(index):
 		_solo_release_picker_active = false
@@ -1330,7 +1331,7 @@ func _choose_compound_copy(path: Array, target: Dictionary) -> bool:
 	if target.has("compound_uid") or not battle.has_ability("next_compound") or not battle.board.valid_path(path):
 		return false
 	var word := Database.get_word_by_glyphs(battle.board.glyphs_of(path))
-	if word == null or word.length() < 3:
+	if word == null or word.length() < BattleBalance.i("long_word_threshold", 3):
 		return false
 	var cards: Array = []
 	var options: Array = []
@@ -1361,7 +1362,7 @@ func _run_three_tiles(path: Array, word_name: String) -> void:
 		var inst: CharInstance = battle.board.cells[i]
 		if inst != null and not inst.pinned and not path.has(battle.board.to_xy(i)):
 			eligible[inst.uid] = true
-	if eligible.size() < 3:
+	if eligible.size() < BattleBalance.i("recast_target_count", 3):
 		_bubble.set_error("%s：需要三个施词以外的非固定字" % word_name)
 		return
 	_pending_path = path
@@ -1625,9 +1626,7 @@ func _check_battle_over() -> void:
 		EventBus.hp_changed.emit(GameState.player_hp, GameState.player_max_hp)
 		if victory:
 			GameState.add_captured(battle.captured_chars)
-			if battle.player.equity > 0:
-				GameState.add_gold(battle.player.equity)
-				_on_log("投资本金返还：+%d 金币" % battle.player.equity)
+
 			GameState.settle_victory_economy()
 			Relics.on_battle_won()
 		var ex_result := {}
@@ -1684,6 +1683,23 @@ func _pop_confirm() -> void:
 	_confirm_motion = create_tween()
 	_confirm_motion.tween_property(_confirm_btn, "scale", Vector2(1.025, 1.025), 0.06)
 	_confirm_motion.tween_property(_confirm_btn, "scale", Vector2.ONE, 0.10)
+
+
+func _open_gild_picker(path: Array) -> void:
+	var cards: Array = GameState.deck.filter(func(c): return not c.gilded and c.is_player_owned() and not c.temporary)
+	if cards.is_empty():
+		_bubble.set_error("字袋中没有尚未镀金的实体字。")
+		return
+	var options: Array = []
+	for card in cards:
+		options.append({"text": "【%s】#%d（只强化这一枚）" % [card.glyph(), card.uid]})
+	options.append({"text": "取消"})
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": "永久镀金：选择一枚实体字", "body": "镀金后每次单字或组词打出+1金币。同字形的其他实体不受影响。", "options": options})
+	overlay.chose.connect(func(index):
+		if index >= cards.size(): return
+		_on_commit(path, {"gild_uid": cards[index].uid}))
+	_mount_overlay(overlay)
 
 
 func _open_deck() -> void:
@@ -1878,7 +1894,7 @@ func _update_input() -> void:
 	var locked := _busy or _finished or _modal_count > 0
 	_board_view.set_interactable(not locked, false)
 	if _recast_three_active:
-		_confirm_btn.text = "%s（%d/3）" % [_three_tiles_word, _recast_three_cells.size()]
+		_confirm_btn.text = "%s（%d/%d）" % [_three_tiles_word, _recast_three_cells.size(), BattleBalance.i("recast_target_count", 3)]
 		_confirm_btn.disabled = true
 	elif _collect_own_active:
 		_confirm_btn.text = "发动（%s %d）" % ["分流" if _collect_junk else "收心", _collect_own_cells.size()]
@@ -1888,7 +1904,7 @@ func _update_input() -> void:
 		_confirm_btn.disabled = locked
 	elif not _ready_action.is_empty():
 		if _ready_action.get("repeat_rotate", false):
-			_confirm_btn.text = "发动（转速 %d/3）" % battle.repeat_rotate_count
+			_confirm_btn.text = "发动（转速 %d/%d）" % [battle.repeat_rotate_count, BattleBalance.i("rotate_limit", 3)]
 		else:
 			_confirm_btn.text = "发动"
 		_confirm_btn.disabled = locked
@@ -1936,6 +1952,34 @@ func _toggle_log() -> void:
 	_update_input()
 
 
+func _inspect_tile(pos: Vector2i) -> void:
+	if _bubble.frame_details == null or battle == null: return
+	var inst := battle.board.get_xy(pos)
+	var lines: Array[String] = ["当前字 · 第%d行%d列" % [pos.y + 1, pos.x + 1]]
+	if inst != null:
+		lines[0] += "【%s】" % "".join(inst.glyph_list())
+		if inst.gilded: lines.append("金：此实体已永久镀金；每次有效单字或组词+%d金币，弃字不触发。" % BattleBalance.i("gild_gold", 1))
+		if inst.temporary: lines.append("临：临时字，用后移除，战后消失。")
+		if inst.word_only: lines.append("词：仅组词触发效果，单打只弃掉。")
+		if inst.is_fused(): lines.append("融合：一格包含多个字形，作为一个实体共同使用。")
+		if inst.temporary_uses > 0: lines.append("叠层：还有%d次额外使用，先消耗复制层，最后消耗实体。" % inst.temporary_uses)
+		if inst.refined: lines.append("炼：本场重新入盘时恢复两次额外使用。")
+		if inst.pinned: lines.append("歇：本回合已用，下回合恢复；不能移动。" if inst.pinned_exhausted else "固：本场固定在原格，每回合可用一次；不能移动或换字。")
+		for pid in inst.pollutions:
+			var pd := Database.get_pollution(pid)
+			if pd != null: lines.append("%s：%s" % [pd.name, pd.description])
+		for sid in inst.statuses:
+			var sd := Database.get_status(str(sid))
+			if sd != null: lines.append("%s：%s" % [sd.name, sd.description])
+	for mark in EnemyMechanics.markers(battle):
+		if mark.cell == pos:
+			var explanation := "%s框 · %s：%s" % [mark.label, mark.source, mark.description]
+			if not lines.has(explanation): lines.append(explanation)
+	var has_effect := inst != null and lines.size() > 1
+	_bubble.frame_details.text = "\n".join(lines) if has_effect else ""
+	_bubble.frame_details.visible = has_effect
+
+
 func _selection_context(path: Array) -> String:
 	var enemy: Combatant = battle.enemies[_target_index] if not battle.enemies.is_empty() else null
 	var target := enemy.display_name if enemy != null and enemy.is_alive() else "无"
@@ -1949,7 +1993,7 @@ func _selection_context(path: Array) -> String:
 		if glyphs.size() == 1 or _current_word != null:
 			var focus: String = GlyphVfxProfile.for_play(glyphs, _current_word).focus
 			var labels := {"shield": "自身护盾", "heal": "自身气血", "heat": "热度", "energy": "储能",
-				"gold": "金币", "temp_funds": "临时资金", "equity": "股权", "board": "字盘", "ability": "自身能力"}
+				"gold": "金币", "board": "字盘", "ability": "自身能力"}
 			target = labels.get(focus, target)
 	var cost := _pollution_cost_text(path).strip_edges()
 	var context := "目标：%s\n%s" % [target, "污染代价：无" if cost.is_empty() else cost]
@@ -2013,7 +2057,7 @@ func _cast_destination(profile: Dictionary, play: Dictionary) -> Vector2:
 		"shield": return _defense_point("block")
 		"heal": return _effects.point_of(_player_hp_value)
 		"energy", "heat": return _status_point(profile.focus)
-		"gold", "temp_funds", "equity": return _effects.point_of(_gold_strip.item_for(profile.focus))
+		"gold": return _effects.point_of(_gold_strip.item_for(profile.focus))
 		"board": return _board_effect_point(play)
 	return _effects.point_of(_player_status)
 
@@ -2151,8 +2195,8 @@ func _wait_step(duration: float) -> bool:
 
 
 func _resource_feedback(before: Array) -> void:
-	var after := [battle.player.energy, battle.player.heat, GameState.gold, battle.player.temp_funds, battle.player.equity]
-	var ids := ["energy", "heat", "gold", "temp_funds", "equity"]
+	var after := [battle.player.energy, battle.player.heat, GameState.gold]
+	var ids := ["energy", "heat", "gold"]
 	var played := _active_fx_profile.duplicate(true)
 	# 等新数值控件完成排版，再在实际图标旁反馈，避免第一帧落在旧位置。
 	await get_tree().process_frame

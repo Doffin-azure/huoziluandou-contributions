@@ -21,8 +21,6 @@ var largest_hp_hit: int = 0
 var energy: int = 0
 var heat: int = 0
 var heat_capacity: int = 10
-var equity: int = 0
-var temp_funds: int = 0            ## 本回合临时支付额度
 
 # --- 跨战永久 ---
 var permanent_damage_reduction: int = 0
@@ -65,7 +63,7 @@ func take_damage(amount: int) -> int:
 	var before_shield := block + persistent_block
 	var dmg: int = amount
 	if statuses.has("vulnerable"):
-		dmg = int(ceil(dmg * 1.5))
+		dmg = int(ceil(dmg * BattleBalance.f("vulnerable_mult", 1.5)))
 	if is_player:
 		dmg = max(0, dmg - permanent_damage_reduction - turn_damage_reduction - next_damage_reduction)
 		next_damage_reduction = 0
@@ -80,7 +78,7 @@ func take_damage(amount: int) -> int:
 		dmg -= persisted
 	# 放心：本回合受伤减半（向上取整，再减 1）
 	if is_player and turn_damage_halve and dmg > 0:
-		dmg = max(0, int(ceil(dmg / 2.0)) - 1)
+		dmg = max(0, int(ceil(dmg / BattleBalance.f("guard_divisor", 2.0))) - BattleBalance.i("guard_flat", 1))
 	# 心力：抵挡一次致命伤害（本次伤害不生效，保留当前生命）
 	if is_player and dmg > 0 and hp - dmg <= 0 and heart_power > 0:
 		heart_power -= 1

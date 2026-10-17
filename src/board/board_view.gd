@@ -3,6 +3,7 @@ class_name BoardView
 signal commit(path: Array)
 signal selection_changed(path: Array, glyphs: Array, word: WordData)
 signal tile_picked(pos: Vector2i)
+signal tile_inspected(pos: Vector2i)
 signal pick_cancelled
 
 var board: BoardState
@@ -157,6 +158,7 @@ func set_interactable(value: bool, dim := true) -> void:
 func _on_tile_pressed(pos: Vector2i) -> void:
 	if not _interactable:
 		return
+	tile_inspected.emit(pos)
 	if not pick_mode.is_empty():
 		if _valid_pick(pos):
 			pick_anchor = pos
@@ -335,7 +337,7 @@ func _valid_pick(pos: Vector2i) -> bool:
 	var cell: CharInstance = board.get_xy(pos)
 	match pick_mode:
 		"three":
-			if cell == null or cell.pinned or pick_selected.size() >= 3:
+			if cell == null or cell.pinned or pick_selected.size() >= BattleBalance.i("recast_target_count", 3):
 				return false
 			for chosen in pick_selected:
 				var inst := board.get_xy(chosen)

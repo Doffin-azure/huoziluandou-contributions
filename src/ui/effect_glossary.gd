@@ -12,7 +12,7 @@ const ENTRIES := {
 	"extra_use": ["额外使用", "每次有效使用先扣1次额外使用，字留在原格；额外次数耗尽后，再次使用才正常消耗原实体。不同来源的次数可以叠加。"],
 	"refined": ["精炼效果", "当次获得2次额外使用；本场该实体以后每次重新补入盘面，都恢复至少2次额外使用。仅移动或进入新回合不刷新，战后结束。"],
 	"pinned": ["固定", "本场留在原格，不能移动或换字；每回合最多有效使用1次，下回合恢复使用机会。"],
-	"gilded": ["镀金", "每枚镀金字参与有效多字词时获得1金币。原实体上的镀金跨战保留，临时复制不继承。"],
+	"gilded": ["镀金", "每枚镀金字每次有效单字或组词打出获得1金币。原实体上的镀金跨战保留，临时复制不继承。"],
 	"replay": ["效果重演", "即时效果额外结算1次，不重复消耗组成词的字块；金币、储能等费用仍须再付。持续能力的启用效果不重演。"],
 	"return": ["原格返回", "优先放回原来所在的格子，原格被占用则改放空格。回放只返回当前有空位容纳的原实体；重连在满盘时继续等待空位。"],
 	"vulnerable": ["易伤", "受到的伤害提高50%，向上取整。多层仍为50%增幅；敌方易伤在本场不按回合衰减。"],
@@ -23,12 +23,11 @@ const ENTRIES := {
 	"burn": ["灼烧", "在目标行动后造成伤害；放火持续2次行动，伤害按施放时热度记录，此后改变热度不改变这次灼烧。与字块的灼热污染不同。"],
 	"scorch": ["灼热污染", "字块上的污染标签。打出这枚字会使玩家受到灼热伤害；净化只移除污染标签，不改变所有权。"],
 	"overflow": ["溢热", "热度增加并超出热容时，会生成带灼热污染的【热】。相关能力只在实际新增污染时触发，抽到或移动旧的【热】不触发。"],
-	"funds": ["临时资金", "仅本回合可用的金币支付额度，支付时优先消耗；不是实际金币收入，未用完的回合结束清空。"],
 	"energy": ["储能", "本场可积累并跨回合保留的资源。写明消耗或支付时才扣除；仅按当前储能计算伤害的词不会自动消耗。"],
 	"capacity": ["热容", "容纳热度的阈值。超过热容的新增热度可能产生溢热污染，提高热容不会主动降低已有热度。"],
 	"non_attack": ["非攻击伤害", "不属于攻击，不享受力量或下一次攻击的强化；仍可被护盾吸收，并按受击目标的减伤与易伤结算。"],
 	"double_attack": ["超强翻倍", "下一次攻击的各段基础伤害、力量与热力加成翻倍。蓄力、连载、过火的追加伤害不随之翻倍；被护盾全挡也消耗机会。"],
-	"double_passive": ["可翻倍的被动收益", "只支持这些能力中首项可兑现的收益：加速、流转、能力、连载、蓄能、蓄热、复利、分利、过热、火热、电流过载、电能、心力、护甲。消耗与降温量不重复，没有实际收益时不消耗机会。"],
+	"double_passive": ["可翻倍的被动收益", "只支持这些能力中首项可兑现的收益：加速、流转、能力、连载、蓄能、蓄热、分利、过热、火热、电流过载、电能、心力、护甲。消耗与降温量不重复，没有实际收益时不消耗机会。"],
 	"formation": ["结阵", "之后打出的词先登记，点「发动」再按顺序结算。多词可以共享同一枚【击】；每个词的实时来源和资源按轮到它结算时的状态计算。"]
 }
 
@@ -41,19 +40,24 @@ const TERMS := {
 	"效果重演": "replay", "原格返回": "return", "易伤": "vulnerable", "心蚀": "corrosion",
 	"心力": "heart", "爆金": "bounty", "灼烧": "burn", "灼热污染": "scorch",
 	"再生": "regen",
-	"溢热": "overflow", "临时资金": "funds", "储能": "energy", "热容": "capacity",
+	"溢热": "overflow", "储能": "energy", "热容": "capacity",
 	"非攻击伤害": "non_attack", "超强翻倍": "double_attack", "被动收益": "double_passive",
 	"结阵": "formation"
 }
 
 static func brief(word: WordData) -> String:
-	return WordDescriptions.BRIEF_TEXT.get(word.word, word.describe())
+	return word.describe() if word.has_meta("balance_changed") else WordDescriptions.BRIEF_TEXT.get(word.word, word.describe())
 
 static func entry(meta: String) -> Dictionary:
 	if meta.begins_with("term:"):
 		var key := meta.trim_prefix("term:")
 		if ENTRIES.has(key):
-			return {"title": ENTRIES[key][0], "text": ENTRIES[key][1]}
+			var description: String = ENTRIES[key][1]
+			if key == "gilded": description = "每枚镀金字有效单打或组词时获得%d金币；原实体跨战保留。" % BattleBalance.i("gild_gold", 1)
+			elif key == "vulnerable": description = "受到的伤害乘以%s，向上取整；层数不改变倍率。" % BattleBalance.f("vulnerable_mult", 1.5)
+			elif key == "counter": description = "敌人行动结束后，反击伤害=剩余临时格挡+%d×反击层数。" % BattleBalance.i("counter_per_stack", 3)
+			elif key == "refined": description = "本场该实体重新入盘时恢复至少%d次额外使用。" % BattleBalance.i("refined_layers", 2)
+			return {"title": ENTRIES[key][0], "text": description}
 	elif meta.begins_with("word:"):
 		var word := Database.get_word_by_glyphs_string(meta.trim_prefix("word:"))
 		if word != null:

@@ -40,6 +40,10 @@ func reload() -> void:
 	acts.clear()
 	starter_decks.clear()
 	warnings.clear()
+	BattleBalance.load_configuration()
+	if not BattleBalance.warning.is_empty():
+		warnings.append(BattleBalance.warning)
+		push_warning(BattleBalance.warning)
 
 	for res in _load_dir(CHAR_DIR, "CharacterData"):
 		for effect in res.solo_effects:
@@ -61,9 +65,13 @@ func reload() -> void:
 		acts[res.index] = res
 	for res in _load_dir(DECK_DIR, "StarterDeckData"):
 		starter_decks[res.id] = res
+	var balance_warning := EnemyBalance.load_into(enemies, pollutions)
+	if not balance_warning.is_empty():
+		warnings.append(balance_warning)
+		push_warning(balance_warning)
 
 	if ResourceLoader.exists(RULES_PATH):
-		rules = load(RULES_PATH)
+		rules = BattleBalance.apply_resource(load(RULES_PATH))
 	if rules == null:
 		rules = BattleRules.default_rules()
 
@@ -88,7 +96,7 @@ func _load_dir(dir_path: String, _expect_class: String) -> Array:
 		if res == null:
 			warnings.append("无法加载: %s" % full)
 			continue
-		out.append(res)
+		out.append(BattleBalance.apply_resource(res))
 	return out
 
 

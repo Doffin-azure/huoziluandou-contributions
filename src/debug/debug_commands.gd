@@ -164,18 +164,6 @@ static func install() -> void:
 		b.player.energy = maxi(0, _int(a, 0, b.player.energy))
 		_refresh()
 		return ["储能 = %d" % b.player.energy])
-	register("equity", "设置股权", func(a):
-		var b := _battle()
-		if b == null: return _ck()
-		b.player.equity = maxi(0, _int(a, 0, b.player.equity))
-		_refresh()
-		return ["股权 = %d" % b.player.equity])
-	register("funds", "设置临时资金", func(a):
-		var b := _battle()
-		if b == null: return _ck()
-		b.player.temp_funds = maxi(0, _int(a, 0, b.player.temp_funds))
-		_refresh()
-		return ["临时资金 = %d" % b.player.temp_funds])
 	register("draw", "手动补字 N", func(a):
 		var b := _battle()
 		if b == null: return _ck()
@@ -421,17 +409,14 @@ static func install() -> void:
 		if cd == null: return ["用法：/clone 字"]
 		GameState.add_character(cd, 1)
 		_refresh(); return ["已复制【%s】" % g])
-	register("gild", "镀金字：/gild 字", func(a):
+	register("gild", "镀金一枚字：/gild 字", func(a):
 		var g := _glyph(a, 0)
-		var n := 0
 		for inst in GameState.deck:
-			if inst.glyph() == g:
-				inst.gilded = true; n += 1
-		var b := _battle()
-		if b != null:
-			for c in b.board.cells:
-				if c != null and c.glyph() == g: c.gilded = true
-		_refresh(); return ["镀金【%s】×%d" % [g, n]])
+			if inst.glyph() == g and not inst.gilded:
+				inst.gilded = true
+				_refresh()
+				return ["已镀金【%s】#%d" % [g, inst.uid]]
+		return ["没有该字形的未镀金实体"])
 
 	# ---- E. 词 / 字查询 ----
 	register("word", "查词：/word 击破", func(a):

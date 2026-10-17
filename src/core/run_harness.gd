@@ -278,8 +278,6 @@ func _end_battle() -> void:
 	GameState.player_hp = b.player.hp
 	if b.is_victory():
 		GameState.add_captured(b.captured_chars)
-		if b.player.equity > 0:
-			GameState.add_gold(b.player.equity)
 		GameState.settle_victory_economy()
 		_log("胜利：HP %d/%d，金 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold])
 		if node != null and node.type == MapNodeData.Type.BOSS:

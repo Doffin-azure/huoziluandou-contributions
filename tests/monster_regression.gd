@@ -173,8 +173,8 @@ func _energy_payment() -> void:
 	b.spend_energy(2); b.add_energy(8)
 	check(b.monster_net_energy == 2, "普通储能收益不抵消消费")
 	b = make("ink_creditor", "bill")
-	b.player.temp_funds = 5
-	check(EffectUtil.pay(b, 2) and b.monster_paid and intent(b).damage == 6, "临时资金正价支付有效")
+	GameState.gold = 5
+	check(EffectUtil.pay(b, 2) and b.monster_paid and intent(b).damage == 6, "普通金币正价支付有效")
 	b.enemies[0].block = 12; b._enemy_act(b.enemies[0])
 	check(b.enemies[0].block == 4, "催账最多拆8普通盾")
 	b = make("ink_creditor", "bill")

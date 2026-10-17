@@ -17,6 +17,8 @@ enum Kind { ATTACK, BLOCK, ATTACK_BLOCK, BUFF, DEBUFF, MULTI, INJECT, SPECIAL }
 @export var inject_count: int = 0
 ## 注入时附带的污染（PollutionData.id）：rush / block / scorch
 @export var pollution_id: String = ""
+## 空字符串沿用旧怪随机字；新怪显式指定可组词的字形。
+@export var inject_glyph: String = ""
 @export var heal: int = 0
 @export var mechanic_action: String = ""
 

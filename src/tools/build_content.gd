@@ -8,6 +8,7 @@ extends SceneTree
 ##
 ## 运行：godot --headless --script res://src/tools/build_content.gd
 
+const WordDescriptionsS := preload("res://src/data/word_descriptions.gd")
 const CharacterDataS := preload("res://src/data/character_data.gd")
 const EffectDataS := preload("res://src/data/effect_data.gd")
 const WordDataS := preload("res://src/data/word_data.gd")
@@ -101,8 +102,10 @@ func _build_pollutions() -> void:
 		 "desc": "打出附着刺痛的字时，失去 2 点生命。"},
 		{"id": "block", "name": "堵塞", "glyph": "堵", "hp": 0, "draw": 1, "color": "6b6354",
 		 "desc": "打出附着堵塞的字后，下一次正常补字数量 -1（一次性）。"},
+		{"id": "replicate", "name": "蔓生", "glyph": "连", "hp": 0, "draw": 0, "color": "59853d",
+		 "desc": "敌方【连】在注入后的下个玩家回合结束起，每枚仍在盘面的未净化实体每回合复制1枚；新复制的字本次不再复制，同一来源盘面最多4枚。可单打或组成连击、心连心消耗；净化停止复制。"},
 		{"id": "scorch", "name": "灼热", "glyph": "灼", "hp": 1, "draw": 0, "color": "b0522e",
-		 "desc": "自我过热生成的【热】带有灼热，打出时失去 1 点生命；本场循环，战后清除。"},
+		 "desc": "打出附着灼热的字时失去1点生命。敌方注入的字消耗后消失；自我过热生成的【热】在本场循环，战后清除。净化可免除污染代价。"},
 	]
 	for d in defs:
 		var p: PollutionData = PollutionDataS.new()
@@ -211,7 +214,7 @@ func _solo_spec(glyph: String) -> Dictionary:
 		# 下一批（复合 / 独立定位）
 		"充": return {"effects": [{"h": "energy", "a": 1, "note": "储能 +1"}, {"h": "draw_bonus_next", "a": 1, "note": "下回合多补 1 字"}], "note": "储能 +1，下回合多补 1 字"}
 		"爆": return {"effects": [{"h": "damage", "a": 2, "note": "造成 2 伤害"}, {"h": "heat", "a": 1, "note": "热度 +1"}], "note": "造成 2 伤，热度 +1"}
-		"资": return {"h": "temp_funds", "a": 2, "note": "获得 2 点临时资金（本回合有效）"}
+		"资": return {"h": "gold", "a": 2, "note": "获得 2 点金币"}
 		"收": return {"h": "draw_excluding_source", "a": 1, "note": "随机补 1 字，排除本次打出的实体；没有其他可补字时不补"}
 		"障": return {"h": "block_temp", "a": 2, "note": "获得 2 点临时格挡"}
 		"合": return {"h": "combine_next_word", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次成功组词后，获得 2 点临时格挡和 1 点储能，仅一次"}
@@ -380,7 +383,7 @@ func _build_words_from_ledger() -> void:
 		w.word = word
 		w.glyphs = glyphs
 		w.group = GROUP_OVERRIDES.get(word, row[3])
-		w.interaction = INTERACTIONS.get(word, "")
+		w.interaction = "choose_glyph_gild" if word in ["投资", "再投资", "复利投资"] else INTERACTIONS.get(word, "")
 		w.design_stage = row[4]
 		w.effect_summary = row[5]
 		w.priority = row[11]
@@ -392,6 +395,9 @@ func _build_words_from_ledger() -> void:
 			w.description = spec.desc
 			w.effect_summary = spec.desc
 			w.interaction = spec.interaction
+		if word in ["资金", "投资", "再投资", "复利投资", "复利", "利息", "炼金", "纯金", "投币", "合资"] and WordDescriptionsS.TEXT.has(word):
+			w.description = WordDescriptionsS.TEXT[word]
+			w.effect_summary = w.description
 		w.effects = _teffects(effects_list)
 		w.implemented = not effects_list.is_empty()
 		w.rarity = 1
@@ -451,7 +457,7 @@ func _build_extra_words() -> void:
 
 	# 精金：永久镀金
 	_save(_extra("extra_jinjin", "精金", ["精", "金"], "经济", "choose_glyph_gild",
-		"选择一枚己方实体字，将其永久镀金；此后它每次参与有效多字词获得 1 金币",
+		"选择一枚己方实体字，将其永久镀金；此后它每次单字或组词打出获得1金币",
 		ContentBuild.e("gild_glyph", 0, -1, "", "选择一枚己方字永久镀金", {})),
 		"%s/words/extra_jinjin.tres" % RES)
 

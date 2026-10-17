@@ -10,18 +10,18 @@ amount = 5
 args = {
 "max": 3
 }
-note = "自动支付最多3点可用费用，造成一次5×支付额的基础伤害；临时资金优先支付。"
+note = "支付最多3金币，对目标造成支付额×5的基础伤害。"
 
 [resource]
 script = ExtResource("2_fdbhv")
 id = "w069"
 word = "投币"
 glyphs = Array[String](["投", "币"])
-description = "自动支付最多3点可用费用，造成一次5×支付额的基础伤害；临时资金优先支付。"
+description = "支付最多3金币，对目标造成支付额×5的基础伤害。"
 effects = Array[ExtResource("1_r30gb")]([SubResource("Resource_xqhv5")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "自动支付最多3点可用费用，造成一次5×支付额的基础伤害；临时资金优先支付。"
+effect_summary = "支付最多3金币，对目标造成支付额×5的基础伤害。"
 effect_handler_id = "spend_gold_damage"
 p25_implemented = true
 implementation_delta = "—"

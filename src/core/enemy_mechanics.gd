@@ -5,6 +5,9 @@ class_name EnemyMechanics
 static func data(e: Combatant) -> Dictionary:
 	return e.status_data.get("monster", {})
 
+static func parameter(e: Combatant, key: String) -> int:
+	return int(e.enemy_data.tuning.get(key, 0))
+
 static func real_card(c: CharInstance) -> bool:
 	return c != null and c.is_player_owned() and not c.temporary
 
@@ -13,7 +16,7 @@ static func pos(b: BattleState, c: CharInstance) -> Vector2i:
 	return b.board.to_xy(i) if i >= 0 else Vector2i(-1, -1)
 
 static func phase(e: Combatant) -> int:
-	return 2 if e.hp * 2 <= e.max_hp else 1
+	return 2 if e.hp * 100 <= e.max_hp * int(e.enemy_data.tuning.get("phase_percent", 50)) else 1
 
 static func begin_phase(b: BattleState) -> void:
 	for e in b.alive_enemies():
@@ -28,7 +31,7 @@ static func begin_phase(b: BattleState) -> void:
 		var candidates: Array = b.board.cells.filter(func(c): return real_card(c) and not c.pinned)
 		match action:
 			"fold", "proof":
-				var limit := 1 if action == "fold" else 2
+				var limit := 1 if action == "fold" else parameter(e, "target_count")
 				for i in mini(limit, candidates.size()):
 					var c: CharInstance = candidates.pop_at(b.rng.randi_range(0, candidates.size() - 1))
 					d.targets.append(c)
@@ -54,7 +57,7 @@ static func begin_phase(b: BattleState) -> void:
 					if not row.is_empty(): rows.append(row)
 				if not rows.is_empty():
 					var row: Array = rows[b.rng.randi_range(0, rows.size() - 1)]
-					d.targets = row.slice(0, 3 if phase(e) == 1 else 4)
+					d.targets = row.slice(0, parameter(e, "target_count") if phase(e) == 1 else parameter(e, "phase2_target_count"))
 					for c in d.targets: d.origins.append(pos(b, c))
 			"bomb", "seal":
 				var anchor := Vector2i(b.rng.randi_range(0, b.board.size - 2), b.rng.randi_range(0, b.board.size - 2))
@@ -91,13 +94,13 @@ static func update_targets(b: BattleState, e: Combatant, word: WordData = null, 
 		var moved: bool = action == "proof" and i == 1 and pos(b, c) != d.origins[i]
 		if (used or left or moved) and not d.used.has(c.uid):
 			d.used[c.uid] = true
-			if used and multi: reward(b, e, "sign%d" % i, 3)
+			if used and multi: reward(b, e, "sign%d" % i, parameter(e, "reward"))
 	if action == "pair" and d.targets.size() == 2 and not d.done:
 		var a: CharInstance = d.targets[0]
 		var c: CharInstance = d.targets[1]
 		if (pos(b, a) == d.origins[1] and pos(b, c) == d.origins[0]) or (multi and instances.has(a) and instances.has(c)):
 			d.done = true
-			reward(b, e, "pair", 5)
+			reward(b, e, "pair", parameter(e, "reward"))
 
 static func on_play(b: BattleState, word: WordData, instances: Array, consumed: Array, entered_before: Dictionary) -> void:
 	for e in b.alive_enemies():
@@ -116,15 +119,15 @@ static func on_play(b: BattleState, word: WordData, instances: Array, consumed: 
 					d.used[c.uid] = int(d.used.get(c.uid, 0)) + 1 if e.enemy_data.mechanic == "wheel" else d.used.get(c.uid, 0)
 					if e.enemy_data.mechanic == "nest" and entered_before.has(c.uid) and not d.done:
 						d.done = true
-						e.remove_block(6)
-					if e.enemy_data.mechanic == "wheel" and int(d.used[c.uid]) >= 2:
+						e.remove_block(parameter(e, "break_block"))
+					if e.enemy_data.mechanic == "wheel" and int(d.used[c.uid]) >= parameter(e, "required_uses"):
 						d.done = true
-						reward(b, e, "wheel", 8)
+						reward(b, e, "wheel", parameter(e, "reward"))
 		if e.enemy_data.mechanic == "glutton" and not d.stomach.is_empty():
 			var material_count := 0
 			for item in consumed:
 				if item.kind == "real" and not item.get("shared", false): material_count += 1
-			if e.largest_hp_hit >= 10 or (multi and material_count >= 3):
+			if e.largest_hp_hit >= parameter(e, "release_hit") or (multi and material_count >= parameter(e, "release_material")):
 				var rescued: CharInstance = d.stomach.pop_front()
 				b.bag.append(rescued)
 				b._log("饕餮：吐回【%s】至袋顶" % rescued.glyph())
@@ -133,13 +136,13 @@ static func on_play(b: BattleState, word: WordData, instances: Array, consumed: 
 static func task_done(b: BattleState, e: Combatant, action: String) -> bool:
 	var d := data(e)
 	match action:
-		"arc": return b.monster_net_energy >= 2
+		"arc": return b.monster_net_energy >= parameter(e, "energy_required")
 		"bill": return b.monster_paid
 		"nest", "wheel", "pair": return bool(d.get("done", false))
-		"different": return d.get("words", {}).size() >= 2
+		"different": return d.get("words", {}).size() >= parameter(e, "distinct_required")
 		"repeat":
 			for count in d.get("words", {}).values():
-				if int(count) >= 2: return true
+				if int(count) >= parameter(e, "repeat_required"): return true
 	return false
 
 static func unresolved(b: BattleState, e: Combatant, action: String) -> int:
@@ -163,41 +166,44 @@ static func preview(b: BattleState, e: Combatant) -> EnemyMoveData:
 	match action:
 		"gravity": mv.description += "\n全盘向左压缩，固定字不移动。"
 		"rotate": mv.description += "\n中央2×2顺时针旋转；遇固定字整次跳过。"
-		"fold": mv.damage = 8 if unresolved(b, e, action) > 0 else 5
+		"fold": mv.damage = base.damage if unresolved(b, e, action) > 0 else parameter(e, "resolved_damage")
 		"blank": pass
-		"belly": mv.damage = 10 + mini(3, d.get("stomach", []).size())
-		"heat6", "heat8": mv.damage += 4 if b.player.heat >= 8 else 0
-		"arc", "bill": mv.damage = 6 if task_done(b, e, action) else 10
+		"corrode":
+			mv.kind = EnemyMoveData.Kind.INJECT
+		"belly": mv.damage = base.damage + mini(parameter(e, "belly_bonus_cap"), d.get("stomach", []).size())
+		"heat6", "heat8":
+			mv.damage += parameter(e, "heat_bonus") if b.player.heat >= parameter(e, "heat_threshold") else 0
+		"arc", "bill": mv.damage = parameter(e, "resolved_damage") if task_done(b, e, action) else base.damage
 		"pair":
-			mv.damage = 12
-			if d.get("targets", []).size() < 2: mv.damage = 9
-			elif task_done(b, e, action): mv.damage = 7
-			elif d.targets.any(func(c): return pos(b, c).x < 0): mv.damage = 9
-		"nest": mv.damage = 7 if task_done(b, e, action) else 11
-		"wheel": mv.damage = 8 if task_done(b, e, action) else 14
+			mv.damage = base.damage
+			if d.get("targets", []).size() < 2: mv.damage = parameter(e, "partial_damage")
+			elif task_done(b, e, action): mv.damage = parameter(e, "resolved_damage")
+			elif d.targets.any(func(c): return pos(b, c).x < 0): mv.damage = parameter(e, "partial_damage")
+		"nest": mv.damage = parameter(e, "resolved_damage") if task_done(b, e, action) else base.damage
+		"wheel": mv.damage = parameter(e, "resolved_damage") if task_done(b, e, action) else base.damage
 		"seal":
-			mv.damage = 8
+			mv.damage = base.damage
 			for cell in d.get("cells", []):
-				if b.board.get_xy(cell) != null: mv.damage += 2
-		"proof": mv.damage = (10 if second else 8) + 2 * unresolved(b, e, action)
-		"rail": mv.damage = (12 if second else 10) + 2 * unresolved(b, e, action)
-		"different", "repeat": mv.damage = (10 if second else 8) if task_done(b, e, action) else (14 if second else 12)
-		"proof_shield": mv.block = 8 if second else 6
-		"rail_shield": mv.block = 10 if second else 8
-		"boss_multi": mv.damage = 7 if second else 6
+				if b.board.get_xy(cell) != null: mv.damage += parameter(e, "occupied_bonus")
+		"proof": mv.damage = (parameter(e, "phase2_damage") if second else base.damage) + parameter(e, "unresolved_bonus") * unresolved(b, e, action)
+		"rail": mv.damage = (parameter(e, "phase2_damage") if second else base.damage) + parameter(e, "unresolved_bonus") * unresolved(b, e, action)
+		"different", "repeat": mv.damage = (parameter(e, "phase2_resolved_damage") if second else parameter(e, "resolved_damage")) if task_done(b, e, action) else (parameter(e, "phase2_damage") if second else base.damage)
+		"proof_shield": mv.block = parameter(e, "phase2_block") if second else base.block
+		"rail_shield": mv.block = parameter(e, "phase2_block") if second else base.block
+		"boss_multi": mv.damage = parameter(e, "phase2_multi_damage") if second else base.damage
 		"copy":
+			mv.inject_count = 0 # 只有空间分支塞字，其他分支不会继承配置里的数量。
 			var word: WordData = d.get("last_word")
 			var category := copy_category(word)
 			if category == "attack":
-				mv.kind = EnemyMoveData.Kind.ATTACK
-				mv.damage = 10
+				mv.kind = EnemyMoveData.Kind.MULTI if mv.hits > 1 else EnemyMoveData.Kind.ATTACK
+				mv.damage = parameter(e, "attack_damage")
 			elif category == "space":
 				mv.kind = EnemyMoveData.Kind.INJECT
-				mv.inject_count = 1
-				mv.pollution_id = "block"
+				mv.inject_count = base.inject_count
 			else:
 				mv.kind = EnemyMoveData.Kind.BLOCK
-				mv.block = {"defense": 8, "economy": 6, "other": 3}[category]
+				mv.block = parameter(e, category + "_block")
 	mv.description += "\n" + task_text(b, e)
 	return mv
 
@@ -221,46 +227,26 @@ static func before_action(b: BattleState, e: Combatant, mv: EnemyMoveData) -> vo
 	e.status_data.attack_hp_before = b.player.hp
 	var d := data(e)
 	if action in ["arc", "bill"] and task_done(b, e, action):
-		e.remove_block(8 if action == "bill" else 6)
+		e.remove_block(parameter(e, "break_block"))
 	if action == "blank":
-		if b.board.free_count() >= 3: reward(b, e, "blank", 3)
-		else: e.add_block(4)
-	if action in ["different", "repeat"] and task_done(b, e, action): reward(b, e, action, 6)
+		if b.board.free_count() >= parameter(e, "empty_required"): reward(b, e, "blank", parameter(e, "reward"))
+		else: e.add_block(parameter(e, "shield_gain"))
+	if action in ["different", "repeat"] and task_done(b, e, action): reward(b, e, action, parameter(e, "reward"))
 
 static func special(b: BattleState, e: Combatant, mv: EnemyMoveData) -> void:
 	var d := data(e)
 	match mv.mechanic_action:
-		"refill8": e.add_block(maxi(0, 8 - e.block))
+		"refill8": e.add_block(maxi(0, parameter(e, "shield_target") - e.block))
 		"gravity":
 			if not blocked_interference(b): b.apply_gravity_left()
 		"rotate":
 			if not blocked_interference(b): b.rotate_2x2(Vector2i((b.board.size - 2) / 2, (b.board.size - 2) / 2))
-		"corrode":
-			var existing := b.board.cells.filter(func(c): return c != null and c.statuses.get("injected_by", -1) == e.get_instance_id()).size()
-			var count := mini(2, 3 - existing)
-			if count > 0 and not blocked_interference(b):
-				var guard := mini(count, b.ability_value("guard_inject"))
-				count -= guard
-				if guard > 0:
-					var left := b.ability_value("guard_inject") - guard
-					if left > 0: b.abilities["guard_inject"] = left
-					else: b.abilities.erase("guard_inject")
-				for i in count:
-					var empty := b.board.empty_indices()
-					if empty.is_empty(): break
-					var c := CharInstance.new(Database.get_character_by_glyph("蚀"))
-					c.owner = CharInstance.Owner.ENEMY
-					c.add_pollution("rush")
-					c.statuses.injected_by = e.get_instance_id()
-					b.board.set_xy(empty[b.rng.randi_range(0, empty.size() - 1)], c)
-					b.temp_chars.append(c)
-					if b.has_ability("inject_bounty"): b.earn_gold(2)
 		"swallow":
-			if d.stomach.size() < 3 and not d.targets.is_empty() and b.discard.has(d.targets[0]):
+			if d.stomach.size() < parameter(e, "stomach_capacity") and not d.targets.is_empty() and b.discard.has(d.targets[0]):
 				var c: CharInstance = d.targets[0]
 				b.discard.erase(c)
 				d.stomach.append(c)
-				e.add_block(4)
+				e.add_block(parameter(e, "swallow_block"))
 		"flip":
 			var pairs: Array = []
 			var candidates: Array = b.board.cells.filter(func(c): return real_card(c) and not c.pinned)
@@ -270,10 +256,53 @@ static func special(b: BattleState, e: Combatant, mv: EnemyMoveData) -> void:
 			e.status_data.prepared_pair = [] if pairs.is_empty() else pairs[b.rng.randi_range(0,pairs.size()-1)]
 			e.status_data.prepared_origins = []
 			for c in e.status_data.prepared_pair: e.status_data.prepared_origins.append(pos(b,c))
-			if pairs.is_empty(): e.add_block(4)
+			if pairs.is_empty(): e.add_block(parameter(e, "empty_block"))
 
-		"bomb_mark": e.add_block(maxi(0, 6 - e.block))
+		"bomb_mark": e.add_block(maxi(0, parameter(e, "mark_block") - e.block))
 	b._log("%s：%s" % [e.display_name, mv.title])
+
+## 所有指定塞字共用防护、护、加收与空格检查；同源字限制仅计算盘面实体。
+static func injected_count(b: BattleState, source_id: int, glyph: String) -> int:
+	return b.board.cells.filter(func(c): return c != null and c.is_enemy_owned() and c.glyph() == glyph and c.statuses.get("injected_by", -1) == source_id).size()
+
+static func inject_move(b: BattleState, e: Combatant, mv: EnemyMoveData) -> int:
+	var count := mv.inject_count
+	var cap := parameter(e, "inject_cap")
+	if cap > 0: count = mini(count, maxi(0, cap - injected_count(b, e.get_instance_id(), mv.inject_glyph)))
+	if count <= 0 or b.board.free_count() <= 0: return 0
+	var before := b.temp_chars.size()
+	var added := b.inject_enemy_glyphs(count, mv.pollution_id, mv.inject_glyph, e.get_instance_id())
+	for c in b.temp_chars.slice(before):
+		c.statuses.inject_cap = cap
+		c.statuses.replicate_count = parameter(e, "replicate_count")
+		c.statuses.replicate_delay = parameter(e, "replicate_delay")
+	return added
+
+## 玩家完整获得一个操作阶段后，未净化的连在回合结束复制；按快照分批，子代不在本次继续繁殖。
+static func replicate_glyphs(b: BattleState) -> void:
+	if b.is_over(): return
+	var waves := {}
+	for c in b.board.cells.duplicate():
+		if c == null or not c.is_enemy_owned() or not c.has_pollution("replicate"): continue
+		var delay: int = maxi(1, int(c.statuses.get("replicate_delay", 1)))
+		if b.turn - int(c.statuses.get("injected_turn", b.turn)) < delay: continue
+		if int(c.statuses.get("replicated_turn", -1)) == b.turn: continue
+		c.statuses.replicated_turn = b.turn
+		var source_id: int = c.statuses.get("injected_by", -1)
+		var wave: Dictionary = waves.get(source_id, {"count": 0, "parent": c})
+		wave.count += int(c.statuses.get("replicate_count", 1))
+		waves[source_id] = wave
+	for source_id in waves:
+		var parent: CharInstance = waves[source_id].parent
+		var cap: int = int(parent.statuses.get("inject_cap", 4))
+		var count := mini(int(waves[source_id].count), maxi(0, cap - injected_count(b, source_id, parent.glyph())))
+		if count <= 0 or b.board.free_count() <= 0: continue
+		var before := b.temp_chars.size()
+		var added := b.inject_enemy_glyphs(count, "replicate", parent.glyph(), source_id)
+		for c in b.temp_chars.slice(before):
+			for key in ["inject_cap", "replicate_count", "replicate_delay"]:
+				c.statuses[key] = parent.statuses.get(key, 1)
+		b._log("蔓生【%s】：复制%d枚，同源盘面上限%d；单打、组词或净化可阻止复制" % [parent.glyph(), added, cap])
 
 static func blocked_interference(b: BattleState) -> bool:
 	if not b.has_ability("prevent_interference"): return false
@@ -284,13 +313,13 @@ static func blocked_interference(b: BattleState) -> bool:
 static func after_action(b: BattleState, e: Combatant, mv: EnemyMoveData) -> void:
 	if e.enemy_data.mechanic.is_empty(): return
 	var action := mv.mechanic_action
-	if action in ["heat6", "heat8"] and b.player.is_alive() and e.is_alive(): b.add_heat(2)
+	if action in ["heat6", "heat8"] and b.player.is_alive() and e.is_alive(): b.add_heat(parameter(e, "heat_gain"))
 	if action == "leech" and b.player.is_alive() and e.is_alive():
 		# 吸能只认这一完整攻击实际造成的生命减少，心力免死/精分不触发。
 		if int(e.status_data.get("attack_hp_before", b.player.hp)) > b.player.hp:
-			var stolen := mini(2, b.player.energy)
+			var stolen := mini(parameter(e, "steal"), b.player.energy)
 			b.player.energy -= stolen
-			e.add_block(mini(stolen * 2, maxi(0, 8 - e.block)))
+			e.add_block(mini(stolen * parameter(e, "shield_per_energy"), maxi(0, parameter(e, "shield_cap") - e.block)))
 	if action == "bomb" and e.is_alive() and b.player.is_alive() and not blocked_interference(b):
 		for cell in data(e).get("cells", []):
 			var c: CharInstance = b.board.get_xy(cell)
@@ -298,12 +327,12 @@ static func after_action(b: BattleState, e: Combatant, mv: EnemyMoveData) -> voi
 			if real_card(c):
 				if b.has_ability("blastproof"):
 					b.bag.append(c)
-					b.player.add_persistent_block(1)
+					b.player.add_persistent_block(parameter(e, "protect_block"))
 				else: b.discard.append(c)
 			else: b.temp_chars.erase(c)
 			b.board.clear_xy(cell)
-	if action == "rail" and e.is_alive() and not data(e).get("targets", []).is_empty() and unresolved(b, e, "rail") == 0: e.remove_block(8)
-	if action in ["different", "repeat"] and e.is_alive() and b.player.is_alive() and not task_done(b, e, action): e.add_block(8 if phase(e) == 2 else 6)
+	if action == "rail" and e.is_alive() and not data(e).get("targets", []).is_empty() and unresolved(b, e, "rail") == 0: e.remove_block(parameter(e, "clear_break"))
+	if action in ["different", "repeat"] and e.is_alive() and b.player.is_alive() and not task_done(b, e, action): e.add_block(parameter(e, "phase2_fail_block") if phase(e) == 2 else parameter(e, "fail_block"))
 
 static func release_dead(b: BattleState) -> void:
 	for e in b.enemies:
@@ -323,7 +352,7 @@ static func task_text(b: BattleState, e: Combatant) -> String:
 	var extra := "；".join(targets)
 	var progress := ""
 	match e.enemy_data.mechanic:
-		"charge": progress = "本阶段储能净消费：%d / 2" % b.monster_net_energy
+		"charge": progress = "本阶段储能净消费：%d / %d" % [b.monster_net_energy, parameter(e, "energy_required")]
 		"credit": progress = "正价支付：" + ("已完成" if b.monster_paid else "未完成")
 		"nest", "wheel", "pair": progress = "任务：" + ("已完成" if d.get("done", false) else "未完成")
 		"compiler":
@@ -333,6 +362,7 @@ static func task_text(b: BattleState, e: Combatant) -> String:
 static func markers(b: BattleState) -> Array:
 	var out: Array = []
 	for e in b.alive_enemies():
+		var first_marker := out.size()
 		var d := data(e)
 		if e.enemy_data != null and not e.enemy_data.moves.is_empty() and e.enemy_data.moves[e.move_index % e.enemy_data.moves.size()].mechanic_action == "rotate":
 			var anchor := Vector2i((b.board.size - 2) / 2, (b.board.size - 2) / 2)
@@ -341,4 +371,7 @@ static func markers(b: BattleState) -> Array:
 			var cell := pos(b, d.targets[i])
 			if cell.x >= 0 and not (e.enemy_data.mechanic in ["fold", "proof"] and d.used.has(d.targets[i].uid)): out.append({"cell": cell, "label": "红" if e.enemy_data.mechanic == "proof" and i == 0 else ("蓝" if e.enemy_data.mechanic == "proof" else "签")})
 		for cell in d.get("cells", []): out.append({"cell": cell, "label": "爆" if e.enemy_data.mechanic == "bomb" else "印"})
+		for index in range(first_marker, out.size()):
+			out[index]["source"] = e.display_name
+			out[index]["description"] = task_text(b, e)
 	return out

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PollutionData" format=3]
+
+[ext_resource type="Script" path="res://src/data/pollution_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "replicate"
+name = "蔓生"
+glyph = "连"
+description = "敌方【连】在注入后的下个玩家回合结束起，每枚仍在盘面的未净化实体每回合复制1枚；新复制的字本次不再复制，同一来源盘面最多4枚。可单打或组成连击、心连心消耗；净化停止复制。"
+color = Color(0.35, 0.52, 0.24, 1)

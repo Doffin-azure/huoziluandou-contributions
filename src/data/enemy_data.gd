@@ -11,6 +11,8 @@ class_name EnemyData
 @export var initial_block: int = 0
 ## 精选怪物机制标识；空值使用旧版行动。
 @export var mechanic: String = ""
+## 策划配置在数据库加载时填入，各怪物数值独立。
+@export var tuning: Dictionary = {}
 @export var act: int = 1
 @export var accent: Color = Color("7a3b3b")
 ## 行动循环。会按顺序循环释放，长度可不等。

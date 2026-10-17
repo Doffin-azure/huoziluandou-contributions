@@ -43,10 +43,10 @@ static func _active_triggers(effects: Array, b: BattleState, word: WordData = nu
 			lines.append("连：本词成功后额外补%d字，仅一次。" % b.ability_value("link_draw_once"))
 		if b.has_ability("combine_word_once"):
 			var count := b.ability_value("combine_word_once")
-			lines.append("合：本词成功后获得%d临挡、%d储能，仅一次。" % [2 * count, count])
+			lines.append("合：本词成功后获得%d临挡、%d储能，仅一次。" % [BattleBalance.i("combine_block", 2) * count, BattleBalance.i("combine_energy", 1) * count])
 		if b.has_ability("speed_word_once"):
 			var count := b.ability_value("speed_word_once")
-			lines.append("速：本词成功后补%d字、热度+%d，仅一次。" % [2 * count, count])
+			lines.append("速：本词成功后补%d字、热度+%d，仅一次。" % [BattleBalance.i("speed_draw", 2) * count, BattleBalance.i("speed_heat", 1) * count])
 		if b.has_ability("repeat_zero"):
 			lines.append("反复：本词将生成【%s】的整套临时字，随机放入空格。" % word.word)
 		if b.has_ability("next_free_word"):
@@ -101,7 +101,7 @@ static func replayable(b: BattleState) -> Array:
 static func refundable(b: BattleState) -> int:
 	if b.last_energy_spent <= 0 or b.last_energy_half_claimed:
 		return 0
-	return maxi(0, int(ceil(b.last_energy_spent / 2.0)) - b.last_energy_refunded)
+	return maxi(0, int(ceil(b.last_energy_spent / BattleBalance.f("refund_divisor", 2.0))) - b.last_energy_refunded)
 
 static func _current(effects: Array, b: BattleState, path: Array, target: Dictionary) -> String:
 	var lines: Array[String] = []
@@ -156,13 +156,13 @@ static func _effect(e: EffectData, b: BattleState, path: Array, target: Dictiona
 		"energy_to_heat_damage":
 			return "%d储能，对应+%d热度、一次%d基础伤害。" % [energy, energy, energy * int(e.args.get("per", 2))]
 		"energy_to_heat_block":
-			return "%d储能，对应+%d热度、%d临时格挡。" % [energy, energy, energy * 3]
+			return "%d储能，对应+%d热度、%d临时格挡。" % [energy, energy, energy * BattleBalance.i("energy_heat_block_mult", 3)]
 		"heat_to_energy":
 			return "%d热度，可转为%d储能。" % [heat, heat]
 		"heat_to_energy_damage":
-			return "%d热度，可转为%d储能，基础伤害5。" % [heat, int(heat / 2)]
+			return "%d热度，可转为%d储能，基础伤害%d。" % [heat, int(heat / BattleBalance.i("fire_electric_divisor", 2)), BattleBalance.i("fire_electric_damage", 5)]
 		"heat_to_persist_block", "suspend":
-			return "%d热度，对应%d持久盾。" % [heat, heat * 2]
+			return "%d热度，对应%d持久盾。" % [heat, heat * BattleBalance.i("heat_block_mult", 2)]
 		"electric_strike":
 			return "%d储能，对应一次%d基础伤害，不消耗储能。" % [energy, e.amount + energy * int(e.args.get("per", 2))]
 		"fire_power":
@@ -178,12 +178,8 @@ static func _effect(e: EffectData, b: BattleState, path: Array, target: Dictiona
 			var shield := b.player.persistent_block
 			var bonus := int(floor(shield / float(maxi(1, int(e.args.get("per", 2)))))) * int(e.args.get("bonus", 3))
 			return "现有%d持久盾，将全部消耗，对应一次%d基础伤害。" % [shield, e.amount + bonus]
-		"alchemy":
-			return "现有%d股权，对应获得%d金币、补至多%d字；消耗全部股权。" % [b.player.equity, b.player.equity * int(e.args.get("per", 3)), b.player.equity]
 		"permanent_damage_reduction":
 			return "本局已获得永久减伤，重复施放不叠加。" if GameState.permanent_damage_reduction > 0 else "本局尚未获得永久减伤，首次打出后从下一场战斗生效。"
-		"permanent_gold_growth":
-			return "本局胜利金币增长已启用，重复施放不叠加。" if GameState.gold_growth_percent > 0 else "本次首次启用，当前这场胜利即可享受金币增长。"
 		"heat_to_damage_flow":
 			var cooled := mini(heat, mini(int(e.args.get("max", 4)), b.drawn_this_turn))
 			return "本回合已补%d字、现有%d热度，可降%d热，对应%d基础伤害。" % [b.drawn_this_turn, heat, cooled, cooled * e.amount]
@@ -192,16 +188,16 @@ static func _effect(e: EffectData, b: BattleState, path: Array, target: Dictiona
 		"conditional_draw_after_attack":
 			return "本回合此前已有攻击词，满足额外补字条件。" if b.attack_words_this_turn > 0 else "本回合此前没有攻击词，不额外补字。"
 		"conditional_draw_half_hp":
-			var low := b.player.hp * 2 < b.player.max_hp
+			var low := b.player.hp * BattleBalance.i("hp_half_divisor", 2) < b.player.max_hp
 			return "生命%d/%d，本次补%d字。" % [b.player.hp, b.player.max_hp, int(e.args.get("low", e.amount)) if low else int(e.args.get("high", 1))]
 		"profit_if_earned":
 			return "本回合已获得%d金币，满足额外获得%d金币的条件。" % [b.gold_earned_this_turn, e.amount] if b.gold_earned_this_turn > 0 else "本回合此前未获得金币，本次无金币收益。"
 		"rest_cool":
-			return "本回合尚未使敌人掉血，本次可回复1生命。" if b.damage_dealt_this_turn <= 0 else "本回合已使敌人掉血，本次只降温、不回复生命。"
+			return "本回合尚未使敌人掉血，本次可回复%d生命。" % BattleBalance.i("rest_heal", 1) if b.damage_dealt_this_turn <= 0 else "本回合已使敌人掉血，本次只降温、不回复生命。"
 		"heat_to_energy_solo":
 			return "现有%d热度，可消耗%d热度换%d储能。" % [heat, int(e.args.get("heat_cost", 2)), e.amount] if heat >= int(e.args.get("heat_cost", 2)) else "现有%d热度，不足%d，本次只弃掉原字。" % [heat, int(e.args.get("heat_cost", 2))]
 		"solo_release":
-			return "现有%d储能，可选择免费2基础伤害，或消耗1储能打8基础伤害。" % energy if energy > 0 else "没有储能，本次免费造成2基础伤害。"
+			return "现有%d储能，可选择免费%d基础伤害，或消耗%d储能打%d基础伤害。" % [energy, e.amount, BattleBalance.i("release_cost", 1), BattleBalance.i("release_damage", 8)] if energy >= BattleBalance.i("release_cost", 1) else "储能不足，本次免费造成%d基础伤害。" % e.amount
 		"precision_draw", "buy_bag_solo":
 			var source := b.board.get_xy(path[0]) if not path.is_empty() else null
 			var candidates := b.solo_bag_candidates(source)
@@ -212,18 +208,18 @@ static func _effect(e: EffectData, b: BattleState, path: Array, target: Dictiona
 			if existing > 0:
 				var total := existing + e.amount
 				if e.handler == "combine_next_word":
-					return "已有合效果，本次叠加后，下一词获得%d临挡、%d储能，仅触发一次。" % [2 * total, total]
+					return "已有合效果，本次叠加后，下一词获得%d临挡、%d储能，仅触发一次。" % [BattleBalance.i("combine_block", 2) * total, BattleBalance.i("combine_energy", 1) * total]
 				if e.handler == "speed_next_word":
-					return "已有速效果，本次叠加后，下一词补%d字、热度+%d，仅触发一次。" % [2 * total, total]
+					return "已有速效果，本次叠加后，下一词补%d字、热度+%d，仅触发一次。" % [BattleBalance.i("speed_draw", 2) * total, BattleBalance.i("speed_heat", 1) * total]
 				var labels := {"energy_refund_once": "返还储能", "force_once": "整次攻击追加伤害", "energy_gain_once": "额外储能", "link_next_word": "补字", "solo_gain_once": "单字首项收益加成"}
 				return "已有待用%s%d，本次叠加后为%d；下次触发时一次结算。" % [labels[e.handler], existing, total]
 		"spend_gold_damage":
 			var payment := mini(EffectUtil.available(b), int(e.args.get("max", 3)))
 			return "按%d点原费用计伤，优惠后实际支付%d，基础伤害%d。" % [payment, EffectUtil.discounted_cost(b, payment), payment * e.amount]
 		"serial":
-			return "本场已累计%d次词，距离下次奖励还需%d次（含本次）。" % [b.serial_words, 3 - b.serial_words % 3]
+			return "本场已累计%d次词，距离下次奖励还需%d次（含本次）。" % [b.serial_words, BattleBalance.i("serial_interval", 3) - b.serial_words % BattleBalance.i("serial_interval", 3)]
 		"ability_strong_heart":
-			return "本场心力已挡下%d次致命伤，下回合开始可回复%d生命。" % [b.player.heart_power_triggered, 2 + b.player.heart_power_triggered]
+			return "本场心力已挡下%d次致命伤，下回合开始可回复%d生命。" % [b.player.heart_power_triggered, BattleBalance.i("strong_heart_base", 2) + BattleBalance.i("heart_trigger_heal", 1) * b.player.heart_power_triggered]
 		"energy_around_tail":
 			var count := 0
 			if not path.is_empty():

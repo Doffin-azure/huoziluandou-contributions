@@ -2,7 +2,7 @@ extends Control
 ## 词效回归：实体守恒、回合/跨战边界、结阵联动和实际 HUD 多阶段交互。
 
 ## 固定数量防止脚本异常中断某个测试函数后得到假通过。
-const EXPECTED_CHECKS := 411
+const EXPECTED_CHECKS := 409
 var checks: Array = []
 
 func _ready() -> void:
@@ -56,8 +56,6 @@ func _battle() -> BattleState:
 	GameState.player_hp = 60
 	GameState.gold = 100
 	GameState.permanent_damage_reduction = 0
-	GameState.gold_growth_percent = 0
-	GameState.reinvest_gold = 0
 	GameState.deck.clear()
 	var rules: BattleRules = Database.rules.duplicate()
 	rules.opening_draw = 0
@@ -211,7 +209,7 @@ func _run_word_balance() -> void:
 		var spec: Dictionary = ContentBuild.BALANCE_SPECS[text]
 		var word := Database.get_word_by_glyphs_string(text)
 		synced = synced and word != null and word.effect_summary == spec.desc and word.interaction == spec.interaction and word.effects[0].handler == spec.handler and word.effects[0].amount == spec.amount and word.effects[0].args == spec.args
-	_check("word_balance_specs", synced, "21词资源与生成器的效果、数值、参数、描述和交互同步")
+	_check("word_balance_specs", synced, "当前数值词资源与生成器的效果、数值、参数、描述和交互同步")
 	var b := _battle()
 	for i in 3:
 		_word(b, "加强")
@@ -361,12 +359,9 @@ func _run_word_balance() -> void:
 	_check("overheat_rearms", b.has_ability("heat_overload_bonus_armed") and b.ability_value("next_draw_bonus") == 2 and not b.has_ability("heat_overload_bonus"), "过热本场每回合重新武装首次溢热奖励")
 	b = _battle()
 	_word(b, "复利")
-	_word(b, "投资")
 	_word(b, "复利")
-	_word(b, "投资")
 	b.begin_player_turn(false)
-	_word(b, "投资")
-	_check("compound_battle_lifetime", b.player.equity == 11 and b.has_ability("compound_equity"), "复利每回合首投+1，重施不刷新当回合资格，三次投资共11股权")
+	_check("immediate_profit_no_passive", GameState.gold == 104 and not b.has_ability("compound_equity"), "复利只即时给普通金币，没有股权或被动首投奖励")
 
 func _occurrences(b: BattleState, inst: CharInstance) -> int:
 	var n := 0
@@ -1544,9 +1539,11 @@ func _run_logic() -> void:
 	_check("repeat_immediate_only", b.player.heat_capacity - cap_before == 4 and b.base_draw_penalty == 0 and b.next_draw_penalty == 1, "重复触发重载：热容增加=%d，补字惩罚=%d；按只重演即时效果应4/1（仅下回合）" % [b.player.heat_capacity - cap_before, b.next_draw_penalty])
 
 	b = _battle()
-	_word(b, "再投资")
+	var gild_card := CharInstance.new(Database.get_character_by_glyph("击"))
+	GameState.deck.append(gild_card)
+	_word(b, "再投资", 0, {"gild_uid": gild_card.uid})
 	GameState.settle_victory_economy()
-	_check("reinvest_next_battle", GameState.gold == 94 and GameState.reinvest_gold == 6, "再投资后当场胜利结算，金币=%d、待返本金=%d；按下一场返还应94/6" % [GameState.gold, GameState.reinvest_gold])
+	_check("gild_immediate_cost", GameState.gold == 97 and gild_card.gilded, "再投资即时支付3金币并镀金，无当场返还")
 
 func _new_screen():
 	GameState.start_new_run("v03")
@@ -1915,18 +1912,14 @@ func _run_boundaries() -> void:
 	_check("double_draw_fixed_cell", b.drawn_this_turn == 2 and b.player.heat == 1, "回的原格补字同样触发超速和真实补字统计")
 
 	b = _battle()
-	_word(b, "再投资")
+	var gild_next := CharInstance.new(Database.get_character_by_glyph("击"))
+	GameState.deck.append(gild_next)
+	_word(b, "再投资", 0, {"gild_uid": gild_next.uid})
 	var second := BattleState.new(b.rules)
-	second.start([], [b.enemies[0].enemy_data], 7)
-	_word(second, "再投资")
+	second.start(GameState.make_battle_deck(), [b.enemies[0].enemy_data], 7)
 	GameState.settle_victory_economy()
-	_check("reinvest_mixed_due", GameState.gold == 100 and GameState.reinvest_gold == 6, "第二场只兑付第一场投资，新投资保留到第三场")
 	GameState.settle_victory_economy()
-	_check("reinvest_no_double_refund", GameState.gold == 100 and GameState.reinvest_gold == 6, "已兑付批次不能重复返还")
-	var third := BattleState.new(b.rules)
-	third.start([], [b.enemies[0].enemy_data], 7)
-	GameState.settle_victory_economy()
-	_check("reinvest_next_due", GameState.gold == 112 and GameState.reinvest_gold == 0, "第三场兑付第二场投资")
+	_check("gild_cross_battle", gild_next.gilded and GameState.gold == 97, "永久镀金跨战保留，胜利重复结算不生金币")
 
 	b = _battle()
 	_pad(b)
@@ -1994,14 +1987,15 @@ func _run_boundaries() -> void:
 	encounter.enemies.append(Database.get_enemy("ink_spirit"))
 	h.node = encounter
 	h._start_battle(encounter)
-	_word(h.battle_h.battle, "再投资")
+	var run_card: CharInstance = GameState.deck[0]
+	_word(h.battle_h.battle, "再投资", 0, {"gild_uid": run_card.uid})
 	h.battle_h.battle.enemies[0].hp = 0
 	h._end_battle()
-	_check("run_reinvest_current", GameState.gold == 94 and GameState.reinvest_gold == 6, "整局无头接口当前胜利不提前兑付投资")
+	_check("run_gild_current", GameState.gold == 97 and run_card.gilded, "整局接口镀金即时扣费，无投资返还")
 	h._start_battle(encounter)
 	h.battle_h.battle.enemies[0].hp = 0
 	h._end_battle()
-	_check("run_reinvest_persists", GameState.gold == 106 and GameState.reinvest_gold == 0, "整局无头接口下一场保留并兑付投资")
+	_check("run_gild_persists", GameState.gold == 97 and run_card.gilded, "整局接口下战保留镀金，不产生自动收益")
 
 	b = _battle()
 	var pool := ["放", "防", "盾", "冷"]

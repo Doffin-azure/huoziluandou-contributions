@@ -798,7 +798,7 @@ func rest(choice: String, glyph_id := "") -> bool:
 	return true
 
 
-## 修饰 = 镀金：参与多字词 +1 金币（GDD）
+## 修饰 = 镀金：单字或组词打出+1金币（GDD）
 func _gild(glyph_id: String) -> bool:
 	var n := 1
 	var done := 0
@@ -808,7 +808,7 @@ func _gild(glyph_id: String) -> bool:
 			done += 1
 	if done == 0:
 		return false
-	_log("镀金【%s】×%d：参与多字词 +1 金币" % [Database.get_character(glyph_id).glyph, done])
+	_log("镀金【%s】×%d：单字或组词打出+1金币" % [Database.get_character(glyph_id).glyph, done])
 	return true
 
 
@@ -1153,6 +1153,8 @@ func _encounter_move_text(move: EnemyMoveData) -> String:
 		EnemyMoveData.Kind.BLOCK: result += " +%d盾" % move.block
 		EnemyMoveData.Kind.ATTACK_BLOCK: result += " %d伤/+%d盾" % [move.damage, move.block]
 		EnemyMoveData.Kind.INJECT: result += " 注%d字" % move.inject_count
+	if move.inject_count > 0 and move.kind != EnemyMoveData.Kind.INJECT:
+		result += "（空间类时注%d枚【%s】）" % [move.inject_count, move.inject_glyph] if move.mechanic_action == "copy" else " 注%d枚【%s】" % [move.inject_count, move.inject_glyph]
 	return result
 
 
@@ -1174,7 +1176,7 @@ func apply_battle_setup(state: BattleState) -> void:
 	var e: Combatant = state.enemies[0] if not state.enemies.is_empty() else null
 	var kind: String = fight.kind
 	if has_seal("字印"):
-		var drawn := state.draw_to_board(1)
+		var drawn := state.draw_to_board(BattleBalance.i("seal_draw", 1))
 		state._log("字印：开场多抽 %d 枚字" % drawn)
 	if kind == "boss" and e != null:
 		_boss_setup(state, e)
@@ -1193,14 +1195,14 @@ func _boss_setup(state: BattleState, e: Combatant) -> void:
 	if not e.enemy_data.mechanic.is_empty():
 		# 朱笔保留收益：降低首领当前/最大生命6，不改任务伤害。
 		if has_seal("朱笔"):
-			e.max_hp = maxi(1, e.max_hp - 6)
-			e.hp = maxi(0, e.hp - 6)
+			e.max_hp = maxi(1, e.max_hp - BattleBalance.i("seal_boss_hp", 6))
+			e.hp = maxi(0, e.hp - BattleBalance.i("seal_boss_hp", 6))
 			state._log("朱笔：首领生命上限 −6")
 	if has_seal("朱笔") and not affixes.is_empty():
 		var cut: Array = affixes.pop_back()
 		state._log("朱笔：首领少一条词条（%s）" % (AFFIX_TEXT[cut[0]] % cut[1]))
 	for a in affixes:
-		var v: int = a[1]
+		var v: int = BattleBalance.i("legacy_boss_%d_%s" % [act, a[0]], int(a[1]))
 		match a[0]:
 			"armor":
 				if v > 0:
@@ -1226,7 +1228,7 @@ func _boss_setup(state: BattleState, e: Combatant) -> void:
 				inst.temporary = true
 				state.bag.append(inst)
 		"热度":
-			state.player.add_heat(3)
+			state.player.add_heat(BattleBalance.i("debuff_heat", 3))
 		"熔字":
 			if not state.bag.is_empty():
 				var inst: CharInstance = state.bag.pop_at(state.rng.randi_range(0, state.bag.size() - 1))
@@ -1234,7 +1236,7 @@ func _boss_setup(state: BattleState, e: Combatant) -> void:
 		"淹格":
 			_return_one(state, "")
 		"首领护盾":
-			e.add_block(8)
+			e.add_block(BattleBalance.i("debuff_shield", 8))
 
 
 ## 把字盘上 1 枚非临时字放回字袋（少抽字 / 淹格：这一格第一回合空着）
@@ -1262,8 +1264,8 @@ func finish_battle(victory: bool) -> Dictionary:
 	if has_seal("镇纸") and victory:
 		var lost: int = int(f.get("hp_start", GameState.player_hp)) - GameState.player_hp
 		if lost > 0:
-			GameState.heal(mini(4, lost))
-			_log("镇纸：这场少掉 %d 点血" % mini(4, lost))
+			GameState.heal(mini(BattleBalance.i("seal_recovery", 4), lost))
+			_log("镇纸：这场少掉 %d 点血" % mini(BattleBalance.i("seal_recovery", 4), lost))
 	if not victory:
 		over = true
 		_log("败于%s，远征中止" % f.name)

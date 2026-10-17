@@ -42,7 +42,7 @@ static func name_of(id: String) -> String:
 
 
 static func desc_of(id: String) -> String:
-	return DEFS[id][1] if DEFS.has(id) else ""
+	return BattleBalance.relic_description(id, DEFS[id][1]) if DEFS.has(id) else ""
 
 
 static func needs_bind(id: String) -> bool:
@@ -75,11 +75,11 @@ static func sell_price(id: String) -> int:
 # ---------------------------------------------------------------- 战斗钩子
 
 static func board_size(rules: BattleRules, relics: Array) -> int:
-	return maxi(rules.board_size, 5) if relics.has("press") else rules.board_size
+	return maxi(rules.board_size, BattleBalance.i("press_board", 5)) if relics.has("press") else rules.board_size
 
 
 static func opening_draw(rules: BattleRules, relics: Array) -> int:
-	return rules.opening_draw + (4 if relics.has("press") else 0)
+	return rules.opening_draw + (BattleBalance.i("press_draw", 4) if relics.has("press") else 0)
 
 
 ## 洗袋之前：化肥母本换成本场临时副本；石板记下绑定的实体。
@@ -88,7 +88,7 @@ static func prepare_deck(b: BattleState) -> void:
 		var inst := _bag_inst(b, int(b.relic_binds.get("slab", -1)))
 		if inst != null:
 			b.slab_uid = inst.uid
-			b.slab_uses = 5
+			b.slab_uses = BattleBalance.i("slab_uses", 5)
 	if b.relics.has("fertilizer"):
 		var src := _bag_inst(b, int(b.relic_binds.get("fertilizer", -1)))
 		if src != null and src.uid != b.slab_uid:
@@ -114,18 +114,18 @@ static func _bag_inst(b: BattleState, uid: int) -> CharInstance:
 ## 第一回合开始（开局补字、begin_player_turn 之后）
 static func on_battle_start(b: BattleState) -> void:
 	if b.relics.has("barrier"):
-		b.player.add_block(10)
-		b._log("屏障：临时格挡 +10")
+		b.player.add_block(BattleBalance.i("barrier_block", 10))
+		b._log("屏障：临时格挡 +%d" % BattleBalance.i("barrier_block", 10))
 	if b.relics.has("buckler"):
-		b.player.add_persistent_block(4)
-		b._log("小盾：持久盾 +4")
+		b.player.add_persistent_block(BattleBalance.i("buckler_block", 4))
+		b._log("小盾：持久盾 +%d" % BattleBalance.i("buckler_block", 4))
 	if b.relics.has("powerbank"):
-		b.add_energy(4)
-		b._log("充电宝：储能 +4")
+		b.add_energy(BattleBalance.i("powerbank_energy", 4))
+		b._log("充电宝：储能 +%d" % BattleBalance.i("powerbank_energy", 4))
 	if b.relics.has("breach"):
 		for e in b.alive_enemies():
-			e.add_status("vulnerable", 2)
-		b._log("破防：敌人获得 2 层易伤")
+			e.add_status("vulnerable", BattleBalance.i("breach_stacks", 2))
+		b._log("破防：敌人获得 %d 层易伤" % BattleBalance.i("breach_stacks", 2))
 	if b.relics.has("blitz"):
 		b.blitz_turn = 1
 		b._log("闪电战：第一回合结束后，敌人跳过这一次行动")
@@ -136,8 +136,8 @@ static func on_battle_start(b: BattleState) -> void:
 ## 普通回合补字之后（第一回合不调用）
 static func after_turn_draw(b: BattleState) -> void:
 	if b.relics.has("clean") and not board_dirty(b):
-		if b.draw_to_board(1) > 0:
-			b._log("光洁：盘面没有污染字，多补 1 枚")
+		if b.draw_to_board(BattleBalance.i("clean_draw", 1)) > 0:
+			b._log("光洁：盘面没有污染字，多补 %d 枚" % BattleBalance.i("clean_draw", 1))
 
 
 static func board_dirty(b: BattleState) -> bool:
@@ -236,7 +236,7 @@ static func play_has_strike(glyphs: Array) -> bool:
 
 
 static func strike_bonus(b: BattleState, target: Combatant) -> int:
-	return 2 if b.strike_active and b.relics.has("strike") and target != null and not target.is_player else 0
+	return BattleBalance.i("strike_damage", 2) if b.strike_active and b.relics.has("strike") and target != null and not target.is_player else 0
 
 
 ## 流火结算后
@@ -246,7 +246,7 @@ static func on_wash_heat(b: BattleState, target: Combatant) -> Array:
 	var e := target if target != null and not target.is_player and target.is_alive() else b.first_alive_enemy()
 	if e == null:
 		return []
-	var real := b.deal_damage(e, 50, false)
+	var real := b.deal_damage(e, BattleBalance.i("skyfire_damage", 50), false)
 	b._log("天火：对%s造成 %d 伤害" % [e.display_name, real])
 	return ["天火：造成 %d 伤害" % real]
 
@@ -254,7 +254,7 @@ static func on_wash_heat(b: BattleState, target: Combatant) -> Array:
 # ---------------------------------------------------------------- 战外钩子
 
 static func rest_bonus() -> int:
-	return 20 if GameState.relics.has("sleep") else 0
+	return BattleBalance.i("sleep_heal", 20) if GameState.relics.has("sleep") else 0
 
 
 ## 拾取效果（绑定类在 GameState.bind_relic 里另外处理）
@@ -265,7 +265,7 @@ static func on_pickup(id: String) -> void:
 			if GameState.relic_counters.get("fireman_claimed", false):
 				return
 			GameState.relic_counters["fireman_claimed"] = true
-			for i in 4:
+			for i in BattleBalance.i("fireman_count", 4):
 				_grant_glyph("火", "火人")
 
 
@@ -275,7 +275,7 @@ static func on_battle_won() -> void:
 		return
 	var n := int(GameState.relic_counters.get("egg", 0)) + 1
 	GameState.relic_counters["egg"] = n
-	if n % EGG_EVERY == 0:
+	if n % BattleBalance.i("egg_interval", 4) == 0:
 		var g := ""
 		if GameState.expedition != null:
 			g = GameState.expedition.roll_glyph(1, false, GameState.expedition.relic_rng)
