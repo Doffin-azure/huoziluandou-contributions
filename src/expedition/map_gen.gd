@@ -574,9 +574,12 @@ static func pass_mask(m: Dictionary, t: int, boss := false) -> PackedByteArray:
 ## fog = 初见玩家（只看见身边 2 步，朝引导点走，躲首领）；omni = 熟图玩家；chase=false 时首领不动
 ## terr：格 → 伏兵编号（走进领地任一格即触发该伏兵）
 ## slide_n：水流滑几格；0 = 原型的一直滑到墙（只给原型对照用），游戏里是 SLIDE_N
-static func sim(m: Dictionary, mode: String, chase: bool, terr: Dictionary, slide_n := 0) -> Dictionary:
+## boss_seed：-1 = 原型的匀加速追击（地图初筛和对照测试用）；≥0 = 游戏里的概率追击（同 Expedition.tick），用这个种子掷骰
+static func sim(m: Dictionary, mode: String, chase: bool, terr: Dictionary, slide_n := 0, boss_seed := -1) -> Dictionary:
 	var S := {"pos": m.start, "t": 0, "boss": m.lair, "acc": 0.0, "stir": null, "rise": null, "stun": 0, "alarm": false,
-		"known": {}, "got": 0, "taken": {}, "hp": 60, "used": {}}
+		"known": {}, "got": 0, "taken": {}, "hp": 60, "used": {}, "miss": 0}
+	var brng := RandomNumberGenerator.new()
+	brng.seed = maxi(0, boss_seed)
 	var content := {}
 	for k in m.content:
 		content[k] = true
@@ -592,11 +595,19 @@ static func sim(m: Dictionary, mode: String, chase: bool, terr: Dictionary, slid
 		if S.stun > 0:
 			S.stun -= 1
 			return false
-		S.acc += spd(S.t - S.rise)
 		var bm := pass_mask(m, S.t, true)
-		while S.acc >= 1:
-			S.acc -= 1
-			S.boss = step_toward(bm, S.boss, S.pos)
+		if boss_seed >= 0:
+			var base := minf(1.0, P.p0 + P.pGrow * maxi(0, S.t - int(S.rise)))
+			if brng.randf() < minf(1.0, base * (S.miss + 1)):
+				S.miss = 0
+				S.boss = step_toward(bm, S.boss, S.pos)
+			else:
+				S.miss += 1
+		else:
+			S.acc += spd(S.t - S.rise)
+			while S.acc >= 1:
+				S.acc -= 1
+				S.boss = step_toward(bm, S.boss, S.pos)
 		return bfs(bm, S.boss)[S.pos] <= 1
 	for g in 400:
 		var pm := pass_mask(m, S.t)
@@ -734,6 +745,10 @@ static func roll_wake(m: Dictionary) -> void:
 	var R := Rng.new(int(m.seed) * 7919 + 13)
 	m["wake"] = WAKE_GAME.x + R.ri(WAKE_GAME.y - WAKE_GAME.x + 1)
 	m["buffer"] = BUFFER_GAME.x + R.ri(BUFFER_GAME.y - BUFFER_GAME.x + 1)
+
+
+## 游戏用图复核初见拿量时掷几次首领骰子
+const FOG_ROLLS := 6
 
 
 ## 游戏里水流滑几格（「流速」另加，见 Expedition._slide）
@@ -931,7 +946,14 @@ static func assign_ambush(m: Dictionary) -> bool:
 	m["amb"] = ambs.map(func(x): return x.k)
 	m["ambush"] = ambs
 	m["terr"] = terr
-	m["fog"] = sim(m, "fog", true, terr, SLIDE_N)
+	# 复核用游戏里的概率追击：掷 FOG_ROLLS 次取平均，m.fog.got 记平均值（四舍五入）
+	var got := 0
+	var last := {}
+	for r in FOG_ROLLS:
+		last = sim(m, "fog", true, terr, SLIDE_N, int(m.seed) * 31 + r)
+		got += int(last.got)
+	last.got = int(round(float(got) / FOG_ROLLS))
+	m["fog"] = last
 	var n := float(m.content.size())
 	return m.fog.got >= 0.45 * n and m.fog.got <= 0.75 * n
 
