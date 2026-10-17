@@ -28,16 +28,9 @@ static var STAGE := Color("251f1a")
 static var STAGE_EDGE := Color("5d4430")
 static var SURFACE_RAISED := Color("f7eedc")
 static var SHADOW := Color(0.08, 0.06, 0.04, 0.45)
-static var BG_TOP := Color("efe6d2")
-static var BG_BOTTOM := Color("d8c8a2")
 
 # 风格开关（供 Ink / TileView 判断用）
 static var STYLE_ID := "paper"
-static var STYLE_NAME := "宣纸活字"
-static var BG_KIND := "paper"
-static var TILE_KIND := "wood"
-static var PANEL_ALPHA := 1.0
-static var GLOW := false
 static var CORNER_BONUS := 0
 
 
@@ -68,14 +61,7 @@ static func apply(style: GameStyle) -> void:
 	STAGE_EDGE = style.STAGE_EDGE
 	SURFACE_RAISED = style.SURFACE_RAISED
 	SHADOW = style.SHADOW
-	BG_TOP = style.BG_TOP
-	BG_BOTTOM = style.BG_BOTTOM
 	STYLE_ID = style.id
-	STYLE_NAME = style.name
-	BG_KIND = style.bg_kind
-	TILE_KIND = style.tile_kind
-	PANEL_ALPHA = style.panel_alpha
-	GLOW = style.glow
 	CORNER_BONUS = style.corner_bonus
 
 

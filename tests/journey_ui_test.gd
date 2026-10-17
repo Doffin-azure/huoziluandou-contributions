@@ -173,7 +173,7 @@ func _verify_actions() -> void:
 	var offer_count: int = shop._offers.size()
 	var settings := SettingsOverlay.new()
 	shop.add_child(settings)
-	settings._set_style("neon")
+	settings._set_style("taopunk")
 	await _frames()
 	_ok(Router.current == current and GameState.rng.state == rng_state and shop._offers.size() == offer_count, "battle theme setting does not recreate the shop or reroll its offers")
 	settings.queue_free()

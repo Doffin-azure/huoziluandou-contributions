@@ -117,7 +117,7 @@ func _run() -> void:
 	await _frames()
 	_ok(Router.current_path.ends_with("/glyph_graph_screen.gd"), "glyph graph action still uses the existing route")
 	_ok(is_zero_approx(Router.study_stage.camera_blend) and Router.study_stage.camera.projection == Camera3D.PROJECTION_PERSPECTIVE, "glyph graph keeps its original room background camera")
-	Ink.apply_style(GameStyle.neon())
+	Ink.apply_style(GameStyle.taopunk())
 	Router.goto("res://src/screens/title_screen.gd")
 	await _frames()
 	_ok(Router.current._courtyard.visible and not Router.study_stage.visible, "title art stays consistent when the battle theme changes")

@@ -110,13 +110,12 @@ func _build() -> void:
 func _build_style_buttons() -> void:
 	for c in _style_row.get_children():
 		c.queue_free()
-	var options := [["taopunk", "青铜绘卷"], ["paper", "宣纸活字"], ["neon", "墨芯 · 大模型"]]
-	for opt in options:
-		var active: bool = Settings.visual_style == opt[0]
-		var b := Ink.button(opt[1] + ("　✓" if active else ""), active)
+	for id in GameStyle.IDS:
+		var active: bool = Settings.visual_style == id
+		var b := Ink.button(GameStyle.get_style(id).name + ("　✓" if active else ""), active)
 		b.custom_minimum_size = Vector2(180, 48 * JourneyStyle.touch_scale(self))
 		b.disabled = active
-		b.pressed.connect(_set_style.bind(opt[0]))
+		b.pressed.connect(_set_style.bind(id))
 		_style_row.add_child(b)
 
 
@@ -131,6 +130,7 @@ func _on_toggle(btn: Button) -> void:
 
 func _set_style(style_id: String) -> void:
 	Settings.set_visual_style(style_id)
+	style_id = Settings.visual_style
 	if Router.current_path.ends_with("/battle_screen.gd"):
 		Ink.pending_style = style_id
 	else:

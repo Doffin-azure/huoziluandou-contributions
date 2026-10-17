@@ -13,7 +13,7 @@ var storage_path := PATH
 ##   true：松手即结算（旧的手感，节奏更快）。
 var drag_release_play: bool = false
 
-## 视觉风格：taopunk 为当前定稿；paper / neon 保留为可选旧版。
+## 视觉风格：青铜绘卷与宣纸活字；已退役或未知配置回到当前定稿。
 var visual_style: String = "taopunk"
 var board_font_path := ""
 var reduced_motion: bool = false
@@ -25,11 +25,12 @@ var _cfg := ConfigFile.new()
 func _ready() -> void:
 	if _cfg.load(storage_path) == OK:
 		drag_release_play = bool(_cfg.get_value("input", "drag_release_play", drag_release_play))
-		# 定稿启用独立的风格键，旧版 style 不覆盖新默认；仍可主动切回旧版。
-		visual_style = str(_cfg.get_value("visual", "art_style", visual_style))
+		var stored_style := str(_cfg.get_value("visual", "art_style", visual_style))
+		visual_style = GameStyle.normalize_id(stored_style)
 		board_font_path = str(_cfg.get_value("visual", "board_font", ""))
 		reduced_motion = bool(_cfg.get_value("visual", "reduced_motion", false))
 		sfx_volume = clampf(float(_cfg.get_value("audio", "sfx_volume", 0.65)), 0.0, 1.0)
+		if stored_style != visual_style: _save()
 
 
 func set_drag_release_play(value: bool) -> void:
@@ -41,6 +42,7 @@ func set_drag_release_play(value: bool) -> void:
 
 
 func set_visual_style(style_id: String) -> void:
+	style_id = GameStyle.normalize_id(style_id)
 	if visual_style == style_id:
 		return
 	visual_style = style_id
@@ -50,7 +52,8 @@ func set_visual_style(style_id: String) -> void:
 
 func _save() -> void:
 	_cfg.set_value("input", "drag_release_play", drag_release_play)
-	_cfg.set_value("visual", "style", visual_style)
+	if _cfg.has_section_key("visual", "style"):
+		_cfg.erase_section_key("visual", "style")
 	_cfg.set_value("visual", "art_style", visual_style)
 	_cfg.set_value("visual", "board_font", board_font_path)
 	_cfg.set_value("visual", "reduced_motion", reduced_motion)

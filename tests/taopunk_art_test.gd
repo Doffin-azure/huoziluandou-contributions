@@ -63,7 +63,7 @@ func _run() -> void:
 	for i in range(16, 32): _screen.battle.bag.append(GameState.deck[i])
 	_screen._refresh_all()
 	await _frames(25)
-	_ok(Palette.STYLE_ID == "taopunk" and Palette.TILE_KIND == "bronze", "青铜绘卷使用独立风格令牌")
+	_ok(Palette.STYLE_ID == "taopunk" and Palette.WOOD == Color("1f4946"), "青铜绘卷使用独立风格令牌")
 	_ok(stage._illustrated_backdrop.visible and not stage._display.visible and not stage.shared_table_active(), "定稿环境为独立手绘背景，保留书房场景供切换")
 	_ok(stage.viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED, "手绘战斗中停用隐藏的书房 3D 渲染")
 	var board: BoardView = _screen._board_view
