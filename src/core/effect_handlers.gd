@@ -419,7 +419,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			if washed > 0:
 				b._shuffle(b.bag)
 			b.add_heat(-2)
-			return ["流火：洗回 %d 枚【热】，热度 -2" % washed]
+			return ["流火：洗回 %d 枚【热】，热度 -2" % washed] + Relics.on_wash_heat(b, enemy)
 		"next_copy_layer":
 			return EffectUtil.simple_ability(b, "next_copy_layer", "超能：下一条 3+ 字词可消耗储能保留临时复制层")
 		"double_next_ability":

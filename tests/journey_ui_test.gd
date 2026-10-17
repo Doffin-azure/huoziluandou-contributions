@@ -116,6 +116,7 @@ func _run() -> void:
 			_ok(JSON.stringify(JSON.parse_string(JSON.stringify(_snapshot))) == JSON.stringify(expected), "presentation preserves reward offers, shop prices, event choice and RNG states")
 		await _verify_actions()
 		await _verify_mobile()
+		await _verify_expedition_merge()
 	if is_instance_valid(Router.current): Router.current.queue_free()
 	Router.current = null
 	Router.host = null
@@ -249,3 +250,49 @@ func _verify_mobile() -> void:
 	await _shot("settings-phone")
 	settings.queue_free()
 	await _frames()
+
+
+func _verify_expedition_merge() -> void:
+	var screen := await _open("expedition_map")
+	var ex: Expedition = screen.ex
+	ex.tray = ["冷", "冷", "冷"]
+	screen.refresh()
+	await _frames()
+	var tick := ex.t
+	var rng := ex.rng.state
+	screen._wish_btn.pressed.emit()
+	await _frames()
+	_ok(ex.top_panel().get("wish", false) and ex.t == tick and ex.rng.state == rng, "wish action opens the merged panel without spending time or rerolling the map")
+	for i in 3: screen._on_tray(i)
+	await _frames()
+	_ok(screen._forge_sel.size() == 3, "wish UI accepts the remote three-glyph recipe")
+	var submit: Button
+	for button in _descendants(screen._event_box, "button"):
+		if button.text.begins_with("投进去"): submit = button
+	_ok(submit != null and not submit.disabled, "three-glyph wish exposes an enabled submit action")
+	if submit != null: submit.pressed.emit()
+	await _frames()
+	_ok(ex.wish_used and ex.tray.size() == 1 and screen._wish_btn.disabled, "wish submit forwards all three glyphs and refreshes the once-per-act state")
+	GameState.relics = Relics.DEFS.keys()
+	ex.active["超能力"] = true
+	screen.refresh()
+	await _frames()
+	_ok(screen._relic_label.get_theme_color("font_color") == JourneyStyle.GOLD and screen._relic_label.tooltip_text.contains(Relics.desc_of("press")), "merged relic inventory retains readable local colors and full descriptions")
+	for window_size in [Vector2i(960, 432), Vector2i(1440, 810)]:
+		get_window().size = window_size
+		await _frames(12)
+		# 各尺寸从入口重新布局，沿用同一份远征进度。
+		Router.goto("res://src/screens/expedition_map_screen.gd")
+		await _frames(12)
+		screen = Router.current
+		var bounds := screen.get_global_rect()
+		var buttons := _descendants(screen._wish_btn.get_parent(), "button").filter(func(button): return button.is_visible_in_tree())
+		_ok(buttons.all(func(button): return bounds.encloses(button.get_global_rect())), "late-run expedition actions fit with all relics and the used-wish label at %s" % window_size)
+		await _shot("expedition-relics-%d" % window_size.x)
+	ex.boss_down = true
+	screen.refresh()
+	await _frames()
+	_ok(screen._confront_btn.text == "结束本幕" and not screen._confront_btn.disabled, "defeated boss keeps exploration available with an explicit finish action")
+	screen._confront_btn.pressed.emit()
+	await _frames()
+	_ok(ex.top_panel().get("kind", "") == "act_end", "finish-act action opens the merged settlement panel")

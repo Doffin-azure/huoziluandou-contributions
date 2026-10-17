@@ -16,26 +16,29 @@ const AMBUSH_T := 1
 const REST_T := 3
 ## 印章：效果 / 主要来源
 const SEALS := {
-	"镇纸": ["每场战斗少掉 4 点血", "精英"], "夜灯": ["视野 +1 格", "大赏"], "更漏": ["首领起身后加速得更慢", "大赏"],
-	"拓本": ["打开任何赏都多一个选项", "大赏"], "闲章": ["被「封」的奖励会显示伏兵的位置", "精英"],
-	"朱砂": ["首领战开场，首领少一条词条", "首领"], "砚台": ["休息点的治疗量翻倍", "精英"],
+	"镇纸": ["每场战斗少掉 4 点血", "精英"], "夜灯": ["视野 +1 格", "大赏"], "更漏": ["首领走路概率增长得更慢", "大赏"],
+	"拓本": ["打开任何赏都多一个选项", "大赏"], "印鉴": ["被「封」的奖励会显示伏兵的位置", "精英"],
+	"朱笔": ["首领战开场，首领少一条词条", "首领"], "蒲团": ["休息点的治疗量翻倍", "精英"],
 	"活字盒": ["字匣 +2 格", "大赏"], "宽版": ["版面立刻扩成 3×3（一局只能有一次）", "首领"],
 }
 ## 三幕首领：借用的敌人资源（数值沿用 resources/enemies），名字随主题
 const BOSS := {1: "boss_word_demon", 2: "boss_lead_plate", 3: "boss_chaos_press"}
 const BOSS_NAME := {"墨池": "墨渊", "熔铸坊": "铸印魔", "潮汐渠": "潮伯", "雷池": "雷公"}
-## 首领词条（逐幕加强）：破甲 / 破防 / 朱砂 可以削掉
+## 首领词条（逐幕加强）：破甲 / 破防 / 朱笔 可以削掉
 const BOSS_AFFIX := {1: [["armor", 8], ["shield", 6]], 2: [["armor", 12], ["shield", 8], ["strength", 1]],
 	3: [["armor", 16], ["shield", 10], ["strength", 2]]}
 const AFFIX_TEXT := {"armor": "护甲（持久盾）+%d", "shield": "开场护盾 +%d", "strength": "力量 +%d"}
 const ELITE := "iron_seal"
 const FOE_ENEMY := ["ink_spirit", "ember_imp", "paper_guard", "rust_scribe", "bronze_seal"]
 ## 被追上的位置减益（机关格本身及上下左右）
-const SPOT_DEBUFF := {"纸": "少抽字", "泉": "污染字", "焰": "热度", "炉": "熔字", "流": "淹格", "潮": "淹格", "闸": "首领护盾", "桩": "首领护盾"}
+const SPOT_DEBUFF := {"纸": "少抽字", "泉": "污染字", "焰": "热度", "炉": "熔字", "流": "淹格", "潮": "淹格", "闸": "首领护盾", "桩": "首领护盾",
+	"渗": "污染字", "吊": "熔字", "线": "首领护盾"}
 const DEBUFF_TEXT := {"先手": "首领先手：第一回合首领先行动", "少抽字": "开局少抽 1 枚字", "污染字": "字袋混进 1 枚污染字（本场）",
 	"热度": "开局热度 +3", "熔字": "开局 1 枚字被熔掉（本场）", "淹格": "字盘 1 格被水淹，第一回合不能放字", "首领护盾": "首领开局护盾 +8"}
 
 var rng := RandomNumberGenerator.new()
+var relic_rng := RandomNumberGenerator.new()  ## 遗物单独用一条随机数，不打乱地图 / 赏 / 印章的随机序列
+var boss_rng := RandomNumberGenerator.new()   ## 首领走不走单独一条随机数
 var run_seed := 0
 var act := 1
 var themes: Array = []
@@ -52,10 +55,11 @@ var used := {}                  ## 机关使用次数
 var boss := 0
 var stir = null
 var rise = null
-var acc := 0.0
+var miss := 0                   ## 首领起身后连续没走的步数（伪随机累计）
 var stun := 0
 var alarm := false
 var halt_done := false          ## 急停已触发
+var boss_down := false          ## 本幕首领已被击败：不再追击，可以继续探索，随时结束本幕
 var rush_left := 5              ## 急速剩余步数
 var half_step := 0.0
 var ink := START_INK
@@ -68,6 +72,7 @@ var seals: Array = []
 var active := {}                ## 版面上正在生效的词谱词
 var flip_used := false
 var power_used := false
+var wish_used := false          ## 随身许愿机本幕已用
 var repeat_used := false
 var spent := 0                  ## 本幕在商店花的金币
 var buyback: Array = []
@@ -89,6 +94,8 @@ static func start(seed_value: int = -1) -> Expedition:
 	else:
 		ex.rng.randomize()
 	ex.run_seed = ex.rng.randi_range(1, 1 << 30)
+	ex.relic_rng.seed = ex.run_seed ^ 0x5E1C
+	ex.boss_rng.seed = ex.run_seed ^ 0xB055
 	ex.themes = MapGen.THEME_ORDER.duplicate()
 	for i in range(ex.themes.size() - 1, 0, -1):
 		var j := ex.rng.randi_range(0, i)
@@ -115,14 +122,16 @@ func load_act(n: int) -> void:
 	boss = m.lair
 	stir = null
 	rise = null
-	acc = 0.0
+	miss = 0
 	stun = 0
 	alarm = false
 	halt_done = false
+	boss_down = false
 	rush_left = 5
 	half_step = 0.0
 	flip_used = false
 	power_used = false
+	wish_used = false
 	repeat_used = false
 	spent = 0
 	fight = {}
@@ -150,12 +159,29 @@ func vision() -> int:
 	return MapGen.P.vision + (1 if has("开灯") else 0) + (1 if has_seal("夜灯") else 0)
 
 
+## 首领这一步走的概率（伪随机）：基线 = 0.35 + 0.05 × 起身后的步数（冷却 / 更漏让增长变慢）；
+## 没走就累计：概率 = 基线 × (连续没走的步数 + 1)，最高 100%；走了一步就回到基线
+func move_base() -> float:
+	if not awake():
+		return 0.0
+	return minf(1.0, MapGen.P.p0 + MapGen.P.pGrow * acc_scale() * maxi(0, t - int(rise)))
+
+
+func move_chance() -> float:
+	return minf(1.0, move_base() * (miss + 1))
+
+
 func acc_scale() -> float:
 	return (0.5 if has("冷却") else 1.0) * (0.5 if has_seal("更漏") else 1.0)
 
 
 func awake() -> bool:
-	return rise != null and t >= rise
+	return not boss_down and rise != null and t >= rise
+
+
+## 惊动到起身的缓冲步数（每张图 7～10 步，见 MapGen.roll_wake）
+func buffer_steps() -> int:
+	return int(m.get("buffer", MapGen.P.buffer))
 
 
 func wake_time() -> int:
@@ -175,6 +201,11 @@ func can_enter(k: int) -> bool:
 	if m.ink[k] != 0:
 		return false
 	return not gate_shut(k, t) or has("电流过载")
+
+
+## 导线这一步通不通电（和电闸同相位；「停电」让电闸常开，导线也就常通）
+func mover_live(k: int, at_t: int) -> bool:
+	return has("停电") or MapGen.mover_live(mech_at(k), at_t)
 
 
 func boss_mask() -> PackedByteArray:
@@ -212,19 +243,21 @@ func is_beacon(k: int) -> bool:
 
 
 # ---------------------------------------------------------------- 时间与首领
-## 过一步：首领到点 / 被大赏惊动 / 有人从巢穴 2 步内经过 → 惊动，缓冲 4 步后起身，沿最短路追
+## 过一步：首领到点 / 被大赏惊动 / 有人从巢穴 2 步内经过 → 惊动，缓冲 7～10 步后起身，沿最短路追
 ## 返回 true = 被追上
 func tick() -> bool:
 	t += 1
+	if boss_down:
+		return false
 	if stir == null:
 		var near := MapGen.bfs(MapGen.mask_of(func(k): return can_enter(k) and not m.obst.has(k)), m.lair)[pos] <= 2
 		if t >= wake_time() or alarm or near:
 			stir = t
-			rise = t + MapGen.P.buffer
-			_log("首领被惊动了：%d 步后起身" % MapGen.P.buffer)
+			rise = t + buffer_steps()
+			_log("首领被惊动了：%d 步后起身" % buffer_steps())
 			var why := "你打开了大赏" if alarm else ("你从巢穴旁经过" if near else "它睡醒了")
 			alerts.append(["首领被惊动了", "%s。首领【%s】%d 步后起身，然后会沿最短路追你。
-地图上的红色【%s】就是它。" % [why, m.TH.boss, MapGen.P.buffer, m.TH.boss]])
+地图上的红色【%s】就是它。" % [why, m.TH.boss, buffer_steps(), m.TH.boss]])
 	if not awake():
 		return false
 	if not halt_done:
@@ -237,14 +270,15 @@ func tick() -> bool:
 	if stun > 0:
 		stun -= 1
 		return false
-	acc += MapGen.spd(t - int(rise), acc_scale())
 	var bm := boss_mask()
-	while acc >= 1:
-		acc -= 1
+	if boss_rng.randf() < move_chance():
+		miss = 0
 		var nx := MapGen.step_toward(bm, boss, pos)
 		if nx != boss:
 			boss = nx
 			boss_trail.append(boss)
+	else:
+		miss += 1
 	return MapGen.bfs(bm, boss)[pos] <= 1
 
 
@@ -369,13 +403,27 @@ func _step_mech() -> int:
 			if int(used.get(pos, 0)) < 1:
 				used[pos] = 1
 				_slide(mc.dir)
+		"渗":
+			pos = mc.to
+			_log("渗墨点：从另一个渗墨点冒出来")
+		"吊":
+			if not used.has(pos):
+				used[pos] = 1
+				pos = mc.to
+				_log("吊钩：被吊过墨渍墙")
+		"线":
+			if mover_live(pos, t):
+				pos = mc.to
+				_log("导线通电：一下子到了另一头")
+			else:
+				_log("导线没电：等电闸开了再来")
 	return 0
 
 
 ## 水流：顺着箭头滑 3 格（流速 +2），撞墙停；不耗步
 func _slide(dir: Vector2i) -> void:
 	var p := MapGen.rc(pos)
-	var n := 3 + (2 if has("流速") else 0)
+	var n := MapGen.SLIDE_N + (2 if has("流速") else 0)
 	for i in n:
 		var q: Vector2i = p + dir
 		if not MapGen.inb(q.x, q.y) or not can_enter(MapGen.kk(q.x, q.y)) or m.obst.has(MapGen.kk(q.x, q.y)):
@@ -442,11 +490,11 @@ func ambush_index_at(k: int) -> int:
 	return -1
 
 
-## 伏兵位置是否已知：情报揭示，或「闲章」（被封的奖励会显示伏兵的位置）
+## 伏兵位置是否已知：情报揭示，或「印鉴」（被封的奖励会显示伏兵的位置）
 func revealed_amb_at(k: int) -> bool:
 	var ambs: Array = m.get("ambush", [])
 	for i in ambs.size():
-		if ambs[i].k == k and not amb_done.has(i) and (revealed_amb.has(i) or has_seal("闲章")):
+		if ambs[i].k == k and not amb_done.has(i) and (revealed_amb.has(i) or has_seal("印鉴")):
 			return true
 	return false
 
@@ -548,7 +596,7 @@ func formable(cd: CharacterData, owned: Dictionary) -> bool:
 
 ## tier：0 普通（稀有度 ≤2，同战后奖励 / 商店）/ 1 稀有（2～3）/ 2 首领级（≥1，同幕末大奖）
 ## theme=true 只取本幕主题字
-func roll_glyph(tier := 0, theme := false) -> String:
+func roll_glyph(tier := 0, theme := false, r: RandomNumberGenerator = null) -> String:
 	var owned := owned_glyphs()
 	var lo: int = [0, 2, 1][tier]
 	var hi: int = [2, 4, 4][tier]
@@ -558,7 +606,8 @@ func roll_glyph(tier := 0, theme := false) -> String:
 	var ok: Array = pool.filter(func(cd): return formable(cd, owned))
 	if ok.is_empty():
 		ok = pool
-	return ok[rng.randi_range(0, ok.size() - 1)].glyph
+	var rr := r if r != null else rng
+	return ok[rr.randi_range(0, ok.size() - 1)].glyph
 
 
 ## 成对的字：取游戏词库里一个两字词，两个字都在字库里
@@ -688,6 +737,38 @@ func swap_seal(index: int) -> void:
 	update_vision()
 
 
+# ---------------------------------------------------------------- 遗物
+## 来源：熔炉许愿（见 forge）、商店货架；卖回商店拿一半价钱。遗物管战斗，不占印章格
+func _grant_relic(id: String, why: String) -> bool:
+	if not GameState.add_relic(id):
+		return false
+	_log("%s：得到遗物%s" % [why, Relics.text(id)])
+	if Relics.needs_bind(id) and not GameState.deck.is_empty():
+		push_panel({"kind": "relic_bind", "relic": id})
+	return true
+
+
+func sell_relic(id: String) -> bool:
+	if top_panel().get("kind", "") != "shop" or not GameState.remove_relic(id):
+		return false
+	var gold := Relics.sell_price(id)
+	GameState.add_gold(gold)
+	_log("商店：卖掉遗物「%s」，❖ +%d" % [Relics.name_of(id), gold])
+	return true
+
+
+## 绑定类遗物：从字袋挑一枚字（按字形挑，绑到其中一枚实体）
+func bind_relic(glyph_id: String) -> bool:
+	var p := top_panel()
+	if p.get("kind", "") != "relic_bind":
+		return false
+	if not GameState.bind_relic(p.relic, glyph_id):
+		return false
+	pop_panel()
+	_log("「%s」绑定在【%s】上" % [Relics.name_of(p.relic), Database.get_character(glyph_id).glyph])
+	return true
+
+
 ## 从某来源里挑一个还没有的印章（精英 / 首领）
 func roll_seal(source: String) -> String:
 	var free: Array = SEALS.keys().filter(func(s): return SEALS[s][1] == source and not seals.has(s) and not (s == "宽版" and wide_used))
@@ -697,7 +778,7 @@ func roll_seal(source: String) -> String:
 # ---------------------------------------------------------------- 休息点
 ## 治疗 / 删字 / 修饰 三选一，耗 3 步，每个休息点只能用一次；清洗额外清 1 枚污染字
 func rest_heal_amount() -> int:
-	return int(round(GameState.player_max_hp * 0.3)) * (2 if has_seal("砚台") else 1)
+	return int(round(GameState.player_max_hp * 0.3)) * (2 if has_seal("蒲团") else 1) + Relics.rest_bonus()
 
 
 func rest(choice: String, glyph_id := "") -> bool:
@@ -754,6 +835,9 @@ func shop_offers() -> Array:
 	offers.append({"kind": "remove", "base": rng.randi_range(16, 20)})
 	offers.append({"kind": "gild", "base": rng.randi_range(28, 35)})
 	offers.append({"kind": "heal", "base": rng.randi_range(10, 14)})
+	# 遗物货架：每家一件，用遗物自己的随机数（不打乱原来的货）
+	for id in Relics.roll_choices(GameState.relics, relic_rng):
+		offers.append({"kind": "relic", "relic": id, "base": Relics.price(id)})
 	if not m.has("shops"):
 		m["shops"] = {}
 	m.shops[pos] = offers
@@ -791,6 +875,9 @@ func buy(index: int, glyph_id := "") -> bool:
 	if GameState.gold < cost:
 		return false
 	match o.kind:
+		"relic":
+			if GameState.has_relic(o.relic):
+				return false
 		"glyph", "buyback":
 			if tray.size() >= tray_cap() and GameState.deck_size() >= DECK_CAP:
 				return false
@@ -803,6 +890,11 @@ func buy(index: int, glyph_id := "") -> bool:
 	GameState.spend_gold(cost)
 	spent += cost
 	match o.kind:
+		"relic":
+			# 先移掉货架，再拿遗物（绑定面板压在商店上面）
+			offers.remove_at(index)
+			index = -1
+			_grant_relic(o.relic, "商店")
 		"glyph":
 			gain_glyph(o.glyph, "买字")
 		"buyback":
@@ -815,7 +907,7 @@ func buy(index: int, glyph_id := "") -> bool:
 			_log("商店：治疗")
 	if has("投币"):
 		GameState.add_gold(1)
-	if index < offers.size():
+	if index >= 0 and index < offers.size():
 		offers.remove_at(index)
 	return true
 
@@ -828,18 +920,34 @@ func leave_panel() -> void:
 
 # ---------------------------------------------------------------- 熔炉
 ## 投两个字匣里的字熔成一个稀有字；炼金 +4 金币；回收：消耗的字一半机会回到字匣
-func forge(a: int, b: int) -> bool:
+## 许愿：投 2～3 个字。和某件遗物相关的字越多，越可能熔出那件遗物（见 Relics.wish_odds）；
+## 没熔出遗物就照旧熔成一个稀有字。c = 第三个字的下标（-1 = 只投两个）
+func forge(a: int, b: int, c: int = -1) -> bool:
 	var p := top_panel()
-	if p.get("kind", "") != "forge" or a == b or a < 0 or b < 0 or a >= tray.size() or b >= tray.size():
+	var idx: Array = [a, b] + ([c] if c >= 0 else [])
+	if p.get("kind", "") != "forge":
 		return false
-	var gs: Array = [tray[a], tray[b]]
-	for i in [maxi(a, b), mini(a, b)]:
+	for i in idx:
+		if i < 0 or i >= tray.size() or idx.count(i) > 1:
+			return false
+	var gs: Array = idx.map(func(i): return tray[i])
+	var order: Array = idx.duplicate()
+	order.sort()
+	order.reverse()
+	for i in order:
 		tray.remove_at(i)
 	used[p.k] = int(used.get(p.k, 0)) + 1
+	if p.get("wish", false):
+		wish_used = true
 	pop_panel()
-	var out := roll_glyph(1)
-	_log("熔炉：【%s】【%s】熔成【%s】" % [gs[0], gs[1], out])
-	gain_glyph(out)
+	var named := "".join(gs.map(func(g): return "【%s】" % g))
+	var wished := Relics.wish_roll(gs, GameState.relics, relic_rng)
+	if not wished.is_empty():
+		_grant_relic(wished, "熔炉许愿：%s" % named)
+	else:
+		var out := roll_glyph(1)
+		_log("熔炉：%s熔成【%s】" % [named, out])
+		gain_glyph(out)
 	if has("炼金"):
 		GameState.add_gold(4)
 		_log("炼金：❖ +4")
@@ -973,7 +1081,7 @@ func refresh_active() -> void:
 # ---------------------------------------------------------------- 首领：主动迎战 / 超能力 / 幕间
 ## 主动迎战：首领醒着且在 2 步内，或站在巢穴旁；不吃位置减益
 func can_confront() -> bool:
-	if busy():
+	if busy() or boss_down:
 		return false
 	var d := MapGen.bfs(boss_mask(), boss)[pos]
 	return d <= 2
@@ -984,6 +1092,21 @@ func confront() -> bool:
 		return false
 	fight = _boss_encounter(false)
 	_log("主动迎战首领")
+	return true
+
+
+## 随身许愿机：开局就带着，每幕一次，在地图任意位置打开许愿面板（规则同熔炉，字匣里要有 2 个字）
+const WISH_KEY := -1
+
+
+func can_wish() -> bool:
+	return not wish_used and not busy() and tray.size() >= 2
+
+
+func open_wish() -> bool:
+	if not can_wish():
+		return false
+	push_panel({"kind": "forge", "k": WISH_KEY, "wish": true})
 	return true
 
 
@@ -1017,13 +1140,35 @@ func boss_path(n := 6) -> Array:
 
 
 ## 首领状态（界面用）：睡着不报确切时间；惊动后倒计时；追击时报距离
+## 首领棋子是否显示在地图上：被惊动以后，或者它所在的格在视野里 / 去过
+func boss_revealed() -> bool:
+	if boss_down:
+		return false
+	return stir != null or visible.has(boss) or explored.has(boss)
+
+
 func boss_status() -> String:
+	if boss_down:
+		return "首领已败 · 可以继续探索"
 	if stir == null:
 		return "首领沉睡"
 	if not awake():
 		return "首领惊动 · %d 步后起身" % (int(rise) - t)
 	var d := MapGen.bfs(boss_mask(), boss)[pos]
 	return "首领追来 · 相距 %d 步%s" % [d, "（被定住 %d 步）" % stun if stun > 0 else ""]
+
+
+## 打赢首领后，玩家自己决定什么时候结束本幕（进入幕间结算）
+func can_finish_act() -> bool:
+	return boss_down and not busy()
+
+
+func finish_act() -> bool:
+	if not can_finish_act():
+		return false
+	push_panel({"kind": "act_end"})
+	_log("第 %d 幕完成" % act)
+	return true
 
 
 ## 幕间结算：利息（复利投资逐幕翻倍）+ 投资返还（再投资提高到 50%）
@@ -1147,12 +1292,12 @@ func apply_battle_setup(state: BattleState) -> void:
 			state._enemy_act(e, true)
 
 
-## 首领词条：朱砂少一条；破甲护甲 −8；破防失去全部护盾；停火第一回合不攻击；被追上吃位置减益
+## 首领词条：朱笔少一条；破甲护甲 −8；破防失去全部护盾；停火第一回合不攻击；被追上吃位置减益
 func _boss_setup(state: BattleState, e: Combatant) -> void:
 	var affixes: Array = BOSS_AFFIX[act].duplicate(true)
-	if has_seal("朱砂") and not affixes.is_empty():
+	if has_seal("朱笔") and not affixes.is_empty():
 		var cut: Array = affixes.pop_back()
-		state._log("朱砂：首领少一条词条（%s）" % (AFFIX_TEXT[cut[0]] % cut[1]))
+		state._log("朱笔：首领少一条词条（%s）" % (AFFIX_TEXT[cut[0]] % cut[1]))
 	for a in affixes:
 		var v: int = a[1]
 		match a[0]:
@@ -1248,8 +1393,13 @@ func finish_battle(victory: bool) -> Dictionary:
 			var s := roll_seal("首领")
 			if not s.is_empty():
 				add_seal(s)
-			push_panel({"kind": "act_end"})
-			_log("击败首领%s，第 %d 幕完成" % [f.name, act])
+			boss_down = true
+			stun = 0
+			boss_trail.clear()
+			alerts.clear()   ## 战前排队的惊动 / 起身提示已经过时
+			_log("击败首领%s：可以继续探索，准备好了就结束本幕" % f.name)
+			alerts.append(["首领已被击败", "首领【%s】倒下了，不会再追你。
+剩下的赏、商店、休息点都还在，可以慢慢拿完；准备好了，点「结束本幕」进入幕间结算。" % m.TH.boss])
 			return {"reward": false}
 		"ambush":
 			amb_done[int(f.amb)] = true

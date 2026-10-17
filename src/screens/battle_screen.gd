@@ -369,6 +369,8 @@ func _refresh_all(animate_board := false) -> void:
 	_refresh_player()
 	_refresh_piles()
 	_turn_label.text = "回合 %d" % battle.turn
+	_turn_label.mouse_filter = Control.MOUSE_FILTER_PASS
+	_turn_label.tooltip_text = ("遗物：\n" + "\n".join(battle.relics.map(func(r): return Relics.text(r)))) if not battle.relics.is_empty() else ""
 	_board_view.rebuild(animate_board)
 	_update_input()
 	_layout()
@@ -1624,6 +1626,7 @@ func _check_battle_over() -> void:
 				GameState.add_gold(battle.player.equity)
 				_on_log("投资本金返还：+%d 金币" % battle.player.equity)
 			GameState.settle_victory_economy()
+			Relics.on_battle_won()
 		var ex_result := {}
 		if _expedition:
 			ex_result = GameState.expedition.finish_battle(victory)

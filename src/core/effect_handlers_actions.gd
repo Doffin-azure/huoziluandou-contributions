@@ -149,6 +149,9 @@ static func _replay_last_attack(b: BattleState) -> Array:
 	if b.last_attack_word == null or b.last_attack_effects.is_empty():
 		return ["连击：此前没有可重演的即时攻击"]
 	var msgs: Array = []
+	# 刻刀（打击增强）：重演不算「带【击】」的出字
+	var strike_was := b.strike_active
+	b.strike_active = false
 	for e in b.last_attack_effects:
 		if e.handler == "replay_last_attack" or e.timing == "persistent":
 			continue  # 禁止递归
@@ -156,6 +159,7 @@ static func _replay_last_attack(b: BattleState) -> Array:
 			"target": b.last_attack_target_data, "target_index": b.last_attack_target,
 			"path": b.last_attack_path, "word": b.last_attack_word, "consumed": []}
 		msgs.append_array(EffectResolver.resolve_all([e], sub))
+	b.strike_active = strike_was
 	if msgs.is_empty():
 		msgs.append("连击：重演【%s】" % b.last_attack_word.word)
 	return msgs

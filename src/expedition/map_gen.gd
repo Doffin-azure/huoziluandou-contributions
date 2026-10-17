@@ -9,7 +9,7 @@ const H := 8
 const N := W * H
 const DIRS := [Vector2i(0, 1), Vector2i(1, 0), Vector2i(0, -1), Vector2i(-1, 0)]
 const P := {"inkLo": 0.15, "inkHi": 0.20, "vision": 2, "wakeLo": 10, "wakeHi": 14, "buffer": 4, "v0": 0.5, "acc": 0.01,
-	"vmax": 1.0, "fightT": 2, "restT": 3, "ambT": 1, "maxDetour": 5, "minDeg": 2.7}
+	"vmax": 1.0, "p0": 0.35, "pGrow": 0.05, "fightT": 2, "restT": 3, "ambT": 1, "maxDetour": 5, "minDeg": 2.7}
 const INF := 1 << 30
 ## 主题：字池、明敌、首领字、两种机关。gate=周期开关，slow=多耗 1 步，slide=顺流滑行，stun=定住首领，flavor=只影响资源
 const THEME_ORDER := ["墨池", "熔铸坊", "潮汐渠", "雷池"]
@@ -19,13 +19,20 @@ const THEMES := {
 		{"g": "纸", "n": [4, 6], "kind": "slow", "color": "c9b88a", "desc": "吸墨纸：经过要多耗 1 步，首领不受影响"}]},
 	"熔铸坊": {"ink": "4a2f28", "glyphs": "火热炼铸金精重强", "foes": ["爆", "热", "甲"], "boss": "铸", "mech": [
 		{"g": "焰", "n": [3, 5], "kind": "flavor", "color": "d2542a", "desc": "烈焰格：可以走，每次经过气血 −3"},
-		{"g": "炉", "n": [1, 2], "kind": "flavor", "color": "8a3a1f", "desc": "熔炉：投两个字熔成一个稀有字，一次性"}]},
+		{"g": "炉", "n": [1, 2], "kind": "flavor", "color": "8a3a1f", "desc": "熔炉：投 2～3 个字许愿，相关的字越多越可能熔出遗物，否则熔成稀有字；一次性"}]},
 	"潮汐渠": {"ink": "2b3a45", "glyphs": "流回转清冷急分合", "foes": ["冷", "急", "流"], "boss": "潮", "mech": [
 		{"g": "流", "n": [2, 3], "kind": "slide", "color": "3d7fb0", "desc": "水流：顺着箭头滑出去，不耗步；首领不能用"},
 		{"g": "潮", "n": [2, 3], "kind": "gate", "cycle": [4, 4], "color": "5a7f9a", "desc": "涨潮格：开 4 步、淹 4 步，淹着时谁都过不去"}]},
 	"雷池": {"ink": "2e2a3d", "glyphs": "电能充放蓄超力加", "foes": ["电", "爆", "急"], "boss": "雷", "mech": [
 		{"g": "闸", "n": [2, 3], "kind": "gate", "cycle": [3, 3], "color": "6a5aa0", "desc": "电闸：开 3 步、关 3 步，关着时谁都过不去"},
 		{"g": "桩", "n": [1, 2], "kind": "stun", "color": "c9a83a", "desc": "蓄电桩：首领醒着时踩上去，把它定住 3 步，一次性"}]},
+}
+## 远距离移动机关（原型里没有）：原型合格之后另摆，见 place_movers，不打乱原型的随机序列。潮汐渠用原有的水流。
+## warp=成对传送（双向，可反复用），hoist=吊过一道墨渍墙（一次性），wire=沿导线到另一头（只在电闸开着的步通电）
+const MOVERS := {
+	"墨池": {"g": "渗", "kind": "warp", "color": "5b4a7a", "desc": "渗墨点：成对出现，踩上一个就从另一个冒出来，双向、可反复用，不耗步；首领不能用"},
+	"熔铸坊": {"g": "吊", "kind": "hoist", "n": [2, 3], "color": "7a6a5a", "desc": "吊钩：把你吊过箭头前面的墨渍墙，一次性，不耗步；首领不能用"},
+	"雷池": {"g": "线", "kind": "wire", "cycle": [3, 3], "color": "4a7ab0", "desc": "导线：踩一头立刻到另一头，只在电闸开着的那 3 步通电，不耗步；首领不能用"},
 }
 const SHAPES := [[[0, 0], [0, 1]], [[0, 0], [1, 0]], [[0, 0], [0, 1], [0, 2]], [[0, 0], [1, 0], [2, 0]], [[0, 0], [1, 0], [1, 1]],
 	[[0, 0], [0, 1], [1, 0]], [[0, 0], [0, 1], [1, 1]], [[0, 1], [1, 0], [1, 1]], [[0, 0], [0, 1], [0, 2], [1, 1]],
@@ -144,7 +151,13 @@ static func shut(mc: Dictionary, t: int) -> bool:
 	return mc.kind == "gate" and (t % (mc.cycle[0] + mc.cycle[1])) >= mc.cycle[0]
 
 
+## 移动机关第 t 步能不能用：导线和电闸同相位（电闸开着时通电），其余总能用
+static func mover_live(mc: Dictionary, t: int) -> bool:
+	return mc.kind != "wire" or (t % (mc.cycle[0] + mc.cycle[1])) < mc.cycle[0]
+
+
 ## 首领速度，e = 起身后过了几步；acc_scale 用于「更漏」「冷却」
+## 只给生成器的初见模拟用（和 HTML 原型对齐，决定地图合不合格）；游戏里首领走不走见 Expedition.move_chance
 static func spd(e: int, acc_scale := 1.0) -> float:
 	return minf(P.vmax, P.v0 + P.acc * acc_scale * maxi(0, e))
 
@@ -560,7 +573,8 @@ static func pass_mask(m: Dictionary, t: int, boss := false) -> PackedByteArray:
 
 ## fog = 初见玩家（只看见身边 2 步，朝引导点走，躲首领）；omni = 熟图玩家；chase=false 时首领不动
 ## terr：格 → 伏兵编号（走进领地任一格即触发该伏兵）
-static func sim(m: Dictionary, mode: String, chase: bool, terr: Dictionary) -> Dictionary:
+## slide_n：水流滑几格；0 = 原型的一直滑到墙（只给原型对照用），游戏里是 SLIDE_N
+static func sim(m: Dictionary, mode: String, chase: bool, terr: Dictionary, slide_n := 0) -> Dictionary:
 	var S := {"pos": m.start, "t": 0, "boss": m.lair, "acc": 0.0, "stir": null, "rise": null, "stun": 0, "alarm": false,
 		"known": {}, "got": 0, "taken": {}, "hp": 60, "used": {}}
 	var content := {}
@@ -572,7 +586,7 @@ static func sim(m: Dictionary, mode: String, chase: bool, terr: Dictionary) -> D
 			return false
 		if S.stir == null and (S.t >= m.wake or S.alarm or bfs(pass_mask(m, S.t), m.lair)[S.pos] <= 2):
 			S.stir = S.t
-			S.rise = S.t + P.buffer
+			S.rise = S.t + int(m.get("buffer", P.buffer))
 		if S.rise == null or S.t < S.rise:
 			return false
 		if S.stun > 0:
@@ -642,9 +656,16 @@ static func sim(m: Dictionary, mode: String, chase: bool, terr: Dictionary) -> D
 			if mc.kind == "slide" and not S.used.has(nx):
 				S.used[nx] = true
 				var p := rc(S.pos)
-				while inb(p.x + mc.dir.x, p.y + mc.dir.y) and pm[kk(p.x + mc.dir.x, p.y + mc.dir.y)] != 0:
+				var left: int = slide_n if slide_n > 0 else INF
+				while left > 0 and inb(p.x + mc.dir.x, p.y + mc.dir.y) and pm[kk(p.x + mc.dir.x, p.y + mc.dir.y)] != 0:
 					p += mc.dir
+					left -= 1
 				S.pos = kk(p.x, p.y)
+			# 新机关每个只让模拟用一次，免得渗墨点来回弹
+			if mc.kind in ["warp", "hoist", "wire"] and not S.used.has(nx) and mover_live(mc, S.t):
+				S.used[nx] = true
+				S.used[mc.to] = true
+				S.pos = mc.to
 		var at: int = S.pos
 		var o: Dictionary = m.node.get(at, {})
 		if not o.is_empty() and (o.t == "敌" or o.t == "险") and not S.taken.has(at):
@@ -695,10 +716,163 @@ static func generate(seed_value: int, theme_name := "随机") -> Dictionary:
 		var m := build(seed_value + i, theme_name)
 		if m.has("fail") or not m.pass:
 			continue
-		if assign_ambush(m):
+		roll_wake(m)
+		if relocate_lair(m) and place_movers(m) and assign_ambush(m):
 			m["tries"] = i + 1
 			return m
 	return {}
+
+
+## 游戏里首领的节奏：第 7～10 步被惊动（这时首领棋子出现在地图上），再过 7～10 步起身开追。
+## 原型（gen_proto / build 里的初筛）仍用 P.wakeLo～wakeHi 和 P.buffer，地图对照测试不受影响。
+const WAKE_GAME := Vector2i(7, 10)
+const BUFFER_GAME := Vector2i(7, 10)
+
+
+## 用单独的随机数重抽醒来时间和缓冲，不动原型的随机序列
+static func roll_wake(m: Dictionary) -> void:
+	var R := Rng.new(int(m.seed) * 7919 + 13)
+	m["wake"] = WAKE_GAME.x + R.ri(WAKE_GAME.y - WAKE_GAME.x + 1)
+	m["buffer"] = BUFFER_GAME.x + R.ri(BUFFER_GAME.y - BUFFER_GAME.x + 1)
+
+
+## 游戏里水流滑几格（「流速」另加，见 Expedition._slide）
+const SLIDE_N := 3
+
+
+## 摆远距离移动机关（MOVERS）。用单独的随机数，放在首领巢穴之后、伏兵之前。
+## 共同规则：机关格和落点都是外面的空地，不压内容、散字、墨障、别的机关、起点、凹槽和凹槽口，落点离巢穴至少 3 格；
+## 机关格之间至少隔 1 格；值得用：落点沿路走要比直接到远（渗 ≥ 8 步，吊 ≥ 4 步，线比导线长 ≥ 3 步）。
+## 不会跳进凹槽，所以大赏仍要从口上的精英身边进。主题没有新机关（潮汐渠）直接返回 true；摆不下返回 false 换下一张图。
+static func place_movers(m: Dictionary) -> bool:
+	if not MOVERS.has(m.tn):
+		return true
+	var R := Rng.new(int(m.seed) * 6151 + 41)
+	var mv: Dictionary = MOVERS[m.tn]
+	var mouth := {}
+	for p in m.pockets:
+		mouth[p.o] = true
+	# land：能当落点；free：还能当机关格（和别的机关格隔 1 格）
+	var land := func(k: int) -> bool:
+		return m.ink[k] == 0 and not m.pocket.has(k) and not mouth.has(k) and not m.node.has(k) and not m.glyph.has(k) \
+			and not m.obst.has(k) and not m.mech.has(k) and k != m.start and m.ds[k] < INF and man(k, m.lair) >= 3 \
+			and not m.mech.values().any(func(o): return o.get("to", -1) == k)
+	var free := func(k: int) -> bool:
+		return land.call(k) and not m.mech.keys().any(func(x): return man(x, k) < 2)
+	# 走路距离：墨障能冲开，算可走；关着的门不算
+	var walk := mask_of(func(k): return m.ink[k] == 0 and not (m.mech.has(k) and m.mech[k].kind == "gate"))
+	var cand: Array = R.shuf(range(N).filter(func(k): return free.call(k)))
+	match mv.kind:
+		"warp":
+			for a in cand:
+				var d := bfs(walk, a)
+				for b in cand:
+					if b != a and d[b] >= 8 and d[b] < INF and man(a, b) >= 5 and free.call(a) and free.call(b):
+						_put_mover(m, mv, a, b)
+						_put_mover(m, mv, b, a)
+						return true
+			return false
+		"hoist":
+			var want: int = mv.n[0] + R.ri(mv.n[1] - mv.n[0] + 1)
+			var c := 0
+			for k in cand:
+				if c >= want:
+					break
+				if not free.call(k):
+					continue
+				var p := rc(k)
+				var d := bfs(walk, k)
+				for dir in R.shuf(DIRS):
+					# 箭头前面是 1～2 格墨渍，再过去是落点
+					var q: Vector2i = p + dir
+					var wall := 0
+					while wall < 2 and inb(q.x, q.y) and m.ink[kk(q.x, q.y)] != 0:
+						wall += 1
+						q += dir
+					if wall == 0 or not inb(q.x, q.y):
+						continue
+					var to := kk(q.x, q.y)
+					if not land.call(to) or d[to] < 4 or d[to] >= INF:
+						continue
+					var mc := _put_mover(m, mv, k, to)
+					mc["dir"] = dir
+					c += 1
+					break
+			return c >= mv.n[0]
+		"wire":
+			for a in cand:
+				var d := bfs(walk, a)
+				for b in cand:
+					var dm := man(a, b)
+					if b == a or dm < 4 or dm > 6 or d[b] >= INF or d[b] < dm + 3 or not free.call(a) or not free.call(b):
+						continue
+					# 导线：先横后竖（或反过来）拐一个弯，只画出来，不占格
+					var pa := rc(a)
+					var pb := rc(b)
+					var path: Array = []
+					var cur := pa
+					var horiz_first := R.next() < 0.5
+					for leg in 2:
+						var along_c := horiz_first == (leg == 0)
+						while (cur.y != pb.y) if along_c else (cur.x != pb.x):
+							if along_c:
+								cur.y += signi(pb.y - cur.y)
+							else:
+								cur.x += signi(pb.x - cur.x)
+							if cur != pb:
+								path.append(kk(cur.x, cur.y))
+					_put_mover(m, mv, a, b)["path"] = path
+					_put_mover(m, mv, b, a)["path"] = path
+					m["wire_path"] = path
+					return true
+			return false
+	return false
+
+
+static func _put_mover(m: Dictionary, mv: Dictionary, k: int, to: int) -> Dictionary:
+	var o: Dictionary = mv.duplicate(true)
+	o["to"] = to
+	m.mech[k] = o
+	return o
+
+
+## 首领巢穴离起点至少几步（沿可走的路算）。起点总在地图中部偏左，太大会把左半圈排除掉
+const LAIR_MIN_PATH := 6
+
+
+## 地图最外一圈的格
+static func is_rim(k: int) -> bool:
+	var p := rc(k)
+	return p.x == 0 or p.y == 0 or p.x == H - 1 or p.y == W - 1
+
+
+## 首领巢穴改到最外一圈的随机空地（原型把它放在离起点最远处，玩家很快就能猜到）。
+## 条件：走得到；离起点至少 LAIR_MIN_PATH 步（沿路走）；不贴着大赏、休息点、商店；不压机关、墨障、散字、凹槽。
+## 用单独的随机数（只看种子），不影响原型的其余排布；一个合格的格都没有就换下一张图。
+static func relocate_lair(m: Dictionary) -> bool:
+	var R := Rng.new(int(m.seed) * 4099 + 29)
+	var mk := mask_of(func(k): return m.ink[k] == 0 and not m.obst.has(k) and not (m.mech.has(k) and m.mech[k].kind == "gate"))
+	var d := bfs(mk, m.start)
+	var keep_off: Array = []
+	for k in m.node:
+		if m.node[k].t in ["大", "休", "市", "险"]:
+			keep_off.append(k)
+	var cand: Array = []
+	for k in N:
+		if not is_rim(k) or m.ink[k] != 0 or m.pocket.has(k) or m.obst.has(k) or m.mech.has(k) or m.glyph.has(k):
+			continue
+		if k == m.start or (m.node.has(k) and m.node[k].t != "巢") or d[k] >= INF or d[k] < LAIR_MIN_PATH:
+			continue
+		if keep_off.any(func(x): return man(x, k) < 3):
+			continue
+		cand.append(k)
+	if cand.is_empty():
+		return false
+	var lair: int = cand[R.ri(cand.size())]
+	m.node.erase(m.lair)
+	m.node[lair] = {"t": "巢"}
+	m["lair"] = lair
+	return true
 
 
 ## v0.3 伏兵：领地 = 所在格 + 上下左右；领地里的小赏 / 谜 / 散字被「封」；
@@ -714,6 +888,8 @@ static func assign_ambush(m: Dictionary) -> bool:
 		forbid[p.o] = true
 	for k in m.mech:
 		forbid[k] = true
+		if m.mech[k].has("to"):
+			forbid[m.mech[k].to] = true
 	for k in m.obst:
 		forbid[k] = true
 	var target := 3 + R.ri(4)
@@ -755,7 +931,7 @@ static func assign_ambush(m: Dictionary) -> bool:
 	m["amb"] = ambs.map(func(x): return x.k)
 	m["ambush"] = ambs
 	m["terr"] = terr
-	m["fog"] = sim(m, "fog", true, terr)
+	m["fog"] = sim(m, "fog", true, terr, SLIDE_N)
 	var n := float(m.content.size())
 	return m.fog.got >= 0.45 * n and m.fog.got <= 0.75 * n
 

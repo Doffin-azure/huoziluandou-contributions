@@ -6,6 +6,7 @@ var _screen: Control
 var _capture := false
 var _saved_motion := false
 var _saved_release := false
+var _saved_style := ""
 var _recording := false
 var _recorded := 0
 const GLYPHS := ["击", "破", "回", "流", "防", "御", "加", "速", "充", "电", "火", "爆", "金", "币", "冷", "转"]
@@ -15,6 +16,8 @@ func _ready() -> void:
 	_capture = OS.get_cmdline_user_args().has("--capture")
 	_saved_motion = Settings.reduced_motion
 	_saved_release = Settings.drag_release_play
+	_saved_style = Palette.STYLE_ID
+	Ink.apply_style(GameStyle.paper())
 	Settings.reduced_motion = false
 	Settings.drag_release_play = false
 	if _capture:
@@ -406,7 +409,43 @@ func _run() -> void:
 	_ok(Router.current_path.contains("title_screen"), "动画中切换界面无遗留输入锁")
 	if _capture:
 		_ok(not is_instance_valid(shared_tray) and Router.study_stage.battle_table.papers.is_empty(), "退出战斗释放共享字盘与纸面，不把表现节点留在书房")
+	await _verify_relic_board()
 	Settings.reduced_motion = _saved_motion
 	Settings.drag_release_play = _saved_release
+	Ink.apply_style(GameStyle.get_style(_saved_style))
 	print("[battle_ui_test] PASS=%d FAIL=%d" % [_pass, _fail])
 	get_tree().quit(1 if _fail > 0 else 0)
+
+
+func _verify_relic_board() -> void:
+	var saved_style: String = Palette.STYLE_ID
+	Ink.apply_style(GameStyle.get_style("taopunk"))
+	GameState.start_new_run("v03")
+	GameState.add_relic("press")
+	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7})
+	await _frames(12)
+	_screen = Router.current
+	var board: BoardView = _screen._board_view
+	_ok(_screen.battle.board.size == 5 and board.tiles.size() == 25 and board._presentation.actors.size() == 25, "对开版遗物在当前美术下构建 5×5 字盘与全部字块")
+	for i in 25:
+		_screen.battle.board.cells[i] = CharInstance.new(Database.get_character_by_glyph(GLYPHS[i % GLYPHS.size()]))
+	_screen.battle.board.set_cell(3, 4, CharInstance.new(Database.get_character_by_glyph("击")))
+	_screen.battle.board.set_cell(4, 4, CharInstance.new(Database.get_character_by_glyph("破")))
+	_screen._refresh_all()
+	await _frames(12)
+	var projected := true
+	for i in 25:
+		projected = projected and board._cell_at(board.tiles[i].get_global_rect().get_center()) == board.tiles[i].grid_pos
+	_ok(projected, "扩大字盘后所有 25 枚字块的投影与点击位置一致")
+	_ok(_screen._turn_label.tooltip_text.contains(Relics.desc_of("press")), "战斗回合入口保留远端遗物说明")
+	var hp: int = _screen.battle.enemies[0].hp
+	_mouse_tap_cell(Vector2i(3, 4))
+	_mouse_tap_cell(Vector2i(4, 4))
+	_ok(board.path == [Vector2i(3, 4), Vector2i(4, 4)] and not _screen._confirm_btn.disabled, "新增第五行仍能连字并激活出字")
+	_screen._confirm_btn.pressed.emit()
+	await _idle()
+	_ok(_screen.battle.enemies[0].hp == hp - 8, "扩大字盘的击破正常结算 8 伤害")
+	await _shot("battle-merged-relic-board")
+	Router.goto("res://src/screens/title_screen.gd")
+	await _frames(10)
+	Ink.apply_style(GameStyle.get_style(saved_style))

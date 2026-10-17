@@ -46,7 +46,7 @@ func _option_card(seal: String, title: String, desc: String, cb: Callable) -> Co
 
 
 func _heal_amount() -> int:
-	return int(round(GameState.player_max_hp * 0.3))
+	return int(round(GameState.player_max_hp * 0.3)) + Relics.rest_bonus()
 
 
 func _do_heal() -> void:

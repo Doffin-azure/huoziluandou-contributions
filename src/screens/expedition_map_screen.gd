@@ -23,8 +23,10 @@ var _title_label: Label
 var _boss_label: Label
 var _stat_label: Label
 var _seal_label: Label
+var _relic_label: Label
 var _confront_btn: Button
 var _power_btn: Button
+var _wish_btn: Button
 var _sel := -1
 var _forge_sel: Array = []
 var _boss_bar: PanelContainer
@@ -142,12 +144,22 @@ func _build_header() -> Control:
 	stats.add_child(_stat_label)
 	_seal_label = JourneyStyle.label("", "", JourneyStyle.GOLD)
 	stats.add_child(_seal_label)
+	_relic_label = JourneyStyle.label("", "", JourneyStyle.GOLD)
+	# 完整清单放在悬停描述中，避免遗物数量撑开顶栏。
+	_relic_label.clip_text = true
+	_relic_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_relic_label.mouse_filter = Control.MOUSE_FILTER_PASS
+	stats.add_child(_relic_label)
 	row.add_child(stats)
+	_wish_btn = _ghost("许愿机", func(): ex.open_wish())
+	_wish_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_wish_btn.tooltip_text = "随身许愿机：每幕一次，投 2～3 个字匣里的字许愿，可能熔出遗物"
+	row.add_child(_wish_btn)
 	_power_btn = _ghost("超能力", func(): ex.use_power())
 	_power_btn.tooltip_text = "每幕一次：首领起身后把它定住 6 步"
 	_power_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_power_btn)
-	_confront_btn = _ghost("迎战首领", func(): ex.confront())
+	_confront_btn = _ghost("迎战首领", func(): ex.finish_act() if ex.boss_down else ex.confront())
 	_confront_btn.tooltip_text = "首领在 2 步内时可以主动迎战，不吃位置减益"
 	_confront_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_confront_btn)
@@ -279,13 +291,17 @@ func _focus_map_position() -> void:
 func _refresh_boss_bar() -> void:
 	var color := Palette.INK_SOFT
 	var text := "首领【%s】在巢穴里沉睡，没有在追你" % ex.m.TH.boss
-	if ex.stir != null and not ex.awake():
+	if ex.boss_down:
+		color = Palette.JADE
+		text = "首领【%s】已被击败 · 剩下的东西可以慢慢拿，准备好了点「结束本幕」" % ex.m.TH.boss
+	elif ex.stir != null and not ex.awake():
 		color = Palette.GOLD_DK
 		text = "首领【%s】被惊动了！%d 步后起身追你" % [ex.m.TH.boss, int(ex.rise) - ex.t]
 	elif ex.awake():
 		var d := MapGen.bfs(ex.boss_mask(), ex.boss)[ex.pos]
 		color = Palette.VERMILION if d > 3 else Palette.VERMILION_DK
-		text = "首领【%s】正在追你 · 相距 %d 步%s · 地图上红色的【%s】" % [ex.m.TH.boss, d, "（被定住 %d 步）" % ex.stun if ex.stun > 0 else "", ex.m.TH.boss]
+		var go := "（被定住 %d 步）" % ex.stun if ex.stun > 0 else " · 下一步 %d%% 会动" % int(round(ex.move_chance() * 100))
+		text = "首领【%s】正在追你 · 相距 %d 步%s · 地图上红色的【%s】" % [ex.m.TH.boss, d, go, ex.m.TH.boss]
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = color
 	sb.set_corner_radius_all(0)
@@ -314,8 +330,15 @@ func _on_stats_changed() -> void:
 	_stat_label.text = "墨 %d　❖ %d　字袋 %d/%d" % [ex.ink, GameState.gold, GameState.deck_size(), Expedition.DECK_CAP]
 	_seal_label.text = "印章：" + ("、".join(ex.seals) if not ex.seals.is_empty() else "无")
 	_seal_label.tooltip_text = "\n".join(ex.seals.map(func(s): return "%s：%s" % [s, Expedition.SEALS[s][0]]))
-	_confront_btn.disabled = not ex.can_confront()
+	_relic_label.text = "遗物：" + ("、".join(GameState.relics.map(func(r): return Relics.name_of(r))) if not GameState.relics.is_empty() else "无")
+	_relic_label.tooltip_text = "\n".join(GameState.relics.map(func(r): return Relics.text(r) + _bind_note(r)))
+	_confront_btn.text = "结束本幕" if ex.boss_down else "迎战首领"
+	_confront_btn.tooltip_text = "进入幕间结算；剩下没拿的东西会留在这一幕" if ex.boss_down else "首领在 2 步内时可以主动迎战，不吃位置减益"
+	_confront_btn.disabled = not (ex.can_finish_act() if ex.boss_down else ex.can_confront())
 	_power_btn.visible = ex.has("超能力")
+	_wish_btn.disabled = not ex.can_wish()
+	_wish_btn.text = "许愿机（本幕已用）" if ex.wish_used else "许愿机"
+	_wish_btn.tooltip_text = "本幕已经用过，下一幕再来" if ex.wish_used else ("字匣里至少要有 2 个字" if ex.tray.size() < 2 else "随身许愿机：每幕一次，投 2～3 个字匣里的字许愿，可能熔出遗物")
 	_power_btn.disabled = not ex.can_power()
 
 
@@ -374,6 +397,9 @@ func _map_cell(k: int) -> Button:
 			if mc.kind == "gate" and ex.gate_shut(k, ex.t):
 				bg = bg.darkened(0.45)
 				tip = "关着 · "
+			elif mc.kind == "wire" and not ex.mover_live(k, ex.t):
+				bg = bg.darkened(0.45)
+				tip = "没电 · "
 			tip += mc.desc
 		elif m.obst.has(k):
 			bg = Color(NODE_COLOR["障"])
@@ -397,6 +423,10 @@ func _map_cell(k: int) -> Button:
 			tip = "散字【%s】" % m.glyph[k] + ("：被%s看守" % gd if not gd.is_empty() else "：走过去就拾")
 			if not gd.is_empty():
 				fg = Palette.INK_FAINT
+		elif m.get("wire_path", []).has(k):
+			fg = Color(MapGen.MOVERS["雷池"].color)
+			text = "·"
+			tip = "导线从这里经过（只是连线，踩两头才会传送）"
 		if ex.sealed(k) and (not o.is_empty() or m.glyph.has(k)) and not ex.taken.has(k):
 			text = "封"
 			fg = Palette.VERMILION
@@ -512,7 +542,7 @@ func _on_tray(i: int) -> void:
 	if ex.top_panel().get("kind", "") == "forge":
 		if _forge_sel.has(i):
 			_forge_sel.erase(i)
-		elif _forge_sel.size() < 2:
+		elif _forge_sel.size() < 3:
 			_forge_sel.append(i)
 	else:
 		_sel = -1 if _sel == i else i
@@ -549,6 +579,7 @@ func _refresh_event() -> void:
 		"forge": _event_forge()
 		"event": _event_mystery(p)
 		"seal_swap": _event_seal_swap(p)
+		"relic_bind": _event_relic_bind(p)
 		"act_end": _event_act_end()
 		_: _event_idle()
 
@@ -576,7 +607,7 @@ func _event_fight() -> void:
 				notes.append("防护：开场 +6 护盾。")
 		"boss":
 			var affixes: Array = Expedition.BOSS_AFFIX[ex.act].map(func(a): return Expedition.AFFIX_TEXT[a[0]] % a[1])
-			notes.append("首领词条：" + "、".join(affixes) + ("（朱砂：少一条）" if ex.has_seal("朱砂") else ""))
+			notes.append("首领词条：" + "、".join(affixes) + ("（朱笔：少一条）" if ex.has_seal("朱笔") else ""))
 			if not str(f.get("debuff", "")).is_empty():
 				notes.append("被追上的位置：" + Expedition.DEBUFF_TEXT[f.debuff])
 			elif f.get("caught", false) and ex.has("反超"):
@@ -624,7 +655,7 @@ func _event_shop() -> void:
 	var names := {"glyph": "买字【%s】", "buyback": "回购【%s】", "remove": "删字", "gild": "修饰（镀金）", "heal": "治疗 30%"}
 	for i in offers.size():
 		var o: Dictionary = offers[i]
-		var label: String = names[o.kind] % o.glyph if o.has("glyph") else names[o.kind]
+		var label: String = ("遗物「%s」" % Relics.name_of(o.relic)) if o.kind == "relic" else (names[o.kind] % o.glyph if o.has("glyph") else names[o.kind])
 		var cost := ex.price(o)
 		var b: Button
 		match o.kind:
@@ -634,8 +665,16 @@ func _event_shop() -> void:
 				b = _ghost("%s　❖ %d" % [label, cost], func(): _pick_deck("镀金哪一枚？", func(id): ex.buy(i, id)))
 			_:
 				b = _ghost("%s　❖ %d" % [label, cost], func(): ex.buy(i))
-		b.disabled = GameState.gold < cost
+		b.disabled = GameState.gold < cost or (o.kind == "relic" and GameState.has_relic(o.relic))
 		_add(b)
+		if o.kind == "relic":
+			var cap := Ink.caption(Relics.desc_of(o.relic))
+			cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			_add(cap)
+	for id in GameState.relics.duplicate():
+		var sell := _ghost("卖掉「%s」　❖ +%d" % [Relics.name_of(id), Relics.sell_price(id)], func(): ex.sell_relic(id))
+		sell.tooltip_text = Relics.text(id)
+		_add(sell)
 	var notes: Array = []
 	for w in ["收购", "合资", "投币", "回购"]:
 		if ex.has(w):
@@ -646,15 +685,33 @@ func _event_shop() -> void:
 
 
 func _event_forge() -> void:
-	_add(Ink.h2("熔炉"))
-	_add(Ink.body("在字匣里点两个字，熔成一个稀有字。"))
+	var wish: bool = ex.top_panel().get("wish", false)
+	_add(Ink.h2("许愿机" if wish else "熔炉 · 许愿"))
+	var intro := Ink.body("在字匣里点 2～3 个字投进去。字和哪件遗物越相关，越可能熔出那件遗物；没熔出就得到一个稀有字。")
+	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_add(intro)
 	if ex.has("炼金"):
 		_add(Ink.caption("炼金：额外得 4 金币"))
-	var ok := _forge_sel.size() == 2
-	var b := _ghost("熔炼" + ("【%s】【%s】" % [ex.tray[_forge_sel[0]], ex.tray[_forge_sel[1]]] if ok else ""), func(): ex.forge(_forge_sel[0], _forge_sel[1]); _forge_sel.clear(), true)
+	var gs: Array = _forge_sel.map(func(i): return ex.tray[i])
+	if _forge_sel.size() >= 2:
+		var odds := Relics.wish_odds(gs, GameState.relics)
+		if odds.is_empty():
+			_add(Ink.caption("这几个字和遗物都不相关：会熔成一个稀有字。"))
+		else:
+			_add(Ink.label("熔出遗物的机会：%d%%" % int(round(Relics.wish_chance(gs, GameState.relics) * 100)), "", Palette.VERMILION))
+			for c in odds.slice(0, 4):
+				var hit: Array = gs.filter(func(g): return Relics.related(c.id, g))
+				var line := Ink.caption("「%s」%d%%（%s）　%s" % [Relics.name_of(c.id), int(round(c.p * 100)), "".join(hit), Relics.desc_of(c.id)])
+				line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				_add(line)
+	var ok := _forge_sel.size() >= 2
+	var label := "投进去" + "".join(gs.map(func(g): return "【%s】" % g))
+	var b := _ghost(label, func(): ex.forge(_forge_sel[0], _forge_sel[1], _forge_sel[2] if _forge_sel.size() > 2 else -1); _forge_sel.clear(), true)
 	b.disabled = not ok
 	_add(b)
-	_add(_ghost("不熔，走开", func(): ex.leave_panel(); _forge_sel.clear()))
+	_add(_ghost("先不许愿" if wish else "不熔，走开", func(): ex.leave_panel(); _forge_sel.clear()))
+	if wish:
+		_add(Ink.caption("每幕一次；关掉不算用掉。"))
 
 
 func _event_mystery(p: Dictionary) -> void:
@@ -671,6 +728,22 @@ func _event_seal_swap(p: Dictionary) -> void:
 	for i in ex.seals.size():
 		_add(_ghost("丢掉「%s」换它" % ex.seals[i], func(): ex.swap_seal(i)))
 	_add(_ghost("不要新印章", func(): ex.swap_seal(-1)))
+
+
+func _event_relic_bind(p: Dictionary) -> void:
+	_add(Ink.h2("「%s」选一枚字" % Relics.name_of(p.relic)))
+	var desc := Ink.body(Relics.desc_of(p.relic) + "。")
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_add(desc)
+	_add(_ghost("从字袋里挑", func(): _pick_deck("「%s」绑哪一枚？" % Relics.name_of(p.relic), func(id): ex.bind_relic(id)), true))
+
+
+## 绑定类遗物：被绑的字已不在字袋时提示
+func _bind_note(id: String) -> String:
+	if not Relics.needs_bind(id):
+		return ""
+	var inst := GameState.relic_bound_inst(id)
+	return "（绑定【%s】）" % inst.glyph() if inst != null else "（绑定的字已不在字袋，暂不生效）"
 
 
 func _event_act_end() -> void:
@@ -770,6 +843,8 @@ func _refresh_boss_piece() -> void:
 	_boss_badge.text = ("z" if ex.stir == null else ("%d" % (int(ex.rise) - ex.t) if stirred else ("定" if ex.stun > 0 else "")))
 	_boss_piece.tooltip_text = "首领【%s】· %s" % [ex.m.TH.boss, ex.boss_status()]
 	_boss_piece.modulate.a = 0.85 if ex.stir == null else 1.0
+	# 一开始看不见：睡着时只有走到看得见它的地方才露面；惊动后一直显示
+	_boss_piece.visible = ex.boss_revealed()
 	# 逐格播放首领这一次走过的路
 	var steps: Array = ex.boss_trail.duplicate()
 	ex.boss_trail.clear()
@@ -841,7 +916,7 @@ func _build_legend() -> Control:
 			[th.boss, Palette.VERMILION.darkened(0.45), Palette.GOLD, "首领棋子 · 惊动（金边，角标倒计时）"],
 			[th.boss, Palette.VERMILION, Palette.PAPER, "首领棋子 · 追击（白边，前方虚点 = 要走的路）"],
 		]],
-		["本幕机关 · " + ex.m.tn, th.mech.map(func(mc): return [mc.g, Color("496564"), Palette.PAPER, mc.desc])],
+		["本幕机关 · " + ex.m.tn, (th.mech + ([MapGen.MOVERS[ex.m.tn]] if MapGen.MOVERS.has(ex.m.tn) else [])).map(func(mc): return [mc.g, Color("496564"), Palette.PAPER, mc.desc])],
 		["玩家与版面", [
 			["●", Palette.PAPER_DARK, Palette.VERMILION, "你（朱红粗框）"],
 			["", Palette.PAPER_DARK, Palette.GOLD_DK, "金框 = 下一步能走的格"],
