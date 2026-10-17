@@ -13,7 +13,7 @@ var storage_path := PATH
 ##   true：松手即结算（旧的手感，节奏更快）。
 var drag_release_play: bool = false
 
-## 视觉风格：青铜绘卷与宣纸活字；已退役或未知配置回到当前定稿。
+## 视觉风格固定为青铜绘卷；旧主题配置迁移到当前定稿。
 var visual_style: String = "taopunk"
 var board_font_path := ""
 var reduced_motion: bool = false
@@ -30,7 +30,8 @@ func _ready() -> void:
 		board_font_path = str(_cfg.get_value("visual", "board_font", ""))
 		reduced_motion = bool(_cfg.get_value("visual", "reduced_motion", false))
 		sfx_volume = clampf(float(_cfg.get_value("audio", "sfx_volume", 0.65)), 0.0, 1.0)
-		if stored_style != visual_style: _save()
+		if stored_style != visual_style or _cfg.has_section_key("visual", "style"):
+			_save()
 
 
 func set_drag_release_play(value: bool) -> void:

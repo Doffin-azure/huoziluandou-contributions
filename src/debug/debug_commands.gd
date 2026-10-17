@@ -104,13 +104,6 @@ static func install() -> void:
 		if Debug != null: Debug.clear_log()
 		return [])
 	register("refresh", "刷新战斗界面", func(_a): _refresh(); return ["已刷新"])
-	register("style", "切换风格 taopunk|paper", func(a):
-		var id: String = _glyph(a, 0)
-		if not GameStyle.IDS.has(id):
-			return ["用法：/style taopunk|paper"]
-		Ink.apply_style(GameStyle.get_style(id))
-		Router.goto(Router.current_path)
-		return ["风格已切到 " + id])
 	register("seed", "固定本场随机种子", func(a):
 		var b := _battle()
 		if b == null: return _ck()

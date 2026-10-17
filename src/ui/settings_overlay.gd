@@ -4,7 +4,6 @@ class_name SettingsOverlay
 
 signal closed
 
-var _style_row: VBoxContainer
 var _panel: PanelContainer
 
 
@@ -56,12 +55,7 @@ func _build() -> void:
 
 	col.add_child(Ink.hline())
 
-	# ---- 战斗字盘 ----
-	col.add_child(Ink.label("战斗字盘", "Subheading"))
-	col.add_child(Ink.caption("切换战斗字盘的显示风格，下场战斗生效。行旅界面保持墨青与朱砂配色。"))
-	_style_row = Ink.vbox(8)
-	col.add_child(_style_row)
-	_build_style_buttons()
+	# 字盘字体独立于美术风格，继续允许自定义。
 	col.add_child(BoardFontPicker.new())
 
 	col.add_child(Ink.hline())
@@ -106,19 +100,6 @@ func _build() -> void:
 	col.add_child(audio_row)
 
 
-
-func _build_style_buttons() -> void:
-	for c in _style_row.get_children():
-		c.queue_free()
-	for id in GameStyle.IDS:
-		var active: bool = Settings.visual_style == id
-		var b := Ink.button(GameStyle.get_style(id).name + ("　✓" if active else ""), active)
-		b.custom_minimum_size = Vector2(180, 48 * JourneyStyle.touch_scale(self))
-		b.disabled = active
-		b.pressed.connect(_set_style.bind(id))
-		_style_row.add_child(b)
-
-
 func _toggle_text() -> String:
 	return "开" if Settings.drag_release_play else "关"
 
@@ -126,18 +107,6 @@ func _toggle_text() -> String:
 func _on_toggle(btn: Button) -> void:
 	Settings.set_drag_release_play(not Settings.drag_release_play)
 	btn.text = _toggle_text()
-
-
-func _set_style(style_id: String) -> void:
-	Settings.set_visual_style(style_id)
-	style_id = Settings.visual_style
-	if Router.current_path.ends_with("/battle_screen.gd"):
-		Ink.pending_style = style_id
-	else:
-		Ink.apply_style(GameStyle.get_style(style_id))
-		Ink.pending_style = ""
-	# Journey pages own their theme. Rebuilding them would reroll rewards and shops.
-	_build_style_buttons()
 
 
 func _input(event: InputEvent) -> void:

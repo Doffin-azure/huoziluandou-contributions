@@ -1,10 +1,9 @@
 extends RefCounted
 class_name GameStyle
-## 视觉风格令牌。切换风格 = 换一套令牌 + 背景/字块材质 + 主题。
+## 视觉风格令牌。青铜绘卷基于宣纸基础令牌构建。
 ## 风格：
 ##   taopunk —— 青铜绘卷：手绘青绿 / 青铜机关 / 朱红（当前定稿）
-##   paper —— 宣纸 / 木活字 / 朱印（旧版可选）
-const IDS := ["taopunk", "paper"]
+##   paper —— 内部基础令牌与旧版渲染验证，不再提供切换入口。
 
 var id := "paper"
 var name := "宣纸活字"
@@ -39,12 +38,12 @@ var SURFACE_RAISED := Color("f7eedc")
 var SHADOW := Color(0.08, 0.06, 0.04, 0.45)
 
 
-static func get_style(style_id: String) -> GameStyle:
-	return paper() if normalize_id(style_id) == "paper" else taopunk()
+static func get_style(_style_id: String) -> GameStyle:
+	return taopunk()
 
 
-static func normalize_id(style_id: String) -> String:
-	return style_id if IDS.has(style_id) else "taopunk"
+static func normalize_id(_style_id: String) -> String:
+	return "taopunk"
 
 
 static func taopunk() -> GameStyle:

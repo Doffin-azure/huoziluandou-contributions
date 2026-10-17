@@ -1,13 +1,12 @@
 extends Node
 ## Ink —— 全局“美术工具箱”。
 ## 所有界面都用 Ink.xxx() 组装；改一处即全局换皮。
-## 风格由 GameStyle 令牌驱动（青铜绘卷 / 宣纸）；战斗中换肤延后至离开页面。
+## 当前使用青铜绘卷令牌；字体可独立自定义。
 
 var theme: Theme
 var serif: Font
 var sans: Font
 var board_font: Font
-var pending_style := ""
 signal board_font_changed
 var style: GameStyle
 
@@ -33,12 +32,6 @@ func apply_style(new_style: GameStyle) -> void:
 	theme = _build_theme()
 	if get_tree() != null:
 		get_tree().root.theme = theme
-
-
-func apply_pending_style() -> void:
-	if pending_style.is_empty(): return
-	apply_style(GameStyle.get_style(pending_style))
-	pending_style = ""
 
 
 func _load_fonts() -> void:

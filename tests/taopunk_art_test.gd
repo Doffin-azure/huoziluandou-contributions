@@ -139,11 +139,11 @@ func _run() -> void:
 	var settings: SettingsOverlay = PauseMenu._instance._settings
 	_ok(settings.find_children("*", "Control", true, false).any(func(child): return child is BoardFontPicker), "真实设置页提供字体入口")
 	await _shot("taopunk-settings-phone")
-	settings._set_style("paper")
-	_ok(Palette.STYLE_ID == "taopunk" and Ink.pending_style == "paper" and _screen.battle.get_instance_id() == battle_id, "战斗切换风格延后生效，不拆解当前战斗")
+	settings.find_children("*", "Button", true, false).filter(func(b): return b.text == "关闭")[0].pressed.emit()
+	_ok(Palette.STYLE_ID == "taopunk" and _screen.battle.get_instance_id() == battle_id, "关闭设置保留青铜绘卷与当前战斗")
 	Router.goto("res://src/screens/map_screen.gd")
 	await _frames()
-	_ok(Palette.STYLE_ID == "paper" and Ink.pending_style.is_empty(), "离开战斗后应用待切换风格")
+	_ok(Palette.STYLE_ID == "taopunk", "离开战斗后仍使用青铜绘卷")
 	Settings.visual_style = _old_style
 	Settings.board_font_path = _old_font
 	Settings.storage_path = _old_path
