@@ -1153,6 +1153,8 @@ func _encounter_move_text(move: EnemyMoveData) -> String:
 		EnemyMoveData.Kind.BLOCK: result += " +%d盾" % move.block
 		EnemyMoveData.Kind.ATTACK_BLOCK: result += " %d伤/+%d盾" % [move.damage, move.block]
 		EnemyMoveData.Kind.INJECT: result += " 注%d字" % move.inject_count
+	if move.inject_count > 0 and move.kind != EnemyMoveData.Kind.INJECT:
+		result += "（空间类时注%d枚【%s】）" % [move.inject_count, move.inject_glyph] if move.mechanic_action == "copy" else " 注%d枚【%s】" % [move.inject_count, move.inject_glyph]
 	return result
 
 

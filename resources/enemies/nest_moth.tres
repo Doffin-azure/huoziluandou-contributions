@@ -10,6 +10,7 @@ title = "结巢"
 description = "循环行动：结巢 → 啄字 → 扑击"
 damage = 0
 block = 6
+mechanic_action = "seed_nest"
 
 [sub_resource type="Resource" id="Resource_ksxml"]
 script = ExtResource("1_njcvm")
@@ -29,7 +30,7 @@ script = ExtResource("2_dol0d")
 id = "nest_moth"
 name = "铸巢蛾"
 glyph = "铸"
-description = "啄字前阶段内，将真实己方原实体通过补字或回收效果放入盘面，再成功用它组词，移除怪物最多6普通盾，啄字降至7。开窗前已完成的基础补字不计；临时生成字、纯移动和重连返还不计。每题只拆一次盾。"
+description = "结巢获得6盾，并往空格注入1枚蔓生【连】；每枚未净化的连在下个玩家回合结束复制1枚，同源盘面最多4枚，可单打或组成连击、心连心清理。净化停止复制。啄字前阶段内，真实己方原实体通过补字或回收进入盘面再成功组词，移除最多6普通盾，啄字降至7；临时生成、纯移动和重连返还不计。"
 max_hp = 52
 mechanic = "nest"
 act = 2

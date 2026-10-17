@@ -70,7 +70,7 @@ func _build_daylight() -> void:
 	# Linear tonemapping keeps the chosen paint colours predictable; no filmic desaturation.
 	environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	environment.tonemap_exposure = 1.0
-	environment.ssao_enabled = true
+	environment.ssao_enabled = RenderingServer.get_current_rendering_method() == "forward_plus"
 	environment.ssao_radius = 0.25
 	environment.ssao_intensity = 0.65
 	environment.ssr_enabled = false

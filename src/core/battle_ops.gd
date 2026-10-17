@@ -115,18 +115,20 @@ static func take_revealed(b: BattleState, uid: int) -> CharInstance:
 
 ## 敌人注入：owner=ENEMY，带污染，可被玩家组词但打出要付代价；消耗后消失。
 
-static func inject_enemy_glyphs(b: BattleState, count: int, pollution_id: String) -> int:
+static func inject_enemy_glyphs(b: BattleState, count: int, pollution_id: String, fixed_glyph := "", source_id := -1) -> int:
 	var pool := ["蚀", "障", "灰", "碍", "秽"]
 	var added := 0
 	for i in count:
 		if b.board.free_count() <= 0:
 			break
-		var glyph: String = pool[b.rng.randi_range(0, pool.size() - 1)]
+		var glyph: String = fixed_glyph if not fixed_glyph.is_empty() else pool[b.rng.randi_range(0, pool.size() - 1)]
 		var cd: CharacterData = Database.get_character_by_glyph(glyph)
 		if cd == null:
 			continue
 		var ci := CharInstance.new(cd)
 		ci.owner = CharInstance.Owner.ENEMY
+		ci.statuses.injected_by = source_id
+		ci.statuses.injected_turn = b.turn
 		if not pollution_id.is_empty():
 			ci.add_pollution(pollution_id)
 		var empties := b.board.empty_indices()

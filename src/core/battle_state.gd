@@ -1553,6 +1553,7 @@ func end_player_turn() -> void:
 
 	# 化肥：回合结束、敌人行动前繁殖
 	Relics.breed(self)
+	EnemyMechanics.replicate_glyphs(self)
 	_log("玩家结束回合")
 	var blitz := blitz_turn > 0 and turn == blitz_turn
 	for e in enemies:
@@ -1662,11 +1663,14 @@ func _enemy_act(e: Combatant, opening := false) -> void:
 			player.add_status(mv.status_id, mv.status_stacks)
 			_log("%s 施加减益 %s" % [e.display_name, mv.status_id])
 		EnemyMoveData.Kind.INJECT:
-			var n := inject_enemy_glyphs(mv.inject_count, mv.pollution_id)
+			var n := EnemyMechanics.inject_move(self, e, mv)
 			_log("%s 注入 %d 个污染字" % [e.display_name, n])
 		EnemyMoveData.Kind.SPECIAL:
 			EnemyMechanics.special(self, e, mv)
 
+	if mv.kind != EnemyMoveData.Kind.INJECT and mv.inject_count > 0 and player.is_alive() and e.is_alive():
+		var n := EnemyMechanics.inject_move(self, e, mv)
+		_log("%s 注入 %d 个【%s】" % [e.display_name, n, mv.inject_glyph])
 	EnemyMechanics.after_action(self, e, mv)
 
 	# 反只回应攻击自己的敌人；等完整多段行动结束，向该攻击者结算一次。
@@ -1838,7 +1842,7 @@ func return_pending_reveal() -> void:
 func take_revealed(uid: int) -> CharInstance:
 	return BattleOps.take_revealed(self, uid)
 
-func inject_enemy_glyphs(count: int, pollution_id: String) -> int:
+func inject_enemy_glyphs(count: int, pollution_id: String, fixed_glyph := "", source_id := -1) -> int:
 	if count > 0 and has_ability("prevent_interference"):
 		abilities.erase("prevent_interference")
 		_log("防护：抵消本次敌方盘面干扰")
@@ -1854,7 +1858,7 @@ func inject_enemy_glyphs(count: int, pollution_id: String) -> int:
 			else:
 				abilities["guard_inject"] = v
 			_log("护：抵消 %d 枚塞字" % reduced)
-	var n: int = BattleOps.inject_enemy_glyphs(self, count, pollution_id)
+	var n: int = BattleOps.inject_enemy_glyphs(self, count, pollution_id, fixed_glyph, source_id)
 	if n > 0 and has_ability("inject_bounty"):
 		var g := earn_gold(n * 2)
 		_log("加收：敌人注入 %d 枚，获得 %d 金币" % [n, g])

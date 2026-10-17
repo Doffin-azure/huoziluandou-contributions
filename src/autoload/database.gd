@@ -61,6 +61,10 @@ func reload() -> void:
 		acts[res.index] = res
 	for res in _load_dir(DECK_DIR, "StarterDeckData"):
 		starter_decks[res.id] = res
+	var balance_warning := EnemyBalance.load_into(enemies, pollutions)
+	if not balance_warning.is_empty():
+		warnings.append(balance_warning)
+		push_warning(balance_warning)
 
 	if ResourceLoader.exists(RULES_PATH):
 		rules = load(RULES_PATH)
