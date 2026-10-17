@@ -252,18 +252,31 @@ func _test_start_and_move() -> void:
 	var g1 := MapGen.generate(4242, "墨池")
 	var g2 := MapGen.generate(4242, "墨池")
 	_ok(g1.lair == g2.lair, "同一种子首领位置一样")
+	var sa := MapGen.sim(g1, "fog", true, g1.terr, MapGen.SLIDE_N, 5)
+	var sb := MapGen.sim(g1, "fog", true, g1.terr, MapGen.SLIDE_N, 5)
+	_ok(sa.got == sb.got and sa.t == sb.t, "概率追击模拟：同一个骰子种子结果一样")
+	var nc := float(g1.content.size())
+	_ok(g1.fog.got >= 0.45 * nc and g1.fog.got <= 0.75 * nc, "游戏用图按概率追击复核：初见拿到 %d/%d" % [g1.fog.got, nc])
 	var nb := _find(ex, func(k): return ex.can_step(k) and ex.mech_at(k).is_empty() and not ex.m.obst.has(k) and not ex.m.get("terr", {}).has(k))
 	ex.move(nb)
 	_ok(ex.pos == nb and ex.t == 1, "走一步，时间 +1")
 	_ok(not ex.can_step(ex.m.start + 2 * MapGen.W + 2) or MapGen.man(ex.m.start + 2 * MapGen.W + 2, ex.pos) == 1, "只能走相邻格")
 	# 墨障：花 2 墨冲开；墨不够以血冲开
-	var ob := _find(ex, func(k): return ex.m.obst.has(k))
+	# 找一张有墨障、且墨障旁有空地的图（不依赖某个种子碰巧有墨障）
+	var exo: Expedition = null
+	var ob := -1
+	for sd in range(1, 60):
+		exo = _fresh(sd)
+		ob = _find(exo, func(k): return exo.m.obst.has(k) and MapGen.nbrs(k).any(func(n): return exo.m.ink[n] == 0 and not exo.m.obst.has(n)))
+		if ob >= 0:
+			break
+	_ok(ob >= 0, "能找到带墨障的图")
 	if ob >= 0:
-		ex.pos = _find(ex, func(k): return MapGen.man(k, ob) == 1 and ex.m.ink[k] == 0)
-		ex.panels.clear()
-		ex.fight = {}
-		ex.move(ob)
-		_ok(ex.ink == Expedition.START_INK - Expedition.BARRIER_INK and not ex.m.obst.has(ob), "墨障：花 2 墨冲开")
+		exo.pos = MapGen.nbrs(ob).filter(func(n): return exo.m.ink[n] == 0 and not exo.m.obst.has(n))[0]
+		exo.panels.clear()
+		exo.fight = {}
+		exo.move(ob)
+		_ok(exo.ink == Expedition.START_INK - Expedition.BARRIER_INK and not exo.m.obst.has(ob), "墨障：花 2 墨冲开")
 	# 主题机关
 	var hp := GameState.player_hp
 	ex.m = MapGen.generate(11, "熔铸坊")
