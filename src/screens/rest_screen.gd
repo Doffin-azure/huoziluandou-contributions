@@ -10,7 +10,10 @@ func build(root: Control) -> void:
 
 	var main := JourneyStyle.page(root)
 	var stats := JourneyStyle.label("气血 %d / %d" % [GameState.player_hp, GameState.player_max_hp], "Stat", JourneyStyle.GOLD)
-	main.add_child(JourneyStyle.heading("休整 · 灯下", "灯火未熄。选择一项整备，然后继续前行。", stats))
+	var tools := Ink.hbox(16)
+	tools.add_child(stats)
+	tools.add_child(JourneyStyle.button("字袋", _open_deck))
+	main.add_child(JourneyStyle.heading("休整 · 灯下", "灯火未熄。选择一项整备，然后继续前行。", tools))
 	var center := CenterContainer.new()
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main.add_child(center)
@@ -116,3 +119,7 @@ func _apply_upgrade(ch: CharacterData) -> void:
 func _finish() -> void:
 	GameState.complete_current_node()
 	goto("res://src/screens/map_screen.gd")
+
+
+func _open_deck() -> void:
+	if not _done: CollectionOverlay.open_deck(self)

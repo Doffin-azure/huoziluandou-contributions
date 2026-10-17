@@ -7,6 +7,7 @@ var action_text := ""
 var secondary_text := ""
 var on_action: Callable
 var on_secondary: Callable
+var on_deck: Callable
 var detail_title: Label
 var description: Label
 var action_button: Button
@@ -45,6 +46,7 @@ func _ready() -> void:
 	status_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	status_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	header.add_child(status_label)
+	if on_deck.is_valid(): header.add_child(JourneyStyle.button("字袋", on_deck))
 	var empty := Ink.expander()
 	empty.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	main.add_child(empty)

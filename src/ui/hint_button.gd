@@ -9,6 +9,7 @@ func _ready() -> void:
 
 
 func _make_custom_tooltip(for_text: String) -> Object:
+	if for_text.strip_edges().is_empty(): return null
 	if JourneyStyle.is_active(self):
 		var hint := JourneyStyle.label(for_text)
 		hint.theme = JourneyStyle.get_theme()

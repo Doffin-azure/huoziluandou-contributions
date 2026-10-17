@@ -14,6 +14,7 @@ static func word_text(word: WordData, b: BattleState, path: Array = [], target: 
 	if not current.is_empty():
 		lines.append("当前：" + current)
 	lines.append_array(_active_triggers(word.effects, b, word))
+	lines.append_array(_pollution_lines(b, path))
 	if b.formation_mode and not b.formation_queue.is_empty() and not current.is_empty():
 		lines.append("结阵按发动时的状态依次结算。")
 	return "\n".join(lines)
@@ -22,12 +23,13 @@ static func solo_text(inst: CharInstance, b: BattleState, path: Array = [], targ
 	if inst == null or inst.data == null:
 		return ""
 	if inst.word_only:
-		return "仅供组词的临时复制；单独打出只弃掉，不触发单字效果。"
+		return "\n".join(["仅供组词的临时复制；单独打出只弃掉，不触发单字效果。"] + _pollution_lines(b, path))
 	var lines: Array[String] = [inst.data.description]
 	var current := _current(inst.data.solo_effects, b, path, target)
 	if not current.is_empty():
 		lines.append("当前：" + current)
 	lines.append_array(_active_triggers(inst.data.solo_effects, b))
+	lines.append_array(_pollution_lines(b, path))
 	if b.formation_mode and not b.formation_queue.is_empty() and not current.is_empty():
 		lines.append("结阵按发动时的上一手与资源状态依次结算。")
 	if inst.pinned:
@@ -35,6 +37,30 @@ static func solo_text(inst: CharInstance, b: BattleState, path: Array = [], targ
 	elif inst.temporary_uses > 0:
 		lines.append("本枚字还可使用%d次，下一次使用后仍留在原格。" % (inst.temporary_uses + 1))
 	return "\n".join(lines)
+
+static func _pollution_lines(b: BattleState, path: Array) -> Array[String]:
+	var lines: Array[String] = []
+	var has_damage := false
+	for pos in path:
+		var inst: CharInstance = b.board.get_xy(pos)
+		if inst == null: continue
+		var details: Array[String] = []
+		for id in inst.pollutions:
+			var pollution: PollutionData = Database.get_pollution(id)
+			if pollution == null: continue
+			var costs: Array[String] = []
+			if pollution.hp_loss_on_play > 0:
+				if b.has_ability("fireproof") and inst.glyph() == "热":
+					costs.append("防火生效，免伤")
+				else:
+					costs.append("%d伤害" % pollution.hp_loss_on_play)
+					has_damage = true
+			if pollution.draw_penalty_on_play > 0:
+				costs.append("下次补字-%d" % pollution.draw_penalty_on_play)
+			if not costs.is_empty(): details.append(pollution.name + "：" + "、".join(costs))
+		if not details.is_empty(): lines.append("出字时【%s】：%s。" % ["".join(inst.glyph_list()), "；".join(details)])
+	if has_damage: lines.append("污染伤害为基础值，照常计算防御、减伤与易伤。")
+	return lines
 
 static func _active_triggers(effects: Array, b: BattleState, word: WordData = null) -> Array[String]:
 	var lines: Array[String] = []
@@ -115,6 +141,14 @@ static func _effect(e: EffectData, b: BattleState, path: Array, target: Dictiona
 	var energy := b.player.energy
 	var heat := b.player.heat
 	match e.handler:
+		"merge_flow":
+			if target.get("picking", false): return ""
+			if target.has("cell1") and target.has("cell2"): return "两个落点已选好，点击「发动」确认；点击「清除」可取消重选。"
+			if not b.has_adjacent_empty_pair(): return "需要盘面已有两个相邻空格；未满足时不会消耗所选字。"
+			return "先点「出字」，再选弃字、依次点两个相邻空格，最后点「发动」。"
+		"replace_self":
+			if b.bag.is_empty() and b.discard.is_empty():
+				return "字袋和弃字堆都没有其他可换字，本次无法换成其他字。"
 		"repeat_last":
 			if b.last_played_glyphs.is_empty():
 				return "尚未打出任何字，无法复制；本次只弃掉【再】。"

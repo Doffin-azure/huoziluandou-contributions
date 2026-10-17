@@ -14,6 +14,19 @@ var _scroll: ScrollContainer
 var _counts: Dictionary = {}
 
 
+static func open_deck(owner: Control) -> void:
+	for child in owner.get_children():
+		if child is CollectionOverlay: return
+	var counts := GameState.glyph_counts()
+	var characters: Array = []
+	for glyph in counts:
+		var character: CharacterData = Database.get_character_by_glyph(glyph)
+		if character != null: characters.append(character)
+	var overlay := CollectionOverlay.new()
+	overlay.setup({"title": "字袋", "subtitle": "共 %d 枚 · 仅查看，不消耗金币或整备机会" % GameState.deck_size(), "characters": characters, "counts": counts})
+	owner.add_child(overlay)
+
+
 func setup(p_cfg: Dictionary) -> void:
 	cfg = p_cfg
 

@@ -31,6 +31,7 @@ func build(root: Control) -> void:
 	_hud.secondary_text = "离开市集"
 	_hud.on_action = _purchase_selected
 	_hud.on_secondary = _leave
+	_hud.on_deck = _open_deck
 	root.add_child(_hud)
 	_showcase.layout_changed.connect(_layout_offers)
 	_refresh()
@@ -185,3 +186,7 @@ func _choose_char(title: String) -> void:
 func _leave() -> void:
 	GameState.complete_current_node()
 	goto("res://src/screens/map_screen.gd")
+
+
+func _open_deck() -> void:
+	if not _busy: CollectionOverlay.open_deck(self)

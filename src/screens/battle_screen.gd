@@ -283,6 +283,7 @@ func _build_left() -> Control:
 	stamp.material = _confirm_ink
 	_confirm_btn.add_child(stamp)
 	_confirm_btn.mouse_entered.connect(func(): _confirm_ink.set_shader_parameter("hovered", true))
+	_confirm_btn.tooltip_text = "拖动连字后点击出字，或按回车。\n需要目标的词请按提示选择，再点「发动」。"
 	_confirm_btn.mouse_exited.connect(func(): _confirm_ink.set_shader_parameter("hovered", false))
 	_confirm_btn.button_down.connect(func(): _confirm_ink.set_shader_parameter("pressed", true))
 	_confirm_btn.button_up.connect(func(): _confirm_ink.set_shader_parameter("pressed", false))
@@ -408,7 +409,7 @@ func _refresh_player() -> void:
 	_show_defense(battle.player.block, battle.player.persistent_block)
 	var wallet: Array = [{"id": "gold", "title": "金币", "value": GameState.gold, "color": Palette.GOLD_DK, "description": "可用金币 %d，本战获得 %d。" % [GameState.gold, battle.gold_earned]}]
 	if battle.player.temp_funds > 0:
-		wallet.append({"id": "temp_funds", "title": "临时资金", "value": battle.player.temp_funds, "color": Palette.GOLD_DK, "description": "本回合可使用的临时资金。"})
+		wallet.append({"id": "temp_funds", "title": "临时资金", "value": battle.player.temp_funds, "color": Palette.GOLD_DK, "description": EffectGlossary.ENTRIES["funds"][1]})
 	if battle.player.equity > 0:
 		wallet.append({"id": "equity", "title": "股权", "value": battle.player.equity, "color": Palette.GOLD_DK, "description": "当前累计股权。"})
 	_gold_strip.set_entries(wallet)
@@ -888,12 +889,15 @@ func _on_tile_picked(pos: Vector2i) -> void:
 	if _merge_active:
 		if _merge_cell1 == Vector2i(-1, -1):
 			_merge_cell1 = pos
-			_board_view.begin_pick("empty")
-			_on_log("合流：选择第二个相邻空格")
+			var excluded: Array = []
+			for i in battle.board.cells.size():
+				var cell := battle.board.to_xy(i)
+				if not battle.board.is_adjacent(pos, cell): excluded.append(cell)
+			_board_view.begin_pick("empty", false, excluded)
+			_pick_prompt(_pending_path, "合流 · 3/3：点金框中的相邻空格作为第二个落点，再点「发动」。")
 			return
 		if not battle.board.is_adjacent(_merge_cell1, pos):
-			_board_view.begin_pick("empty")
-			_on_log("合流：第二个空格必须与第一个相邻")
+			_bubble.set_error("合流：第二个空格必须与第一个四邻相接，请选择金框内的空格。")
 			return
 		var mp := _pending_path
 		_pending_path = []
@@ -1002,7 +1006,7 @@ func _run_pair(path: Array, mode: String) -> void:
 func _pick_prompt(path: Array, instruction: String) -> void:
 	var glyphs := battle.board.glyphs_of(path)
 	var word := Database.get_word_by_glyphs(glyphs)
-	_bubble.set_text("".join(glyphs), (word.effect_summary + "\n" if word != null else "") + instruction, SpeechBubble.State.PREVIEW)
+	_bubble.set_text("".join(glyphs), (EffectPreview.word_text(word, battle, path, {"picking": true}, true) + "\n" if word != null else "") + instruction, SpeechBubble.State.PREVIEW)
 	_bubble.set_context(_selection_context(path))
 	_update_input()
 
@@ -1154,7 +1158,7 @@ func _run_line_pick(path: Array, rows_only := false) -> void:
 			options.append({"text": "第 %d 列" % (i + 1)})
 	var word_name := _current_word.word if _current_word != null else "目标选择"
 	var ov := ChoiceOverlay.new()
-	ov.setup({"title": "%s：选择%s" % [word_name, "一行" if rows_only else "一行或一列"], "options": options})
+	ov.setup({"title": "%s：选择%s" % [word_name, "一行" if rows_only else "一行或一列"], "options": options, "board_peek": true})
 	ov.chose.connect(_on_line_chosen.bind(rows_only))
 	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_mount_overlay(ov)
@@ -1389,11 +1393,11 @@ func _run_collect_own(path: Array, junk := false) -> void:
 
 func _run_merge_flow(path: Array) -> void:
 	if not battle.has_adjacent_empty_pair():
-		_on_log("合流：没有两个相邻空格，跳过")
+		_bubble.set_error("合流需要盘面已有两个相邻空格。请先腾出位置；本次未消耗所选字。")
 		return
 	var revealed := battle.reveal_from_bag(1)
 	if revealed.is_empty():
-		_on_log("合流：字袋为空")
+		_bubble.set_error("合流：字袋和弃字堆没有可揭示的字，本次未发动。")
 		return
 	_pending_path = path
 	_merge_active = true
@@ -1402,14 +1406,15 @@ func _run_merge_flow(path: Array) -> void:
 	_merge_cell1 = Vector2i(-1, -1)
 	var list := battle.discard_instances()
 	if list.is_empty():
-		_on_log("合流：弃字堆为空")
 		_abort_merge()
+		_bubble.set_error("合流：揭示后弃字堆没有可选字。请先积累弃字，再尝试；所选字未消耗。")
 		return
 	var options: Array = []
 	for d in list:
 		options.append({"text": "【%s】" % d["glyph"]})
+	options.append({"text": "取消（不消耗字）"})
 	var ov := ChoiceOverlay.new()
-	ov.setup({"title": "合流：从弃字堆指定 1 枚", "options": options})
+	ov.setup({"title": "合流 · 1/3 选择弃字", "body": "已揭示【%s】。再选1枚弃字，依次点两个相邻空格，最后点「发动」。" % revealed[0].glyph(), "options": options, "board_peek": true})
 	ov.chose.connect(_on_merge_discard_chosen.bind(list))
 	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_mount_overlay(ov)
@@ -1418,9 +1423,11 @@ func _run_merge_flow(path: Array) -> void:
 func _on_merge_discard_chosen(index: int, list: Array) -> void:
 	if index < 0 or index >= list.size():
 		_abort_merge()
+		_bubble.set_text("合流", "已取消，所选字未消耗，揭示字已放回。", SpeechBubble.State.PREVIEW)
 		return
 	_merge_discard_uid = int(list[index]["uid"])
 	_board_view.begin_pick("empty")
+	_pick_prompt(_pending_path, "合流 · 2/3：点第一个空格，再点与它四邻相接的第二个空格。选好后点「发动」。")
 	_on_log("合流：选择第一个空格")
 
 
