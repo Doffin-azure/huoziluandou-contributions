@@ -1,5 +1,5 @@
 # 吉祥物
 
-`mascot.png` = 界面左下角气泡框旁的蓝发 chibi（本项目为玩梗 demo，素材直接使用参考图）。
-想换图：替换 `mascot.png`（或放 `mascot.jpg` / `mascot.webp`），`src/ui/mascot_view.gd` 会按候选列表自动加载；
-没有图片时退回程序化占位。
+2026-10-18：原 `mascot.png` 是未取得授权的网络梗图，为参赛素材合规已移除，`src/ui/mascot_view.gd` 退回程序化蓝鲸占位。
+当前主线没有场景实例化 MascotView。
+想换图：放入自有或已授权的 `mascot.png` / `mascot.jpg` / `mascot.webp`，并同步更新素材使用声明。
