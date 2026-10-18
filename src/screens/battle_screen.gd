@@ -1644,6 +1644,7 @@ func _check_battle_over() -> void:
 
 
 func _show_defeat() -> void:
+	Music.play("defeat")
 	var overlay := ChoiceOverlay.new()
 	overlay.setup({
 		"title": "力竭",

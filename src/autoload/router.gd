@@ -27,3 +27,4 @@ func goto(screen_path: String, params: Dictionary = {}) -> void:
 	host.add_child(screen)
 	current = screen
 	current_path = screen_path
+	Music.for_screen(screen_path)
