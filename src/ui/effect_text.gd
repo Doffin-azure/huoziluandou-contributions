@@ -4,6 +4,7 @@ class_name EffectText
 
 var _plain := ""
 var _source_word: WordData
+var _local_entries: Dictionary = {}
 var _layer: CanvasLayer
 var _cards: Array[PanelContainer] = []
 var _hovered: Dictionary = {}
@@ -30,11 +31,13 @@ func _init() -> void:
 	set_process_input(false)
 
 
-func set_effect_text(value: String, number_size := 0, source_word: WordData = null) -> void:
-	if value != _plain or source_word != _source_word:
+func set_effect_text(value: String, number_size := 0, source_word: WordData = null, local_entries: Dictionary = {}) -> void:
+	value = BattleText.clean(value)
+	if value != _plain or source_word != _source_word or local_entries != _local_entries:
 		close_help()
 	_plain = value
 	_source_word = source_word
+	_local_entries = local_entries.duplicate(true)
 	text = _format(value, number_size)
 	if source_word != null and EffectGlossary.brief(source_word) != source_word.describe():
 		text += "\n[font_size=%d]%s[/font_size]" % [mini(get_theme_font_size("normal_font_size"), 16), EffectGlossary.link("完整词效", "word:" + source_word.word)]
@@ -42,7 +45,7 @@ func set_effect_text(value: String, number_size := 0, source_word: WordData = nu
 
 
 func _format(value: String, number_size := 0, exclude := "") -> String:
-	var formatted := EffectGlossary.format_text(value, number_size, exclude)
+	var formatted := EffectGlossary.format_text(BattleText.clean(value), number_size, exclude, _local_entries)
 	return _journey_links(formatted) if JourneyStyle.is_active(self) else formatted
 
 
@@ -67,7 +70,8 @@ func _on_link_clicked(meta: Variant, depth: int) -> void:
 
 
 func open_entry(meta: String, depth := 0) -> void:
-	var info := EffectGlossary.entry(meta)
+	var info: Dictionary = _local_entries.get(meta, {})
+	if info.is_empty(): info = EffectGlossary.entry(meta)
 	if info.is_empty() or not is_inside_tree() or depth > _cards.size():
 		return
 	if depth == 0:
@@ -149,7 +153,7 @@ func open_entry(meta: String, depth := 0) -> void:
 	description.meta_hover_ended.connect(_on_link_exited.bind(depth + 1))
 	description.meta_clicked.connect(_on_link_clicked.bind(depth + 1))
 	scroll.add_child(description)
-	var hint := Ink.label("悬浮查看 · 点按词条固定 · ×关闭", "Muted")
+	var hint := Ink.label("悬浮查看 · 点击保持展开 · ×关闭", "Muted")
 	hint.add_theme_font_size_override("font_size", int(13 * help_scale))
 	col.add_child(hint)
 	card.modulate.a = 0.0

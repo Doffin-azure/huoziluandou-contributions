@@ -151,12 +151,12 @@ func _run_vulnerable() -> void:
 	b.end_player_turn()
 	_check("vulnerable_multi_enemy_expire", not enemy.statuses.has("vulnerable") and not other.statuses.has("vulnerable"), "多个敌人的易伤各自到期，不会保留零层状态")
 	var word := Database.get_word_by_glyphs_string("破防")
-	_check("vulnerable_copy_synced", word.describe() == WordDescriptions.TEXT["破防"] and word.effects[0].note == word.describe() and "每回合减1层" in WordDescriptions.BRIEF_TEXT["破防"] and "每回合开始减少1层" in EffectGlossary.ENTRIES.vulnerable[1], "破防资源、完整说明、精简说明和wiki词条都使用衰减规则")
+	_check("vulnerable_copy_synced", word.describe() == BattleText.word(word) and "易伤" in EffectGlossary.brief(word) and "每回合开始减少1层" in word.effects[0].note and "敌我双方每回合开始减少1层" in EffectGlossary.entry("term:vulnerable").text, "破防资源、完整说明、精简说明和wiki词条都使用衰减规则")
 
 func _run_description_previews() -> void:
 	var unified := true
 	for word in Database.words.values():
-		unified = unified and word.describe() == WordDescriptions.TEXT.get(word.word, "") and word.description == word.effect_summary
+		unified = unified and word.describe() == BattleText.word(word) and word.description == word.effect_summary
 		for stale in ["P23初稿", "尚未收敛", "临时草案", "未定稿", "倾向删除"]:
 			unified = unified and not stale in word.describe()
 	_check("word_description_source", unified and WordDescriptions.TEXT.size() == Database.words.size(), "全部%d词共享完整说明，游戏介绍没有旧设计草稿" % Database.words.size())
@@ -225,7 +225,7 @@ func _run_description_previews() -> void:
 	_check("preview_pending_temporary_effects", "首个伤害段额外+2" in text and "每段额外+6" in text and "获得4临挡、2储能" in text and _preview_signature(b) == before, "即将使用的词显示已武装的力、蓄力和合收益，不提前消费")
 	b.enable_ability("counter", 2)
 	var entries := StatusDisplay.collect(b.player, b)
-	_check("preview_counter_stacks", entries.any(func(item): return item.id == "ability:counter" and "+6" in item.description and "所有敌人行动后" in item.description), "反击状态提示按当前层数解释追加伤害和时机")
+	_check("preview_counter_stacks", entries.any(func(item): return item.id == "ability:counter" and "+6" in item.description and "敌人全部行动后" in item.description), "反击状态提示按当前层数解释追加伤害和时机")
 	b.enemies[0].add_status("vulnerable", 2)
 	entries = StatusDisplay.collect(b.enemies[0], b)
 	_check("preview_enemy_vulnerable_lifetime", entries.any(func(item): return item.id == "vulnerable" and "每回合衰减 1 层" in item.description and not "不按回合衰减" in item.description), "敌方易伤提示每回合减少1层")
@@ -237,7 +237,7 @@ func _run_word_balance() -> void:
 	for text in ContentBuild.BALANCE_SPECS:
 		var spec: Dictionary = ContentBuild.BALANCE_SPECS[text]
 		var word := Database.get_word_by_glyphs_string(text)
-		synced = synced and word != null and word.effect_summary == spec.desc and word.interaction == spec.interaction and word.effects[0].handler == spec.handler and word.effects[0].amount == spec.amount and word.effects[0].args == spec.args
+		synced = synced and word != null and word.effect_summary == BattleText.word(word) and word.interaction == spec.interaction and word.effects[0].handler == spec.handler and word.effects[0].amount == spec.amount and word.effects[0].args == spec.args
 	_check("word_balance_specs", synced, "当前数值词资源与生成器的效果、数值、参数、描述和交互同步")
 	var b := _battle()
 	for i in 3:
@@ -2093,7 +2093,7 @@ func _run_ui_word_balance() -> void:
 		picker._on_choose(0)
 		screen._board_view._on_tile_pressed(Vector2i(3, 3))
 		_check("ui_transfer_ready_" + text, not screen._ready_action.is_empty() and screen.battle.board.get_cell(3, 3) == null and GameState.gold == 10, "选完落点仍等待确认")
-		_check("ui_transfer_selected_preview_" + text, "已选原实体【电】" in screen._bubble._effect_text and "需支付2" in screen._bubble._effect_text, "确认前预览显示实际选中实体及当前费用")
+		_check("ui_transfer_selected_preview_" + text, "已选己方原字【电】" in screen._bubble._effect_text and "需付2" in screen._bubble._effect_text, "确认前预览显示实际选中实体及当前费用")
 		screen._on_primary()
 		await _wait_for_screen_idle(screen)
 		_check("ui_transfer_commit_" + text, screen.battle.board.get_cell(3, 3) == original and original.gilded and original.temporary_uses == 1 and GameState.gold == 8 and _occurrences(screen.battle, original) == 1 and not screen._busy, "确认才支付2，保留原实体属性并加一次使用")

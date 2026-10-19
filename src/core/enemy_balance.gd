@@ -95,36 +95,61 @@ static func load_into(enemies: Dictionary, pollutions: Dictionary) -> String:
 		if pd != null:
 			pd.hp_loss_on_play = int(row[2])
 			pd.draw_penalty_on_play = int(row[3])
-			pd.description = ("留在盘面的敌方字按制造怪物说明的等待回合、复制数量和盘面上限蔓生。单打、组词消耗或净化可停止复制。" if pd.id == "replicate" else "") + "单打或组词打出时失去%d生命，下次正常补字减少%d枚。净化可免除污染代价。" % [pd.hp_loss_on_play, pd.draw_penalty_on_play]
+			pd.description = pollution_description(pd)
 	for ed in enemies.values():
-		if not ed.mechanic.is_empty(): ed.description = describe(ed)
+		ed.description = describe(ed)
 	return warning
 
-static func describe(ed: EnemyData) -> String:
+static func parameters(ed: EnemyData) -> Dictionary:
 	var p: Dictionary = ed.tuning.duplicate()
 	for move in ed.moves:
 		if not move.mechanic_action.is_empty():
 			p[move.mechanic_action + "_damage"] = move.damage
-			p[move.mechanic_action + "_block"] = move.block
+			if not p.has(move.mechanic_action + "_block"): p[move.mechanic_action + "_block"] = move.block
 			p[move.mechanic_action + "_inject"] = move.inject_count
+	return p
+
+static func describe(ed: EnemyData) -> String:
+	var p := parameters(ed)
 	var template := ""
 	match ed.mechanic:
-		"shell": template = "补纸将普通护盾补至{shield_target}，已达目标时不再增加。"
-		"fold": template = "提前标记一枚己方原实体。单打、成词或移出盘面可解签，使折页伤害由{fold_damage}降至{resolved_damage}；通过成词解签另造成{reward}机制伤害。纯移动不解签。"
-		"blank": template = "留白攻击前空格至少{empty_required}，怪物受到{reward}机制伤害；否则获得{shield_gain}盾。随后攻击{blank_damage}。"
-		"corrosion": template = "注蚀向空格注入{corrode_inject}枚刺痛【蚀】，同源盘面最多{inject_cap}枚。可单打、净化或组成心蚀；打出代价见污染说明，不进入永久字袋。"
-		"glutton": template = "最多吞{stomach_capacity}枚弃字中的己方原实体，每次成功吞字得{swallow_block}盾。一次出字单段生命伤害达到{release_hit}，或一词消耗至少{release_material}枚材料，吐回一枚至袋顶。每次出字最多吐一枚，战后全部归还。"
-		"furnace": template = "每次攻击前热度至少{heat_threshold}，本次伤害增加{heat_bonus}。炉息后注入{heat6_inject}枚、喷焰后注入{heat8_inject}枚灼热【热】，再升热{heat_gain}。可组热流、电热；打出代价见污染说明。"
-		"charge": template = "本玩家阶段实际净储能消费至少{energy_required}，放弧前拆除最多{break_block}普通盾，伤害由{arc_damage}降至{resolved_damage}。退款抵扣对应消费，正常获得储能不抵扣。"
-		"credit": template = "本阶段首次成功支付正数通用费用即获得收讫印；催账前有印拆除最多{break_block}普通盾，伤害由{bill_damage}降至{resolved_damage}。折后零费、失败、取消不计。"
-		"pair": template = "同一行两枚标记原实体完整互换原坐标，或同词使用两者，奖励{reward}机制伤害，合简降至{resolved_damage}。只处理其中一枚降至{partial_damage}，未处理为{pair_damage}。空题得{empty_block}盾，伤害固定{partial_damage}。"
-		"nest": template = "结巢得{seed_nest_block}盾并向空格注入{seed_nest_inject}枚蔓生【连】。每枚新连等待{replicate_delay}个玩家回合后，每回合结束复制{replicate_count}枚，同源盘面最多{inject_cap}枚；单打、组词或净化可停止复制。啄字前阶段内真实己方原实体补入再成词，拆{break_block}盾，啄字由{nest_damage}降至{resolved_damage}。"
-		"bomb": template = "布印将盾补至{mark_block}并预告两格。引爆攻击{bomb_damage}，摧毁仍在标记格的非固定字。己方原实体进弃字，敌方与临时字移除；防爆使己方实体改回袋，每救回一枚得{protect_block}持久盾。"
-		"copy": template = "拓只读上一玩家阶段最后成功多字词。按攻击、防御、空间、经济顺序取首类：攻击{attack_damage}、得盾{defense_block}、塞{copy_inject}枚堵塞【重】、得盾{economy_block}；其他或无词得盾{other_block}。单字不改记录。重可组重击、重力，打出代价见污染说明。"
-		"seal": template = "预告固定印区坐标；朱批基础{seal_damage}伤，每个仍占用格增加{occupied_bonus}伤。只检查一次，不改变字的归属。"
-		"wheel": template = "同一枚己方原实体在本阶段成功参与{required_uses}次多字词，奖励{reward}机制伤害，压印由{wheel_damage}降至{resolved_damage}。复制新实体、词效重演不计，每阶段奖励一次。"
-		"leech": template = "攻击实际扣到生命才偷最多{steal}储能；每点转{shield_per_energy}盾，护盾上限{shield_cap}。满盾仍可偷，没储能不额外扣血。"
-		"proof": template = "生命不高于上限{phase_percent}%进入二阶段。朱批标记最多{target_count}枚红蓝签原实体；红签成词、单打或离盘解除，蓝签也可移动解除。每个未解签增加{unresolved_bonus}伤，成词解签奖励{reward}机制伤害。朱批基础{proof_damage}，二阶段{phase2_damage}。"
-		"rail": template = "生命不高于上限{phase_percent}%进入二阶段。压轨标记一行最多{target_count}枚，二阶段{phase2_target_count}枚。每个原实体仍留原行增加{unresolved_bonus}伤。基础{rail_damage}伤，二阶段{phase2_damage}；全部撤离则攻击后拆{clear_break}普通盾，空题不奖励。"
-		"compiler": template = "生命不高于上限{phase_percent}%进入二阶段。异文要求{distinct_required}种不同多字词，重文要求同词主动成功{repeat_required}次。完成奖励{reward}机制伤害，随后攻击{resolved_damage}／{phase2_resolved_damage}。未完成攻击{different_damage}／{phase2_damage}并得盾{fail_block}／{phase2_fail_block}。每阶段独立计数，词效重演不计。"
-	return template.format(p) if not template.is_empty() else ed.description
+		"bee": template = "连针为多段攻击，蓄势后重刺。每段伤害和段数见当前意图。"
+		"tilt": template = "左倾让每行字向左靠拢；旋砚将中央2×2顺时针旋转。固定字不移动，旋转区域有固定字时整次跳过。"
+		"shell": template = "补纸将临时格挡补到{shield_target}，已经达到时不再增加。"
+		"fold": template = "标记1字。打出或移出盘面可解签，仅移动无效。折页伤害：未解{fold_damage}，解签后{resolved_damage}；组词解签再对怪物造成{reward}伤害。"
+		"blank": template = "攻击前有至少{empty_required}个空格，怪物受到{reward}伤害；否则获得{shield_gain}格挡。随后攻击{blank_damage}。"
+		"corrosion": template = "塞入{corrode_inject}枚刺痛【蚀】，同源最多{inject_cap}枚。可单打、组【心蚀】用掉，或净化污染。"
+		"glutton": template = "从弃字堆吞入至多{stomach_capacity}枚原字，每吞1字获得{swallow_block}格挡，腹击伤害+1，最多+{belly_bonus_cap}。打出时单段使它掉血至少{release_hit}，或一个词用掉至少{release_material}字，吐回1字到袋顶；战后归还全部。"
+		"furnace": template = "攻击前热度达到{heat_threshold}时，伤害+{heat_bonus}。炉息塞{heat6_inject}枚、喷焰塞{heat8_inject}枚灼热【热】，攻击后热度+{heat_gain}。"
+		"charge": template = "本回合实际消耗储能减去对应退款达到{energy_required}时，放弧降至{resolved_damage}伤害，并拆除怪物{break_block}格挡；否则造成{arc_damage}伤害。"
+		"credit": template = "本回合成功支付过非零费用时，催账降至{resolved_damage}伤害，并拆除怪物{break_block}格挡；否则造成{bill_damage}伤害。合资代付也算，免费或失败不算。"
+		"pair": template = "标记2字。互换两字原位，或在同一词中使用两字：怪物受{reward}伤害，合简降至{resolved_damage}。未完成上述条件时，有字离盘则为{partial_damage}，否则为{pair_damage}；无目标时为{partial_damage}。"
+		"nest": template = "结巢获得{seed_nest_block}格挡，塞入{seed_nest_inject}枚蔓生【连】。本回合让己方原字补入盘面后再组词，啄字降至{resolved_damage}伤害，并拆除{break_block}格挡。蔓生同源最多{inject_cap}枚，复制规则见蔓生词条。"
+		"bomb": template = "预告2格。引爆造成{bomb_damage}伤害，并摧毁标记格内未固定的字；把字移走可避开。防爆生效时，己方原字改为回袋，每字获得{protect_block}持久盾。"
+		"copy": template = "按上一个词的类型行动：攻击类造成{attack_damage}伤害；防御类获得{defense_block}格挡；空间类塞{copy_inject}枚堵塞【重】；经济类获得{economy_block}格挡。其他或无词时获得{other_block}格挡，单字不改记录。"
+		"seal": template = "预告印区。朱批造成{seal_damage}伤害，区域内每有1字再+{occupied_bonus}。清空印区可避免加伤。"
+		"wheel": template = "本回合让同一枚己方原字参与{required_uses}次组词，怪物受{reward}伤害，压印降至{resolved_damage}；否则造成{wheel_damage}伤害。临时复制和效果重演不计。"
+		"leech": template = "攻击使你掉血后，偷取至多{steal}储能；每点转为{shield_per_energy}格挡，格挡最多{shield_cap}。满盾仍会偷储能。"
+		"proof": template = "标记红蓝签。红签须打出或离盘；蓝签还可移动解除。每枚未解签使朱批伤害+{unresolved_bonus}；组词解签对怪物造成{reward}伤害。生命≤{phase_percent}%进入二阶段。"
+		"rail": template = "标记一行至多{target_count}字，二阶段为{phase2_target_count}字。每枚仍在原行的标记字使压轨伤害+{unresolved_bonus}；全部撤离后，攻击结束拆除{clear_break}格挡。生命≤{phase_percent}%进入二阶段。"
+		"compiler": template = "异文要求{distinct_required}种不同词，重文要求同词打出{repeat_required}次。完成后怪物受{reward}伤害，本次攻击降至{resolved_damage}，二阶段为{phase2_resolved_damage}。未完成时攻击后获{fail_block}格挡，二阶段{phase2_fail_block}。重演不计次数；生命≤{phase_percent}%进入二阶段。"
+	if not template.is_empty(): return template.format(p)
+	if not ed.description.is_empty(): return BattleText.clean(ed.description)
+	var moves: Array[String] = []
+	for move in ed.moves: moves.append(move.title + "：" + BattleText.enemy_move(move))
+	return "按顺序循环行动：\n" + "\n".join(moves)
+
+
+static func pollution_description(data: PollutionData, settings: Dictionary = {}) -> String:
+	var lines: Array[String] = []
+	if data.id == "replicate":
+		if settings.has("replicate_count"):
+			lines.append("等待%d回合后，每回合结束复制%d字；同源最多%d枚，没有空格时不复制。" % [maxi(1, int(settings.get("replicate_delay", 1))), int(settings.replicate_count), int(settings.get("inject_cap", 4))])
+		else:
+			lines.append("留在盘面会复制；数量和等待回合取决于制造它的怪物。")
+		lines.append("用掉此字或净化可阻止复制。")
+	if data.hp_loss_on_play > 0: lines.append("单打或组词使用此字时，失去%d生命。" % data.hp_loss_on_play)
+	if data.draw_penalty_on_play > 0: lines.append("使用此字后，下次正常补字减少%d枚。" % data.draw_penalty_on_play)
+	if data.id == "scorch": lines.append("敌人塞入的字用后消失；溢热生成的【热】本场循环，战后移除。")
+	if data.id != "replicate": lines.append("净化可移除此污染。")
+	return "".join(lines)

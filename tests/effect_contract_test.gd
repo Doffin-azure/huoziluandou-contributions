@@ -241,7 +241,7 @@ func _test_ui() -> void:
 	_check(screen._board_view.pick_mode == "any" and not screen._board_view.pick_excluded.has(Vector2i(2, 1)), "新效果在真实 UI 自动使用公共目标候选")
 	_check(b.board.get_cell(0, 0) != null and _executions == executed, "打开选择阶段不会提前执行效果")
 	screen._on_tile_picked(Vector2i(2, 1))
-	_check("协议预览3临挡" in screen._bubble.body.get_parsed_text(), "选目标后的真实 UI 预览来自同一效果定义")
+	_check("协议预览3临时格挡" in screen._bubble.body.get_parsed_text(), "选目标后的真实 UI 预览来自同一效果定义")
 	screen._on_primary()
 	var deadline := Time.get_ticks_msec() + 5000
 	while screen._busy and Time.get_ticks_msec() < deadline:

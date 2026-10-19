@@ -373,5 +373,27 @@ static func markers(b: BattleState) -> Array:
 		for cell in d.get("cells", []): out.append({"cell": cell, "label": "爆" if e.enemy_data.mechanic == "bomb" else "印"})
 		for index in range(first_marker, out.size()):
 			out[index]["source"] = e.display_name
-			out[index]["description"] = task_text(b, e)
+			out[index]["description"] = marker_description(e, str(out[index].label))
+			out[index]["name"] = marker_name(e, str(out[index].label))
 	return out
+
+
+static func marker_name(e: Combatant, label: String) -> String:
+	if label == "转": return "旋转预告"
+	if label == "爆": return "爆破预告"
+	if label == "印": return "印区"
+	if label == "红": return "红签"
+	if label == "蓝": return "蓝签"
+	return {"fold": "折页签", "pair": "双面签", "rail": "压轨签"}.get(e.enemy_data.mechanic, "目标标记")
+
+static func marker_description(e: Combatant, label: String) -> String:
+	var template := ""
+	if label == "转": return "下次行动将中央2×2顺时针旋转90°。区域内有固定字时，不旋转。"
+	match e.enemy_data.mechanic:
+		"fold": template = "打出或移出此字可解签，单纯移动无效。解签后折页伤害降至{resolved_damage}；组词解签再对怪物造成{reward}伤害。"
+		"pair": template = "两枚签字互换原位，或同词使用两字：怪物受{reward}伤害，合简降至{resolved_damage}。未完成上述条件时，有字离盘则降至{partial_damage}。"
+		"rail": template = "将此字移出原行。每枚仍在原行的签字使压轨伤害+{unresolved_bonus}；全部撤离后，攻击结束拆除{clear_break}格挡。"
+		"proof": template = ("打出或移出此字可解签，单纯移动无效。" if label == "红" else "打出、移出或移动此字都可解签。") + "每枚未解签使朱批伤害+{unresolved_bonus}；组词解签再对怪物造成{reward}伤害。"
+		"bomb": template = "引爆时摧毁此格内未固定的字。把字移走即可避开；己方原字进弃字堆，敌方字和临时字消失。"
+		"seal": template = "朱批时，此格每有1字，伤害+{occupied_bonus}。清空此格可避免加伤。"
+	return template.format(EnemyBalance.parameters(e.enemy_data)) if not template.is_empty() else e.enemy_data.description
