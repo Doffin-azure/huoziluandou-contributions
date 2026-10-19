@@ -105,6 +105,19 @@ func _build() -> void:
 	audio_row.add_child(volume)
 	col.add_child(audio_row)
 
+	var music_row := Ink.hbox(12)
+	music_row.add_child(Ink.label("音乐音量", "Subheading"))
+	var music := HSlider.new()
+	music.min_value = 0
+	music.max_value = 100
+	music.step = 1
+	music.value = Settings.music_volume * 100
+	music.custom_minimum_size = Vector2(160, 48)
+	music.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	music.value_changed.connect(func(value: float): Settings.set_music_volume(value / 100.0))
+	music_row.add_child(music)
+	col.add_child(music_row)
+
 
 
 func _build_style_buttons() -> void:
