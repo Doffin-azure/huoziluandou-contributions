@@ -13,6 +13,7 @@ var _detail_title: Label
 var _detail: Label
 var _action: Button
 var _plan_button: Button
+var _planner_button: Button
 var _selected := ""
 var _routing := false
 var _receipt_open := false
@@ -42,6 +43,8 @@ func build(root: Control) -> void:
 	_progress.size_flags_horizontal = Control.SIZE_EXPAND_FILL; strip.add_child(_progress)
 	strip.add_child(_button("当前",func(): map_view.focus_current()))
 	strip.add_child(_button("全图",func(): map_view.show_overview()))
+	_planner_button = _button("规划路线",_toggle_planning)
+	strip.add_child(_planner_button)
 	strip.add_child(_button("清除预选",_clear_plan))
 	page.add_child(strip)
 	map_view = VIEW.new(); map_view.run = run
@@ -103,6 +106,10 @@ func refresh() -> void:
 	map_view.selected = _selected; map_view.refresh()
 	_progress.text = "已行 %d / %d 站 · %d 个候选节点   /   向右择路，点击查看，拖动浏览" % [maxi(0,run.visited_rooms.size()-1),int(run.layout.rooms[run.graph.boss].column)+1,run.graph.rooms.size()]
 	if not run.planned_route.is_empty(): _progress.text = "预选 %d 站 · 本幕 %d 个候选节点 · 预选可随时修改，前进后不能回头" % [run.planned_route.size(),run.graph.rooms.size()]
+	if map_view.planning and run.phase!="map": _toggle_planning(); return
+	if map_view.planning:
+		_progress.text = "规划中 · 已排 %d 站 · 从左往右点亮着的候选格，点最后一站撤回" % run.planned_route.size()
+		if run.plan_choices().is_empty(): _progress.text = "规划中 · 已排 %d 站，路线已排到首领" % run.planned_route.size()
 	_update_detail()
 	if run.phase=="treasure" and not _receipt_open: _treasure_receipt.call_deferred()
 
@@ -119,7 +126,32 @@ func _update_stats() -> void:
 
 
 func _select_node(id: String) -> void:
+	if map_view.planning: _plan_click(id); return
 	_selected = id; map_view.selected = id; map_view.queue_redraw(); _update_detail()
+
+
+## 规划模式开关：开启后直接点格子排路线，不用再按「预选到此」
+func _toggle_planning() -> void:
+	map_view.set_planning(not map_view.planning and run.phase=="map")
+	_planner_button.text = "完成规划" if map_view.planning else "规划路线"
+	refresh()
+
+
+## 规划模式点格：只能从最左（当前所在之后）一格格往右接；点最后一站撤回一步，点更早的站从那里截断
+func _plan_click(id: String) -> void:
+	if run.phase!="map": return
+	var index: int = run.planned_route.find(id)
+	var result: Dictionary
+	if index>=0 and index==run.planned_route.size()-1: result = run.apply({"type":"undo_plan"})
+	elif index>=0 or run.plan_choices().has(id): result = run.plan_room(id)
+	elif id==run.current_room: result = run.apply({"type":"clear_plan"})
+	else:
+		_detail_title.text = "%s · 不能接在这里" % run.layout.rooms[id].name
+		_detail.text = "规划要从左往右一格格接：只能点亮着的候选格。点已规划的最后一站撤回一步，点当前所在清空重来。"
+		return
+	if not result.get("ok",false): _detail.text = str(result.get("reason","不能规划到这里")); return
+	_selected = run.planned_route[-1] if not run.planned_route.is_empty() else run.current_room
+	refresh()
 
 
 func _update_detail() -> void:
