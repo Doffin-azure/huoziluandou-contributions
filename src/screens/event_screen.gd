@@ -1,5 +1,6 @@
 extends ScreenBase
 ## 事件：风险与资源取舍。选择一个选项后推进节点。
+## 有一定概率多出一个「拾得遗物」选项。
 
 var node: MapNodeData
 var _event: Dictionary
@@ -17,6 +18,9 @@ var _choice_labels: Array[Label] = []
 var _ui_scale := 1.0
 var _vertical := false
 var _layout_key := ""
+
+## 事件里出现遗物选项的概率
+const RELIC_CHANCE := 0.4
 
 const EVENTS := [
 	{
@@ -57,7 +61,12 @@ const EVENTS := [
 
 func build(root: Control) -> void:
 	node = params.get("node", null)
-	_event = EVENTS[GameState.rng.randi_range(0, EVENTS.size() - 1)]
+	_event = EVENTS[GameState.rng.randi_range(0, EVENTS.size() - 1)].duplicate(true)
+	var side := RelicRewardFlow.side_rng("event")
+	if side.randf() < RELIC_CHANCE:
+		var found := RelicRewardFlow.roll(1, side)
+		if not found.is_empty():
+			_event.options.append({"text": "拾得遗物「%s」（%s）" % [Relics.name_of(found[0]), Relics.desc_of(found[0])], "relic": found[0]})
 
 	_scroll = ScrollContainer.new()
 	_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -156,6 +165,10 @@ func _choose(index: int) -> void:
 		return
 	_done = true
 	for button in _buttons: button.disabled = true
+	var relic := str(_event.options[index].get("relic", ""))
+	if not relic.is_empty():
+		RelicRewardFlow.grant(self, relic, func(_id): _finish())
+		return
 	match _event.id:
 		"ink_pool":
 			if index == 0:

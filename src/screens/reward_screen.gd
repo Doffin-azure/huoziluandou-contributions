@@ -1,7 +1,10 @@
 extends ScreenBase
 ## 战后奖励：选两轮字。第一轮跳过换金币；第二轮优先给能和第一轮所选字组词的字。
+## 经典模式：精英先给 1 件遗物；首领（最后一幕除外）先回血，再二选一遗物。
 
 const ROUNDS := 2
+## 首领战后回复最大气血的比例
+const BOSS_HEAL_RATIO := 0.3
 
 var node: MapNodeData
 var _options: Array = []
@@ -14,6 +17,7 @@ var _busy := false
 var _round := 1
 var _anchor := ""            ## 第一轮选中的字；第二轮围绕它出题
 var _links: Dictionary = {}  ## 第二轮候选字 -> 与 _anchor 共组的词
+var _boss_heal := 0
 
 
 func has_scene_background() -> bool:
@@ -28,6 +32,10 @@ func build(root: Control) -> void:
 	_round = int(params.get("round", 1))
 	_anchor = str(params.get("anchor", ""))
 	_options = _roll_options(is_boss, int(params.get("count", 3)))
+	var relic_step := _relic_step(is_boss)
+	if relic_step == "boss":
+		_boss_heal = mini(GameState.player_max_hp - GameState.player_hp, int(round(GameState.player_max_hp * BOSS_HEAL_RATIO)))
+		GameState.heal(_boss_heal)
 	_showcase = preload("res://src/ui/object_stage/object_stage_view.gd").new()
 	_showcase.mode = "reward"
 	_showcase.reward_count = _options.size()
@@ -61,6 +69,33 @@ func build(root: Control) -> void:
 	_layout_cards.call_deferred()
 	_inspect(0)
 	_showcase.stage.open_case()
+	if not relic_step.is_empty():
+		_offer_relics.call_deferred(relic_step)
+
+
+## 只在经典模式第一轮发遗物：精英 1 件，首领二选一；第三幕首领后直接通关，不再发。
+func _relic_step(is_boss: bool) -> String:
+	if _expedition or _round != 1 or node == null or params.get("relic_done", false):
+		return ""
+	if node.type == MapNodeData.Type.ELITE:
+		return "elite"
+	if is_boss and GameState.act_index < 3:
+		return "boss"
+	return ""
+
+
+func _offer_relics(step: String) -> void:
+	params["relic_done"] = true
+	if step == "elite":
+		RelicRewardFlow.offer(self, "精英战利品", "击败精英，得到一件遗物。", RelicRewardFlow.roll(1), _on_relic_taken)
+	else:
+		var body := ("首领倒下，气血回复 %d 点。" % _boss_heal) + "从两件遗物中选一件。"
+		RelicRewardFlow.offer(self, "幕末 · 遗物", body, RelicRewardFlow.roll(2), _on_relic_taken)
+
+
+func _on_relic_taken(_id: String) -> void:
+	if is_inside_tree():
+		_hud.status_label.text = "气血 %d / %d    金币 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
 
 
 func _layout_cards() -> void:

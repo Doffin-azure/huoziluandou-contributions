@@ -330,8 +330,8 @@ func clear_objects() -> void:
 
 func add_object(glyph: String, slot: int, rank := 0, service := false) -> int:
 	var node := Node3D.new()
-	var shop_slots := [Vector3(-4.2, 0.82, 0.2), Vector3(-1.4, 0.82, 0.2), Vector3(1.4, 0.82, 0.2), Vector3(4.15, 0.65, 0.7), Vector3(5.6, 0.65, 0.7), Vector3(4.8, 1.75, -0.55)]
-	node.position = shop_slots[slot % 6] if mode == "shop" else Vector3((slot - (reward_count - 1) * 0.5) * minf(2.85, 8.8 / reward_count), 1.0, 0.1)
+	var shop_slots := [Vector3(-4.2, 0.82, 0.2), Vector3(-1.4, 0.82, 0.2), Vector3(1.4, 0.82, 0.2), Vector3(4.15, 0.65, 0.7), Vector3(5.6, 0.65, 0.7), Vector3(4.8, 1.75, -0.55), Vector3(-6.2, 0.65, 0.9)]
+	node.position = shop_slots[slot % shop_slots.size()] if mode == "shop" else Vector3((slot - (reward_count - 1) * 0.5) * minf(2.85, 8.8 / reward_count), 1.0, 0.1)
 	add_child(node)
 	var w := Workshop.new()
 	var scale_factor := 0.53 if service else 1.0

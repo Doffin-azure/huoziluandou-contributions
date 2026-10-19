@@ -61,7 +61,8 @@ func _run() -> void:
 			_snapshot.reward = screen._options.map(func(item): return item.id)
 			_snapshot.reward_rng = str(GameState.rng.state)
 		elif page == "shop":
-			_snapshot.shop = screen._offers.map(func(item): return [item.kind, item.character.id if item.character != null else "", item.price])
+			# 遗物货架用旁路随机数，单独校验；这里只比原有货物
+			_snapshot.shop = screen._offers.filter(func(item): return item.kind != "relic").map(func(item): return [item.kind, item.character.id if item.character != null else "", item.price])
 			_snapshot.shop_rng = str(GameState.rng.state)
 		elif page == "event":
 			_snapshot.event = screen._event.id
