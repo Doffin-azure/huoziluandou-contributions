@@ -226,10 +226,14 @@ func _verify_mobile() -> void:
 			_ok(screen._mobile and screen._map_grid.get_child(0).size.x * ratio >= 47.9, "phone expedition map cells retain 48px touch size")
 			var tick: int = screen.ex.t
 			var rng: int = screen.ex.rng.state
-			screen._mobile_tabs.show_tab("字阵")
+			screen._mobile_tabs.show_tab("构筑")
 			await _frames()
-			_ok(screen.ex.t == tick and screen.ex.rng.state == rng and screen._plate_grid.is_visible_in_tree(), "expedition tabs only change the view, not time or RNG")
+			_ok(screen.ex.t == tick and screen.ex.rng.state == rng and screen._build_box.is_visible_in_tree(), "expedition tabs only change the view, not time or RNG")
 			await _shot("expedition-plate-phone")
+			screen._build_scroll.ensure_control_visible(screen._tray_row)
+			await _frames()
+			_ok(screen._build_scroll.get_global_rect().encloses(screen._tray_row.get_global_rect()), "phone construction tab can scroll to the character tray")
+			await _shot("expedition-tray-phone")
 			var steps: Array = MapGen.nbrs(screen.ex.pos).filter(func(k): return screen.ex.can_step(k))
 			if not steps.is_empty():
 				var destination: int = steps[0]
@@ -256,44 +260,24 @@ func _verify_mobile() -> void:
 func _verify_expedition_merge() -> void:
 	var screen := await _open("expedition_map")
 	var ex: Expedition = screen.ex
-	ex.tray = ["冷", "冷", "冷"]
-	screen.refresh()
-	await _frames()
-	var tick := ex.t
-	var rng := ex.rng.state
-	screen._wish_btn.pressed.emit()
-	await _frames()
-	_ok(ex.top_panel().get("wish", false) and ex.t == tick and ex.rng.state == rng, "wish action opens the merged panel without spending time or rerolling the map")
-	for i in 3: screen._on_tray(i)
-	await _frames()
-	_ok(screen._forge_sel.size() == 3, "wish UI accepts the remote three-glyph recipe")
-	var submit: Button
-	for button in _descendants(screen._event_box, "button"):
-		if button.text.begins_with("投进去"): submit = button
-	_ok(submit != null and not submit.disabled, "three-glyph wish exposes an enabled submit action")
-	if submit != null: submit.pressed.emit()
-	await _frames()
-	_ok(ex.wish_used and ex.tray.size() == 1 and screen._wish_btn.disabled, "wish submit forwards all three glyphs and refreshes the once-per-act state")
+	_ok(not ex.has_method("open_wish") and screen._build_box != null, "merged map uses current construction rules without the removed wish machine")
 	GameState.relics = Relics.DEFS.keys()
-	ex.active["超能力"] = true
 	screen.refresh()
 	await _frames()
-	_ok(screen._relic_label.get_theme_color("font_color") == JourneyStyle.GOLD and screen._relic_label.tooltip_text.contains(Relics.desc_of("press")), "merged relic inventory retains readable local colors and full descriptions")
+	_ok(screen._relic_label.get_theme_color("font_color") == JourneyStyle.GOLD and screen._relic_label.tooltip_text.contains(Relics.desc_of("press")), "merged relic inventory retains readable art colors and full descriptions")
 	for window_size in [Vector2i(960, 432), Vector2i(1440, 810)]:
 		get_window().size = window_size
 		await _frames(12)
-		# 各尺寸从入口重新布局，沿用同一份远征进度。
 		Router.goto("res://src/screens/expedition_map_screen.gd")
 		await _frames(12)
 		screen = Router.current
 		var bounds := screen.get_global_rect()
-		var buttons := _descendants(screen._wish_btn.get_parent(), "button").filter(func(button): return button.is_visible_in_tree())
-		_ok(buttons.all(func(button): return bounds.encloses(button.get_global_rect())), "late-run expedition actions fit with all relics and the used-wish label at %s" % window_size)
+		var buttons := _descendants(screen._confront_btn.get_parent(), "button").filter(func(button): return button.is_visible_in_tree())
+		_ok(buttons.all(func(button): return bounds.encloses(button.get_global_rect())), "late-run expedition actions fit with all relics at %s" % window_size)
 		await _shot("expedition-relics-%d" % window_size.x)
-	ex.boss_down = true
+	ex.fight = {"kind":"boss", "k":ex.boss, "g":"对", "name":"首领", "caught":false, "debuff":""}
+	ex.finish_battle(true)
 	screen.refresh()
 	await _frames()
-	_ok(screen._confront_btn.text == "结束本幕" and not screen._confront_btn.disabled, "defeated boss keeps exploration available with an explicit finish action")
-	screen._confront_btn.pressed.emit()
-	await _frames()
-	_ok(ex.top_panel().get("kind", "") == "act_end", "finish-act action opens the merged settlement panel")
+	_ok(ex.boss_down and screen._confront_btn.disabled and screen._confront_btn.text == "本层已结束", "defeated boss seals the map immediately under current planning rules")
+	_ok(ex.top_panel().get("kind", "") == "act_end", "boss victory automatically opens the settlement panel")

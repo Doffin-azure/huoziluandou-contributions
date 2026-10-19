@@ -1,75 +1,78 @@
 [gd_resource type="Resource" script_class="ActData" format=3]
 
-[ext_resource type="Script" path="res://src/data/map_node_data.gd" id="1_dmb7u"]
-[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_m1at6"]
-[ext_resource type="Resource" path="res://resources/enemies/ember_imp.tres" id="3_4njjo"]
-[ext_resource type="Resource" path="res://resources/enemies/rust_scribe.tres" id="4_b00fj"]
-[ext_resource type="Resource" path="res://resources/enemies/bronze_seal.tres" id="5_bd1kb"]
-[ext_resource type="Resource" path="res://resources/enemies/iron_seal.tres" id="6_cgyiy"]
-[ext_resource type="Resource" path="res://resources/enemies/boss_chaos_press.tres" id="7_kt6oy"]
-[ext_resource type="Script" path="res://src/data/act_data.gd" id="8_ks20m"]
+[ext_resource type="Script" path="res://src/data/map_node_data.gd" id="1_ks20m"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_l3jqe"]
+[ext_resource type="Resource" path="res://resources/enemies/glutton.tres" id="3_kp4g0"]
+[ext_resource type="Resource" path="res://resources/enemies/furnace_beast.tres" id="4_1o6lm"]
+[ext_resource type="Resource" path="res://resources/enemies/charge_badger.tres" id="5_j2kxv"]
+[ext_resource type="Resource" path="res://resources/enemies/ink_creditor.tres" id="6_twba0"]
+[ext_resource type="Resource" path="res://resources/enemies/double_slip.tres" id="7_glem6"]
+[ext_resource type="Resource" path="res://resources/enemies/nest_moth.tres" id="8_4ek3q"]
+[ext_resource type="Resource" path="res://resources/enemies/bomb_press.tres" id="9_5mnnl"]
+[ext_resource type="Resource" path="res://resources/enemies/copy_master.tres" id="10_2jktc"]
+[ext_resource type="Resource" path="res://resources/enemies/seal_officer.tres" id="11_4kyom"]
+[ext_resource type="Resource" path="res://resources/enemies/wheel_master.tres" id="12_g13og"]
+[ext_resource type="Resource" path="res://resources/enemies/leech.tres" id="13_81sr5"]
+[ext_resource type="Resource" path="res://resources/enemies/compiler_boss.tres" id="14_2fj0v"]
+[ext_resource type="Script" path="res://src/data/act_data.gd" id="15_6xudn"]
 
-[sub_resource type="Resource" id="Resource_l3jqe"]
-script = ExtResource("1_dmb7u")
+[sub_resource type="Resource" id="Resource_nk8ri"]
+script = ExtResource("1_ks20m")
 title = "初试"
-description = "教授组词与单字的取舍"
-enemies = Array[ExtResource("2_m1at6")]([ExtResource("3_4njjo")])
+enemy_pool = Array[ExtResource("2_l3jqe")]([ExtResource("3_kp4g0"), ExtResource("4_1o6lm")])
+enemies = Array[ExtResource("2_l3jqe")]([ExtResource("3_kp4g0")])
 
-[sub_resource type="Resource" id="Resource_kp4g0"]
-script = ExtResource("1_dmb7u")
+[sub_resource type="Resource" id="Resource_jevak"]
+script = ExtResource("1_ks20m")
 order = 2
 title = "第二条线"
-description = "提供第一条新联动"
-enemies = Array[ExtResource("2_m1at6")]([ExtResource("4_b00fj")])
+enemy_pool = Array[ExtResource("2_l3jqe")]([ExtResource("5_j2kxv"), ExtResource("6_twba0")])
+enemies = Array[ExtResource("2_l3jqe")]([ExtResource("5_j2kxv")])
 
-[sub_resource type="Resource" id="Resource_1o6lm"]
-script = ExtResource("1_dmb7u")
+[sub_resource type="Resource" id="Resource_m4xd4"]
+script = ExtResource("1_ks20m")
 order = 3
 type = 1
 title = "途中小憩"
-description = "叙事与风险、资源取舍"
 
-[sub_resource type="Resource" id="Resource_j2kxv"]
-script = ExtResource("1_dmb7u")
+[sub_resource type="Resource" id="Resource_4x4qk"]
+script = ExtResource("1_ks20m")
 order = 4
 title = "机制之敌"
-description = "开始应对机制性敌人"
-enemies = Array[ExtResource("2_m1at6")]([ExtResource("5_bd1kb")])
+enemy_pool = Array[ExtResource("2_l3jqe")]([ExtResource("7_glem6"), ExtResource("8_4ek3q"), ExtResource("9_5mnnl")])
+enemies = Array[ExtResource("2_l3jqe")]([ExtResource("7_glem6")])
 
-[sub_resource type="Resource" id="Resource_twba0"]
-script = ExtResource("1_dmb7u")
+[sub_resource type="Resource" id="Resource_7n4sw"]
+script = ExtResource("1_ks20m")
 order = 5
 type = 2
 title = "市集"
-description = "购字、复制、删字或治疗"
 
-[sub_resource type="Resource" id="Resource_glem6"]
-script = ExtResource("1_dmb7u")
+[sub_resource type="Resource" id="Resource_0sm2y"]
+script = ExtResource("1_ks20m")
 order = 6
 type = 6
 title = "岔路"
-description = "精英（高收益）或事件（较安全）"
-enemies = Array[ExtResource("2_m1at6")]([ExtResource("6_cgyiy")])
+enemy_pool = Array[ExtResource("2_l3jqe")]([ExtResource("10_2jktc"), ExtResource("11_4kyom"), ExtResource("12_g13og"), ExtResource("13_81sr5")])
+enemies = Array[ExtResource("2_l3jqe")]([ExtResource("10_2jktc")])
 is_optional_branch = true
 
-[sub_resource type="Resource" id="Resource_4ek3q"]
-script = ExtResource("1_dmb7u")
+[sub_resource type="Resource" id="Resource_n5bqj"]
+script = ExtResource("1_ks20m")
 order = 7
 type = 4
 title = "休整"
-description = "治疗 / 删字 / 修饰，三选一"
 
-[sub_resource type="Resource" id="Resource_5mnnl"]
-script = ExtResource("1_dmb7u")
+[sub_resource type="Resource" id="Resource_da3mb"]
+script = ExtResource("1_ks20m")
 order = 8
 type = 5
 title = "幕末首领"
-description = "验证整套构筑"
-enemies = Array[ExtResource("2_m1at6")]([ExtResource("7_kt6oy")])
+enemy_pool = Array[ExtResource("2_l3jqe")]([ExtResource("14_2fj0v")])
+enemies = Array[ExtResource("2_l3jqe")]([ExtResource("14_2fj0v")])
 
 [resource]
-script = ExtResource("8_ks20m")
+script = ExtResource("15_6xudn")
 index = 3
 title = "第三幕 · 兑现"
-theme = "在压力下完成联动与收尾。"
-nodes = Array[ExtResource("1_dmb7u")]([SubResource("Resource_l3jqe"), SubResource("Resource_kp4g0"), SubResource("Resource_1o6lm"), SubResource("Resource_j2kxv"), SubResource("Resource_twba0"), SubResource("Resource_glem6"), SubResource("Resource_4ek3q"), SubResource("Resource_5mnnl")])
+nodes = Array[ExtResource("1_ks20m")]([SubResource("Resource_nk8ri"), SubResource("Resource_jevak"), SubResource("Resource_m4xd4"), SubResource("Resource_4x4qk"), SubResource("Resource_7n4sw"), SubResource("Resource_0sm2y"), SubResource("Resource_n5bqj"), SubResource("Resource_da3mb")])

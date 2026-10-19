@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_wlyw0"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_lgxpi"]
+
+[sub_resource type="Resource" id="Resource_1frdq"]
+script = ExtResource("1_wlyw0")
+title = "压轨"
+description = "循环行动：压轨 → 铅铸 → 双铸"
+damage = 10
+mechanic_action = "rail"
+
+[sub_resource type="Resource" id="Resource_rksq1"]
+script = ExtResource("1_wlyw0")
+kind = 1
+title = "铅铸"
+description = "循环行动：压轨 → 铅铸 → 双铸"
+damage = 0
+block = 8
+mechanic_action = "rail_shield"
+
+[sub_resource type="Resource" id="Resource_p4yoy"]
+script = ExtResource("1_wlyw0")
+kind = 5
+title = "双铸"
+description = "循环行动：压轨 → 铅铸 → 双铸"
+hits = 2
+mechanic_action = "boss_multi"
+
+[resource]
+script = ExtResource("2_lgxpi")
+id = "rail_boss"
+name = "铅轨机"
+glyph = "铅"
+description = "转阶段：生命≤当前生命上限50%，初始半血线62。 压轨前标记一行最多3／4枚非固定己方原实体。结算时每枚仍留在原行，攻击+2，最高16／20；回袋、消耗、暂存或移到其他行算撤离。原格补入新字不算旧实体残留；同一原实体成词后因额外使用留在原行仍受计数。全部撤离则压轨攻击后再移除Boss最多8普通盾。空题不发拆盾奖励。"
+max_hp = 124
+mechanic = "rail"
+act = 2
+moves = Array[ExtResource("1_wlyw0")]([SubResource("Resource_1frdq"), SubResource("Resource_rksq1"), SubResource("Resource_p4yoy")])
+is_boss = true

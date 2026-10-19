@@ -16,7 +16,8 @@ func _ready() -> void:
 	viewport.name = "CourtyardWorld"
 	viewport.own_world_3d = true
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	viewport.msaa_3d = Viewport.MSAA_4X
+	viewport.msaa_3d = Viewport.MSAA_2X if RenderingServer.get_current_rendering_method() == "mobile" else Viewport.MSAA_4X
+	if RenderingServer.get_current_rendering_method() == "mobile": max_render_size = Vector2i(1280, 720)
 	viewport.positional_shadow_atlas_size = 2048
 	add_child(viewport)
 	stage = STAGE.instantiate()

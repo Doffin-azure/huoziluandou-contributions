@@ -24,8 +24,8 @@ enum Kind {
 	PERSISTENT_BLOCK,   ## 持久盾（跨回合）
 	ENERGY,             ## 储能
 	HEAT,               ## 热度
-	TEMP_FUNDS,         ## 临时资金
-	EQUITY,             ## 股权
+	TEMP_FUNDS,         ## 废弃槽位（保留序号）
+	EQUITY,             ## 废弃槽位（保留序号）
 	REMOVE_BLOCK,       ## 移除敌方护盾
 	CLEANSE,            ## 净化污染
 	REVEAL_PLACE,       ## 揭示并指定落点
@@ -94,7 +94,6 @@ func semantic_kind() -> int:
 		"gold": return Kind.GAIN_GOLD
 		"energy", "energy_around_tail": return Kind.ENERGY
 		"heat", "heat_clear", "heat_cleanse": return Kind.HEAT
-		"temp_funds": return Kind.TEMP_FUNDS
 		"apply_status_self", "apply_status_enemy", "ignite", "strength_growing": return Kind.APPLY_STATUS
 		_:
 			return Kind.ABILITY if timing == "persistent" else Kind.SPECIAL
@@ -127,9 +126,9 @@ func describe() -> String:
 		Kind.HEAT:
 			return "热度 %+d" % amount
 		Kind.TEMP_FUNDS:
-			return "获得 %d 临时资金" % amount
+			return "旧临时资金效果已移除"
 		Kind.EQUITY:
-			return "获得 %d 股权" % amount
+			return "旧股权效果已移除"
 		Kind.GRAVITY:
 			return "全盘向下重力"
 		Kind.REMOVE_BLOCK:

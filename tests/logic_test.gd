@@ -34,7 +34,7 @@ func _run() -> void:
 	_test_counter()
 	_test_enemy_inject()
 	_test_break_shield()
-	_test_equity_cycle()
+	_test_immediate_economy()
 	_test_energy_heat_conversions()
 	_test_scaling_attacks()
 	_test_cold_snap()
@@ -44,7 +44,7 @@ func _run() -> void:
 	_test_mint()
 	_test_buyback()
 	_test_gravity_always()
-	_test_temp_funds_payment()
+	_test_gold_payment()
 	_test_transform_board()
 	_test_split_grow()
 	_test_empower()
@@ -265,12 +265,12 @@ func _test_batch2_glyphs() -> void:
 	_ok(b2.player.heat == 1, "爆：热度 +1（%d）" % b2.player.heat)
 
 	# 资：临时资金 +2
-	print("[资] 临时资金 +2")
+	print("[资] 普通金币 +2")
 	var b3 := _battle()
-	b3.player.temp_funds = 0
+	var gold_before := GameState.gold
 	_place(b3, 0, 0, "资")
 	b3.try_play([Vector2i(0, 0)])
-	_ok(b3.player.temp_funds == 2, "资：临时资金 +2（%d）" % b3.player.temp_funds)
+	_ok(GameState.gold == gold_before + 2, "资：普通金币+2")
 
 	# 收：随机补 1 字
 	print("[收] 随机补 1 字")
@@ -645,27 +645,19 @@ func _add_enemy(b: BattleState, hp := 200, block := 0) -> Combatant:
 	return e
 
 
-func _test_equity_cycle() -> void:
-	print("[投资/复利/利息/炼金] 股权闭环")
+func _test_immediate_economy() -> void:
 	var b := _battle()
 	var g0 := GameState.gold
 	GameState.gold = 100
-	_place(b, 0, 0, "复")
-	_place(b, 1, 0, "利")
-	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
-	_place(b, 0, 1, "投")
-	_place(b, 1, 1, "资")
-	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
-	_ok(b.player.equity == 4, "投资 3 + 复利 1 = 4 股权（当前 %d）" % b.player.equity)
-	_ok(GameState.gold == 97, "锁定 3 金币（当前 %d）" % GameState.gold)
-	_place(b, 0, 2, "利")
-	_place(b, 1, 2, "息")
-	b.try_play([Vector2i(0, 2), Vector2i(1, 2)])
-	_ok(b.player.equity == 3 and GameState.gold == 99, "利息：-1 股权 +2 金币")
-	_place(b, 0, 3, "炼")
-	_place(b, 1, 3, "金")
-	b.try_play([Vector2i(0, 3), Vector2i(1, 3)])
-	_ok(b.player.equity == 0 and GameState.gold == 108, "炼金：3 股权换 9 金币")
+	for row in 3:
+		var glyphs: String = ["复利", "利息", "炼金"][row]
+		_place(b, 0, row, glyphs[0])
+		_place(b, 1, row, glyphs[1])
+		var result := b.try_play([Vector2i(0, row), Vector2i(1, row)])
+		_ok(result.ok, "即时经济词生效：" + glyphs)
+	_ok(GameState.gold == 107, "复利、利息、炼金直接获得2+2+3金币")
+	GameState.settle_victory_economy()
+	_ok(GameState.gold == 107, "胜利没有额外投资返还")
 	GameState.gold = g0
 
 
@@ -952,29 +944,26 @@ func _test_vigor() -> void:
 
 
 func _test_jingjin() -> void:
-	print("[精金] 永久镀金 + 每词 1 金币")
-	var g0 := GameState.gold
-	GameState.gold = 50
-	var saved := GameState.deck.duplicate()
-	GameState.deck.clear()
-	GameState.deck.append(CharInstance.new(Database.get_character_by_glyph("击")))
 	var b := _battle()
+	var saved := GameState.deck.duplicate()
+	var g0 := GameState.gold
+	var card := CharInstance.new(Database.get_character_by_glyph("击"))
+	var other := CharInstance.new(card.data)
+	GameState.deck.assign([card, other])
 	_place(b, 0, 0, "精")
 	_place(b, 1, 0, "金")
-	_place(b, 0, 1, "击")
-	b.try_play([Vector2i(0, 0), Vector2i(1, 0)], {"gild_glyph": "击"})
-	var gilded := 0
-	for inst in GameState.deck:
-		if inst.glyph() == "击" and inst.gilded:
-			gilded += 1
-	_ok(gilded >= 1, "字袋中的【击】被镀金")
-	var bh: CharInstance = b.board.get_cell(0, 1)
-	_ok(bh != null and bh.gilded, "盘面上的【击】也被镀金")
+	b.board.set_cell(0, 1, card)
+	var result := b.try_play([Vector2i(0, 0), Vector2i(1, 0)], {"gild_uid": card.uid})
+	_ok(result.ok and card.gilded and not other.gilded, "精金只镀金一枚指定实体")
 	_add_enemy(b, 200)
-	_place(b, 1, 1, "破")
 	var gg := GameState.gold
+	b.try_play([Vector2i(0, 1)])
+	_ok(GameState.gold == gg + 1, "镀金单字+1金币")
+	b.board.set_cell(0, 1, card)
+	_place(b, 1, 1, "破")
+	gg = GameState.gold
 	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
-	_ok(GameState.gold == gg + 1, "镀金【击】参与多字词 +1 金币（%d→%d）" % [gg, GameState.gold])
+	_ok(GameState.gold == gg + 1, "镀金参与组词+1金币")
 	GameState.gold = g0
 	GameState.deck = saved
 
@@ -1591,8 +1580,8 @@ func _test_refine_remove() -> void:
 	GameState.gold = g0
 
 
-func _test_temp_funds_payment() -> void:
-	print("[资金→投币] 临时资金优先支付")
+func _test_gold_payment() -> void:
+	print("[资金→投币] 普通金币支付")
 	var b := _battle()
 	var e := _add_enemy(b, 200)
 	var g0 := GameState.gold
@@ -1600,11 +1589,11 @@ func _test_temp_funds_payment() -> void:
 	_place(b, 0, 0, "资")
 	_place(b, 1, 0, "金")
 	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
-	_ok(b.player.temp_funds == 5, "资金：获得 5 临时资金（当前 %d）" % b.player.temp_funds)
+	_ok(GameState.gold == 55, "资金：普通金币+5")
 	_place(b, 0, 1, "投")
 	_place(b, 1, 1, "币")
 	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
-	_ok(b.player.temp_funds == 2 and GameState.gold == 50, "投币：先花临时资金，金币不变")
+	_ok(GameState.gold == 52, "投币：支付3普通金币")
 	_ok(200 - e.hp == 15, "投币：支付 3 × 5 = 15 伤（实际 %d）" % (200 - e.hp))
 	GameState.gold = g0
 

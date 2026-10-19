@@ -116,7 +116,7 @@ static func get_theme() -> Theme:
 
 
 static func touch_scale(control: Control) -> float:
-	return maxf(1.0, control.get_viewport_rect().size.y / maxf(1, control.get_window().size.y))
+	return BattleTouchLayout.unit_for(control.get_viewport_rect().size, control.get_window().size)
 
 
 static func button(caption: String, action: Callable, primary := false) -> Button:

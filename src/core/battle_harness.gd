@@ -62,8 +62,6 @@ func reset(cfg: Dictionary = {}) -> void:
 	GameState.gold = int(cfg.get("gold", rules.starting_gold))
 	if not persistent_run:
 		GameState.permanent_damage_reduction = 0
-		GameState.gold_growth_percent = 0
-		GameState.reinvest_gold = 0
 	battle.start(deck, enemies, seed)
 	if cfg.has("gold"):
 		GameState.gold = int(cfg["gold"])
@@ -121,7 +119,7 @@ func observe() -> Dictionary:
 			"block": b.player.block, "persistent_block": b.player.persistent_block,
 			"energy": b.player.energy, "heat": b.player.heat, "heat_capacity": b.player.heat_capacity,
 			"turn_strength": b.player.turn_strength, "next_damage_reduction": b.player.next_damage_reduction,
-			"gold": GameState.gold, "temp_funds": b.player.temp_funds, "equity": b.player.equity,
+			"gold": GameState.gold,
 			"gold_earned_this_turn": b.gold_earned_this_turn,
 			"temporary_heat_capacity": b.temporary_heat_capacity,
 			"statuses": b.player.statuses.duplicate(),
@@ -162,7 +160,7 @@ func legal_actions(limit := 60) -> Array:
 			break
 		var w: WordData = f["word"]
 		var needs := _needs_of(w)
-		if needs in ["three", "same_pair"] and _auto_target(needs, f["path"]).is_empty():
+		if needs in ["three", "same_pair", "gild"] and _auto_target(needs, f["path"]).is_empty():
 			continue
 		out.append({
 			"type": "play",
@@ -188,9 +186,9 @@ func legal_actions(limit := 60) -> Array:
 				needs = "throw" if inst.data.solo_handler == "throw_neighbor" else "tile"
 			elif battle._solo_requires_target(inst.data, [pos]) == EffectData.Target.BAG_GLYPH:
 				needs = "bag"
-		if needs == "bag" and inst.data.solo_handler == "buy_bag_solo" and EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, 2):
+		if needs == "bag" and inst.data.solo_handler == "buy_bag_solo" and EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, BattleBalance.i("buy_cost", 2)):
 			continue
-		if needs == "throw" and (EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, 1) or _auto_target(needs, [pos]).is_empty()):
+		if needs == "throw" and (EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, BattleBalance.i("throw_cost", 1)) or _auto_target(needs, [pos]).is_empty()):
 			continue
 		var action := {"type": "play", "path": [_xy_out(pos)], "word": null,
 			"needs": needs, "score": solo}
@@ -198,7 +196,7 @@ func legal_actions(limit := 60) -> Array:
 			action["bag_choices"] = battle.solo_bag_candidates(inst).map(func(card): return {
 				"card": _cell_dict(card), "target": {"bag_uid": card.uid, "bag_source_uid": inst.uid}})
 		out.append(action)
-		if inst.data != null and not inst.word_only and inst.data.solo_handler == "solo_release" and inst.glyph_list().size() == 1 and battle.player.energy >= 1 and out.size() < limit:
+		if inst.data != null and not inst.word_only and inst.data.solo_handler == "solo_release" and inst.glyph_list().size() == 1 and battle.player.energy >= BattleBalance.i("release_cost", 1) and out.size() < limit:
 			out.append({"type": "play", "path": [_xy_out(pos)], "word": null,
 				"needs": "none", "score": 8, "target": {"release_energy": true}})
 	out.append({"type": "end_turn"})
@@ -237,7 +235,8 @@ func _needs_of(w: WordData) -> String:
 			"choose_junk_tiles": return "junk"
 			"choose_same_pair": return "same_pair"
 			"reveal_pick_board": return "tile"
-			"choose_glyph_empower", "choose_glyph_gild": return "glyph"
+			"choose_glyph_empower": return "glyph"
+			"choose_glyph_gild": return "gild"
 			"choose_battle_card_remove": return "battle_card"
 			"choose_fuse_pair", "choose_any_pair": return "pair"
 			"choose_row_pair": return "row_pair"
@@ -372,6 +371,11 @@ func _norm_target(d: Dictionary) -> Dictionary:
 
 ## 为需要目标的动作自动挑一个合法目标（批量测试用）。
 func _auto_target(needs: String, path: Array = []) -> Dictionary:
+	if needs == "gild":
+		for card in GameState.deck:
+			if card.is_player_owned() and not card.temporary and not card.gilded:
+				return {"gild_uid": card.uid}
+		return {}
 	var b := battle
 	if needs in ["deploy", "buyback"]:
 		var cards := EffectHandlersActions.deploy_candidates(b) if needs == "deploy" else b.discard.filter(func(c): return c.is_player_owned() and not c.temporary)
@@ -429,7 +433,7 @@ func _auto_target(needs: String, path: Array = []) -> Dictionary:
 					continue
 				seen[inst.uid] = true
 				cells.append(pos)
-				if cells.size() == 3:
+				if cells.size() == BattleBalance.i("recast_target_count", 3):
 					return {"cells": cells}
 		"tile", "enemy":
 			for i in b.board.cells.size():
@@ -490,7 +494,7 @@ func _auto_target(needs: String, path: Array = []) -> Dictionary:
 		"glyph":
 			var counts := GameState.glyph_counts()
 			if not counts.is_empty():
-				return {"empower_glyph": str(counts.keys()[0]), "gild_glyph": str(counts.keys()[0])}
+				return {"empower_glyph": str(counts.keys()[0])}
 		"battle_card":
 			var bc: Dictionary = b.battle_card_counts()
 			if not bc.is_empty():

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_ma8cc"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_7w00e"]
+
+[sub_resource type="Resource" id="Resource_3pjr7"]
+script = ExtResource("1_ma8cc")
+title = "异文审校"
+description = "循环行动：异文审校 → 重文校印 → 收卷"
+damage = 12
+mechanic_action = "different"
+
+[sub_resource type="Resource" id="Resource_2fmji"]
+script = ExtResource("1_ma8cc")
+title = "重文校印"
+description = "循环行动：异文审校 → 重文校印 → 收卷"
+damage = 12
+mechanic_action = "repeat"
+
+[sub_resource type="Resource" id="Resource_y363i"]
+script = ExtResource("1_ma8cc")
+kind = 5
+title = "收卷"
+description = "循环行动：异文审校 → 重文校印 → 收卷"
+hits = 3
+mechanic_action = "boss_multi"
+
+[resource]
+script = ExtResource("2_7w00e")
+id = "compiler_boss"
+name = "万词编纂者"
+glyph = "万"
+description = "转阶段：生命≤当前生命上限50%，初始半血线84。 异文要求当前阶段出2种不同多字词；重文要求当前阶段同一个多字词主动成功出2次。完成当前题：Boss先受6机制伤害，再攻击8／10；未完成：攻击12／14，随后得6／8盾。每题一次，计数阶段间清空。连击这个词只登记“连击”，重演上词不等于再提交上词。"
+max_hp = 168
+mechanic = "compiler"
+act = 3
+moves = Array[ExtResource("1_ma8cc")]([SubResource("Resource_3pjr7"), SubResource("Resource_2fmji"), SubResource("Resource_y363i")])
+is_boss = true

@@ -311,6 +311,8 @@ func button(text: String, primary := false) -> Button:
 
 
 func tooltip(text: String) -> Control:
+	# 状态、资源、意图等共用入口：无内容时不要创建空白悬停面板。
+	if text.strip_edges().is_empty(): return null
 	# 引擎已在 TooltipPanel 内承载自定义内容，只返回正文，避免双层边框。
 	var description := Label.new()
 	description.theme = theme

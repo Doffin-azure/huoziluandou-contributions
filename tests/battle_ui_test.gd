@@ -111,7 +111,9 @@ func _run() -> void:
 		add_child(stage)
 		Router.study_stage = stage
 	Router.host = self
-	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7})
+	var fixture := MapNodeData.new()
+	fixture.enemies.append(Database.get_enemy("ink_spirit"))
+	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7, "node": fixture})
 	await _frames()
 	_screen = Router.current
 	_ok(_screen._board_view.tiles.size() == 16, "真实战斗场景有 16 枚固定视图")

@@ -1,9 +1,26 @@
 extends RefCounted
 class_name Expedition
-## 墨途远征 v0.3（《幕间探索设计报告 v0.3》+《字的经济与全局加成 v0.1》）：
-## 迷雾开阔地图（MapGen）· 首领惊动与追逐 · 明敌看守 · 伏兵领地与封 · 字匣 / 字袋 / 版面三处放字 ·
-## 版面词谱（Lexicon）· 印章 · 休息点三选一 · 商店 · 熔炉 · 谜 · 被追上的位置减益 · 三幕与幕间结算。
+## 墨途远征：迷雾探索、分阶段敌人、首领追逐、字匣与战斗构筑。
+## 印章 / 遗物 / 休息 / 商店 / 熔炉保留；首领击败即封层。
 ## 遭遇进入真正的 4×4 战斗（battle_screen），开场效果见 apply_battle_setup。格子用 MapGen 的整数 k。
+
+
+## 每幕前 / 中 / 深区的固定投放；战斗组词本身保留。
+const NORMAL_STAGES := {
+	1: [["paper_shell", "needle_bee"], ["tilting_inkwell", "fold_moth"], ["blank_child", "corrosion_beetle"]],
+	2: [["glutton", "furnace_beast"], ["charge_badger", "ink_creditor"], ["double_slip", "nest_moth", "bomb_press"]],
+	3: [["charge_badger", "ink_creditor", "bomb_press"], ["glutton", "double_slip", "nest_moth"], ["furnace_beast", "double_slip", "nest_moth"]],
+}
+const ELITE_STAGES := {
+	1: [["iron_seal"], ["iron_seal"], ["iron_seal"]],
+	2: [["copy_master"], ["copy_master", "seal_officer"], ["wheel_master", "leech"]],
+	3: [["copy_master", "seal_officer"], ["seal_officer", "wheel_master"], ["wheel_master", "leech"]],
+}
+const ENCOUNTER_STAGES := {
+	1: ["起步·基础应对", "起步·盘面练习", "起步·污染管理"],
+	2: ["成型·资源运转", "成型·费用调度", "成型·组合考验"],
+	3: ["兑现·复合应对", "兑现·循环稳定", "兑现·终局考验"],
+}
 
 const TRAY_CAP := 6
 const DECK_CAP := 20
@@ -17,17 +34,19 @@ const REST_T := 3
 ## 战后奖励跳过换的金币
 const SKIP_GOLD := 16
 const SHOP_REFRESH_COST := 5
+## 首领击败即封层；有限补给代替无压力清图，进入下一幕时发放。
+const ACT_SUPPLY := {1: {"gold": 12, "heal": 8, "ink": 1}, 2: {"gold": 16, "heal": 10, "ink": 1}}
 ## 印章：效果 / 主要来源
 const SEALS := {
 	"镇纸": ["每场战斗少掉 4 点血", "精英"], "夜灯": ["视野 +1 格", "大赏"], "更漏": ["首领走路概率增长得更慢", "大赏"],
 	"拓本": ["打开任何赏都多一个选项", "大赏"], "印鉴": ["被「封」的奖励会显示伏兵的位置", "精英"],
-	"朱笔": ["首领战开场，首领少一条词条", "首领"], "蒲团": ["休息点的治疗量翻倍", "精英"],
-	"活字盒": ["字匣 +2 格", "大赏"], "宽版": ["版面立刻扩成 3×3（一局只能有一次）", "首领"],
+	"朱笔": ["首领战开场，新首领生命上限 −6；旧首领少一条词条", "首领"], "蒲团": ["休息点的治疗量翻倍", "精英"],
+	"活字盒": ["字匣 +2 格", "大赏"], "字印": ["每场战斗开场多抽 1 枚字", "首领"],
 }
-## 三幕首领：借用的敌人资源（数值沿用 resources/enemies），名字随主题
-const BOSS := {1: "boss_word_demon", 2: "boss_lead_plate", 3: "boss_chaos_press"}
+## 三幕首领使用精选机制资源；地图主题仍保留。
+const BOSS := EnemyRoster.BOSSES
 const BOSS_NAME := {"墨池": "墨渊", "熔铸坊": "铸印魔", "潮汐渠": "潮伯", "雷池": "雷公"}
-## 首领词条（逐幕加强）：破甲 / 破防 / 朱笔 可以削掉
+## 旧资源兼容用的首领词条（逐幕加强），朱笔可以削掉
 const BOSS_AFFIX := {1: [["armor", 8], ["shield", 6]], 2: [["armor", 12], ["shield", 8], ["strength", 1]],
 	3: [["armor", 16], ["shield", 10], ["strength", 2]]}
 const AFFIX_TEXT := {"armor": "护甲（持久盾）+%d", "shield": "开场护盾 +%d", "strength": "力量 +%d"}
@@ -48,7 +67,7 @@ var themes: Array = []
 var m: Dictionary = {}          ## 当前幕地图（MapGen.generate 的结果）
 var pos := 0
 var t := 0                      ## 时间（步）
-var steps := 0                  ## 玩家实际走了几步（加速）
+var steps := 0                  ## 玩家实际走过的格数
 var explored := {}
 var visible := {}
 var taken := {}                 ## 已拿走的赏 / 已击败的敌 / 已拾的散字 / 已用的休息点
@@ -61,23 +80,11 @@ var rise = null
 var miss := 0                   ## 首领起身后连续没走的步数（伪随机累计）
 var stun := 0
 var alarm := false
-var halt_done := false          ## 急停已触发
-var boss_down := false          ## 本幕首领已被击败：不再追击，可以继续探索，随时结束本幕
-var rush_left := 5              ## 急速剩余步数
-var half_step := 0.0
+var halt_done := false          ## 起身提示已触发
+var boss_down := false          ## 首领已败，本层封闭，只能处理首领奖励与幕间结算。
 var ink := START_INK
 var tray: Array = []
-var plate: Array = []
-var plate_n := 2
-var plate_4 := false            ## 本局已扩到 4×4
-var wide_used := false
 var seals: Array = []
-var active := {}                ## 版面上正在生效的词谱词
-var flip_used := false
-var power_used := false
-var wish_used := false          ## 随身许愿机本幕已用
-var repeat_used := false
-var spent := 0                  ## 本幕在商店花的金币
 var buyback: Array = []
 var panels: Array = []          ## 待处理的面板，顶上的先显示
 var fight := {}                 ## 待开战的遭遇
@@ -105,7 +112,6 @@ static func start(seed_value: int = -1) -> Expedition:
 		var tmp = ex.themes[i]
 		ex.themes[i] = ex.themes[j]
 		ex.themes[j] = tmp
-	ex._resize_plate(2)
 	GameState.expedition = ex
 	ex.load_act(1)
 	return ex
@@ -114,6 +120,7 @@ static func start(seed_value: int = -1) -> Expedition:
 func load_act(n: int) -> void:
 	act = n
 	m = MapGen.generate(run_seed + n * 1009, themes[(n - 1) % themes.size()])
+	_assign_encounter_stages()
 	pos = m.start
 	t = 0
 	steps = 0
@@ -130,13 +137,6 @@ func load_act(n: int) -> void:
 	alarm = false
 	halt_done = false
 	boss_down = false
-	rush_left = 5
-	half_step = 0.0
-	flip_used = false
-	power_used = false
-	wish_used = false
-	repeat_used = false
-	spent = 0
 	fight = {}
 	panels.clear()
 	alerts.clear()
@@ -146,8 +146,6 @@ func load_act(n: int) -> void:
 
 
 # ---------------------------------------------------------------- 派生数值
-func has(w: String) -> bool:
-	return active.has(w)
 
 
 func has_seal(s: String) -> bool:
@@ -155,14 +153,14 @@ func has_seal(s: String) -> bool:
 
 
 func tray_cap() -> int:
-	return TRAY_CAP + (1 if has("收放") else 0) + (2 if has_seal("活字盒") else 0)
+	return TRAY_CAP + (2 if has_seal("活字盒") else 0)
 
 
 func vision() -> int:
-	return MapGen.P.vision + (1 if has("开灯") else 0) + (1 if has_seal("夜灯") else 0)
+	return MapGen.P.vision + (1 if has_seal("夜灯") else 0)
 
 
-## 首领这一步走的概率（伪随机）：基线 = 0.35 + 0.05 × 起身后的步数（冷却 / 更漏让增长变慢）；
+## 首领这一步走的概率（伪随机）：基线 = 0.35 + 0.05 × 起身后的步数（更漏让增长变慢）；
 ## 没走就累计：概率 = 基线 × (连续没走的步数 + 1)，最高 100%；走了一步就回到基线
 func move_base() -> float:
 	if not awake():
@@ -175,7 +173,7 @@ func move_chance() -> float:
 
 
 func acc_scale() -> float:
-	return (0.5 if has("冷却") else 1.0) * (0.5 if has_seal("更漏") else 1.0)
+	return 0.5 if has_seal("更漏") else 1.0
 
 
 func awake() -> bool:
@@ -188,7 +186,7 @@ func buffer_steps() -> int:
 
 
 func wake_time() -> int:
-	return int(m.wake) + (4 if has("停息") else 0)
+	return int(m.wake)
 
 
 func mech_at(k: int) -> Dictionary:
@@ -196,19 +194,17 @@ func mech_at(k: int) -> Dictionary:
 
 
 func gate_shut(k: int, at_t: int) -> bool:
-	return m.mech.has(k) and not has("停电") and MapGen.shut(m.mech[k], at_t)
+	return m.mech.has(k) and MapGen.shut(m.mech[k], at_t)
 
 
-## 玩家能否走进 k（墨障算可走：撞上时花墨冲开）；电流过载能穿过关着的门
+## 玩家能否走进 k（墨障算可走：撞上时花墨冲开）
 func can_enter(k: int) -> bool:
-	if m.ink[k] != 0:
-		return false
-	return not gate_shut(k, t) or has("电流过载")
+	return m.ink[k] == 0 and not gate_shut(k, t)
 
 
-## 导线这一步通不通电（和电闸同相位；「停电」让电闸常开，导线也就常通）
+## 导线与电闸采用同一通电相位
 func mover_live(k: int, at_t: int) -> bool:
-	return has("停电") or MapGen.mover_live(mech_at(k), at_t)
+	return MapGen.mover_live(mech_at(k), at_t)
 
 
 func boss_mask() -> PackedByteArray:
@@ -216,7 +212,7 @@ func boss_mask() -> PackedByteArray:
 
 
 # ---------------------------------------------------------------- 迷雾
-## 视野：沿可走路线 vision 步以内，外加一圈（看见墙）；「左右」再加十字 4 格
+## 视野：沿可走路线 vision 步以内，外加一圈看见墙
 func update_vision() -> void:
 	visible.clear()
 	var mk := MapGen.mask_of(func(k): return m.ink[k] == 0 and not m.obst.has(k))
@@ -226,16 +222,6 @@ func update_vision() -> void:
 			visible[k] = true
 			for n in MapGen.nbrs(k):
 				visible[n] = true
-	if has("左右"):
-		var p := MapGen.rc(pos)
-		for dir in MapGen.DIRS:
-			for i in range(1, 5):
-				var q: Vector2i = p + dir * i
-				if not MapGen.inb(q.x, q.y):
-					break
-				visible[MapGen.kk(q.x, q.y)] = true
-				if m.ink[MapGen.kk(q.x, q.y)] != 0:
-					break
 	for k in visible:
 		explored[k] = true
 
@@ -249,9 +235,9 @@ func is_beacon(k: int) -> bool:
 ## 过一步：首领到点 / 被大赏惊动 / 有人从巢穴 2 步内经过 → 惊动，缓冲 7～10 步后起身，沿最短路追
 ## 返回 true = 被追上
 func tick() -> bool:
-	t += 1
-	if boss_down:
+	if boss_down or over:
 		return false
+	t += 1
 	if stir == null:
 		var near := MapGen.bfs(MapGen.mask_of(func(k): return can_enter(k) and not m.obst.has(k)), m.lair)[pos] <= 2
 		if t >= wake_time() or alarm or near:
@@ -267,9 +253,6 @@ func tick() -> bool:
 		halt_done = true
 		alerts.append(["首领起身了", "首领【%s】开始追你，现在相距 %d 步。
 战斗、休息都要花时间；被追上的位置会给首领战减益，主动迎战则不会。" % [m.TH.boss, MapGen.bfs(boss_mask(), boss)[pos]]])
-		if has("急停"):
-			stun += 2
-			_log("急停：首领起身后先原地停 2 步")
 	if stun > 0:
 		stun -= 1
 		return false
@@ -294,26 +277,13 @@ func advance(n: int) -> void:
 
 
 func _caught() -> void:
-	if has("反转") and not flip_used:
-		flip_used = true
-		var bm := boss_mask()
-		for i in 5:
-			var d := MapGen.bfs(bm, pos)
-			var best := boss
-			for nb in MapGen.nbrs(boss):
-				if bm[nb] != 0 and d[nb] > d[best]:
-					best = nb
-			boss = best
-			boss_trail.append(boss)
-		_log("反转：把首领推回 5 格，不开战（每幕一次）")
-		return
 	fight = _boss_encounter(true)
 	_log("首领追上来了！")
 
 
 func _boss_encounter(caught: bool) -> Dictionary:
 	var debuff := ""
-	if caught and not has("反超"):
+	if caught:
 		debuff = location_debuff(pos)
 	return {"kind": "boss", "k": boss, "name": BOSS_NAME.get(m.tn, "首领"), "g": m.TH.boss, "caught": caught, "debuff": debuff}
 
@@ -331,7 +301,7 @@ func location_debuff(k: int) -> String:
 
 # ---------------------------------------------------------------- 移动
 func busy() -> bool:
-	return over or not panels.is_empty() or not fight.is_empty()
+	return over or boss_down or not panels.is_empty() or not fight.is_empty()
 
 
 func can_step(k: int) -> bool:
@@ -342,33 +312,15 @@ func move(k: int) -> bool:
 	if not can_step(k):
 		return false
 	if m.obst.has(k):
-		# 墨障：花 2 墨冲开（爆破免费）；墨不够就以血冲开；防爆免伤
-		if has("爆破"):
-			_log("爆破：冲开墨障，不花墨")
-		elif ink >= BARRIER_INK:
+		if ink >= BARRIER_INK:
 			ink -= BARRIER_INK
 			_log("冲开墨障：墨 −%d" % BARRIER_INK)
-		elif has("防爆"):
-			_log("防爆：墨不够也能冲开墨障，不掉血")
 		else:
 			_hurt(BARRIER_HP, "墨不够，硬冲墨障")
 		m.obst.erase(k)
-	if gate_shut(k, t):
-		_hurt(4, "电流过载：穿过关着的%s" % mech_at(k).g)
 	pos = k
 	steps += 1
-	var cost := 1
-	if has("加速") and steps % 10 == 0:
-		cost = 0
-		_log("加速：这一步免费，首领不动")
-	elif has("急速") and awake() and rush_left > 0:
-		rush_left -= 1
-		half_step += 0.5
-		cost = 1 if half_step >= 1.0 else 0
-		if cost == 1:
-			half_step -= 1.0
-	cost += _step_mech()
-	advance(cost)
+	advance(1 + _step_mech())
 	update_vision()
 	if fight.is_empty():
 		_check_boss_adjacent()
@@ -389,16 +341,11 @@ func _step_mech() -> int:
 				ink += 3
 				_log("墨泉：墨 +3")
 		"纸":
-			if not has("清流"):
-				return 1
+			return 1
 		"焰":
-			if has("防火") or has("防爆"):
-				_log("防火：烈焰格不掉血")
-			else:
-				_hurt(3, "烈焰格")
+			_hurt(3, "烈焰格")
 		"桩":
-			var uses := 2 if has("放电") else 1
-			if awake() and int(used.get(pos, 0)) < uses:
+			if awake() and int(used.get(pos, 0)) < 1:
 				used[pos] = int(used.get(pos, 0)) + 1
 				stun += 3
 				_log("蓄电桩：把首领定住 3 步")
@@ -423,10 +370,10 @@ func _step_mech() -> int:
 	return 0
 
 
-## 水流：顺着箭头滑 3 格（流速 +2），撞墙停；不耗步
+## 水流：顺着箭头滑 3 格，撞墙停；不耗步
 func _slide(dir: Vector2i) -> void:
 	var p := MapGen.rc(pos)
-	var n := MapGen.SLIDE_N + (2 if has("流速") else 0)
+	var n := MapGen.SLIDE_N
 	for i in n:
 		var q: Vector2i = p + dir
 		if not MapGen.inb(q.x, q.y) or not can_enter(MapGen.kk(q.x, q.y)) or m.obst.has(MapGen.kk(q.x, q.y)):
@@ -451,6 +398,7 @@ func _check_boss_adjacent() -> void:
 # ---------------------------------------------------------------- 进格
 ## 走到 pos 上：伏兵领地 → 必须开战；明敌 / 精英 → 开战；赏 / 休 / 市 / 谜 / 熔炉 → 面板；散字 → 自动拾
 func enter_cell() -> void:
+	if boss_down or over: return
 	var terr: Dictionary = m.get("terr", {})
 	if terr.has(pos) and not amb_done.has(terr[pos]):
 		fight = {"kind": "ambush", "k": pos, "amb": terr[pos], "name": "伏兵", "g": ""}
@@ -480,7 +428,7 @@ func enter_cell() -> void:
 	if m.glyph.has(pos):
 		pickup()
 	var mc := mech_at(pos)
-	if not mc.is_empty() and mc.g == "炉" and int(used.get(pos, 0)) < (2 if has("精炼") else 1):
+	if not mc.is_empty() and mc.g == "炉" and int(used.get(pos, 0)) < 1:
 		push_panel({"kind": "forge", "k": pos})
 
 
@@ -513,12 +461,14 @@ func guard_of(k: int) -> String:
 	for n in MapGen.nbrs(k):
 		var o: Dictionary = m.node.get(n, {})
 		if o.get("t", "") in ["敌", "险"] and not taken.has(n):
-			return "精英" if o.t == "险" else "明敌【%s】" % o.g
+			var kind := "elite" if o.t == "险" else "foe"
+			if not explored.has(n): return "精英" if kind == "elite" else "明敌"
+			return ("精英" if kind == "elite" else "明敌") + "【%s】" % encounter_enemy(kind, n).name
 	return ""
 
 
 func pickup() -> bool:
-	if not m.glyph.has(pos) or taken.has(pos) or sealed(pos):
+	if boss_down or over or not m.glyph.has(pos) or taken.has(pos) or sealed(pos):
 		return false
 	var gd := guard_of(pos)
 	if not gd.is_empty():
@@ -531,9 +481,6 @@ func pickup() -> bool:
 	var g: String = m.glyph[pos]
 	tray.append(g)
 	_log("拾得【%s】" % g)
-	if has("重复") and not repeat_used:
-		repeat_used = true
-		gain_glyph(g, "重复：多复制一枚")
 	return true
 
 
@@ -583,10 +530,6 @@ func owned_glyphs() -> Dictionary:
 		out[c.glyph()] = true
 	for g in tray:
 		out[g] = true
-	for row in plate:
-		for g in row:
-			if not str(g).is_empty():
-				out[g] = true
 	return out
 
 
@@ -625,8 +568,9 @@ func roll_pair() -> Array:
 
 
 # ---------------------------------------------------------------- 赏
-## 小赏二选一、中赏 / 大赏三选一；重金让大赏多一个，拓本让所有赏多一个
+## 小赏二选一、中赏 / 大赏三选一；中大赏加入遗物，拓本让所有赏多一个
 func loot_options(tier: String) -> Array:
+	if tier not in ["小", "中", "大"]: return []
 	var opts: Array = []
 	match tier:
 		"小":
@@ -643,18 +587,72 @@ func loot_options(tier: String) -> Array:
 			if not free_seals.is_empty():
 				opts.append({"kind": "seal", "seal": free_seals[rng.randi_range(0, free_seals.size() - 1)]})
 			opts.append({"kind": "glyphs", "glyphs": [roll_glyph(2), roll_glyph(0)]})
-			if plate_n == 3 and not plate_4:
-				opts.append({"kind": "plate4"})
 			opts.append({"kind": "glyphs", "glyphs": roll_pair()})
 			opts.append({"kind": "gold", "gold": 25})
 			opts.append({"kind": "glyphs", "glyphs": [roll_glyph(2, true)]})
 			opts.append({"kind": "intel"})
+	if tier in ["中", "大"]:
+		var relic := roll_loot_relic(tier)
+		if not relic.is_empty(): opts.append({"kind": "relic", "relic": relic})
 	var n := 2 if tier == "小" else 3
-	if tier == "大" and has("重金"):
-		n += 1
 	if has_seal("拓本"):
 		n += 1
-	return opts.slice(0, mini(n, opts.size()))
+	# 同一份奖励只出现一次；先保证字与金币，再抽特色和额外选项。
+	var pool: Array = []
+	var keys := {}
+	for option in opts:
+		var key := _loot_key(option)
+		if not keys.has(key):
+			keys[key] = true
+			pool.append(option)
+	# 两次随机发字可能恰好重复；补足候选，避免拓本奖励空耗。
+	if pool.size() < n:
+		var owned := owned_glyphs()
+		var fallback: Array = reward_pool().filter(func(cd): return cd.rarity <= 2 and formable(cd, owned) and not keys.has("glyphs:" + cd.glyph))
+		while pool.size() < n and not fallback.is_empty():
+			var cd: CharacterData = fallback.pop_at(rng.randi_range(0, fallback.size() - 1))
+			pool.append({"kind": "glyphs", "glyphs": [cd.glyph]})
+	var selected: Array = []
+	_take_loot(pool, selected, ["gold"])
+	_take_loot(pool, selected, ["glyphs"])
+	if tier == "大": _take_loot(pool, selected, ["seal", "relic"])
+	while selected.size() < n and not pool.is_empty():
+		selected.append(pool.pop_at(rng.randi_range(0, pool.size() - 1)))
+	# 展示位置不固定，避免首项长期偏向同一种收益。
+	for i in range(selected.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var item: Dictionary = selected[i]
+		selected[i] = selected[j]
+		selected[j] = item
+	return selected
+
+
+## 中赏最多少见，大赏包含稀有；已有遗物不重复进入奖励池。
+func loot_relic_pool(tier: String) -> Array:
+	if tier not in ["中", "大"]: return []
+	var max_tier := 2 if tier == "中" else 3
+	return Relics.DEFS.keys().filter(func(id): return not GameState.has_relic(id) and int(Relics.TIER[id]) <= max_tier)
+
+
+func roll_loot_relic(tier: String) -> String:
+	var pool := loot_relic_pool(tier)
+	return str(pool[relic_rng.randi_range(0, pool.size() - 1)]) if not pool.is_empty() else ""
+
+
+func _loot_key(option: Dictionary) -> String:
+	if option.kind == "glyphs":
+		var glyphs: Array = option.glyphs.duplicate()
+		glyphs.sort()
+		return "glyphs:" + "".join(glyphs)
+	return str(option.kind) + ":" + str(option.get("relic", option.get("seal", option.get("gold", ""))))
+
+
+func _take_loot(pool: Array, selected: Array, kinds: Array) -> void:
+	var choices: Array = pool.filter(func(option): return kinds.has(option.kind))
+	if choices.is_empty(): return
+	var chosen: Dictionary = choices[rng.randi_range(0, choices.size() - 1)]
+	pool.erase(chosen)
+	selected.append(chosen)
 
 
 func loot_text(o: Dictionary) -> String:
@@ -663,7 +661,7 @@ func loot_text(o: Dictionary) -> String:
 		"gold": return "❖ +%d" % o.gold
 		"intel": return "情报：揭示最近的一个伏兵，或照亮周围 3 步"
 		"seal": return "印章「%s」：%s" % [o.seal, SEALS[o.seal][0]]
-		"plate4": return "版面扩成 4×4（一局一次）"
+		"relic": return "遗物" + Relics.text(o.relic)
 	return ""
 
 
@@ -672,6 +670,9 @@ func choose_loot(i: int) -> void:
 	if p.get("kind", "") != "loot" or i < 0 or i >= p.options.size():
 		return
 	var o: Dictionary = p.options[i]
+	if o.kind == "relic" and GameState.has_relic(o.relic):
+		_log("这件遗物已经拥有，请选择其他奖励")
+		return
 	pop_panel()
 	taken[pos] = true
 	match o.kind:
@@ -685,10 +686,8 @@ func choose_loot(i: int) -> void:
 			_intel()
 		"seal":
 			add_seal(o.seal)
-		"plate4":
-			plate_4 = true
-			_resize_plate(4)
-			_log("版面扩成 4×4")
+		"relic":
+			_grant_relic(o.relic, "开赏")
 
 
 func _intel() -> void:
@@ -721,10 +720,6 @@ func add_seal(s: String) -> void:
 func _take_seal(s: String) -> void:
 	seals.append(s)
 	_log("得到印章「%s」：%s" % [s, SEALS[s][0]])
-	if s == "宽版" and not wide_used and plate_n < 3:
-		wide_used = true
-		_resize_plate(3)
-		_log("宽版：版面扩成 3×3")
 
 
 ## index = 替换掉的印章下标；-1 = 不要新印章
@@ -741,7 +736,7 @@ func swap_seal(index: int) -> void:
 
 
 # ---------------------------------------------------------------- 遗物
-## 来源：熔炉许愿（见 forge）、商店货架；卖回商店拿一半价钱。遗物管战斗，不占印章格
+## 来源：中赏 / 大赏、商店货架；卖回商店拿一半价钱。遗物管战斗，不占印章格
 func _grant_relic(id: String, why: String) -> bool:
 	if not GameState.add_relic(id):
 		return false
@@ -774,12 +769,12 @@ func bind_relic(glyph_id: String) -> bool:
 
 ## 从某来源里挑一个还没有的印章（精英 / 首领）
 func roll_seal(source: String) -> String:
-	var free: Array = SEALS.keys().filter(func(s): return SEALS[s][1] == source and not seals.has(s) and not (s == "宽版" and wide_used))
+	var free: Array = SEALS.keys().filter(func(s): return SEALS[s][1] == source and not seals.has(s))
 	return free[rng.randi_range(0, free.size() - 1)] if not free.is_empty() else ""
 
 
 # ---------------------------------------------------------------- 休息点
-## 治疗 / 删字 / 修饰 三选一，耗 3 步，每个休息点只能用一次；清洗额外清 1 枚污染字
+## 治疗 / 删字 / 修饰 三选一，耗 3 步，每个休息点只能用一次
 func rest_heal_amount() -> int:
 	return int(round(GameState.player_max_hp * 0.3)) * (2 if has_seal("蒲团") else 1) + Relics.rest_bonus()
 
@@ -800,21 +795,15 @@ func rest(choice: String, glyph_id := "") -> bool:
 				return false
 		_:
 			return false
-	if has("清洗"):
-		for c in GameState.deck:
-			if c.data.is_pollution:
-				GameState.remove_by_uid(c.uid)
-				_log("清洗：额外清掉 1 枚污染字")
-				break
 	pop_panel()
 	taken[pos] = true
 	advance(REST_T)
 	return true
 
 
-## 修饰 = 镀金：参与多字词 +1 金币（GDD）；精金额外镀一枚
+## 修饰 = 镀金：单字或组词打出+1金币（GDD）
 func _gild(glyph_id: String) -> bool:
-	var n := 2 if has("精金") else 1
+	var n := 1
 	var done := 0
 	for c in GameState.deck:
 		if c.id() == glyph_id and not c.gilded and done < n:
@@ -822,12 +811,12 @@ func _gild(glyph_id: String) -> bool:
 			done += 1
 	if done == 0:
 		return false
-	_log("镀金【%s】×%d：参与多字词 +1 金币" % [Database.get_character(glyph_id).glyph, done])
+	_log("镀金【%s】×%d：单字或组词打出+1金币" % [Database.get_character(glyph_id).glyph, done])
 	return true
 
 
 # ---------------------------------------------------------------- 商店
-## 买字 / 回购 / 删字 / 修饰 / 治疗（GDD 价位）；收购 7 折、合资 −5、投币每买一样返 1、回购半价
+## 买字 / 回购 / 删字 / 修饰 / 治疗（GDD 价位）；丢弃字可半价回购
 func shop_offers() -> Array:
 	if m.has("shops") and m.shops.has(pos):
 		return m.shops[pos]
@@ -865,22 +854,10 @@ func refresh_shop() -> bool:
 
 
 func price(o: Dictionary) -> int:
-	var p: int = o.base
-	match o.kind:
-		"glyph":
-			if has("收购"):
-				p = int(ceil(p * 0.7))
-		"buyback":
-			p = int(ceil(p * 0.5))
-		"remove", "gild":
-			if has("合资"):
-				p = maxi(0, p - 5)
-	return p
+	return int(ceil(o.base * 0.5)) if o.kind == "buyback" else int(o.base)
 
 
 func buyback_offers() -> Array:
-	if not has("回购"):
-		return []
 	return buyback.map(func(g): return {"kind": "buyback", "glyph": g, "base": 13})
 
 
@@ -908,7 +885,6 @@ func buy(index: int, glyph_id := "") -> bool:
 			if not _gild(glyph_id):
 				return false
 	GameState.spend_gold(cost)
-	spent += cost
 	match o.kind:
 		"relic":
 			# 先移掉货架，再拿遗物（绑定面板压在商店上面）
@@ -925,8 +901,6 @@ func buy(index: int, glyph_id := "") -> bool:
 		"heal":
 			GameState.heal(int(round(GameState.player_max_hp * 0.3)))
 			_log("商店：治疗")
-	if has("投币"):
-		GameState.add_gold(1)
 	if index >= 0 and index < offers.size():
 		offers.remove_at(index)
 	return true
@@ -939,49 +913,25 @@ func leave_panel() -> void:
 
 
 # ---------------------------------------------------------------- 熔炉
-## 投两个字匣里的字熔成一个稀有字；炼金 +4 金币；回收：消耗的字一半机会回到字匣
-## 许愿：投 2～3 个字。和某件遗物相关的字越多，越可能熔出那件遗物（见 Relics.wish_odds）；
-## 没熔出遗物就照旧熔成一个稀有字。c = 第三个字的下标（-1 = 只投两个）
-func forge(a: int, b: int, c: int = -1) -> bool:
+## 每个地图熔炉一次；投两个字匣里的字熔成一个稀有字。
+func forge(a: int, b: int) -> bool:
 	var p := top_panel()
-	var idx: Array = [a, b] + ([c] if c >= 0 else [])
-	if p.get("kind", "") != "forge":
+	if p.get("kind", "") != "forge" or boss_down or over:
 		return false
-	for i in idx:
-		if i < 0 or i >= tray.size() or idx.count(i) > 1:
-			return false
-	var gs: Array = idx.map(func(i): return tray[i])
-	var order: Array = idx.duplicate()
-	order.sort()
-	order.reverse()
-	for i in order:
-		tray.remove_at(i)
-	used[p.k] = int(used.get(p.k, 0)) + 1
-	if p.get("wish", false):
-		wish_used = true
+	var cell := int(p.get("k", -1))
+	if cell != pos or mech_at(cell).get("g", "") != "炉" or int(used.get(cell, 0)) >= 1:
+		return false
+	if a == b or a < 0 or b < 0 or a >= tray.size() or b >= tray.size():
+		return false
+	var gs: Array = [tray[a], tray[b]]
+	tray.remove_at(maxi(a, b))
+	tray.remove_at(mini(a, b))
+	used[cell] = 1
 	pop_panel()
-	var named := "".join(gs.map(func(g): return "【%s】" % g))
-	var wished := Relics.wish_roll(gs, GameState.relics, relic_rng)
-	if not wished.is_empty():
-		_grant_relic(wished, "熔炉许愿：%s" % named)
-	else:
-		var out := roll_glyph(1)
-		_log("熔炉：%s熔成【%s】" % [named, out])
-		gain_glyph(out)
-	if has("炼金"):
-		GameState.add_gold(4)
-		_log("炼金：❖ +4")
-	_recycle(gs)
+	var out := roll_glyph(1)
+	_log("熔炉：%s熔成【%s】" % ["".join(gs.map(func(g): return "【%s】" % g)), out])
+	gain_glyph(out)
 	return true
-
-
-func _recycle(gs: Array) -> void:
-	if not has("回收"):
-		return
-	for g in gs:
-		if rng.randf() < 0.5 and tray.size() < tray_cap():
-			tray.append(g)
-			_log("回收：【%s】回到字匣" % g)
 
 
 # ---------------------------------------------------------------- 谜
@@ -1020,8 +970,8 @@ func choose_event(take: bool) -> void:
 			advance(2)
 
 
-# ---------------------------------------------------------------- 字匣 / 字袋 / 版面
-## 一个字同一时间只在一个地方。字匣 → 字袋（上限 20）；字匣 → 版面空格免费；版面取字耗 1 步（收回免）
+# ---------------------------------------------------------------- 字匣 / 字袋
+## 字匣 → 字袋（上限 20），探索获得的字用于战斗构筑
 func tray_to_deck(i: int) -> bool:
 	if busy() or i < 0 or i >= tray.size() or GameState.deck_size() >= DECK_CAP:
 		return false
@@ -1031,74 +981,17 @@ func tray_to_deck(i: int) -> bool:
 	return true
 
 
-## 丢字：进回购清单；转化 = 换一个同系统的随机字
-func discard(i: int, convert := false) -> bool:
+## 丢字进入回购清单
+func discard(i: int) -> bool:
 	if busy() or i < 0 or i >= tray.size():
 		return false
 	var g: String = tray.pop_at(i)
-	if convert and has("转化"):
-		var sys := Lexicon.sys_of(g)
-		var pool: Array = reward_pool().filter(func(cd): return cd.glyph != g and Lexicon.sys_of(cd.glyph) == sys)
-		if not pool.is_empty():
-			var n: String = pool[rng.randi_range(0, pool.size() - 1)].glyph
-			tray.append(n)
-			_log("转化：【%s】换成【%s】" % [g, n])
-			return true
 	buyback.append(g)
-	_recycle([g])
-	_log("丢掉【%s】" % g)
+	_log("丢掉【%s】，可在商店回购" % g)
 	return true
 
 
-func place(i: int, p: Vector2i) -> bool:
-	if busy() or i < 0 or i >= tray.size() or p.x >= plate_n or p.y >= plate_n or not str(plate[p.x][p.y]).is_empty():
-		return false
-	plate[p.x][p.y] = tray.pop_at(i)
-	refresh_active()
-	return true
-
-
-func take_back(p: Vector2i) -> bool:
-	if busy() or p.x >= plate_n or p.y >= plate_n or str(plate[p.x][p.y]).is_empty() or tray.size() >= tray_cap():
-		return false
-	tray.append(plate[p.x][p.y])
-	plate[p.x][p.y] = ""
-	refresh_active()
-	if not has("收回"):
-		advance(1)
-		_check_boss_adjacent()
-	return true
-
-
-func _resize_plate(n: int) -> void:
-	var old := plate
-	plate = []
-	for r in n:
-		var row: Array = []
-		for c in n:
-			row.append(old[r][c] if r < old.size() and c < old[r].size() else "")
-		plate.append(row)
-	plate_n = n
-	refresh_active()
-
-
-## 版面变了：重算生效的词；精力即时改气血上限
-func refresh_active() -> void:
-	var before := active.duplicate()
-	active = Lexicon.scan(plate).words
-	if active.has("精力") != before.has("精力"):
-		var d := 8 if active.has("精力") else -8
-		GameState.player_max_hp += d
-		GameState.player_hp = clampi(GameState.player_hp + maxi(0, d), 1, GameState.player_max_hp)
-		EventBus.hp_changed.emit(GameState.player_hp, GameState.player_max_hp)
-	for w in active:
-		if not before.has(w):
-			_log("版面生效「%s」：%s" % [w, Lexicon.WORDS[w][1]])
-	if m.has("ink"):
-		update_vision()
-
-
-# ---------------------------------------------------------------- 首领：主动迎战 / 超能力 / 幕间
+# ---------------------------------------------------------------- 首领：主动迎战 / 幕间
 ## 主动迎战：首领醒着且在 2 步内，或站在巢穴旁；不吃位置减益
 func can_confront() -> bool:
 	if busy() or boss_down:
@@ -1112,34 +1005,6 @@ func confront() -> bool:
 		return false
 	fight = _boss_encounter(false)
 	_log("主动迎战首领")
-	return true
-
-
-## 随身许愿机：开局就带着，每幕一次，在地图任意位置打开许愿面板（规则同熔炉，字匣里要有 2 个字）
-const WISH_KEY := -1
-
-
-func can_wish() -> bool:
-	return not wish_used and not busy() and tray.size() >= 2
-
-
-func open_wish() -> bool:
-	if not can_wish():
-		return false
-	push_panel({"kind": "forge", "k": WISH_KEY, "wish": true})
-	return true
-
-
-func can_power() -> bool:
-	return has("超能力") and not power_used and awake() and not busy()
-
-
-func use_power() -> bool:
-	if not can_power():
-		return false
-	power_used = true
-	stun += 6
-	_log("超能力：把首领定住 6 步")
 	return true
 
 
@@ -1169,7 +1034,7 @@ func boss_revealed() -> bool:
 
 func boss_status() -> String:
 	if boss_down:
-		return "首领已败 · 可以继续探索"
+		return "首领已败 · 本层封闭，进入幕间结算"
 	if stir == null:
 		return "首领沉睡"
 	if not awake():
@@ -1178,9 +1043,9 @@ func boss_status() -> String:
 	return "首领追来 · 相距 %d 步%s" % [d, "（被定住 %d 步）" % stun if stun > 0 else ""]
 
 
-## 打赢首领后，玩家自己决定什么时候结束本幕（进入幕间结算）
+## 首领胜利自动结算；保留幂等入口供流程恢复，不允许恢复探索。
 func can_finish_act() -> bool:
-	return boss_down and not busy()
+	return boss_down and not over and panels.is_empty() and fight.is_empty()
 
 
 func finish_act() -> bool:
@@ -1191,153 +1056,182 @@ func finish_act() -> bool:
 	return true
 
 
-## 幕间结算：利息（复利投资逐幕翻倍）+ 投资返还（再投资提高到 50%）
-func act_settlement() -> Array:
-	var out: Array = []
-	if has("利息"):
-		var rate := 0.1 * (pow(2, act - 1) if has("复利投资") else 1.0)
-		var cap := 8 * (int(pow(2, act - 1)) if has("复利投资") else 1)
-		var n := mini(cap, int(floor(GameState.gold * rate)))
-		if n > 0:
-			out.append(["利息", n])
-	if has("投资") and spent > 0:
-		var n := int(floor(spent * (0.5 if has("再投资") else 0.2)))
-		if n > 0:
-			out.append(["投资返还", n])
-	return out
+## 幕间只发有限补给
+
+
+func act_supply() -> Dictionary:
+	return ACT_SUPPLY.get(act, {"gold": 0, "heal": 0, "ink": 0}).duplicate()
 
 
 func next_act() -> void:
 	if top_panel().get("kind", "") != "act_end":
 		return
 	pop_panel()
-	for item in act_settlement():
-		GameState.add_gold(int(item[1]))
-		_log("%s：❖ +%d" % item)
 	if act >= 3:
 		over = true
 		won = true
 		_log("三幕已尽，远征完成")
 		return
+	var supply := act_supply()
+	GameState.add_gold(int(supply.gold))
+	var hp_before := GameState.player_hp
+	GameState.heal(int(supply.heal))
+	ink += int(supply.ink)
+	_log("幕间补给：金币 +%d，气血 +%d，墨 +%d" % [supply.gold, GameState.player_hp - hp_before, supply.ink])
 	load_act(act + 1)
 
 
 # ---------------------------------------------------------------- 接入 4×4 战斗
-## 当前遭遇对应的战斗节点：复制敌人资源，换成本幕的敌名敌字，数值随幕上升
+## 当前遭遇的固定成长阶段，与预告和实际开战共用。
+func _assign_encounter_stages() -> void:
+	var distances := MapGen.bfs(MapGen.mask_of(func(k): return m.ink[k] == 0), m.start)
+	var anchors: Array = []
+	for k in m.node:
+		if m.node[k].t == "敌": anchors.append(int(k))
+	for amb in m.get("ambush", []):
+		if not anchors.has(int(amb.k)): anchors.append(int(amb.k))
+	anchors.sort_custom(func(a, b): return distances[a] < distances[b] if distances[a] != distances[b] else a < b)
+	var stages := {}
+	for i in anchors.size(): stages[anchors[i]] = mini(2, int(i * 3.0 / anchors.size()))
+	for k in m.node:
+		if m.node[k].t != "险": continue
+		var before := anchors.filter(func(a): return distances[a] <= distances[k]).size()
+		stages[int(k)] = mini(2, int(before * 3.0 / maxi(1, anchors.size())))
+	m["encounter_stages"] = stages
+
+
+## 伏兵用领地主人作锚点，换一个入口也不会换怪。阶段由地图固定，不随等待或绕路升级。
+func encounter_anchor(kind: String, cell: int) -> int:
+	if kind == "ambush":
+		var owner := int(m.get("terr", {}).get(cell, -1))
+		var ambs: Array = m.get("ambush", [])
+		if owner >= 0 and owner < ambs.size(): return int(ambs[owner].k)
+	return cell
+
+
+func encounter_stage(kind: String, cell: int) -> int:
+	return 2 if kind == "boss" else int(m.get("encounter_stages", {}).get(encounter_anchor(kind, cell), 0))
+
+
+func stage_text(kind: String, cell: int) -> String:
+	if kind == "boss": return ["起步·幕末检验", "成型·幕末检验", "兑现·终局首领"][act - 1]
+	return ENCOUNTER_STAGES[act][encounter_stage(kind, cell)]
+
+
+func encounter_enemy(kind: String, cell: int) -> EnemyData:
+	var stage := encounter_stage(kind, cell)
+	var pool: Array = NORMAL_STAGES[act][stage]
+	if kind == "boss": pool = [EnemyRoster.BOSSES[act]]
+	elif kind == "elite": pool = ELITE_STAGES[act][stage]
+	var pick := RandomNumberGenerator.new()
+	pick.seed = run_seed * 997 + act * 100003 + encounter_anchor(kind, cell) * 31
+	var source: EnemyData = Database.get_enemy(pool[pick.randi_range(0, pool.size() - 1)])
+	# 深区小幅延长机制应对，伤害沿用初稿；第三幕再加12%生命。首领保持88/124/168。
+	var ed: EnemyData = source.duplicate(true)
+	if kind != "boss": ed.max_hp = ceili(source.max_hp * (100 + 4 * stage + (12 if act == 3 else 0)) / 100.0)
+	return ed
+
+
+func encounter_rewards(encounter: Dictionary) -> Dictionary:
+	var kind: String = encounter.kind
+	var source := "首领" if kind == "boss" else ("精英" if kind == "elite" else "")
+	var seal_available := not source.is_empty() and SEALS.keys().any(func(s): return SEALS[s][1] == source and not seals.has(s))
+	return {"gold": 6 if kind == "boss" else (4 if kind == "elite" else 2),
+		"ink": 1, "count": 3, "seal": seal_available,
+		"time": 0 if kind == "boss" else (AMBUSH_T if kind == "ambush" else FIGHT_T)}
+
+
+func encounter_info(encounter: Dictionary) -> Dictionary:
+	var kind: String = encounter.kind
+	var ed := encounter_enemy(kind, int(encounter.k))
+	var rewards := encounter_rewards(encounter)
+	var hp := maxi(1, ed.max_hp - (6 if kind == "boss" and has_seal("朱笔") and not ed.mechanic.is_empty() else 0))
+	var rewards_text := "战利品%d选1；也可跳过，拿%d金币。" % [rewards.count, SKIP_GOLD] if kind != "boss" else "击败即结束本层，未拿资源放弃；随后处理印章与幕间结算。"
+	if rewards.seal:
+		rewards_text += " 获得1枚印章" + ("（印章位已满，需选择替换）" if seals.size() >= SEAL_CAP else "") + "。"
+	if int(rewards.gold) > 0: rewards_text += " 额外金币+%d。" % rewards.gold
+	if int(rewards.ink) > 0: rewards_text += " 墨+%d。" % rewards.ink
+	if kind == "ambush": rewards_text += " 解封该伏兵控制的奖励。"
+	if kind == "boss" and act < 3:
+		var supply := act_supply()
+		rewards_text += " 进入下一幕后补给：金币+%d、气血最多+%d、墨+%d。" % [supply.gold, supply.heal, supply.ink]
+	var first: EnemyMoveData = ed.moves[0] if not ed.moves.is_empty() else null
+	return {"enemy": ed, "stage": stage_text(kind, int(encounter.k)), "hp": hp, "initial_block": ed.initial_block,
+		"mechanic": ed.description if not ed.description.is_empty() else "按行动循环攻击、防御或干扰字盘。",
+		"cycle": " → ".join(ed.moves.map(func(move): return _encounter_move_text(move))),
+		"first": _encounter_move_text(first) if first != null else "无行动",
+		"rewards": rewards_text,
+		"time": ("胜利后耗%d步；首领已被击败，不再追逐。" if boss_down else "胜利后耗%d步，首领会照常推进。") % rewards.time if kind != "boss" else "击败首领后本层立即封闭，不能再探索。"}
+
+
+func _encounter_move_text(move: EnemyMoveData) -> String:
+	var result := move.title
+	match move.kind:
+		EnemyMoveData.Kind.ATTACK, EnemyMoveData.Kind.MULTI:
+			result += " %d" % move.damage
+			if move.hits > 1: result += "×%d" % move.hits
+		EnemyMoveData.Kind.BLOCK: result += " +%d盾" % move.block
+		EnemyMoveData.Kind.ATTACK_BLOCK: result += " %d伤/+%d盾" % [move.damage, move.block]
+		EnemyMoveData.Kind.INJECT: result += " 注%d字" % move.inject_count
+	if move.inject_count > 0 and move.kind != EnemyMoveData.Kind.INJECT:
+		result += "（空间类时注%d枚【%s】）" % [move.inject_count, move.inject_glyph] if move.mechanic_action == "copy" else " 注%d枚【%s】" % [move.inject_count, move.inject_glyph]
+	return result
+
+
 func battle_node() -> MapNodeData:
 	var node := MapNodeData.new()
-	var base_id := FOE_ENEMY[0]
-	var hp_mul := 1.0 + 0.25 * (act - 1)
-	match fight.kind:
-		"boss":
-			node.type = MapNodeData.Type.BOSS
-			base_id = BOSS[act]
-			hp_mul = 1.0
-		"elite":
-			node.type = MapNodeData.Type.ELITE
-			base_id = ELITE
-		"ambush":
-			node.type = MapNodeData.Type.BATTLE
-			base_id = "ink_spirit"
-			fight.g = m.TH.foes[rng.randi_range(0, m.TH.foes.size() - 1)]
-		_:
-			node.type = MapNodeData.Type.BATTLE
-			base_id = FOE_ENEMY[1 + (int(fight.k) + act) % (FOE_ENEMY.size() - 1)]
-	var base: EnemyData = Database.get_enemy(base_id)
-	if base == null:
-		base = Database.get_enemy("ink_spirit")
-	var ed: EnemyData = base.duplicate()
-	ed.name = fight.name
-	ed.glyph = fight.g if not str(fight.g).is_empty() else base.glyph
-	ed.max_hp = int(round(base.max_hp * hp_mul))
-	node.title = {"boss": "首领 · %s", "elite": "%s · 险战", "ambush": "%s · 突袭", "foe": "%s"}[fight.kind] % fight.name
+	var kind: String = fight.kind
+	node.type = MapNodeData.Type.BOSS if kind == "boss" else (MapNodeData.Type.ELITE if kind == "elite" else MapNodeData.Type.BATTLE)
+	var ed := encounter_enemy(kind, int(fight.k))
+	node.title = ("首领 · " if kind == "boss" else ("精英 · " if kind == "elite" else "")) + ed.name
 	node.enemies.append(ed)
+	fight.name = ed.name
+	fight.g = ed.glyph
 	return node
 
 
-## battle.start() 之后、第一回合之前调用：词谱「战斗开场」类 + 印章 + 首领词条 + 位置减益 + 伏兵突袭
+## battle.start() 之后、第一回合之前调用：印章 + 位置减益 + 伏兵突袭
 func apply_battle_setup(state: BattleState) -> void:
 	fight["hp_start"] = GameState.player_hp
 	var e: Combatant = state.enemies[0] if not state.enemies.is_empty() else null
 	var kind: String = fight.kind
-	var turn_block := 0
-	if has("护盾"):
-		turn_block += 4
-	if has("重甲"):
-		turn_block += 8
-		_return_one(state, "重甲：第一回合少抽 1 枚字")
-	if kind == "ambush" and has("防护"):
-		turn_block += 6
-	if turn_block > 0:
-		# 开局抽字后 begin_player_turn 会清临挡，所以在第一回合直接加
-		state.player.add_block(turn_block)
-		state._log("开场护盾 +%d" % turn_block)
-	if has("护甲"):
-		state.player.add_persistent_block(2)
-		state._log("护甲：持久盾 +2")
-	var energy := (2 if has("蓄能") else 0) + (2 if has("充电") else 0) + (3 if has("充放电") else 0)
-	if energy > 0:
-		state.player.add_energy(energy)
-		state._log("开场储能 +%d" % energy)
-	if has("蓄冷"):
-		state.player.heat_capacity += 3
-	if has("清热"):
-		state.player.add_heat(-2)
-	if has("防御力"):
-		state.player.permanent_damage_reduction += 1
-	if has("蓄力"):
-		state.enable_ability("force_once", state.ability_value("force_once") + 4)
-	if has("重击"):
-		state.pierce_once = true
-	if has("加急"):
-		var n := state.draw_to_board(1)
-		if n > 0:
-			state._log("加急：第一回合多抽 1 枚字")
-	if e != null and has("火力"):
-		state.deal_damage(e, 4, false)
-		state._log("火力：开场先造成 4 点伤害")
-	if e != null and has("电击") and kind in ["elite", "boss"]:
-		state.deal_damage(e, 6, false)
-		state._log("电击：开场先造成 6 点伤害")
+	if has_seal("字印"):
+		var drawn := state.draw_to_board(BattleBalance.i("seal_draw", 1))
+		state._log("字印：开场多抽 %d 枚字" % drawn)
 	if kind == "boss" and e != null:
 		_boss_setup(state, e)
 	if kind == "ambush" and e != null:
-		if has("反击"):
-			state._log("反击：遭遇伏兵，由你先手")
-		else:
-			if has("回防"):
-				state.player.turn_damage_halve = true
-				state._log("回防：第一回合敌人伤害减半")
-			state._log("伏兵突袭！")
-			state._enemy_act(e, true)
+		state._log("伏兵突袭！")
+		state._enemy_act(e, true)
+	# 开场先手推进了招式时，为玩家真正面对的下一招开题。
+	state.monster_entered.clear()
+	if e != null and e.move_index != int(EnemyMechanics.data(e).get("move", -1)):
+		EnemyMechanics.begin_phase(state)
 
 
-## 首领词条：朱笔少一条；破甲护甲 −8；破防失去全部护盾；停火第一回合不攻击；被追上吃位置减益
+## 朱笔降低机制首领生命；旧首领少一条词条；被追上吃位置减益
 func _boss_setup(state: BattleState, e: Combatant) -> void:
-	var affixes: Array = BOSS_AFFIX[act].duplicate(true)
+	var affixes: Array = [] if not e.enemy_data.mechanic.is_empty() else BOSS_AFFIX[act].duplicate(true)
+	if not e.enemy_data.mechanic.is_empty():
+		# 朱笔保留收益：降低首领当前/最大生命6，不改任务伤害。
+		if has_seal("朱笔"):
+			e.max_hp = maxi(1, e.max_hp - BattleBalance.i("seal_boss_hp", 6))
+			e.hp = maxi(0, e.hp - BattleBalance.i("seal_boss_hp", 6))
+			state._log("朱笔：首领生命上限 −6")
 	if has_seal("朱笔") and not affixes.is_empty():
 		var cut: Array = affixes.pop_back()
 		state._log("朱笔：首领少一条词条（%s）" % (AFFIX_TEXT[cut[0]] % cut[1]))
 	for a in affixes:
-		var v: int = a[1]
+		var v: int = BattleBalance.i("legacy_boss_%d_%s" % [act, a[0]], int(a[1]))
 		match a[0]:
 			"armor":
-				if has("破甲"):
-					v = maxi(0, v - 8)
-					state._log("破甲：首领护甲 −8")
 				if v > 0:
 					e.add_persistent_block(v)
 			"shield":
-				if has("破防"):
-					state._log("破防：首领失去全部护盾")
-					continue
 				e.add_block(v)
 			"strength":
 				e.add_status("strength", v)
 		state._log("首领词条：" + AFFIX_TEXT[a[0]] % v)
-	if has("停火"):
-		state.enemy_skip_turns = 1
-		state._log("停火：首领第一回合不攻击")
 	var debuff: String = fight.get("debuff", "")
 	if debuff.is_empty():
 		return
@@ -1354,7 +1248,7 @@ func _boss_setup(state: BattleState, e: Combatant) -> void:
 				inst.temporary = true
 				state.bag.append(inst)
 		"热度":
-			state.player.add_heat(3)
+			state.player.add_heat(BattleBalance.i("debuff_heat", 3))
 		"熔字":
 			if not state.bag.is_empty():
 				var inst: CharInstance = state.bag.pop_at(state.rng.randi_range(0, state.bag.size() - 1))
@@ -1362,7 +1256,7 @@ func _boss_setup(state: BattleState, e: Combatant) -> void:
 		"淹格":
 			_return_one(state, "")
 		"首领护盾":
-			e.add_block(8)
+			e.add_block(BattleBalance.i("debuff_shield", 8))
 
 
 ## 把字盘上 1 枚非临时字放回字袋（少抽字 / 淹格：这一格第一回合空着）
@@ -1383,44 +1277,42 @@ func _return_one(state: BattleState, why: String) -> void:
 
 ## 战斗结束回地图前调用；返回 {"reward": 是否去战后三选一, "count": 选项数}
 func finish_battle(victory: bool) -> Dictionary:
-	if fight.is_empty():
+	if boss_down or fight.is_empty():
 		return {"reward": false}
 	var f := fight
 	fight = {}
 	if has_seal("镇纸") and victory:
 		var lost: int = int(f.get("hp_start", GameState.player_hp)) - GameState.player_hp
 		if lost > 0:
-			GameState.heal(mini(4, lost))
-			_log("镇纸：这场少掉 %d 点血" % mini(4, lost))
+			GameState.heal(mini(BattleBalance.i("seal_recovery", 4), lost))
+			_log("镇纸：这场少掉 %d 点血" % mini(BattleBalance.i("seal_recovery", 4), lost))
 	if not victory:
 		over = true
 		_log("败于%s，远征中止" % f.name)
 		return {"reward": false}
-	var gold := 0
-	if has("金币"):
-		gold += 2
-	if has("铸币") and f.kind in ["elite", "boss"]:
-		gold += 5
+	var payout := encounter_rewards(f)
+	var gold: int = payout.gold
 	if gold > 0:
 		GameState.add_gold(gold)
 		_log("战后 ❖ +%d" % gold)
-	var ink_gain := (1 if has("充能") else 0) + (2 if has("充放电") else 0)
+	var ink_gain: int = payout.ink
 	if ink_gain > 0:
 		ink += ink_gain
 		_log("战胜回墨 +%d" % ink_gain)
 	match f.kind:
 		"boss":
-			var s := roll_seal("首领")
-			if not s.is_empty():
-				add_seal(s)
 			boss_down = true
 			stun = 0
 			boss_trail.clear()
-			alerts.clear()   ## 战前排队的惊动 / 起身提示已经过时
-			_log("击败首领%s：可以继续探索，准备好了就结束本幕" % f.name)
-			alerts.append(["首领已被击败", "首领【%s】倒下了，不会再追你。
-剩下的赏、商店、休息点都还在，可以慢慢拿完；准备好了，点「结束本幕」进入幕间结算。" % m.TH.boss])
+			alerts.clear()
+			# 关闭旧层面板。结算压在首领奖励下方，满印章先选替换再进入结算。
+			panels.clear()
+			push_panel({"kind": "act_end"})
+			var seal := roll_seal("首领")
+			if not seal.is_empty(): add_seal(seal)
+			_log("击败首领%s：本层已封闭，未拿资源放弃，进入幕间结算" % f.name)
 			return {"reward": false}
+
 		"ambush":
 			amb_done[int(f.amb)] = true
 			_log("击退伏兵，领地里的奖励解封")
@@ -1436,7 +1328,7 @@ func finish_battle(victory: bool) -> Dictionary:
 		_check_boss_adjacent()
 	if fight.is_empty():
 		enter_cell()
-	return {"reward": true, "count": 4 if has("分流") else 3}
+	return {"reward": true, "count": payout.count}
 
 
 ## 战后三选一选中的字

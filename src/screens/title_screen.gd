@@ -24,7 +24,7 @@ func build(root: Control) -> void:
 	root.add_child(_courtyard)
 	_menu = VBoxContainer.new()
 	root.add_child(_menu)
-	_title = _label("活字战斗", 54, Color("e6d9b4"))
+	_title = _label("炼字狱", 54, Color("e6d9b4"))
 	_menu.add_child(_title)
 	_subtitle = _label("以字为剑 · 铸词为阵", 16, Color("97a79b"))
 	_menu.add_child(_subtitle)
@@ -92,9 +92,8 @@ func _button(text: String, callback: Callable, primary := false) -> Button:
 func _layout() -> void:
 	if _menu == null or size.y < 1: return
 	# Reserve physical touch targets instead of scaling the entire menu down on phones.
-	var physical_height := maxf(1.0, get_window().size.y)
-	var touch_scale := maxf(1.0, size.y / physical_height)
-	var compact := physical_height < 600
+	var touch_scale := JourneyStyle.touch_scale(self)
+	var compact := size.y / touch_scale < 600
 	_title.add_theme_font_size_override("font_size", int((42 if compact else 54) * touch_scale))
 	_subtitle.add_theme_font_size_override("font_size", int((14 if compact else 16) * touch_scale))
 	_space.custom_minimum_size.y = (16 if compact else 28) * touch_scale

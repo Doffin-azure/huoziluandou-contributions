@@ -133,7 +133,9 @@ func _refresh() -> void:
 	_uses_label.text = "×%d" % (instance.temporary_uses + 1) if instance != null else ""
 	display_key = ""
 	if instance == null:
+		_sel_border.hide()
 		return
+	_refresh_border()
 	var tint := Color.WHITE
 	if instance.owner == CharInstance.Owner.ENEMY:
 		tint = Color(0.94, 0.76, 0.73)
@@ -179,7 +181,7 @@ func set_selected(value: bool, order := -1) -> void:
 	is_selected = value
 	if _sel_border == null:
 		return
-	_sel_border.visible = value
+	_refresh_border()
 	_order.visible = value and order >= 0
 	_order.text = str(order + 1)
 	_status_row.visible = not value
@@ -192,6 +194,14 @@ func set_selected(value: bool, order := -1) -> void:
 		var offset := -5.0 if value and not Settings.reduced_motion else 0.0
 		_motion = create_tween()
 		_motion.tween_property(_visual, "position:y", offset, 0.08).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+
+func _refresh_border() -> void:
+	if _sel_border == null: return
+	_sel_border.visible = instance != null and (is_selected or instance.gilded)
+	var style: StyleBoxFlat = _sel_border.get_theme_stylebox("panel").duplicate()
+	style.border_color = Palette.VERMILION if is_selected else Palette.GOLD_DK
+	_sel_border.add_theme_stylebox_override("panel", style)
 
 
 func set_dimmed(value: bool) -> void:

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_m6uel"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_u7yd4"]
+
+[sub_resource type="Resource" id="Resource_ctyj3"]
+script = ExtResource("1_m6uel")
+title = "蛀咬"
+description = "循环行动：蛀咬 → 注蚀"
+
+[sub_resource type="Resource" id="Resource_ratws"]
+script = ExtResource("1_m6uel")
+kind = 7
+title = "注蚀"
+description = "循环行动：蛀咬 → 注蚀"
+damage = 0
+mechanic_action = "corrode"
+
+[resource]
+script = ExtResource("2_u7yd4")
+id = "corrosion_beetle"
+name = "墨蚀蠹"
+glyph = "墨"
+description = "只向空格注入指定字形；该怪制造且仍在盘上的蚀最多3枚，满额不再补，不进入永久字袋。玩家可以单打蚀、净化、分流或借它组成心蚀。指定字形注入属于新增机制，不能直接沿用通用随机注字当作完成。"
+max_hp = 38
+mechanic = "corrosion"
+moves = Array[ExtResource("1_m6uel")]([SubResource("Resource_ctyj3"), SubResource("Resource_ratws")])

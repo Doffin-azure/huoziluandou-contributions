@@ -19,7 +19,7 @@ const THEMES := {
 		{"g": "纸", "n": [4, 6], "kind": "slow", "color": "c9b88a", "desc": "吸墨纸：经过要多耗 1 步，首领不受影响"}]},
 	"熔铸坊": {"ink": "4a2f28", "glyphs": "火热炼铸金精重强", "foes": ["爆", "热", "甲"], "boss": "铸", "mech": [
 		{"g": "焰", "n": [3, 5], "kind": "flavor", "color": "d2542a", "desc": "烈焰格：可以走，每次经过气血 −3"},
-		{"g": "炉", "n": [1, 2], "kind": "flavor", "color": "8a3a1f", "desc": "熔炉：投 2～3 个字许愿，相关的字越多越可能熔出遗物，否则熔成稀有字；一次性"}]},
+		{"g": "炉", "n": [1, 2], "kind": "flavor", "color": "8a3a1f", "desc": "熔炉：投两枚字匣里的字，换一枚稀有字；一次性"}]},
 	"潮汐渠": {"ink": "2b3a45", "glyphs": "流回转清冷急分合", "foes": ["冷", "急", "流"], "boss": "潮", "mech": [
 		{"g": "流", "n": [2, 3], "kind": "slide", "color": "3d7fb0", "desc": "水流：顺着箭头滑出去，不耗步；首领不能用"},
 		{"g": "潮", "n": [2, 3], "kind": "gate", "cycle": [4, 4], "color": "5a7f9a", "desc": "涨潮格：开 4 步、淹 4 步，淹着时谁都过不去"}]},
@@ -734,9 +734,9 @@ static func generate(seed_value: int, theme_name := "随机") -> Dictionary:
 	return {}
 
 
-## 游戏里首领的节奏：第 7～10 步被惊动（这时首领棋子出现在地图上），再过 7～10 步起身开追。
+## 游戏里首领的节奏：第 8～11 步自然惊动（这时首领棋子出现在地图上），再过 7～10 步起身开追。
 ## 原型（gen_proto / build 里的初筛）仍用 P.wakeLo～wakeHi 和 P.buffer，地图对照测试不受影响。
-const WAKE_GAME := Vector2i(7, 10)
+const WAKE_GAME := Vector2i(8, 11)
 const BUFFER_GAME := Vector2i(7, 10)
 
 

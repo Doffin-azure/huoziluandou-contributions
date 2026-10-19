@@ -13,7 +13,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	viewport = SubViewport.new()
 	viewport.own_world_3d = true
-	viewport.msaa_3d = Viewport.MSAA_4X
+	viewport.msaa_3d = Viewport.MSAA_2X if RenderingServer.get_current_rendering_method() == "mobile" else Viewport.MSAA_4X
 	viewport.positional_shadow_atlas_size = 2048
 	add_child(viewport)
 	stage = Stage.new()
@@ -41,7 +41,8 @@ func _ready() -> void:
 
 func _layout() -> void:
 	var pixels := Vector2(get_viewport().get_texture().get_size())
-	var factor := minf(1, minf(1600 / pixels.x, 900 / pixels.y))
+	var cap := Vector2(1280, 720) if RenderingServer.get_current_rendering_method() == "mobile" else Vector2(1600, 900)
+	var factor := minf(1, minf(cap.x / pixels.x, cap.y / pixels.y))
 	viewport.size = Vector2i(maxi(320, int(pixels.x * factor)), maxi(180, int(pixels.y * factor)))
 	stage.camera.v_offset = -0.65 if JourneyStyle.touch_scale(self) > 1.1 else 0.0
 	layout_changed.emit()

@@ -38,7 +38,7 @@ static func _resolve_kind(eff: EffectData, ctx: Dictionary) -> Array:
 		K.GAIN_GOLD: return EffectHandlers.run("gold", eff, ctx)
 		K.ENERGY: return EffectHandlers.run("energy", eff, ctx)
 		K.HEAT: return EffectHandlers.run("heat", eff, ctx)
-		K.TEMP_FUNDS: return EffectHandlers.run("temp_funds", eff, ctx)
+		K.TEMP_FUNDS: return ["旧临时资金效果已移除"]
 		K.REMOVE_BLOCK: return EffectHandlers.run("remove_enemy_block", eff, ctx)
 		K.CLEANSE: return EffectHandlers.run("cleanse_all", eff, ctx)
 		K.GRAVITY: return EffectHandlers.run("gravity", eff, ctx)
@@ -76,8 +76,7 @@ static func _resolve_kind(eff: EffectData, ctx: Dictionary) -> Array:
 			return ["弃掉一个字"]
 
 		K.EQUITY:
-			src.equity = max(0, src.equity + amount)
-			return ["股权 %+d" % amount]
+			return ["旧股权效果已移除"]
 
 		_:
 			return ["（未实现的效果）"]

@@ -57,6 +57,8 @@ static func describe(move: EnemyMoveData, unit: Combatant) -> Array:
 			result.append({"symbol": "intent_inject", "value": str(move.inject_count), "negative": true})
 		EnemyMoveData.Kind.SPECIAL:
 			result.append({"symbol": "unknown", "value": "", "negative": false})
+	if move.kind != EnemyMoveData.Kind.INJECT and move.inject_count > 0:
+		result.append({"symbol": "intent_inject", "value": str(move.inject_count), "negative": true})
 	return result
 
 
@@ -119,7 +121,8 @@ func _details() -> String:
 		var status := Database.get_status(_move.status_id)
 		if status != null:
 			lines.append("%s获得【%s】%d 层。\n%s" % ["玩家" if _move.kind == EnemyMoveData.Kind.DEBUFF else "敌人", status.name, _move.status_stacks, status.description])
-	elif _move.kind == EnemyMoveData.Kind.INJECT:
+	if _move.inject_count > 0:
+		if not _move.inject_glyph.is_empty(): lines.append("向盘面空格注入 %d 枚【%s】。" % [_move.inject_count, _move.inject_glyph])
 		var pollution := Database.get_pollution(_move.pollution_id)
 		if pollution != null: lines.append("污染：%s\n%s" % [pollution.name, pollution.description])
 	return "\n".join(lines)

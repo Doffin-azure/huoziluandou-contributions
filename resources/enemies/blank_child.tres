@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_epeb5"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_injem"]
+
+[sub_resource type="Resource" id="Resource_evy8q"]
+script = ExtResource("1_epeb5")
+title = "留白"
+description = "循环行动：留白 → 扑击"
+mechanic_action = "blank"
+
+[sub_resource type="Resource" id="Resource_bmqnl"]
+script = ExtResource("1_epeb5")
+title = "扑击"
+description = "循环行动：留白 → 扑击"
+damage = 8
+
+[resource]
+script = ExtResource("2_injem")
+id = "blank_child"
+name = "留白童"
+glyph = "留"
+description = "留白攻击前只检查一次：空格≥3，怪物受到3机制伤害；空格＜3，怪物获得4护盾。随后正常攻击6，不额外封格或减补字。"
+max_hp = 36
+mechanic = "blank"
+moves = Array[ExtResource("1_epeb5")]([SubResource("Resource_evy8q"), SubResource("Resource_bmqnl")])

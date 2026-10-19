@@ -61,7 +61,7 @@ func _build_light() -> void:
 	environment.ambient_light_color = Color("598579")
 	environment.ambient_light_energy = 0.45
 	environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
-	environment.ssao_enabled = true
+	environment.ssao_enabled = RenderingServer.get_current_rendering_method() == "forward_plus"
 	environment.ssao_radius = 0.25
 	environment.ssao_intensity = 1.0
 	var world := WorldEnvironment.new()
@@ -86,7 +86,7 @@ func _build_light() -> void:
 	glow.shadow_enabled = false
 	add_child(glow)
 	if mode == "shop":
-		environment.volumetric_fog_enabled = true
+		environment.volumetric_fog_enabled = RenderingServer.get_current_rendering_method() == "forward_plus"
 		environment.volumetric_fog_density = 0.009
 		environment.volumetric_fog_albedo = Color("9bb4a3")
 		environment.volumetric_fog_ambient_inject = 0.15
