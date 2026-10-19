@@ -57,6 +57,10 @@ var slab_uid := -1                      ## 坠字石绑定的实体
 var slab_uses := 0                      ## 坠字石本场剩余额外次数
 var magic_hand_left := 3                ## 补字鬼手：本场还能补位的字数
 var fruit_uid := -1                      ## 将腐供果：本场被替换为临时副本的永久实体
+var moon_uid := -1                      ## 望乡月：本场那枚【月】
+var moon_turn := 0                      ## 望乡月：放下它的回合，下回合消失
+var cleansed_count := 0                 ## 辟邪尺：攒着的净化数
+var question_choices: Array = []        ## 问冥签：开局待选的三枚字（选完清空）
 var breeders: Dictionary = {}           ## 寄字菌：有繁殖资格的临时字 uid
 var strike_active := false              ## 打击增强：当前出字带【击】
 var bounty_paid: bool = false
@@ -163,6 +167,10 @@ func start(deck: Array, enemy_datas: Array, seed_value: int = -1) -> void:
 	slab_uses = 0
 	magic_hand_left = 3
 	fruit_uid = -1
+	moon_uid = -1
+	moon_turn = 0
+	cleansed_count = 0
+	question_choices.clear()
 	breeders.clear()
 	strike_active = false
 	board = BoardState.new(Relics.board_size(rules, relics))
@@ -209,9 +217,19 @@ func first_alive_enemy() -> Combatant:
 	return null
 
 func is_over() -> bool:
+	_check_revive()
 	return not player.is_alive() or first_alive_enemy() == null
 
+## 反死亡：本局存着的复活机会，倒下时满血站起来（也能抵消死亡、金像这类特殊死亡）
+func _check_revive() -> void:
+	if player == null or player.is_alive() or GameState.revive_charges <= 0:
+		return
+	GameState.revive_charges -= 1
+	player.hp = player.max_hp
+	_log("反死亡：满血复活")
+
 func is_victory() -> bool:
+	_check_revive()
 	return player.is_alive() and first_alive_enemy() == null
 
 
@@ -450,6 +468,7 @@ func earn_gold(amount: int) -> int:
 		var energy_gain := BattleBalance.i("profit_energy", 1) * allowed * passive_multiplier("分利")
 		add_energy(energy_gain)
 		_log("分利：获得 %d 金币，同时储能 +%d" % [allowed, energy_gain])
+	Relics.on_gold_earned(self)
 	return allowed
 
 
@@ -613,10 +632,8 @@ func _execute_prepared_play(play: Dictionary, shared: Dictionary) -> Dictionary:
 	strike_active = Relics.play_has_strike(play.glyphs)
 	var result := _execute_prepared_play_core(play, shared)
 	strike_active = prev
-	if result.get("ok", false) and relics.has("slab"):
-		Relics.slab_fall(self)
-		for e in alive_enemies():
-			EnemyMechanics.update_targets(self, e)
+	if result.get("ok", false):
+		Relics.after_play(self)
 	return result
 
 
@@ -1381,6 +1398,7 @@ func begin_player_turn(draw: bool = true, open_monster_tasks: bool = true) -> vo
 		if str(k).begins_with("next_") and k not in ["next_energy_bonus", "next_serial_bonus"]:
 			abilities.erase(k)
 	restore_reconnect_tiles()
+	Relics.on_turn_start(self)
 	if draw:
 		var vigor := ability_value("vigor_next")
 		abilities.erase("vigor_next")
@@ -1869,10 +1887,18 @@ func converge_to(anchor: Vector2i) -> int:
 	return BattleOps.converge_to(self, anchor)
 
 func cleanse_board() -> int:
-	return BattleOps.cleanse_board(self)
+	var n := BattleOps.cleanse_board(self)
+	Relics.on_cleansed(self, n)
+	return n
 
 func cleanse_scorch() -> int:
-	return BattleOps.cleanse_scorch(self)
+	var n := BattleOps.cleanse_scorch(self)
+	Relics.on_cleansed(self, n)
+	return n
+
+## 问冥签：玩家从三枚里挑一枚
+func take_question(glyph: String) -> bool:
+	return Relics.take_question(self, glyph)
 
 func spawn_word_neighbors(center: Vector2i, max_count: int = 4, center_glyph: String = "") -> Array:
 	return BattleOps.spawn_word_neighbors(self, center, max_count, center_glyph)

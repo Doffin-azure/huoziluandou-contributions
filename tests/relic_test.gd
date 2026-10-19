@@ -46,7 +46,7 @@ func _test_pools() -> void:
 	_reset()
 	var normal: Array = Relics.normal_pool()
 	var event: Array = Relics.event_pool()
-	_ok(event.size() == 3 and normal.size() == 22 and event.has("life_debt") and not normal.any(func(id): return event.has(id)), "普通池与事件池分离：%d / %d" % [normal.size(), event.size()])
+	_ok(event.size() == 3 and normal.size() == Relics.DEFS.size() - 3 and event.has("life_debt") and not normal.any(func(id): return event.has(id)), "普通池与事件池分离：%d / %d" % [normal.size(), event.size()])
 	for id in event:
 		_ok(Relics.is_event_relic(id) and not normal.has(id), "事件遗物不进入普通池：%s" % Relics.name_of(id))
 	var rng := RandomNumberGenerator.new()
@@ -589,7 +589,9 @@ func _test_expedition() -> void:
 	_reset()
 	var ex := Expedition.start(11)
 	_ok(not ex.has_method("can_wish") and not ex.has_method("open_wish"), "许愿机入口与逻辑已删除")
-	_ok(ex.loot_relic_pool("小").is_empty() and ex.loot_relic_pool("中").size() == 12 and ex.loot_relic_pool("大").size() == 15, "中赏12件、大赏15件遗物候选，小赏不投放")
+	var normal: Array = Relics.normal_pool()
+	var mid_n: int = normal.filter(func(id): return int(Relics.TIER[id]) <= 2).size()
+	_ok(ex.loot_relic_pool("小").is_empty() and ex.loot_relic_pool("中").size() == mid_n and ex.loot_relic_pool("大").size() == normal.size(), "中赏%d件、大赏%d件遗物候选，小赏不投放" % [mid_n, normal.size()])
 	var clash: Array = Relics.DEFS.keys().filter(func(id): return Database.words.values().any(func(w): return w.word == Relics.name_of(id)) or Expedition.SEALS.has(Relics.name_of(id)))
 	_ok(clash.is_empty(), "遗物名与战斗词、印章不冲突")
 	# 奖励选择复用拾取与绑定流程。

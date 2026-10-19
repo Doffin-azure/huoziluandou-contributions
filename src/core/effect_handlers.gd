@@ -616,6 +616,19 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 			return ["停电了……（拖动连出「开灯」恢复）"]
 		"lights_on":
 			return ["来电了。"]
+		"moon_pull":
+			var at: Vector2i = (ctx.get("path", []) as Array)[0] if not (ctx.get("path", []) as Array).is_empty() else Vector2i.ZERO
+			var pulled := b.converge_to(at)
+			return ["月：%d 枚字向【月】原位聚拢" % pulled]
+		"death_word":
+			src.hp = 0
+			return ["死亡。"]
+		"anti_death":
+			if GameState.relic_counters.get("anti_death_granted", false):
+				return ["反死亡：这一局已经拿过复活机会"]
+			GameState.relic_counters["anti_death_granted"] = true
+			GameState.revive_charges += 1
+			return ["反死亡：本局获得一次满血复活"]
 		"charge_overheat":
 			return EffectHandlersActions._charge_overheat(b, eff)
 		"recast_board":

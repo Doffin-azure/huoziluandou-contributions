@@ -58,7 +58,7 @@ func _ready() -> void:
 		check(options.size() == (2 if tier == "小" else 3) and not options.any(func(o): return o.kind == "relic"), "全遗物持有后自动回退到有效奖励")
 	GameState.relics.clear()
 	GameState.relics.assign(ex.loot_relic_pool("中"))
-	check(ex.loot_relic_pool("中").is_empty() and ex.loot_relic_pool("大").size() == 3 and not ex.loot_options("中").any(func(o): return o.kind == "relic"), "中档耗尽不越级给稀有，大赏仍可给稀有")
+	check(ex.loot_relic_pool("中").is_empty() and ex.loot_relic_pool("大").size() == Relics.TIER.values().filter(func(t): return int(t) == 3).size() and not ex.loot_options("中").any(func(o): return o.kind == "relic"), "中档耗尽不越级给稀有，大赏仍可给稀有")
 	# Opening loot grants the chosen relic exactly once and handles bind/pickup effects.
 	ex = Expedition.start(32)
 	var cell := ex.pos

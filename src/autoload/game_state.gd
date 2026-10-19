@@ -33,6 +33,8 @@ var room_run: RefCounted = null
 var relics: Array = []
 var relic_binds: Dictionary = {}
 var relic_counters: Dictionary = {}
+## 反死亡：本局存着的复活次数（一局最多拿到一次）
+var revive_charges: int = 0
 
 
 func _ready() -> void:
@@ -50,6 +52,7 @@ func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> voi
 	relics.clear()
 	relic_binds.clear()
 	relic_counters.clear()
+	revive_charges = 0
 	player_max_hp = rules.player_max_hp
 	player_hp = player_max_hp
 	gold = rules.starting_gold
@@ -84,8 +87,12 @@ func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> voi
 func add_character(data: CharacterData, count: int = 1) -> void:
 	if data == null:
 		return
+	# 阴司愿帖·千字同文：之后拿到的字都变成许愿的字；金缕衣：新字也镀金
+	data = Relics.redirect_glyph(data)
 	for i in count:
-		deck.append(CharInstance.new(data))
+		var inst := CharInstance.new(data)
+		inst.gilded = relics.has("midas")
+		deck.append(inst)
 	EventBus.deck_changed.emit()
 
 

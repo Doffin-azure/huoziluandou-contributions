@@ -237,6 +237,9 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"超": return {"h": "next_gap", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次成功组词允许横向或纵向跨过一个空格，最多一次；不能跨过有字的格子"}
 		"精": return {"h": "precision_draw", "a": 0, "target": EffectDataS.Target.BAG_GLYPH, "note": "从字袋揭示 2 枚实体字，选择 1 枚补入原格，另一枚留在字袋；只有 1 枚时直接补入，空袋时只弃字"}
 		"化": return {"h": "heat_to_energy_solo", "a": 1, "target": EffectDataS.Target.NONE, "note": "消耗 2 热度，获得 1 储能；不足 2 热度时只弃掉本字"}
+		"死": return {"h": "damage", "a": 7, "note": "造成 7 伤害"}
+		"亡": return {"h": "apply_status_enemy", "a": 1, "status": "vulnerable", "note": "使目标获得 1 层易伤"}
+		"月": return {"h": "moon_pull", "a": 0, "note": "其他字向【月】原位聚拢"}
 		"购": return {"h": "buy_bag_solo", "a": 2, "target": EffectDataS.Target.BAG_GLYPH, "note": "支付 2 金币，从字袋选择 1 枚己方实体字补入原格，保留原属性；空袋时只弃字，不支付"}
 	return {}
 
@@ -314,6 +317,10 @@ func _build_curated_characters() -> void:
 		["骨", "gu", "gu", ["彩蛋"], 3, false],
 		["开", "kai", "kai", ["彩蛋"], 3, false],
 		["灯", "deng", "deng", ["彩蛋"], 3, false],
+		# 遗物带来的字：判词【死】、佚卷【亡】、望月砚【月】，不进奖励池
+		["死", "si", "si", ["彩蛋"], 3, false],
+		["亡", "wang", "wang", ["彩蛋"], 3, false],
+		["月", "yue", "yue", ["彩蛋"], 3, false],
 		["碍", "ai", "ai", ["enemy"], 2, false],
 		["秽", "hui3", "hui", ["enemy"], 2, false],
 		["污", "pollution", "wu", ["pollution"], 0, true],
@@ -492,6 +499,17 @@ func _build_extra_words() -> void:
 		ContentBuild.e("lights_on", 0, -1, "", "来电了", {})),
 		"%s/words/extra_kaideng.tres" % RES)
 	print("  · 彩蛋词：开灯（额外）")
+
+	# 死亡 / 反死亡：判词【死】+ 佚卷【亡】的彩蛋（遗物说明里不点破）
+	_save(_extra("extra_siwang", "死亡", ["死", "亡"], "彩蛋", "",
+		"彩蛋：打出后你立即死亡；有复活机会时满血站起",
+		ContentBuild.e("death_word", 0, -1, "", "打出后你立即死亡", {})),
+		"%s/words/extra_siwang.tres" % RES)
+	_save(_extra("extra_fansiwang", "反死亡", ["反", "死", "亡"], "彩蛋", "",
+		"彩蛋：本局获得一次满血复活机会（一局只给一次）",
+		ContentBuild.e("anti_death", 0, -1, "", "本局获得一次满血复活", {})),
+		"%s/words/extra_fansiwang.tres" % RES)
+	print("  · 彩蛋词：死亡 / 反死亡（额外）")
 
 	# 方向与空间：左 / 右 / 左右 / 左转 / 右转 / 左击 / 右击（设计负责人新增）
 	_save(_extra_list("extra_zuoyou", "左右", ["左", "右"], "空间", "choose_row_pair",
