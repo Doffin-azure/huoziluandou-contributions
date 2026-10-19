@@ -108,8 +108,9 @@ func run_checks() -> void:
 		if not Router.current_path.ends_with("reward_screen.gd"): get_tree().quit(1); return
 		await snap("seed-%d-reward.png" % seed_value)
 		var chosen: String = Router.current._options[0].glyph
+		var chosen_count := int(GameState.glyph_counts().get(chosen,0))
 		Router.current._accept_pick(); await frames(20)
-		check(Router.current_path==RUN.MAP_SCREEN and run.tray==[chosen],"claim returns chosen glyph to tray and restores map")
+		check(Router.current_path==RUN.MAP_SCREEN and int(GameState.glyph_counts().get(chosen,0))==chosen_count+1,"claim adds chosen glyph to deck and restores map")
 		view = Router.current.map_view
 		check(view.get_instance_id()==identity and view.profile.build_count==1,"reward return reuses world without rebuilding")
 		check(view._look.is_equal_approx(look) and is_equal_approx(view._distance,zoom),"reward return keeps camera unchanged")

@@ -122,16 +122,12 @@ func _play(seed_value: int, policy: String) -> Dictionary:
 		"seen_events": run.seen_events.duplicate(),
 		"deck": deck, "tag_counts": tag_counts,
 		"rarity_counts": _rarity_counts(deck),
-		"active_words": run.active.duplicate(),
 		"generation_ms": run.generation_ms,
 	}
 	return summary
 
 
 func _choose(run, policy: String, events: Array, event_choices: Array, shops: Array, rests: Array) -> Dictionary:
-	# 奖励/事件得到的字先进入字匣；真实玩家会把它收入字袋。
-	if run.phase in ["map", "rest", "shop"] and not run.tray.is_empty():
-		return {"type": "tray_to_deck", "index": 0}
 	match run.phase:
 		"map": return _choose_room(run, policy)
 		"encounter": return {"type": "interact"}

@@ -16,9 +16,6 @@ var _plan_button: Button
 var _selected := ""
 var _routing := false
 var _receipt_open := false
-var _inventory: Control
-var _inventory_box: VBoxContainer
-var _tray_selected := -1
 
 
 func build(root: Control) -> void:
@@ -34,7 +31,6 @@ func build(root: Control) -> void:
 	header.add_child(Ink.expander())
 	_stats = JourneyStyle.label("", "Stat"); header.add_child(_stats)
 	header.add_child(_button("字袋",_open_deck))
-	header.add_child(_button("字匣 · 版面",_open_inventory))
 	header.add_child(_button("菜单",func(): PauseMenu.open()))
 	page.add_child(header)
 	var strip := Ink.hbox(12)
@@ -222,48 +218,3 @@ func _open_deck() -> void:
 	var overlay := CollectionOverlay.new()
 	overlay.setup({"title":"字袋", "subtitle":"%d 枚实体字" % GameState.deck_size(), "characters":chars, "counts":counts})
 	add_child(overlay)
-
-
-func _open_inventory() -> void:
-	if is_instance_valid(_inventory): return
-	_inventory = Control.new(); _inventory.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_inventory.mouse_filter = Control.MOUSE_FILTER_STOP; add_child(_inventory)
-	var shade := ColorRect.new(); shade.color = Color(0,0,0,.72)
-	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); _inventory.add_child(shade)
-	shade.gui_input.connect(func(event):
-		if event is InputEventMouseButton and event.pressed: shade.accept_event(); _close_inventory())
-	var center := CenterContainer.new(); center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	center.mouse_filter = Control.MOUSE_FILTER_IGNORE; _inventory.add_child(center)
-	var panel := Ink.panel("PanelInset")
-	panel.custom_minimum_size.x = minf(size.x-40,480*JourneyStyle.touch_scale(self)); center.add_child(panel)
-	_inventory_box = Ink.vbox(10); panel.add_child(_inventory_box); _refresh_inventory()
-
-
-func _close_inventory() -> void:
-	if is_instance_valid(_inventory): remove_child(_inventory); _inventory.queue_free()
-	_inventory = null; _tray_selected = -1; refresh()
-
-
-func _refresh_inventory() -> void:
-	for child in _inventory_box.get_children(): _inventory_box.remove_child(child); child.queue_free()
-	_inventory_box.add_child(JourneyStyle.label("字匣与版面","Subheading",JourneyStyle.GOLD))
-	_inventory_box.add_child(JourneyStyle.label("字匣 %d / 6 · 选字后收入字袋或放入版面" % run.tray.size(),"Muted"))
-	var enabled: bool = run.phase in ["map","rest","shop"]
-	var tray := HFlowContainer.new(); _inventory_box.add_child(tray)
-	for i in run.tray.size():
-		var button := _button(("「%s」" if i==_tray_selected else " %s ") % run.tray[i],func(): _tray_selected = i; _refresh_inventory())
-		button.disabled = not enabled; tray.add_child(button)
-	if _tray_selected>=0 and _tray_selected<run.tray.size():
-		_inventory_box.add_child(_button("收入字袋",func(): run.apply({"type":"tray_to_deck","index":_tray_selected}); _tray_selected = -1; _refresh_inventory()))
-	var grid := GridContainer.new(); grid.columns = 2; _inventory_box.add_child(grid)
-	for row in 2:
-		for col in 2:
-			var glyph: String = run.plate[row][col]
-			var button := _button(glyph if not glyph.is_empty() else "·",func():
-				if not str(run.plate[row][col]).is_empty(): run.apply({"type":"take_plate","row":row,"col":col})
-				elif _tray_selected>=0: run.apply({"type":"plate","index":_tray_selected,"row":row,"col":col}); _tray_selected = -1
-				_refresh_inventory())
-			button.custom_minimum_size.x = 64*JourneyStyle.touch_scale(self)
-			button.disabled = not enabled; grid.add_child(button)
-	for word: String in run.active: _inventory_box.add_child(JourneyStyle.label(word+"："+str(Lexicon.WORDS[word][1]),"Muted"))
-	_inventory_box.add_child(_button("收起",_close_inventory))

@@ -29,9 +29,9 @@ func settle(run: RefCounted) -> void:
 				check(restored.current_room==run.current_room and restored.reward_options==run.reward_options and not restored.travel.enabled,"reward reload preserves contents and closed doors")
 				GameState.room_run = run
 				var chosen: String = run.reward_options[0].glyph
-				var size_before: int = run.tray.size()
+				var size_before: int = GameState.deck_size()
 				check(run.apply({"type":"reward","index":0,"glyph":chosen}).ok,"existing reward claim succeeds")
-				check(run.phase in ["map","act_end"] and (run.tray.size()==size_before+1 if size_before<6 else true),"claim keeps original tray/deck destination")
+				check(run.phase in ["map","act_end"] and GameState.deck_size()==size_before+1,"claim adds the selected glyph to the deck")
 				check(not run.apply({"type":"reward","index":0,"glyph":chosen}).ok,"reward cannot be claimed twice")
 			"event","event_choose":
 				var actions: Array = run.legal_actions()
@@ -85,9 +85,9 @@ func run_checks() -> void:
 					for sibling: String in initial:
 						if sibling!=first: check(run.sealed.has(sibling) and not run.enter_room(sibling).ok,"unchosen starting branch closes")
 			check(run.phase=="act_end" and run.current_room=="boss" and run.visited_rooms.size()==17,"one forward route reaches boss in 17 stops")
-			var tray: Array = run.tray.duplicate()
+			var deck: Dictionary = GameState.glyph_counts()
 			run.apply({"type":"next_act"})
-			if act<3: check(GameState.act_index==act+1 and run.phase=="map" and run.tray==tray,"next act replaces only map progression")
+			if act<3: check(GameState.act_index==act+1 and run.phase=="map" and GameState.glyph_counts()==deck,"next act replaces only map progression")
 			else: check(run.phase=="victory","third boss completes the run")
 		await get_tree().process_frame
 	check(["battle","elite","event","rest","shop","treasure","boss"].all(func(k):return kinds.has(k)),"routes cover every production node kind")
