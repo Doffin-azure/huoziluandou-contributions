@@ -814,7 +814,7 @@ func _test_screens() -> void:
 	var gold := GameState.gold
 	Router.current._on_skip()
 	await get_tree().process_frame
-	_ok(Router.current_path.contains("expedition_map_screen") and GameState.gold == gold + 8, "跳过三选一拿 8 金币，回到远征地图")
+	_ok(Router.current_path.contains("expedition_map_screen") and GameState.gold == gold + Expedition.SKIP_GOLD, "跳过第一轮拿 %d 金币，回到远征地图" % Expedition.SKIP_GOLD)
 	ex.fight = {"kind": "boss", "k": ex.boss, "name": "首领", "g": ex.m.TH.boss, "caught": true, "debuff": "先手"}
 	Router.current.refresh()
 	Router.current._start_battle()

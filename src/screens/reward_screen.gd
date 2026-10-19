@@ -1,5 +1,10 @@
 extends ScreenBase
-## 战后奖励：三选一增字，或跳过换金币。
+## 战后奖励：选两轮字。第一轮跳过换金币；第二轮优先给能和第一轮所选字组词的字。
+## 经典模式：精英先给 1 件遗物；首领（最后一幕除外）先回血，再二选一遗物。
+
+const ROUNDS := 2
+## 首领战后回复最大气血的比例
+const BOSS_HEAL_RATIO := 0.3
 
 var node: MapNodeData
 var _options: Array = []
@@ -9,6 +14,10 @@ var _showcase: Control
 var _hud: Control
 var _selected := 0
 var _busy := false
+var _round := 1
+var _anchor := ""            ## 第一轮选中的字；第二轮围绕它出题
+var _links: Dictionary = {}  ## 第二轮候选字 -> 与 _anchor 共组的词
+var _boss_heal := 0
 
 
 func has_scene_background() -> bool:
@@ -20,17 +29,29 @@ func build(root: Control) -> void:
 	node = params.get("node", null)
 	_expedition = params.get("expedition", false) and GameState.expedition != null
 	var is_boss := node != null and node.type == MapNodeData.Type.BOSS
+	_round = int(params.get("round", 1))
+	_anchor = str(params.get("anchor", ""))
 	_options = _roll_options(is_boss, int(params.get("count", 3)))
+	var relic_step := _relic_step(is_boss)
+	if relic_step == "boss":
+		_boss_heal = mini(GameState.player_max_hp - GameState.player_hp, int(round(GameState.player_max_hp * BOSS_HEAL_RATIO)))
+		GameState.heal(_boss_heal)
 	_showcase = preload("res://src/ui/object_stage/object_stage_view.gd").new()
 	_showcase.mode = "reward"
 	_showcase.reward_count = _options.size()
 	root.add_child(_showcase)
 	_hud = preload("res://src/ui/object_stage/object_hud.gd").new()
-	_hud.heading = "幕末 · 馈赠" if is_boss else "战后 · 择字"
-	_hud.instruction = "选择字匣中的一枚活字，收入字袋。"
+	_hud.heading = ("幕末 · 馈赠" if is_boss else "战后 · 择字") + "（%d / %d）" % [_round, ROUNDS]
+	if _round == 1:
+		_hud.instruction = "选择字匣中的一枚活字，收入字袋。之后还能再选一枚。"
+	else:
+		_hud.instruction = "再选一枚。能和【%s】组词的字排在前面。" % _anchor
 	_hud.status = "气血 %d / %d    金币 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
 	_hud.action_text = "收入字匣" if _expedition else "收入字袋"
-	_hud.secondary_text = "收下这幕的馈赠" if is_boss else "跳过 · 获得 8 金币"
+	if _round > 1:
+		_hud.secondary_text = "不再选字 · 离开"
+	else:
+		_hud.secondary_text = "收下这幕的馈赠" if is_boss else "跳过 · 获得 %d 金币" % Expedition.SKIP_GOLD
 	_hud.on_action = _accept_pick
 	_hud.on_secondary = _on_skip
 	root.add_child(_hud)
@@ -48,6 +69,33 @@ func build(root: Control) -> void:
 	_layout_cards.call_deferred()
 	_inspect(0)
 	_showcase.stage.open_case()
+	if not relic_step.is_empty():
+		_offer_relics.call_deferred(relic_step)
+
+
+## 只在经典模式第一轮发遗物：精英 1 件，首领二选一；第三幕首领后直接通关，不再发。
+func _relic_step(is_boss: bool) -> String:
+	if _expedition or _round != 1 or node == null or params.get("relic_done", false):
+		return ""
+	if node.type == MapNodeData.Type.ELITE:
+		return "elite"
+	if is_boss and GameState.act_index < 3:
+		return "boss"
+	return ""
+
+
+func _offer_relics(step: String) -> void:
+	params["relic_done"] = true
+	if step == "elite":
+		RelicRewardFlow.offer(self, "精英战利品", "击败精英，得到一件遗物。", RelicRewardFlow.roll(1), _on_relic_taken)
+	else:
+		var body := ("首领倒下，气血回复 %d 点。" % _boss_heal) + "从两件遗物中选一件。"
+		RelicRewardFlow.offer(self, "幕末 · 遗物", body, RelicRewardFlow.roll(2), _on_relic_taken)
+
+
+func _on_relic_taken(_id: String) -> void:
+	if is_inside_tree():
+		_hud.status_label.text = "气血 %d / %d    金币 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
 
 
 func _layout_cards() -> void:
@@ -79,6 +127,22 @@ func _accept_pick() -> void:
 
 
 func _roll_options(is_boss: bool, count := 3) -> Array:
+	var pool := _reward_pool(is_boss)
+	var out: Array = []
+	if not _anchor.is_empty():
+		out = _related_options(pool, count)
+	var rng := GameState.rng
+	var guard := 0
+	while out.size() < count and guard < 200:
+		guard += 1
+		var c: CharacterData = pool[rng.randi_range(0, pool.size() - 1)]
+		if c.glyph == _anchor or out.any(func(x): return x.id == c.id):
+			continue
+		out.append(c)
+	return out
+
+
+func _reward_pool(is_boss: bool) -> Array:
 	var pool: Array = []
 	for c in Database.characters.values():
 		if c.is_pollution or c.pending_design or c.tags.has("enemy") or c.tags.has("彩蛋"):
@@ -91,15 +155,48 @@ func _roll_options(is_boss: bool, count := 3) -> Array:
 				pool.append(c)
 	if pool.is_empty():
 		pool = Database.characters.values()
-	var out: Array = []
-	var rng := GameState.rng
-	var guard := 0
-	while out.size() < count and guard < 200:
-		guard += 1
-		var c: CharacterData = pool[rng.randi_range(0, pool.size() - 1)]
-		if out.any(func(x): return x.id == c.id):
+	return pool
+
+
+## 第二轮：找和 _anchor 同在一个词里的字。补上它就能凑齐整词的排前面，同档内随机。
+func _related_options(pool: Array, count: int) -> Array:
+	var allowed := {}
+	for c in pool:
+		allowed[c.glyph] = c
+	var owned := _owned_glyphs()
+	owned[_anchor] = true
+	var score := {}
+	for w in Database.words.values():
+		if not w.glyphs.has(_anchor):
 			continue
-		out.append(c)
+		for g in w.glyphs:
+			if g == _anchor or not allowed.has(g):
+				continue
+			var complete: bool = w.glyphs.all(func(x): return x == g or owned.has(x))
+			var s := 2 if complete else 1
+			if s > int(score.get(g, 0)):
+				score[g] = s
+				_links[g] = w.word
+	var keys: Array = score.keys()
+	var rng := GameState.rng
+	for i in range(keys.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var t = keys[i]
+		keys[i] = keys[j]
+		keys[j] = t
+	keys.sort_custom(func(a, b): return score[a] > score[b])
+	var out: Array = []
+	for g in keys.slice(0, count):
+		out.append(allowed[g])
+	return out
+
+
+func _owned_glyphs() -> Dictionary:
+	if _expedition:
+		return GameState.expedition.owned_glyphs()
+	var out := {}
+	for c in GameState.deck:
+		out[c.glyph()] = true
 	return out
 
 
@@ -107,6 +204,9 @@ func _with_hint(c: CharacterData) -> CharacterData:
 	var copy: CharacterData = c.duplicate()
 	var words := _words_for(c.glyph)
 	var hint := c.description
+	if _links.has(c.glyph):
+		hint = "与【%s】组「%s」
+" % [_anchor, _links[c.glyph]] + hint
 	if not words.is_empty():
 		var shown := words.slice(0, 4)
 		hint += "\n可组：" + " / ".join(shown)
@@ -125,18 +225,24 @@ func _words_for(glyph: String) -> Array:
 func _on_pick(c: CharacterData) -> void:
 	if _expedition:
 		GameState.expedition.receive_reward_glyph(c)
-		goto("res://src/screens/expedition_map_screen.gd")
-		return
-	GameState.add_character(c, 1)
-	GameState.complete_current_node()
-	if GameState.run_complete():
-		_try_victory()
 	else:
-		goto("res://src/screens/map_screen.gd")
+		GameState.add_character(c, 1)
+	if _round < ROUNDS:
+		var next := params.duplicate()
+		next["round"] = _round + 1
+		next["anchor"] = c.glyph
+		goto("res://src/screens/reward_screen.gd", next)
+		return
+	_leave()
 
 
 func _on_skip() -> void:
-	GameState.add_gold(8)
+	if _round == 1:
+		GameState.add_gold(Expedition.SKIP_GOLD)
+	_leave()
+
+
+func _leave() -> void:
 	if _expedition:
 		goto("res://src/screens/expedition_map_screen.gd")
 		return

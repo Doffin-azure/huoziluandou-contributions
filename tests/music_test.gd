@@ -36,7 +36,7 @@ func _ready() -> void:
 	check(absf(Music._players[Music._active].volume_db - Music._target_db()) < 0.01, "恢复音量")
 	Music.stop()
 	# 音频线程下一次混音才释放播放实例
-	await get_tree().create_timer(0.1).timeout
+	await get_tree().create_timer(0.3).timeout
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Settings.storage_path))
 	Settings.storage_path = saved_path
 	print("[music_test] PASS=%d FAIL=%d TOTAL=%d" % [checks - failures, failures, checks])

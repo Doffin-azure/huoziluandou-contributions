@@ -61,7 +61,8 @@ func _run() -> void:
 			_snapshot.reward = screen._options.map(func(item): return item.id)
 			_snapshot.reward_rng = str(GameState.rng.state)
 		elif page == "shop":
-			_snapshot.shop = screen._offers.map(func(item): return [item.kind, item.character.id if item.character != null else "", item.price])
+			# 遗物货架用旁路随机数，单独校验；这里只比原有货物
+			_snapshot.shop = screen._offers.filter(func(item): return item.kind != "relic").map(func(item): return [item.kind, item.character.id if item.character != null else "", item.price])
 			_snapshot.shop_rng = str(GameState.rng.state)
 		elif page == "event":
 			_snapshot.event = screen._event.id
@@ -139,7 +140,10 @@ func _verify_actions() -> void:
 	_ok(GameState.deck_size() == deck_before, "inspecting a reward does not claim it prematurely")
 	reward._hud.action_button.pressed.emit()
 	await _frames()
-	_ok(GameState.deck_size() == deck_before + 1 and GameState.node_index == node_before + 1, "reward selection adds one glyph and advances one node")
+	_ok(GameState.deck_size() == deck_before + 1 and GameState.node_index == node_before and Router.current._round == 2, "first reward pick adds one glyph and opens the second round")
+	Router.current._hud.action_button.pressed.emit()
+	await _frames()
+	_ok(GameState.deck_size() == deck_before + 2 and GameState.node_index == node_before + 1, "second reward pick adds another glyph and advances one node")
 	var shop := await _open("shop")
 	var gold_before: int = GameState.gold
 	deck_before = GameState.deck_size()

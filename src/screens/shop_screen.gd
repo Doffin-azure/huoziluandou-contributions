@@ -1,5 +1,5 @@
 extends ScreenBase
-## 商店：定向增字、复制、删字、治疗。价格取自 GDD V0.3 测试起点。
+## 商店：定向增字、复制、删字、治疗，外加一件遗物（统一 45 金币）。价格取自 GDD V0.3 测试起点。
 
 var node: MapNodeData
 var _offers: Array = []       ## [{kind, character, price}]
@@ -10,6 +10,8 @@ var _selected := 0
 var _busy := false
 var _pending_offer_index := -1
 var _pending_kind := ""
+## 遗物在柜台上的固定位置（object_stage 的第 7 个货位）
+const RELIC_SLOT := 6
 
 
 func has_scene_background() -> bool:
@@ -28,9 +30,11 @@ func build(root: Control) -> void:
 	_hud.heading = "市集 · 字肆"
 	_hud.instruction = "柜上择字，印台整备。"
 	_hud.action_text = "购入"
-	_hud.secondary_text = "离开市集"
+	_hud.secondary_text = "离开"
 	_hud.on_action = _purchase_selected
 	_hud.on_secondary = _leave
+	_hud.tertiary_text = "刷新 · %d 金币" % Expedition.SHOP_REFRESH_COST
+	_hud.on_tertiary = _refresh_stock
 	root.add_child(_hud)
 	_showcase.layout_changed.connect(_layout_offers)
 	_refresh()
@@ -38,6 +42,23 @@ func build(root: Control) -> void:
 
 
 func _roll_offers() -> Array:
+	var out := _roll_chars()
+	out.append({"kind": "remove", "character": null, "price": GameState.rng.randi_range(16, 20)})
+	out.append({"kind": "copy", "character": null, "price": GameState.rng.randi_range(18, 22)})
+	out.append({"kind": "heal", "character": null, "price": GameState.rng.randi_range(10, 14)})
+	out.append_array(_roll_relic())
+	return out
+
+
+## 遗物货架：1 件候选，已全部拥有时为空
+func _roll_relic() -> Array:
+	var ids := RelicRewardFlow.roll(1, RelicRewardFlow.side_rng("shop"))
+	if ids.is_empty():
+		return []
+	return [{"kind": "relic", "character": null, "relic": ids[0], "price": RelicRewardFlow.SHOP_PRICE, "display_slot": RELIC_SLOT}]
+
+
+func _roll_chars() -> Array:
 	var out: Array = []
 	var pool: Array = []
 	for c in Database.characters.values():
@@ -53,10 +74,18 @@ func _roll_offers() -> Array:
 			continue
 		picked.append(c)
 		out.append({"kind": "buy_char", "character": c, "price": rng.randi_range(12, 15)})
-	out.append({"kind": "remove", "character": null, "price": rng.randi_range(16, 20)})
-	out.append({"kind": "copy", "character": null, "price": rng.randi_range(18, 22)})
-	out.append({"kind": "heal", "character": null, "price": rng.randi_range(10, 14)})
 	return out
+
+
+## 花 5 金币换三枚新字和遗物；没买的服务原样保留在原位。
+func _refresh_stock() -> void:
+	if _busy or not GameState.spend_gold(Expedition.SHOP_REFRESH_COST):
+		return
+	var chars := _roll_chars()
+	for i in chars.size(): chars[i]["display_slot"] = i
+	_offers = chars + _offers.filter(func(o): return o.kind != "buy_char" and o.kind != "relic") + _roll_relic()
+	_selected = 0
+	_refresh()
 
 
 func _refresh() -> void:
@@ -66,10 +95,12 @@ func _refresh() -> void:
 		card.queue_free()
 	_cards.clear()
 	_hud.status_label.text = "金币 %d" % GameState.gold
+	if _hud.tertiary_button != null:
+		_hud.tertiary_button.disabled = GameState.gold < Expedition.SHOP_REFRESH_COST
 	for i in _offers.size():
 		var item: Dictionary = _offers[i]
 		var ch: CharacterData = item.character
-		var glyph: String = ch.glyph if ch != null else {"remove": "删", "copy": "拓", "heal": "息"}[item.kind]
+		var glyph: String = ch.glyph if ch != null else (Relics.name_of(item.relic).left(1) if item.kind == "relic" else {"remove": "删", "copy": "拓", "heal": "息"}[item.kind])
 		_showcase.stage.add_object(glyph, int(item.display_slot), ch.rarity if ch != null else 0, ch == null)
 		var card := GlyphOffer.new()
 		card.character = ch
@@ -97,8 +128,14 @@ func _inspect(index: int) -> void:
 	_showcase.stage.select_object(index)
 	var item: Dictionary = _offers[index]
 	var ch: CharacterData = item.character
-	var title: String = ch.glyph if ch != null else {"remove": "删字", "copy": "复制", "heal": "调息"}[item.kind]
-	var body: String = ch.description if ch != null else {"remove": "从字袋中永久移除一枚字。", "copy": "复制字袋中的一枚字。", "heal": "回复 %d 点气血。" % _heal_amount()}[item.kind]
+	var title: String
+	var body: String
+	if item.kind == "relic":
+		title = "遗物「%s」" % Relics.name_of(item.relic)
+		body = Relics.desc_of(item.relic)
+	else:
+		title = ch.glyph if ch != null else {"remove": "删字", "copy": "复制", "heal": "调息"}[item.kind]
+		body = ch.description if ch != null else {"remove": "从字袋中永久移除一枚字。", "copy": "复制字袋中的一枚字。", "heal": "回复 %d 点气血。" % _heal_amount()}[item.kind]
 	_hud.set_detail(title + "  ·  " + str(item.price) + " 金币", body)
 	_hud.action_button.text = "金币不足" if GameState.gold < int(item.price) else "购入 · %d 金币" % item.price
 	_hud.action_button.disabled = GameState.gold < int(item.price)
@@ -135,6 +172,12 @@ func _buy(index: int) -> void:
 		"heal":
 			GameState.heal(_heal_amount())
 			_finish_offer(index)
+		"relic":
+			_busy = true
+			RelicRewardFlow.grant(self, offer.relic, func(_id):
+				_busy = false
+				if is_inside_tree() and index < _offers.size():
+					_finish_offer(index))
 		"remove":
 			_pending_offer_index = index
 			_pending_kind = "remove"

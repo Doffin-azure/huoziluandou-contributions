@@ -71,7 +71,13 @@ func _run() -> void:
 	_ok(stage.objects[3].position.z > stage.rests[3].z, "claim pulls the specimen toward the player")
 	await _wait_screen_change(reward)
 	await _frames()
-	_ok(GameState.deck_size() == before + 1 and Router.current_path.ends_with("map_screen.gd"), "claim settles once and returns to the existing route")
+	_ok(GameState.deck_size() == before + 1 and Router.current_path.ends_with("reward_screen.gd") and Router.current._round == 2, "first claim settles once and opens the second round")
+	var second: Control = Router.current
+	await _frames(2)
+	second._accept_pick()
+	await _wait_screen_change(second)
+	await _frames()
+	_ok(GameState.deck_size() == before + 2 and Router.current_path.ends_with("map_screen.gd"), "second claim settles once and returns to the existing route")
 	_ok(weak_stage.get_ref() == null, "leaving the reward releases its 3D stage")
 	var shop := await _open("shop")
 	await _shot("shop-desktop")
@@ -86,7 +92,7 @@ func _run() -> void:
 	shop._purchase_selected()
 	_ok(shop._busy and GameState.gold == gold, "purchase waits for the pickup and rejects duplicate presses")
 	await get_tree().create_timer(0.4).timeout
-	_ok(GameState.gold == gold - price and GameState.deck_size() == before + 1 and shop._offers.size() == 5, "purchase charges the exact original price once")
+	_ok(GameState.gold == gold - price and GameState.deck_size() == before + 1 and shop._offers.size() == 6, "purchase charges the exact original price once")
 	_ok(shop._showcase.stage.rests[0] == second_rest and shop._offers[0].display_slot == 1, "remaining goods retain their counter positions")
 	Settings.reduced_motion = true
 	Settings.changed.emit()
