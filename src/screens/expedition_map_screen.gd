@@ -681,6 +681,10 @@ func _event_shop() -> void:
 			notes.append("「%s」%s" % [w, Lexicon.WORDS[w][1]])
 	if not notes.is_empty():
 		_add(Ink.caption("　".join(notes)))
+	var refresh := _ghost("刷新货架　❖ %d" % Expedition.SHOP_REFRESH_COST, func(): ex.refresh_shop())
+	refresh.disabled = GameState.gold < Expedition.SHOP_REFRESH_COST
+	_add(refresh)
+	_add(Ink.caption("刷新换一批字和遗物，服务保留。"))
 	_add(_ghost("离开", func(): ex.leave_panel()))
 
 

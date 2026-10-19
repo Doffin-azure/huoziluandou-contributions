@@ -139,7 +139,10 @@ func _verify_actions() -> void:
 	_ok(GameState.deck_size() == deck_before, "inspecting a reward does not claim it prematurely")
 	reward._hud.action_button.pressed.emit()
 	await _frames()
-	_ok(GameState.deck_size() == deck_before + 1 and GameState.node_index == node_before + 1, "reward selection adds one glyph and advances one node")
+	_ok(GameState.deck_size() == deck_before + 1 and GameState.node_index == node_before and Router.current._round == 2, "first reward pick adds one glyph and opens the second round")
+	Router.current._hud.action_button.pressed.emit()
+	await _frames()
+	_ok(GameState.deck_size() == deck_before + 2 and GameState.node_index == node_before + 1, "second reward pick adds another glyph and advances one node")
 	var shop := await _open("shop")
 	var gold_before: int = GameState.gold
 	deck_before = GameState.deck_size()

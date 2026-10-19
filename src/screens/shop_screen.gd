@@ -28,9 +28,11 @@ func build(root: Control) -> void:
 	_hud.heading = "市集 · 字肆"
 	_hud.instruction = "柜上择字，印台整备。"
 	_hud.action_text = "购入"
-	_hud.secondary_text = "离开市集"
+	_hud.secondary_text = "离开"
 	_hud.on_action = _purchase_selected
 	_hud.on_secondary = _leave
+	_hud.tertiary_text = "刷新 · %d 金币" % Expedition.SHOP_REFRESH_COST
+	_hud.on_tertiary = _refresh_stock
 	root.add_child(_hud)
 	_showcase.layout_changed.connect(_layout_offers)
 	_refresh()
@@ -38,6 +40,14 @@ func build(root: Control) -> void:
 
 
 func _roll_offers() -> Array:
+	var out := _roll_chars()
+	out.append({"kind": "remove", "character": null, "price": GameState.rng.randi_range(16, 20)})
+	out.append({"kind": "copy", "character": null, "price": GameState.rng.randi_range(18, 22)})
+	out.append({"kind": "heal", "character": null, "price": GameState.rng.randi_range(10, 14)})
+	return out
+
+
+func _roll_chars() -> Array:
 	var out: Array = []
 	var pool: Array = []
 	for c in Database.characters.values():
@@ -53,10 +63,18 @@ func _roll_offers() -> Array:
 			continue
 		picked.append(c)
 		out.append({"kind": "buy_char", "character": c, "price": rng.randi_range(12, 15)})
-	out.append({"kind": "remove", "character": null, "price": rng.randi_range(16, 20)})
-	out.append({"kind": "copy", "character": null, "price": rng.randi_range(18, 22)})
-	out.append({"kind": "heal", "character": null, "price": rng.randi_range(10, 14)})
 	return out
+
+
+## 花 5 金币换三枚新字；没买的服务原样保留在原位。
+func _refresh_stock() -> void:
+	if _busy or not GameState.spend_gold(Expedition.SHOP_REFRESH_COST):
+		return
+	var chars := _roll_chars()
+	for i in chars.size(): chars[i]["display_slot"] = i
+	_offers = chars + _offers.filter(func(o): return o.kind != "buy_char")
+	_selected = 0
+	_refresh()
 
 
 func _refresh() -> void:
@@ -66,6 +84,8 @@ func _refresh() -> void:
 		card.queue_free()
 	_cards.clear()
 	_hud.status_label.text = "金币 %d" % GameState.gold
+	if _hud.tertiary_button != null:
+		_hud.tertiary_button.disabled = GameState.gold < Expedition.SHOP_REFRESH_COST
 	for i in _offers.size():
 		var item: Dictionary = _offers[i]
 		var ch: CharacterData = item.character

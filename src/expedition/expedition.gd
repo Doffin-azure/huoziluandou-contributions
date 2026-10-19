@@ -14,6 +14,9 @@ const BARRIER_HP := 4
 const FIGHT_T := 2
 const AMBUSH_T := 1
 const REST_T := 3
+## 战后奖励第一轮跳过换的金币
+const SKIP_GOLD := 16
+const SHOP_REFRESH_COST := 5
 ## 印章：效果 / 主要来源
 const SEALS := {
 	"镇纸": ["每场战斗少掉 4 点血", "精英"], "夜灯": ["视野 +1 格", "大赏"], "更漏": ["首领走路概率增长得更慢", "大赏"],
@@ -842,6 +845,23 @@ func shop_offers() -> Array:
 		m["shops"] = {}
 	m.shops[pos] = offers
 	return offers
+
+
+## 花 SHOP_REFRESH_COST 金币换一批字和遗物；删字 / 修饰 / 治疗这些服务原样保留。
+func refresh_shop() -> bool:
+	if top_panel().get("kind", "") != "shop" or GameState.gold < SHOP_REFRESH_COST:
+		return false
+	var services: Array = shop_offers().filter(func(o): return o.kind in ["remove", "gild", "heal"])
+	GameState.spend_gold(SHOP_REFRESH_COST)
+	var offers: Array = []
+	for i in 3:
+		offers.append({"kind": "glyph", "glyph": roll_glyph(0), "base": rng.randi_range(12, 15)})
+	offers.append_array(services)
+	for id in Relics.roll_choices(GameState.relics, relic_rng):
+		offers.append({"kind": "relic", "relic": id, "base": Relics.price(id)})
+	m.shops[pos] = offers
+	_log("商店：花 %d 金币刷新货架" % SHOP_REFRESH_COST)
+	return true
 
 
 func price(o: Dictionary) -> int:
