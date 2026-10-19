@@ -336,7 +336,7 @@ func _apply_shop(t: String, action: Dictionary) -> Dictionary:
 		GameState.add_character(o.character, 1)
 		_log("买入字：%s" % o.character.glyph)
 	elif o.kind == "heal":
-		# 商店治疗不算休息，不加安魂枕
+		# 商店治疗不算休息，不加安神香
 		var shop_heal := int(round(GameState.player_max_hp * 0.3))
 		GameState.heal(shop_heal)
 		_log("治疗 +%d" % shop_heal)

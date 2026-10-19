@@ -488,7 +488,7 @@ func pickup() -> bool:
 func gain_glyph(g: String, why := "") -> void:
 	if Database.get_character_by_glyph(g) == null:
 		return
-	# 阴司愿帖·千字同文：之后拿到的字都变成许愿的字
+	# 许愿笺·千字同文：之后拿到的字都变成许愿的字
 	g = Relics.redirect_glyph(Database.get_character_by_glyph(g)).glyph
 	var note := ("%s：" % why) if not why.is_empty() else ""
 	if tray.size() < tray_cap():
@@ -753,7 +753,7 @@ func _grant_relic(id: String, why: String) -> bool:
 	return true
 
 
-## 贴金纸 / 替身草人：挑一枚；挑够了关掉面板
+## 泥金笔 / 复字拓片：挑一枚；挑够了关掉面板
 func pick_relic(glyph_id: String) -> bool:
 	var p := top_panel()
 	if p.get("kind", "") != "relic_pick" or not Relics.apply_pick(p.relic, glyph_id):
@@ -765,7 +765,7 @@ func pick_relic(glyph_id: String) -> bool:
 	return true
 
 
-## 阴司愿帖：许愿；「千字同文」要带上字形 id
+## 许愿笺：许愿；「千字同文」要带上字形 id
 func choose_wish(index: int, glyph_id := "") -> bool:
 	var p := top_panel()
 	if p.get("kind", "") != "relic_wish" or index < 0 or index >= p.options.size():
