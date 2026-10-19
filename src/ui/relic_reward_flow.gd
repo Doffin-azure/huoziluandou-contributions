@@ -49,7 +49,7 @@ static func grant(host: Node, id: String, on_done: Callable) -> void:
 	bind_owned(host, id, on_done)
 
 
-## 拾取后的选择：绑定类挑一枚绑定；贴金纸 / 替身草人挑字；阴司愿帖许愿
+## 拾取后的选择：绑定类挑一枚绑定；泥金笔 / 复字拓片挑字；许愿笺许愿
 
 
 ## Also used after a saved route controller has granted the relic exactly once.
@@ -104,7 +104,7 @@ static func bind_owned(host: Node, id: String, on_done: Callable) -> void:
 	host.add_child(picker)
 
 
-## 贴金纸 / 替身草人：挑 left 枚字；关掉窗口就随机挑剩下的
+## 泥金笔 / 复字拓片：挑 left 枚字；关掉窗口就随机挑剩下的
 static func _pick_loop(host: Node, id: String, left: int, on_done: Callable) -> void:
 	var counts := Relics.pick_candidates(id)
 	if left <= 0 or counts.is_empty():
@@ -116,14 +116,14 @@ static func _pick_loop(host: Node, id: String, left: int, on_done: Callable) -> 
 		_pick_loop(host, id, left - 1, on_done))
 
 
-## 阴司愿帖：从 3 个愿望里选 1 个
+## 许愿笺：从 3 个愿望里选 1 个
 static func _wish(host: Node, on_done: Callable) -> void:
 	var wishes := Relics.wish_options(GameState.rng)
 	var options: Array = []
 	for w in wishes:
 		options.append({"text": "「%s」" % Relics.WISHES[w][0], "hint": Relics.WISHES[w][1]})
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "阴司愿帖 · 许一个愿", "body": "每个愿望都有代价，只能许一次。", "options": options})
+	overlay.setup({"title": "许愿笺 · 许一个愿", "body": "每个愿望都有代价，只能许一次。", "options": options})
 	overlay.chose.connect(func(index: int):
 		var wish: String = wishes[index]
 		if wish != "endless_glyph":

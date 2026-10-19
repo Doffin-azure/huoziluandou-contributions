@@ -464,7 +464,7 @@ const EVENTS := [
 		"tags": ["relic", "heal"],
 		"weight": 0.6,
 		"options": [
-			{"text": "取炉（失去 6 气血，获得【安魂枕】）", "primary": true, "requires": {"type": "lacks_relic", "relic": "sleep"}, "effects": [
+			{"text": "取炉（失去 6 气血，获得【安神香】）", "primary": true, "requires": {"type": "lacks_relic", "relic": "sleep"}, "effects": [
 				{"type": "damage", "amount": 6},
 				{"type": "gain_relic", "relic": "sleep"},
 			]},

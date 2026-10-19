@@ -99,7 +99,7 @@ static func _replay_last_attack(b: BattleState) -> Array:
 	if b.last_attack_word == null or b.last_attack_effects.is_empty():
 		return ["连击：此前没有可重演的即时攻击"]
 	var msgs: Array = []
-	# 刑卒护指（打击增强）：重演不算「带【击】」的出字
+	# 刻刀（打击增强）：重演不算「带【击】」的出字
 	var strike_was := b.strike_active
 	b.strike_active = false
 	for e in b.last_attack_effects:
