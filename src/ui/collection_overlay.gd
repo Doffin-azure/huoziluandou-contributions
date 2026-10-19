@@ -12,6 +12,7 @@ var _mode := "chars"
 var _word_grid: GridContainer
 var _scroll: ScrollContainer
 var _counts: Dictionary = {}
+var _relic_page: RelicCompendiumOverlay
 
 
 func setup(p_cfg: Dictionary) -> void:
@@ -57,6 +58,8 @@ func _build() -> void:
 	if not str(cfg.get("subtitle", "")).is_empty():
 		var st := Ink.label(str(cfg["subtitle"]), "Muted")
 		st.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		st.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		st.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		head.add_child(st)
 	head.add_child(Ink.expander())
 	var close := Ink.button("关闭")
@@ -70,6 +73,9 @@ func _build() -> void:
 	_add_tab("实体字", "chars")
 	if not (cfg.get("words", []) as Array).is_empty():
 		_add_tab("词", "words")
+
+	if cfg.get("show_relics", false) and not cfg.get("pick_on_click", false):
+		_add_tab("遗物", "relics")
 
 	col.add_child(Ink.hline())
 
@@ -95,6 +101,11 @@ func _build() -> void:
 	_word_grid.visible = false
 	wrap.add_child(_word_grid)
 
+	if cfg.get("show_relics", false) and not cfg.get("pick_on_click", false):
+		_relic_page = RelicCompendiumOverlay.new()
+		_relic_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		col.add_child(_relic_page)
+
 	_populate_chars()
 	_populate_words()
 	_scroll.resized.connect(_layout_columns)
@@ -111,8 +122,14 @@ func _add_tab(text: String, mode: String) -> void:
 
 func _show_tab(mode: String) -> void:
 	_mode = mode
+	_scroll.visible = mode != "relics"
+	if is_instance_valid(_relic_page):
+		_relic_page.visible = mode == "relics"
 	_grid.visible = mode == "chars"
 	_word_grid.visible = mode == "words"
+	_scroll.scroll_vertical = 0
+	for effect in find_children("*", "RichTextLabel", true, false):
+		if effect is EffectText: effect.close_help()
 	for button in _tab_bar.get_children():
 		button.theme_type_variation = "PrimaryButton" if button.get_meta("tab") == mode else "GhostButton"
 

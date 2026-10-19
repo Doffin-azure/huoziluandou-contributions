@@ -1,175 +1,133 @@
 extends Control
-## 遗物图鉴回归：数据驱动卡片、档次/绑定/持有标签、设置入口与 ESC 层级（图鉴先关，设置随后）。
-
+## 遗物子页面的入口、数据、布局、选择模式隔离与关闭行为。
 var _pass := 0
 var _fail := 0
-
 
 func _ready() -> void:
 	_run.call_deferred()
 
-
-func _ok(value: bool, message: String) -> void:
-	if value:
+func _ok(condition: bool, message: String) -> void:
+	if condition:
 		_pass += 1
-		print("  ok  ", message)
+		print("  ✓ ", message)
 	else:
 		_fail += 1
 		push_error(message)
 
-
 func _frames(count := 8) -> void:
-	for index in count: await get_tree().process_frame
-
+	for i in count: await get_tree().process_frame
 
 func _labels(node: Node) -> Array:
 	var out: Array = []
-	for c in node.get_children():
-		if c is Label:
-			out.append(c.text)
-		out.append_array(_labels(c))
+	for child in node.get_children():
+		if child is Label: out.append(child.text)
+		out.append_array(_labels(child))
 	return out
 
-
-func _effects(node: Node) -> Array:
-	var out: Array = []
-	for c in node.get_children():
-		if c is EffectText:
-			out.append(c)
-		out.append_array(_effects(c))
-	return out
-
-
-func _find_button(root: Node, text: String) -> Button:
-	for c in root.get_children():
-		if c is Button and c.text == text:
-			return c
-		var found := _find_button(c, text)
-		if found != null:
-			return found
+func _button(root: Node, text: String) -> Button:
+	for child in root.get_children():
+		if child is Button and child.text == text: return child
+		var found := _button(child, text)
+		if found != null: return found
 	return null
-
-
-func _find_compendium(root: Node) -> RelicCompendiumOverlay:
-	for c in root.get_children():
-		if c is RelicCompendiumOverlay and not c.is_queued_for_deletion():
-			return c
-		var found := _find_compendium(c)
-		if found != null:
-			return found
-	return null
-
-
-func _escape() -> InputEventAction:
-	var event := InputEventAction.new()
-	event.action = "cancel_selection"
-	event.pressed = true
-	return event
-
 
 func _run() -> void:
 	GameState.relics.clear()
-	GameState.relic_binds.clear()
 	GameState.relics.append("strike")
-
-	var settings := SettingsOverlay.new()
-	add_child(settings)
+	var before := GameState.relics.duplicate()
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(1280, 720)
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(viewport)
+	var library := CollectionOverlay.new()
+	library.setup({"title": "字库图鉴", "subtitle": "%d 种实体字 · %d 个词" % [Database.characters.size() - 1, Database.words.size()], "words": Database.words.values(), "show_relics": true})
+	viewport.add_child(library)
 	await _frames()
-
-	var btn := _find_button(settings, "遗物图鉴")
-	_ok(btn != null, "设置浮层提供「遗物图鉴」入口")
-	if btn == null:
-		_finish()
-		return
-	btn.pressed.emit()
+	var tab := _button(library, "遗物")
+	_ok(tab != null and _button(library, "实体字") != null and _button(library, "词") != null, "图鉴内提供实体字、词、遗物三个页面")
+	if tab == null:
+		_finish(); return
+	_ok(library._mode == "chars" and not library._relic_page.visible, "默认展示实体字")
+	tab.pressed.emit()
 	await _frames()
-
-	var comp := _find_compendium(settings)
-	_ok(comp != null, "「遗物图鉴」按钮打开图鉴浮层")
-	if comp == null:
-		_finish()
-		return
-
-	var cards := comp._grid.get_children()
-	_ok(cards.size() == Relics.DEFS.size(), "卡片数 == Relics.DEFS.size()（%d 件）" % Relics.DEFS.size())
-
-	var ids := {}
+	var page := library._relic_page
+	_ok(page.is_visible_in_tree() and not library._scroll.visible, "遗物是图鉴内的独立子页面")
+	var cards := page._grid.get_children()
+	_ok(cards.size() == Relics.DEFS.size(), "全部 38 件遗物均有卡片")
+	var seen := {}
+	var names_ok := true
+	var descriptions_ok := true
+	var tags_ok := true
 	var order_ok := true
 	var last_tier := 0
 	var last_id := ""
-	var names_ok := true
-	var descs_ok := true
-	var tiers_ok := true
-	var binds_ok := true
-	var owned_ok := true
 	for card in cards:
 		var id := str(card.get_meta("relic_id", ""))
-		if id.is_empty() or not Relics.DEFS.has(id):
-			names_ok = false
-			continue
-		ids[id] = true
-		var tier := int(Relics.TIER.get(id, 2))
-		if tier < last_tier or (tier == last_tier and id < last_id):
-			order_ok = false
+		seen[id] = true
+		var labels := _labels(card)
+		names_ok = names_ok and labels.has(Relics.name_of(id))
+		var effects := card.find_children("*", "RichTextLabel", true, false)
+		descriptions_ok = descriptions_ok and not effects.is_empty() and effects[0]._plain == BattleText.clean(Relics.desc_of(id))
+		var tier := int(Relics.TIER[id])
+		tags_ok = tags_ok and labels.has(page._tier_text(id)) and labels.has("事件专属") == Relics.is_event_relic(id) and labels.has("需绑定一枚字") == Relics.needs_bind(id) and labels.has("持有中") == GameState.has_relic(id)
+		order_ok = order_ok and (tier > last_tier or (tier == last_tier and id > last_id))
 		last_tier = tier
 		last_id = id
-		var texts := _labels(card)
-		if not texts.has(Relics.name_of(id)):
-			names_ok = false
-		var effect_nodes := _effects(card)
-		if effect_nodes.is_empty() or effect_nodes[0]._plain != BattleText.clean(Relics.desc_of(id)):
-			descs_ok = false
-		var tier_names := {1: "常见", 2: "少见", 3: "稀有"}
-		if not texts.has("◆".repeat(tier) + " " + str(tier_names[tier])):
-			tiers_ok = false
-		if texts.has("需绑定一枚字") != Relics.needs_bind(id):
-			binds_ok = false
-		if texts.has("持有中") != GameState.has_relic(id):
-			owned_ok = false
-	_ok(ids.size() == Relics.DEFS.size(), "meta relic_id 齐全且无重复")
-	_ok(names_ok, "名称 == Relics.name_of(id)")
-	_ok(descs_ok, "描述 _plain == BattleText.clean(Relics.desc_of(id))")
-	_ok(order_ok, "按档次升序（再 id）排序")
-	_ok(tiers_ok, "档次文本（slab→稀有、sleep→常见 等）")
-	_ok(binds_ok, "slab 有「需绑定一枚字」，strike 无")
-	_ok(owned_ok, "strike 持有后标「持有中」，slab 无")
-
-	var escape := _escape()
-	comp._input(escape)
-	settings._input(escape)
+	_ok(seen.size() == Relics.DEFS.size(), "遗物 ID 无遗漏或重复")
+	_ok(names_ok and descriptions_ok, "名称与完整效果同步当前遗物数据")
+	_ok(tags_ok, "档次、事件专属、绑定和持有状态正确")
+	_ok(order_ok, "按档次与 ID 稳定排序")
+	for dimensions in [Vector2i(1280, 720), Vector2i(640, 480), Vector2i(960, 540)]:
+		viewport.size = dimensions
+		await _frames(16)
+		var bounds := page._scroll.get_global_rect()
+		var fits := page._grid.size.x <= bounds.size.x + 1
+		var readable := true
+		for card in cards:
+			fits = fits and card.size.x > 0 and card.get_global_rect().end.x <= bounds.end.x + 1
+			var effects := card.find_children("*", "RichTextLabel", true, false)
+			readable = readable and not effects.is_empty() and effects[0].size.y > 0 and effects[0].size.x > 0
+		_ok(fits and readable, "%s 下卡片不横向溢出，词条有实际显示区域" % dimensions)
+		_ok(page._scroll.get_v_scroll_bar().max_value > bounds.size.y, "%s 下可纵向滚动浏览全部遗物" % dimensions)
+		for argument in OS.get_cmdline_user_args():
+			if argument.begins_with("--capture-dir="):
+				await RenderingServer.frame_post_draw
+				var path := argument.trim_prefix("--capture-dir=").path_join("relic-library-%dx%d.png" % [dimensions.x, dimensions.y])
+				_ok(viewport.get_texture().get_image().save_png(path) == OK, "保存遗物子页面截图")
+	page._scroll.scroll_vertical = int(page._scroll.get_v_scroll_bar().max_value)
 	await _frames()
-	_ok(_find_compendium(settings) == null, "ESC 先关闭遗物图鉴")
-	_ok(is_instance_valid(settings), "同帧派发 ESC 不连带关闭设置（图鉴先）")
-
-	settings._input(escape)
+	_ok(cards.back().get_global_rect().end.y <= page._scroll.get_global_rect().end.y + 2, "滚动到底可看完整最后一张卡片")
+	var help: EffectText = cards[0].find_children("*", "RichTextLabel", true, false)[0]
+	help.open_entry("term:energy")
 	await _frames()
-	_ok(not is_instance_valid(settings), "图鉴关闭后 ESC 才关闭设置")
-
-	settings = SettingsOverlay.new()
-	add_child(settings)
+	_ok(not help._cards.is_empty(), "遗物词条可打开解释浮层")
+	_button(library, "词").pressed.emit()
 	await _frames()
-	btn = _find_button(settings, "遗物图鉴")
-	if btn == null:
-		_finish()
-		return
-	btn.pressed.emit()
+	_ok(library._word_grid.is_visible_in_tree() and not page.visible, "可从遗物切回词页面")
+	_ok(help._cards.is_empty(), "切换页面时关闭词条解释，避免浮层残留")
+	_button(library, "实体字").pressed.emit()
 	await _frames()
-	comp = _find_compendium(settings)
-	if comp == null:
-		_finish()
-		return
-	settings._input(escape)
-	comp._input(escape)
+	_ok(library._grid.is_visible_in_tree() and not page.visible, "可切回实体字页面")
+	_ok(GameState.relics == before, "浏览和切换页面不修改持有遗物")
+	var picker := CollectionOverlay.new()
+	picker.setup({"characters": [], "pick_on_click": true, "show_relics": true})
+	viewport.add_child(picker)
 	await _frames()
-	_ok(_find_compendium(settings) == null, "（设置先）图鉴仍被关闭")
-	_ok(is_instance_valid(settings), "同帧派发 ESC 不连带关闭设置（设置先）")
-
-	settings._input(escape)
+	_ok(_button(picker, "遗物") == null, "选字浮层不出现遗物子页")
+	picker.queue_free()
+	var settings := SettingsOverlay.new()
+	viewport.add_child(settings)
 	await _frames()
-	_ok(not is_instance_valid(settings), "（设置先）图鉴关闭后 ESC 才关闭设置")
-
+	_ok(_button(settings, "遗物图鉴") == null, "设置中移除独立遗物图鉴入口")
+	settings.queue_free()
+	var event := InputEventAction.new()
+	event.action = "cancel_selection"
+	event.pressed = true
+	library._input(event)
+	await _frames()
+	_ok(not is_instance_valid(library), "ESC 关闭整个图鉴，不残留独立遗物浮层")
+	viewport.queue_free()
 	_finish()
-
 
 func _finish() -> void:
 	print("[relic_compendium_test] PASS=%d FAIL=%d" % [_pass, _fail])
