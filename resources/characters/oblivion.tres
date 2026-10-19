@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_oblivion"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_oblivion"]
+
+[sub_resource type="Resource" id="Resource_oblivion"]
+script = ExtResource("2_oblivion")
+kind = 29
+handler = "self_draw_penalty"
+amount = 1
+note = "打出后，下一次正常补字 -1。"
+
+[resource]
+script = ExtResource("1_oblivion")
+id = "oblivion"
+glyph = "忘"
+pinyin = "wang"
+description = "打出后，下一次正常补字 -1。"
+tags = Array[String](["pollution", "event"])
+solo_effects = Array[ExtResource("2_oblivion")]([SubResource("Resource_oblivion")])
+solo_handler = "self_draw_penalty"
+rarity = 0
+removable = false
+is_pollution = true

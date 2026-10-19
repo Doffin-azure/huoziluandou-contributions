@@ -3,7 +3,7 @@ extends Resource
 class_name EffectData
 ## 一条可复用的效果数据。
 ## 两种驱动方式：
-##   1) handler 非空 -> 由 EffectHandlers 按名字分发（V0.2 推荐，适合有特殊规则的词）
+##   1) handler 非空 -> 由 EffectRegistry 分发；内置 handler 保留原实现。
 ##   2) handler 为空 -> 走 kind 的通用分支（简单数值效果）
 ## 词/字的特效表现与数值都在这里，改卡只需改资源。
 
@@ -60,7 +60,7 @@ enum Target {
 }
 
 @export var kind: Kind = Kind.DAMAGE
-## 非空时由 EffectHandlers 分发（见 src/core/effect_handlers.gd）
+## 非空时由 EffectRegistry 分发；扩展使用“命名空间:效果名”。
 @export var handler: String = ""
 @export var amount: int = 0
 @export var amount_per_extra_glyph: int = 0
@@ -78,25 +78,7 @@ enum Target {
 
 ## handler 驱动的效果以 handler 为准，不能把旧资源的默认 DAMAGE 当作攻击。
 func semantic_kind() -> int:
-	if handler.is_empty():
-		return kind
-	match handler:
-		"damage", "overdo", "gravity_damage", "shield_smash", "break_shield_damage", \
-		"energy_discharge", "heat_burst", "destroy_2x2", "clear_board", \
-		"heat_to_damage_flow", "spend_gold_damage", "electric_strike", "fire_power", \
-		"energy_to_heat_damage", "cold_snap", "damage_multi", "solo_release", "chip_shield_damage":
-			return Kind.DAMAGE
-		"damage_all": return Kind.DAMAGE_ALL
-		"block_temp", "joint_force": return Kind.BLOCK
-		"block_persist", "alloy": return Kind.PERSISTENT_BLOCK
-		"heal": return Kind.HEAL
-		"draw_random", "draw_excluding_source": return Kind.DRAW_CHARS
-		"gold": return Kind.GAIN_GOLD
-		"energy", "energy_around_tail": return Kind.ENERGY
-		"heat", "heat_clear", "heat_cleanse": return Kind.HEAT
-		"apply_status_self", "apply_status_enemy", "ignite", "strength_growing": return Kind.APPLY_STATUS
-		_:
-			return Kind.ABILITY if timing == "persistent" else Kind.SPECIAL
+	return EffectRegistry.semantic_kind(self)
 
 
 func is_attack() -> bool:
@@ -104,9 +86,13 @@ func is_attack() -> bool:
 
 
 func describe() -> String:
+	return EffectRegistry.describe(self)
+
+
+func describe_builtin() -> String:
 	if not note.is_empty():
 		return note
-	match kind:
+	match semantic_kind():
 		Kind.DAMAGE:
 			return "造成 %d 点伤害" % amount
 		Kind.DAMAGE_ALL:

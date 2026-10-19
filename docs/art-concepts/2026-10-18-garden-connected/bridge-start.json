@@ -1,0 +1,631 @@
+{
+  "legal_actions": [
+    {
+      "label": "普通战",
+      "room": "n01",
+      "type": "enter_room"
+    },
+    {
+      "label": "普通战",
+      "room": "n02",
+      "type": "enter_room"
+    },
+    {
+      "label": "普通战",
+      "room": "n03",
+      "type": "enter_room"
+    }
+  ],
+  "observe": {
+    "act": 1,
+    "branch_choices": {},
+    "candidate_nodes": 55,
+    "current_room": "start",
+    "deck": {
+      "击": 2,
+      "反": 1,
+      "回": 2,
+      "御": 1,
+      "流": 1,
+      "破": 1,
+      "连": 1,
+      "重": 1,
+      "防": 2
+    },
+    "deck_size": 12,
+    "done": false,
+    "event_temp_hp": 0,
+    "forward_only": true,
+    "generation": {
+      "area_reduction": 0.39203381147541,
+      "kind": "compact_garden",
+      "nodes": 55,
+      "seed": 29,
+      "version": 2
+    },
+    "generation_error": "",
+    "gold": 6,
+    "grid_origin": [
+      0.0,
+      0.0
+    ],
+    "grid_step": 1.0,
+    "hp": 60,
+    "inventory_actions": [],
+    "layout": "compact_garden",
+    "log": [
+      "开局 seed=29，字袋 12 枚",
+      "第1幕：选择庭门前进，首领守在终庭。"
+    ],
+    "max_hp": 60,
+    "mode": "courtyard",
+    "next_rooms": [
+      "n01",
+      "n02",
+      "n03"
+    ],
+    "node": 1,
+    "node_title": "",
+    "node_type": "start",
+    "pending_reward": false,
+    "phase": "map",
+    "plate": [
+      [
+        "",
+        ""
+      ],
+      [
+        "",
+        ""
+      ]
+    ],
+    "position": [
+      5,
+      23
+    ],
+    "resolved": [
+      "start"
+    ],
+    "room_kind": "start",
+    "rooms": [
+      {
+        "id": "start",
+        "kind": "start",
+        "next": [
+          "n01",
+          "n02",
+          "n03"
+        ],
+        "sealed": false,
+        "visited": true
+      },
+      {
+        "id": "n01",
+        "kind": "battle",
+        "next": [
+          "n04"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n02",
+        "kind": "battle",
+        "next": [
+          "n05",
+          "n04"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n03",
+        "kind": "battle",
+        "next": [
+          "n07",
+          "n06"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n04",
+        "kind": "shop",
+        "next": [
+          "n08"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n05",
+        "kind": "battle",
+        "next": [
+          "n09"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n06",
+        "kind": "battle",
+        "next": [
+          "n10"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n07",
+        "kind": "event",
+        "next": [
+          "n11",
+          "n10"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n08",
+        "kind": "battle",
+        "next": [
+          "n12",
+          "n13"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n09",
+        "kind": "battle",
+        "next": [
+          "n13"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n10",
+        "kind": "rest",
+        "next": [
+          "n14",
+          "n13"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n11",
+        "kind": "event",
+        "next": [
+          "n14"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n12",
+        "kind": "battle",
+        "next": [
+          "n15"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n13",
+        "kind": "event",
+        "next": [
+          "n15"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n14",
+        "kind": "shop",
+        "next": [
+          "n16",
+          "n17"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n15",
+        "kind": "battle",
+        "next": [
+          "n18",
+          "n19"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n16",
+        "kind": "event",
+        "next": [
+          "n20",
+          "n21"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n17",
+        "kind": "battle",
+        "next": [
+          "n21"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n18",
+        "kind": "elite",
+        "next": [
+          "n22"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n19",
+        "kind": "shop",
+        "next": [
+          "n22"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n20",
+        "kind": "battle",
+        "next": [
+          "n23",
+          "n24"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n21",
+        "kind": "event",
+        "next": [
+          "n24"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n22",
+        "kind": "rest",
+        "next": [
+          "n25",
+          "n26"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n23",
+        "kind": "elite",
+        "next": [
+          "n26"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n24",
+        "kind": "battle",
+        "next": [
+          "n27",
+          "n26"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n25",
+        "kind": "event",
+        "next": [
+          "n28",
+          "n29"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n26",
+        "kind": "rest",
+        "next": [
+          "n30"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n27",
+        "kind": "shop",
+        "next": [
+          "n31"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n28",
+        "kind": "treasure",
+        "next": [
+          "n32"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n29",
+        "kind": "treasure",
+        "next": [
+          "n32"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n30",
+        "kind": "treasure",
+        "next": [
+          "n33"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n31",
+        "kind": "treasure",
+        "next": [
+          "n34",
+          "n33"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n32",
+        "kind": "battle",
+        "next": [
+          "n35",
+          "n36",
+          "n37"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n33",
+        "kind": "battle",
+        "next": [
+          "n37"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n34",
+        "kind": "elite",
+        "next": [
+          "n38"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n35",
+        "kind": "battle",
+        "next": [
+          "n39"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n36",
+        "kind": "event",
+        "next": [
+          "n39",
+          "n40"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n37",
+        "kind": "rest",
+        "next": [
+          "n40"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n38",
+        "kind": "elite",
+        "next": [
+          "n41"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n39",
+        "kind": "event",
+        "next": [
+          "n43",
+          "n42"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n40",
+        "kind": "battle",
+        "next": [
+          "n44"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n41",
+        "kind": "event",
+        "next": [
+          "n45",
+          "n44"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n42",
+        "kind": "event",
+        "next": [
+          "n46"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n43",
+        "kind": "battle",
+        "next": [
+          "n47",
+          "n48"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n44",
+        "kind": "rest",
+        "next": [
+          "n48"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n45",
+        "kind": "elite",
+        "next": [
+          "n49",
+          "n48"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n46",
+        "kind": "event",
+        "next": [
+          "n50",
+          "n51"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n47",
+        "kind": "battle",
+        "next": [
+          "n51"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n48",
+        "kind": "elite",
+        "next": [
+          "n52"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n49",
+        "kind": "battle",
+        "next": [
+          "n53",
+          "n52"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n50",
+        "kind": "rest",
+        "next": [
+          "boss"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n51",
+        "kind": "rest",
+        "next": [
+          "boss"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n52",
+        "kind": "rest",
+        "next": [
+          "boss"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "n53",
+        "kind": "rest",
+        "next": [
+          "boss"
+        ],
+        "sealed": false,
+        "visited": false
+      },
+      {
+        "id": "boss",
+        "kind": "boss",
+        "next": [],
+        "sealed": false,
+        "visited": false
+      }
+    ],
+    "schema": 1,
+    "sealed_rooms": [],
+    "seed": 29,
+    "seen_events": [],
+    "tray": []
+  },
+  "steps": [],
+  "summary": {
+    "act": 1,
+    "branch_choices": {},
+    "current_room": "start",
+    "deck_size": 12,
+    "gold": 6,
+    "hp": 60,
+    "max_hp": 60,
+    "mode": "courtyard",
+    "node": 1,
+    "phase": "map",
+    "seed": 29,
+    "victory": false,
+    "visited_rooms": 1
+  }
+}

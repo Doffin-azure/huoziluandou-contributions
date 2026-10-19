@@ -1,0 +1,19 @@
+{
+  "acts_per_seed": 3,
+  "checks": 1391,
+  "failures": [],
+  "node_kinds": [
+    "battle",
+    "shop",
+    "event",
+    "treasure",
+    "elite",
+    "rest",
+    "boss"
+  ],
+  "seeds": [
+    17,
+    29,
+    67
+  ]
+}

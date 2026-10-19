@@ -218,10 +218,12 @@ func _test_start_and_move() -> void:
 	# 首领巢穴：最外一圈的随机空地，离起点沿路 ≥ 6 步，不贴着大赏 / 休息点 / 商店 / 精英
 	var rim_ok := 0
 	var lairs := {}
+	var garden_count := 0
 	for s in 60:
 		var lm := MapGen.generate(3000 + s * 7, MapGen.THEME_ORDER[s % 4])
 		if lm.is_empty():
 			continue
+		if lm.has("layout"): garden_count += 1
 		var lk: int = lm.lair
 		lairs[lk] = true
 		var pd := MapGen.bfs(MapGen.mask_of(func(x): return lm.ink[x] == 0 and not lm.obst.has(x) and not (lm.mech.has(x) and lm.mech[x].kind == "gate")), lm.start)
@@ -236,7 +238,11 @@ func _test_start_and_move() -> void:
 	for lk in lairs:
 		var lp := MapGen.rc(lk)
 		sides["上" if lp.x == 0 else ("下" if lp.x == MapGen.H - 1 else ("左" if lp.y == 0 else "右"))] = true
-	_ok(lairs.size() >= 15 and sides.size() >= 3, "首领巢穴位置随机：60 张图里有 %d 个不同位置，分布在 %s" % [lairs.size(), sides.keys()])
+	# Courtyards reserve full building footprints, so fewer rim entrances
+	# are legal than in the flat prototype. Still require several locations
+	# on at least three sides; the original flat-map threshold stays intact.
+	var minimum_lairs := 8 if garden_count == 60 else 15
+	_ok(lairs.size() >= minimum_lairs and sides.size() >= 3, "首领巢穴位置随机：60 张图里有 %d 个不同位置，分布在 %s" % [lairs.size(), sides.keys()])
 	var g1 := MapGen.generate(4242, "墨池")
 	var g2 := MapGen.generate(4242, "墨池")
 	_ok(g1.lair == g2.lair, "同一种子首领位置一样")
@@ -619,41 +625,39 @@ func _test_screens() -> void:
 	var screen: Control = Router.current
 	_ok(screen._map_grid.get_child_count() == MapGen.N and screen._build_box.get_child_count() >= 4, "远征地图12×8与构筑提示，不再显示版面")
 	_ok(screen._legend_box != null and screen._legend_box.is_inside_tree(), "页面里有图样说明（颜色、敌人、机关）")
-	_ok(screen._boss_bar_label.text.contains("沉睡"), "地图上方的首领提示条：沉睡")
-	await get_tree().process_frame
-	_ok(not screen._boss_piece.visible, "首领沉睡且不在视野里：棋子不显示")
+	_ok(not screen._actor_panel.visible and screen._boss_label.text.contains("沉睡"), "状态收进行囊，探索时不显示顶栏")
 	ex.stir = ex.t
 	ex.rise = ex.t
 	ex.alerts.append(["首领起身了", "测试"])
 	screen.refresh()
-	_ok(screen._boss_bar_label.text.contains("正在追你") and screen._alert_open, "首领追来：提示条显示距离，并弹窗")
+	_ok(screen._boss_label.text.contains("首领追来") and screen._notice.visible and ex.alerts.is_empty(), "首领追来：行囊更新状态，并显示短暂提醒")
 	await get_tree().process_frame
-	_ok(screen._boss_piece.position == screen._cell_origin(ex.boss) and screen._boss_glyph.text == ex.m.TH.boss and screen._boss_piece.visible, "首领被惊动后显示：一枚棋子，摆在它所在的格")
+	_ok(screen._map_view.boss_actor.position == screen._map_view.world_position(ex.boss), "首领实体落在对应的世界坐标")
 	var from := ex.boss
 	for i in 30:
 		if ex.tick():
 			break
 	_ok(ex.boss != from and not ex.boss_trail.is_empty(), "首领每步都在地图上移动，记下走过的格")
 	screen.refresh()
-	_ok(ex.boss_trail.is_empty() and screen._boss_tween != null and screen._boss_shown == ex.boss, "棋子逐格走到新位置")
-	_ok(screen._path_layer.points.size() == ex.boss_path().size(), "画出首领接下来要走的路")
+	_ok(ex.boss_trail.is_empty() and screen._map_view.boss_tween != null and screen._map_view._shown_boss == ex.boss, "首领逐格播放移动动画")
+	_ok(screen._map_view.path_cells == ex.boss_path(), "画出首领接下来要走的路")
 	ex.boss = ex.m.lair
 	ex.fight = {}
 	var am: Dictionary = ex.m.ambush[0]
 	ex.fight = {"kind": "ambush", "k": am.cells[-1], "amb": 0, "name": "伏兵", "g": ""}
 	screen.refresh()
 	await get_tree().process_frame
-	_ok((screen._map_grid.get_child(am.k) as Button).text == "伏", "伏兵战进行中：伏兵所在格显示「伏」")
+	_ok(screen._map_view.cell_info(am.k).text == "伏", "伏兵战进行中：伏兵所在格显示「伏」")
 	ex.fight = {}
 	ex.amb_done[0] = true
 	screen.refresh()
 	await get_tree().process_frame
-	_ok((screen._map_grid.get_child(am.k) as Button).text == "✕", "打赢伏兵：那一格画 ✕")
+	_ok(screen._map_view.cell_info(am.k).text == "✕", "打赢伏兵：那一格画 ✕")
 	ex.amb_done.clear()
 	ex.stir = null
 	ex.rise = null
 	ex.alerts.clear()
-	screen._alert_open = false
+	screen._notice.visible = false
 	for c in screen.get_children():
 		if c is ChoiceOverlay:
 			c.queue_free()

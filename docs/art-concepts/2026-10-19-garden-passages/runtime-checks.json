@@ -1,0 +1,60 @@
+{
+  "android_device_tested": false,
+  "checks": 188,
+  "failures": [],
+  "renderer": "forward_plus",
+  "seeds": [
+    {
+      "cache_limit": 49,
+      "draw_calls": 429,
+      "idle_frame_ms": {
+        "max": 17.235,
+        "median": 16.618,
+        "p95": 17.226
+      },
+      "loaded_regions": 18,
+      "memory_bytes": 275247143.0,
+      "profile": {
+        "active_local_lights": 4,
+        "assembly_ms": 7933.891,
+        "build_count": 1,
+        "fog_ms": 0.0,
+        "outline_ms": 1.51,
+        "outline_warmup_ms": 1666.003,
+        "resume_ms": 4.392
+      },
+      "seed": 29,
+      "walking_frame_ms": {
+        "max": 32.994,
+        "median": 16.663,
+        "p95": 19.296
+      }
+    },
+    {
+      "cache_limit": 49,
+      "draw_calls": 464,
+      "idle_frame_ms": {
+        "max": 17.548,
+        "median": 16.661,
+        "p95": 17.298
+      },
+      "loaded_regions": 18,
+      "memory_bytes": 281347625.0,
+      "profile": {
+        "active_local_lights": 4,
+        "assembly_ms": 10245.399,
+        "build_count": 1,
+        "fog_ms": 0.0,
+        "outline_ms": 1.653,
+        "outline_warmup_ms": 1595.175,
+        "resume_ms": 5.238
+      },
+      "seed": 67,
+      "walking_frame_ms": {
+        "max": 19.375,
+        "median": 16.657,
+        "p95": 17.595
+      }
+    }
+  ]
+}

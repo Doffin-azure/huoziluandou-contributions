@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://tests/expedition_building_lab_capture.gd" id="1"]
+
+[node name="BuildingCapture" type="Node"]
+script = ExtResource("1")

@@ -32,6 +32,11 @@ func apply(architecture: Node3D, landscape: Node3D) -> void:
 		# Suppress facet chatter in the curved soffit, while keeping the rafters distinct.
 		if str(instance.name).begins_with("RoofSoffits"): colors = ["1a2e35", "263e42", "3b514f"]
 		instance.material_override = _pigment(source, colors, _needs_outline(instance.name))
+		if str(instance.name).begins_with("TerraceBoards"):
+			# Let the two low lanterns paint a warm pool on the boards. Keep this
+			# local to the foreground, instead of tinting the whole garden orange.
+			instance.material_override = instance.material_override.duplicate()
+			instance.material_override.set_shader_parameter("local_light_gain",.92)
 	var flower_index := 0
 	var cliff_index := 0
 	for instance in landscape.get_children():

@@ -186,8 +186,7 @@ static func entry(meta: String) -> Dictionary:
 				var status := Database.get_status("vulnerable")
 				var decay := status.decay_per_turn if status != null else 1
 				description = vulnerable_damage_text()
-				description += ("玩家每回合开始减少%d层。" % decay if decay > 0 else "玩家不按回合减层。")
-				description += "敌方本场不减层。"
+				description += ("敌我双方每回合开始减少%d层。" % decay if decay > 0 else "敌我双方不按回合减层。")
 			elif key == "counter": description = "所有敌人行动后，攻击首个存活敌人一次：伤害=剩余临时格挡+%d×层数。之后清空反击层数。" % BattleBalance.i("counter_per_stack", 3)
 			elif key == "refined": description = "立即获得%d次额外使用。本场每次从字袋或弃字堆重新入盘时，恢复至少%d次；移动或换回合不恢复。" % [BattleBalance.i("refined_layers", 2), BattleBalance.i("refined_layers", 2)]
 			elif key in ["strength", "regen", "corrosion", "bounty", "double_attack"]:

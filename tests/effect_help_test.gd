@@ -219,18 +219,18 @@ func _run() -> void:
 	var saved_decay := vulnerability.decay_per_turn
 	vulnerability.decay_per_turn = 2
 	var vulnerable_help: String = EffectGlossary.entry("term:vulnerable").text
-	_check(vulnerable_help.contains("2.25") and vulnerable_help.contains("每回合开始减少2层") and vulnerable_help.contains("敌方本场不减层"), "易伤浮层同时保留当前倍率、玩家衰减和敌方持续规则")
+	_check(vulnerable_help.contains("2.25") and vulnerable_help.contains("每回合开始减少2层") and vulnerable_help.contains("敌我双方"), "易伤浮层显示当前倍率和敌我双方减层规则")
 	b.player.statuses["vulnerable"] = 5
 	b.enemies[0].statuses["vulnerable"] = 5
 	var player_debuff: Dictionary = StatusDisplay.collect(b.player, b).filter(func(item): return item.id == "vulnerable")[0]
 	var enemy_debuff: Dictionary = StatusDisplay.collect(b.enemies[0], b).filter(func(item): return item.id == "vulnerable")[0]
 	_check(player_debuff.description.contains("2.25") and player_debuff.description.contains("衰减 2 层"), "玩家状态浮层显示当前倍率和减层")
-	_check(enemy_debuff.description.contains("2.25") and enemy_debuff.description.contains("本场保留"), "敌方状态浮层显示当前倍率与本场持续")
-	b._tick_player_statuses()
-	_check(b.player.status_stacks("vulnerable") == 3 and b.enemies[0].status_stacks("vulnerable") == 5, "易伤说明与实际玩家减层、敌人不减层一致")
+	_check(enemy_debuff.description.contains("2.25") and enemy_debuff.description.contains("衰减 2 层"), "敌方状态浮层显示当前倍率与减层")
+	b.begin_player_turn(false, false)
+	_check(b.player.status_stacks("vulnerable") == 3 and b.enemies[0].status_stacks("vulnerable") == 3, "易伤说明与实际敌我双方减层一致")
 	vulnerability.decay_per_turn = 0
 	vulnerable_help = EffectGlossary.entry("term:vulnerable").text
-	_check(vulnerable_help.contains("玩家不按回合减层") and not vulnerable_help.contains("减少0层"), "衰减设0时明确不衰减")
+	_check(vulnerable_help.contains("敌我双方不按回合减层") and not vulnerable_help.contains("减少0层"), "衰减设0时明确不衰减")
 	vulnerability.decay_per_turn = saved_decay
 	BattleBalance.values = saved_values
 	screen.queue_free()

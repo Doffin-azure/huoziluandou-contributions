@@ -59,10 +59,13 @@ func _build_menu() -> void:
 	_menu = VBoxContainer.new()
 	_menu.add_theme_constant_override("separation", 4)
 	add_child(_menu)
-	_menu.add_child(_label("活字战斗", 54, Color("e6d9b4")))
-	_menu.add_child(_label("以字为剑 · 铸词为阵", 16, Color("97a79b")))
+	var wordmark := TextureRect.new()
+	wordmark.texture = preload("res://assets/title/branding/lianziyu-wordmark-v1.png")
+	wordmark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; wordmark.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	wordmark.custom_minimum_size = Vector2(400,210); wordmark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_menu.add_child(wordmark)
 	var space := Control.new()
-	space.custom_minimum_size.y = 45
+	space.custom_minimum_size.y = 12
 	_menu.add_child(space)
 	_menu.add_child(_button("开始新冒险", func(): set_detail(true), true))
 	_menu.add_child(_button("字库图鉴", _open_library))
@@ -92,6 +95,7 @@ func _build_settings() -> void:
 	col.add_child(_label("样板 · 光照与氛围", 21, Color("e6d9b4")))
 	_key_slider = _slider(col, "日光", stage.key.light_energy, 3.0, stage.set_key_strength)
 	_accent_slider = _slider(col, "亭内补光", stage.accent.light_energy, 5.0, stage.set_accent_strength)
+	_slider(col,"前景灯光",stage.foreground.lamps[0].light_energy,4.0,stage.set_terrace_strength)
 	_reflection_check = CheckButton.new()
 	_reflection_check.text = "水面反射"
 	_reflection_check.button_pressed = true
@@ -133,7 +137,7 @@ func _layout() -> void:
 	if _menu == null: return
 	var unit := minf(size.x / 1280.0, size.y / 720.0)
 	_menu.scale = Vector2.ONE * unit
-	_menu.position = Vector2(size.x * 0.075, size.y * 0.21)
+	_menu.position = Vector2(size.x * 0.055, size.y * 0.05)
 	_menu.size.x = 350
 	_return.scale = Vector2.ONE * unit
 	_return.position = Vector2(size.x * 0.075, size.y * 0.82)

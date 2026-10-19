@@ -6,6 +6,8 @@ var node: MapNodeData
 var _event: Dictionary
 var _done := false
 var _pending_removal := false
+var _pending_effect: Dictionary = {}
+var _picker_generation := 0
 var _scroll: ScrollContainer
 var _page: Control
 var _art: TextureRect
@@ -15,58 +17,39 @@ var _title: Label
 var _body: Label
 var _buttons: Array[Button] = []
 var _choice_labels: Array[Label] = []
+var _leave_button: Button
 var _ui_scale := 1.0
 var _vertical := false
 var _layout_key := ""
+var _room_session: RefCounted
 
-## 事件里出现遗物选项的概率
 const RELIC_CHANCE := 0.4
 
-const EVENTS := [
-	{
-		"id": "ink_pool",
-		"illustration": "res://assets/events/ink_pool.png",
-		"title": "墨池遗字",
-		"body": "林间有一方墨池，字迹在池底幽幽浮动。\n伸手可取，却要付出代价。",
-		"options": [
-			{"text": "探手取字（失去 8 生命，获得一枚字）", "primary": true},
-			{"text": "掬一捧墨（获得 18 金币）"},
-			{"text": "静观而退"},
-		],
-	},
-	{
-		"id": "broken_stele",
-		"illustration": "res://assets/events/broken_stele.png",
-		"title": "断碑",
-		"body": "半截石碑立在荒径，\n碑上刻字已被岁月磨平，唯余一道深痕。",
-		"options": [
-			{"text": "拓下残字（获得一枚稀有字）", "primary": true},
-			{"text": "敲下碑角（获得 25 金币，失去 5 生命）"},
-			{"text": "绕道而行"},
-		],
-	},
-	{
-		"id": "old_bookshop",
-		"illustration": "res://assets/events/old_bookshop.png",
-		"title": "旧书肆",
-		"body": "无人看管的书肆里堆满残页，\n老板的位置只剩一盏将熄的灯。",
-		"options": [
-			{"text": "撕下一页（删掉字袋中一枚字）", "primary": true},
-			{"text": "诵读静心（回复 18 点气血）"},
-			{"text": "顺手牵金（获得 14 金币）"},
-		],
-	},
-]
+const EventEffects := preload("res://src/core/event_effects.gd")
+const LANTERN := preload("res://src/data/lantern_riddles.gd")
+const SHEFU := preload("res://src/data/shefu_rewards.gd")
+const EVENTS: Array = preload("res://src/data/event_catalog.gd").EVENTS
 
 
 func build(root: Control) -> void:
 	node = params.get("node", null)
-	_event = EVENTS[GameState.rng.randi_range(0, EVENTS.size() - 1)].duplicate(true)
-	var side := RelicRewardFlow.side_rng("event")
-	if side.randf() < RELIC_CHANCE:
-		var found := RelicRewardFlow.roll(1, side)
-		if not found.is_empty():
-			_event.options.append({"text": "拾得遗物「%s」（%s）" % [Relics.name_of(found[0]), Relics.desc_of(found[0])], "relic": found[0]})
+	if params.get("room_run",false) and GameState.room_run!=null:
+		_room_session = preload("res://src/screens/room_node_session.gd").new(GameState.room_run)
+		_event = _room_session.run.current_event()
+	else:
+		var pool: Array = EventEffects.all().filter(func(event): return EventEffects.condition_met(event.get("requires", {})))
+		if pool.is_empty(): pool = EventEffects.all()
+		_event = EventEffects.node(pool[GameState.rng.randi_range(0, pool.size() - 1)])
+
+	if _room_session == null:
+		var side := RelicRewardFlow.side_rng("event")
+		if side.randf() < RELIC_CHANCE:
+			var found := RelicRewardFlow.roll(1, side)
+			if not found.is_empty():
+				_event.options.append({"text": "拾得遗物「%s」（%s）" % [Relics.name_of(found[0]), Relics.desc_of(found[0])], "relic": found[0]})
+
+	_event = LANTERN.fill(_event, GameState.rng)
+	_event = SHEFU.fill(_event, GameState.rng)
 
 	_scroll = ScrollContainer.new()
 	_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -78,7 +61,9 @@ func build(root: Control) -> void:
 	_page.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_scroll.add_child(_page)
 	_art = TextureRect.new()
-	_art.texture = load(_event.illustration)
+	var illustration_path := str(_event.get("illustration", ""))
+	_art.texture = load(illustration_path) if not illustration_path.is_empty() else null
+	_art.visible = _art.texture != null
 	_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -93,6 +78,22 @@ func build(root: Control) -> void:
 	_body = Ink.body(_event.body)
 	_copy.add_child(_body)
 	_copy.add_child(Ink.spacer(6))
+	_render_event()
+	resized.connect(_layout)
+	_copy.minimum_size_changed.connect(_place.call_deferred)
+	_layout.call_deferred()
+	if _room_session!=null and _room_session.run.phase=="event_choose": _resume_room_choice.call_deferred()
+
+
+func _render_event() -> void:
+	for button in _buttons: _copy.remove_child(button); button.queue_free()
+	_buttons.clear(); _choice_labels.clear()
+	if is_instance_valid(_leave_button):
+		_copy.remove_child(_leave_button); _leave_button.queue_free()
+	_leave_button = null
+	var path := str(_event.get("illustration",""))
+	_art.texture = load(path) if not path.is_empty() else null; _art.visible = _art.texture!=null
+	_title.text = _event.title; _body.text = _event.body
 	for i in _event.options.size():
 		var opt: Dictionary = _event.options[i]
 		var b := Ink.button("", bool(opt.get("primary", false)))
@@ -107,11 +108,20 @@ func build(root: Control) -> void:
 		b.button_down.connect(func(): label.add_theme_color_override("font_color", JourneyStyle.TEXT))
 		b.button_up.connect(func(): label.add_theme_color_override("font_color", JourneyStyle.TEXT))
 		b.pressed.connect(_choose.bind(i))
+		b.disabled = not EventEffects.option_available(opt) or (_room_session!=null and _room_session.run.phase=="event_choose")
 		_copy.add_child(b)
 		_buttons.append(b)
 		_choice_labels.append(label)
-	resized.connect(_layout)
-	_copy.minimum_size_changed.connect(_place.call_deferred)
+	# 纯益事件允许额外空手离开；不占三个收益选项的位置。
+	var has_empty: bool = _event.options.any(func(opt): return (opt.get("effects", []) as Array).is_empty())
+	if bool(_event.get("allow_leave", true)) and not has_empty:
+		_leave_button = Ink.button("空手离开")
+		_leave_button.custom_minimum_size.y = 40
+		_leave_button.pressed.connect(_leave_event)
+		if _room_session != null and _room_session.run.phase != "event":
+			_leave_button.disabled = true
+		_copy.add_child(_leave_button)
+	_layout_key = ""
 	_layout.call_deferred()
 
 
@@ -125,9 +135,9 @@ func _layout() -> void:
 	_ui_scale = maxf(1.0, size.y / maxf(1, get_window().size.y))
 	var margin := 24 * _ui_scale
 	var width := minf(size.x - margin * 2, 1080 * _ui_scale)
-	var art_width := width if _vertical else width * 0.40
-	var gap := 28 * _ui_scale if compact else 56.0
-	var copy_width := width if _vertical else width - art_width - gap
+	var art_width := (width if _vertical else width * 0.40) if _art.visible else 0.0
+	var gap := (28 * _ui_scale if compact else 56.0) if _art.visible and not _vertical else 0.0
+	var copy_width := width if _vertical or not _art.visible else width - art_width - gap
 	_art.size = Vector2(art_width, minf(art_width, 300 * _ui_scale) if _vertical else art_width)
 	_art.position.x = (size.x - width) * 0.5
 	_copy.position.x = _art.position.x if _vertical else _art.position.x + art_width + gap
@@ -150,104 +160,122 @@ func _layout() -> void:
 
 
 func _place() -> void:
-	if _copy == null or _art.size.x < 1: return
+	if _copy == null or size.y < 1: return
 	var copy_height := _copy.get_combined_minimum_size().y
-	var height := _art.size.y + 24 * _ui_scale + copy_height if _vertical else maxf(_art.size.y, copy_height)
+	var art_height := _art.size.y if _art.visible else 0.0
+	var art_gap := 24 * _ui_scale if _art.visible and _vertical else 0.0
+	var height := art_height + art_gap + copy_height if _vertical else maxf(art_height, copy_height)
 	var top := maxf(24 * _ui_scale, (size.y - height) * 0.5)
 	_page.custom_minimum_size.y = height + 48 * _ui_scale
 	_art.position.y = top
-	_copy.position.y = top + _art.size.y + 24 * _ui_scale if _vertical else top + (height - copy_height) * 0.5
+	_copy.position.y = top + art_height + art_gap if _vertical else top + (height - copy_height) * 0.5
 	_copy.size.y = copy_height
 
 
 func _choose(index: int) -> void:
-	if _done:
-		return
+	if _done or index < 0 or index >= _event.options.size(): return
 	_done = true
 	for button in _buttons: button.disabled = true
+	if is_instance_valid(_leave_button): _leave_button.disabled = true
+	if _room_session!=null:
+		_room_event_result(_room_session.apply({"type":"event","index":index})); return
 	var relic := str(_event.options[index].get("relic", ""))
 	if not relic.is_empty():
 		RelicRewardFlow.grant(self, relic, func(_id): _finish())
 		return
-	match _event.id:
-		"ink_pool":
-			if index == 0:
-				GameState.damage(8)
-				GameState.add_character(_random_char(0, 2), 1)
-				_finish()
-			elif index == 1:
-				GameState.add_gold(18)
-				_finish()
-			else:
-				_finish()
-		"broken_stele":
-			if index == 0:
-				GameState.add_character(_random_char(2, 4), 1)
-				_finish()
-			elif index == 1:
-				GameState.add_gold(25)
-				GameState.damage(5)
-				_finish()
-			else:
-				_finish()
-		"old_bookshop":
-			if index == 0:
-				_remove_prompt()
-			elif index == 1:
-				GameState.heal(18)
-				_finish()
-			else:
-				GameState.add_gold(14)
-				_finish()
+	var result: Dictionary = EventEffects.resolve(_event.options[index].get("effects", []), GameState.rng)
+	if not result.get("ok", false):
+		_done = false
+		for button in _buttons: button.disabled = false
+		push_error("事件结算失败：" + str(result.get("reason", "未知错误")))
+		return
+	_pending_effect = result.get("pending", {})
+	_continue_effects()
 
 
-func _remove_prompt() -> void:
-	var counts := GameState.glyph_counts()
-	var chars: Array = []
-	for glyph in counts.keys():
-		var cd: CharacterData = Database.get_character_by_glyph(str(glyph))
-		if cd != null:
-			chars.append(cd)
-	if chars.is_empty():
+func _leave_event() -> void:
+	if _done: return
+	_done = true
+	if _room_session != null:
+		var result: Dictionary = _room_session.run.apply({"type": "event_leave"})
+		if not result.get("ok", false):
+			_done = false
+			push_error("空手离开失败：" + str(result.get("reason", "未知错误")))
+			if is_instance_valid(_leave_button): _leave_button.disabled = false
+			return
+		goto("res://src/screens/room_map_screen.gd")
+		return
+	GameState.clear_event_temp_hp()
+	GameState.complete_current_node()
+	goto("res://src/screens/map_screen.gd")
+
+
+func _continue_effects() -> void:
+	if _pending_effect.is_empty():
 		_finish()
 		return
+	_open_removal_picker()
+
+
+func _open_removal_picker() -> void:
+	var chars: Array = []
+	var counts: Dictionary = GameState.glyph_counts()
+	for glyph in _pending_effect.get("glyphs", []):
+		var character: CharacterData = Database.get_character_by_glyph(str(glyph))
+		if character != null: chars.append(character)
+	if chars.is_empty():
+		_pending_effect = {}
+		_finish()
+		return
+	_picker_generation += 1
+	var generation := _picker_generation
 	var overlay := CollectionOverlay.new()
 	_pending_removal = true
-	overlay.setup({
-		"title": "撕下哪一页？",
-		"characters": chars,
-		"counts": counts,
-		"pick_on_click": true,
-	})
-	overlay.picked.connect(_on_removed)
-	overlay.closed.connect(func():
-		if _pending_removal and is_inside_tree():
-			_pending_removal = false
-			_done = false
-			for button in _buttons: button.disabled = false)
+	overlay.setup({"title": "撕下哪一页？", "characters": chars, "counts": counts, "pick_on_click": true})
+	overlay.picked.connect(_on_removed.bind(generation))
+	overlay.closed.connect(_on_picker_closed.bind(generation))
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(overlay)
 
 
-func _on_removed(ch: CharacterData) -> void:
-	if not _pending_removal: return
+func _on_picker_closed(generation: int) -> void:
+	if generation != _picker_generation or not _pending_removal or not is_inside_tree(): return
 	_pending_removal = false
-	GameState.remove_character_id(ch.id)
-	_finish()
+	_pending_effect = {}
+	_done = false
+	for button in _buttons: button.disabled = false
 
 
-func _random_char(min_rarity: int, max_rarity: int) -> CharacterData:
-	var pool: Array = []
-	for c in Database.characters.values():
-		if c.is_pollution or c.pending_design or c.tags.has("enemy") or c.tags.has("彩蛋"):
-			continue
-		if c.rarity >= min_rarity and c.rarity <= max_rarity:
-			pool.append(c)
-	if pool.is_empty():
-		pool = Database.characters.values()
-	return pool[GameState.rng.randi_range(0, pool.size() - 1)]
+func _on_removed(character: CharacterData, generation := -1) -> void:
+	if generation < 0: generation = _picker_generation
+	if generation != _picker_generation or not _pending_removal: return
+	_pending_removal = false
+	var result: Dictionary = EventEffects.resume(_pending_effect, character.glyph, GameState.rng)
+	if not result.get("ok", false):
+		_pending_effect = {}
+		_done = false
+		for button in _buttons: button.disabled = false
+		push_error("事件删字失败：" + str(result.get("reason", "未知错误")))
+		return
+	_pending_effect = result.get("pending", {})
+	_continue_effects()
 
 
 func _finish() -> void:
+	if _room_session!=null: goto("res://src/screens/room_map_screen.gd"); return
+	GameState.clear_event_temp_hp()
 	GameState.complete_current_node()
 	goto("res://src/screens/map_screen.gd")
+
+
+func _room_event_result(result: Dictionary) -> void:
+	if not result.ok: push_error(str(result.reason)); _done = false; _render_event(); return
+	if _room_session.run.phase not in ["event","event_choose"]: _finish(); return
+	_event = _room_session.run.current_event(); _done = false; _render_event()
+	if _room_session.run.phase=="event_choose": _resume_room_choice()
+
+
+func _resume_room_choice() -> void:
+	_done = true
+	_body.text = str(_event.body)+"\n\n选择要删去的字（还需 %d 枚）。" % int(_room_session.run.pending_event_effect.get("remaining",1))
+	_room_session.pick(self,"选择要删去的字",_room_event_result)

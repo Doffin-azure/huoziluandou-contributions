@@ -10,6 +10,7 @@ uniform sampler2D grain_texture : source_color, filter_linear_mipmap, repeat_ena
 uniform float grain_amount : hint_range(0.0, 0.3) = 0.05;
 uniform float grain_scale = 0.5;
 uniform bool foliage = false;
+uniform float local_light_gain = 0.30;
 uniform vec4 distance_ink : source_color = vec4(0.055, 0.30, 0.33, 1.0);
 varying vec3 world_position;
 varying vec3 world_normal;
@@ -59,6 +60,6 @@ void light() {
 		// LIGHT_COLOR includes PI. Clamp energy without erasing the lighting controls.
 		DIFFUSE_LIGHT = max(DIFFUSE_LIGHT, contribution * clamp(LIGHT_COLOR / PI, vec3(0.0), vec3(1.0)));
 	} else {
-		DIFFUSE_LIGHT += contribution * min(LIGHT_COLOR / PI, vec3(1.0)) * 0.30;
+		DIFFUSE_LIGHT += contribution * min(LIGHT_COLOR / PI, vec3(1.0)) * local_light_gain;
 	}
 }

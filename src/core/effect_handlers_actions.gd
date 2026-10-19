@@ -14,73 +14,15 @@ const CREMATE_FLAVOR := [
 
 ## 预览不取牌、不洗牌、不支付。所有多阶段选择确认后再统一结算。
 static func deploy_candidates(b: BattleState) -> Array:
-	var out: Array = []
-	for i in range(b.bag.size() - 1, -1, -1):
-		var inst: CharInstance = b.bag[i]
-		if inst.is_player_owned() and not inst.temporary:
-			out.append(inst)
-			if out.size() == BattleBalance.i("deploy_choices", 3):
-				break
-	return out
+	return EffectTargets.deploy_candidates(b)
 
 static func discard_candidate(b: BattleState, target: Dictionary) -> CharInstance:
-	var uid := int(target.get("place_uid", target.get("discard_uid", -1)))
-	for inst in b.discard:
-		if inst.uid == uid and inst.is_player_owned() and not inst.temporary:
-			return inst
-	return null
+	return EffectTargets.discard_candidate(b, target)
 
 static func validate_word_target(b: BattleState, handler: String, path: Array, target: Dictionary) -> String:
-	if handler == "gild_glyph":
-		var candidate := gild_candidate(target)
-		if candidate == null:
-			return "镀金：请选择字袋中一枚未镀金的实体字"
-		var word: WordData = Database.get_word_by_glyphs_string("".join(b.board.glyphs_of(path)))
-		var cost := int(word.effects[0].args.get("cost", 0)) if word != null else 0
-		if EffectUtil.available(b) < EffectUtil.discounted_cost(b, cost):
-			return "镀金：金币不足（需%d）" % cost
-	if handler in ["reveal_place", "buyback"]:
-		var candidates := deploy_candidates(b) if handler == "reveal_place" else b.discard.filter(func(c): return c.is_player_owned() and not c.temporary)
-		if candidates.is_empty():
-			return ""
-		var name := "投放" if handler == "reveal_place" else "回购"
-		var chosen: CharInstance = null
-		if handler == "buyback":
-			chosen = discard_candidate(b, target)
-		else:
-			for inst in candidates:
-				if inst.uid == int(target.get("bag_uid", -1)):
-					chosen = inst
-		if chosen == null:
-			return "%s：请选择有效的原实体" % name
-		var pos: Vector2i = target.get("tile", Vector2i(-1, -1))
-		if not b.board.in_bounds(pos.x, pos.y):
-			return "%s：请选择棋盘内的落点" % name
-		var occupied := b.board.get_xy(pos)
-		if occupied != null and (not path.has(pos) or occupied.pinned or occupied.temporary_uses > 0):
-			return "%s：落点没有可用空格" % name
-		if EffectUtil.available(b) < EffectUtil.discounted_cost(b, BattleBalance.i("buy_cost", 2)):
-			return "%s：支付额不足（需 2）" % name
-	elif handler == "divert":
-		var cells: Array = target.get("cells", [])
-		if cells.size() > BattleBalance.i("divert_limit", 2):
-			return "分流：至多选择两枚杂字"
-		var seen := {}
-		for pos in cells:
-			var inst := b.board.get_xy(pos)
-			if path.has(pos) or not BattleState.is_refinable_junk(inst) or seen.has(inst.uid):
-				return "分流：请选择施词以外的不同杂字"
-			seen[inst.uid] = true
-	elif handler == "refine_layer":
-		var a: Vector2i = target.get("tile", Vector2i(-1, -1))
-		var c: Vector2i = target.get("tile2", Vector2i(-1, -1))
-		var first := b.board.get_xy(a)
-		var second := b.board.get_xy(c)
-		if a == c or path.has(a) or path.has(c) or first == null or second == null:
-			return "精炼：请选择施词以外的两个不同实体"
-		if not first.is_player_owned() or not second.is_player_owned() or first.temporary or second.temporary or first.pinned or second.pinned or first.glyph_list() != second.glyph_list():
-			return "精炼：需要两枚字形相同、非固定的己方原实体"
-	return ""
+	var effect := EffectData.new()
+	effect.handler = handler
+	return EffectRegistry.validate(effect, b, path, target)
 
 static func scatter_word_copy(b: BattleState, glyphs: Array) -> void:
 	var spaces := b.board.empty_indices()
@@ -157,7 +99,7 @@ static func _replay_last_attack(b: BattleState) -> Array:
 	if b.last_attack_word == null or b.last_attack_effects.is_empty():
 		return ["连击：此前没有可重演的即时攻击"]
 	var msgs: Array = []
-	# 刻刀（打击增强）：重演不算「带【击】」的出字
+	# 刑卒护指（打击增强）：重演不算「带【击】」的出字
 	var strike_was := b.strike_active
 	b.strike_active = false
 	for e in b.last_attack_effects:
@@ -508,6 +450,24 @@ static func _pin_glyph(b: BattleState, ctx: Dictionary) -> Array:
 	inst.pinned_exhausted = false
 	return ["精铸：将【%s】固定（每回合使用一次，不消耗，不可移动/换字）" % inst.glyph()]
 
+static func _anchor_self(b: BattleState, ctx: Dictionary) -> Array:
+	var path: Array = ctx.get("path", [])
+	if path.is_empty(): return ["础：没有可安放的字"]
+	var origin: Vector2i = path[0]
+	var inst: CharInstance = b.board.get_xy(origin)
+	if inst == null or not inst.is_player_owned() or inst.temporary:
+		return ["础：请选择己方永久实体字"]
+	var tile: Vector2i = EffectUtil.tile(ctx)
+	if not b.board.in_bounds(tile.x, tile.y) or b.board.get_xy(tile) != null or tile == origin:
+		return ["础：请选择棋盘内的空格"]
+	# 在消耗前把原实体搬到目标格；随后它作为固定字留在盘面。
+	b.board.set_xy(origin, null)
+	b.board.set_xy(tile, inst)
+	inst.pinned = true
+	inst.pinned_exhausted = false
+	return ["础：将【础】安放在 (%d,%d)，固定本场，不受重力/位移影响。" % [tile.x, tile.y]]
+
+
 static func _precision_place(b: BattleState, ctx: Dictionary, eff: EffectData) -> Array:
 	var cost: int = eff.amount
 	var tile: Vector2i = EffectUtil.tile(ctx)
@@ -704,7 +664,7 @@ static func _collect_own(b: BattleState, ctx: Dictionary) -> Array:
 		b.bag.append(inst)
 		n += 1
 	if n > 0:
-		b.player.heal(n * BattleBalance.i("collect_heal", 1))
+		b.heal_player(n * BattleBalance.i("collect_heal", 1))
 	return ["收心：将 %d 枚字放回抽字袋，回复 %d 生命" % [n, n * BattleBalance.i("collect_heal", 1)]]
 
 

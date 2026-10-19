@@ -82,6 +82,7 @@ var _confirm_motion: Tween
 var _confirm_ink: ShaderMaterial
 var _step_timer: Timer
 var _exiting := false
+var _room_run := false
 var _expedition := false   ## 墨途远征的遭遇：战后回远征地图，不走奖励页
 
 
@@ -103,6 +104,8 @@ func build(root: Control) -> void:
 		enemy_datas = [Database.get_enemy("ink_spirit")]
 	battle.start(GameState.make_battle_deck(), enemy_datas, int(params.get("seed", -1)))
 	_expedition = params.get("expedition", false) and GameState.expedition != null
+	_room_run = params.get("room_run", false) and GameState.room_run != null
+	if _room_run: GameState.room_run.apply_battle_setup(battle)
 	if _expedition:
 		GameState.expedition.apply_battle_setup(battle)
 	_topbar = _build_topbar()
@@ -634,8 +637,10 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 		return
 	if _choose_word_transfer(path, target):
 		return
-	if target.is_empty() and _current_word != null and not _current_word.interaction.is_empty():
-		match _current_word.interaction:
+	var request := battle.play_options(path)
+	var interaction: String = request.interaction
+	if target.is_empty() and not interaction.is_empty():
+		match interaction:
 			"reveal_pick_board":
 				_run_transform(path)
 				return
@@ -652,13 +657,13 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 				_run_pair(path, "same")
 				return
 			"choose_any_pair", "choose_row_pair", "choose_move":
-				_run_pair(path, {"choose_any_pair": "any", "choose_row_pair": "row", "choose_move": "move"}[_current_word.interaction])
+				_run_pair(path, {"choose_any_pair": "any", "choose_row_pair": "row", "choose_move": "move"}[interaction])
 				return
 			"choose_place_two":
 				_run_place_two(path)
 				return
 			"choose_recover_two", "choose_recover_to_bag":
-				_run_recover(path, _current_word.interaction)
+				_run_recover(path, interaction)
 				return
 			"choose_glyph_gild":
 				_open_gild_picker(path)
@@ -684,12 +689,7 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 	if _choose_compound_copy(path, target):
 		return
 	var play_target := target.duplicate()
-	var glyphs_before := battle.board.glyphs_of(path)
-	var word_before: WordData = Database.get_word_by_glyphs(glyphs_before) if glyphs_before.size() >= 2 else null
-	var needs_target := word_before != null and word_before.requires_target != EffectData.Target.NONE
-	if glyphs_before.size() == 1 and not path.is_empty():
-		var inst: CharInstance = battle.board.get_xy(path[0])
-		needs_target = inst != null and inst.data != null and battle._solo_requires_target(inst.data, path) != EffectData.Target.NONE
+	var needs_target := int(request.required_target) != EffectData.Target.NONE
 	if not play_target.is_empty() or not needs_target:
 		# 规则层索引针对存活列表；HUD 索引针对固定敌人列表。
 		play_target["target_index"] = battle.alive_enemies().find(battle.enemies[_target_index]) if not battle.enemies.is_empty() else 0
@@ -806,9 +806,10 @@ func _request_target(target_kind: int) -> void:
 			_board_view.begin_pick("enemy", false, true)
 			instruction = "请选择敌方字。"
 		EffectData.Target.BOARD_TILE:
+			var choice_spec := battle.play_options(_pending_path)
 			var inst: CharInstance = battle.board.get_xy(_pending_path[0]) if _pending_path.size() == 1 else null
-			if inst != null and inst.glyph_list().size() == 1 and inst.data.solo_handler in ["cleanse_adjacent", "wash_adjacent", "move_neighbor", "split_neighbor", "recast_neighbor", "refine_junk_neighbor"]:
-				var candidates := battle.solo_target_cells(inst, _pending_path[0])
+			if choice_spec.has("cells") and (inst == null or inst.data.solo_handler != "throw_neighbor"):
+				var candidates: Array = choice_spec.cells
 				var excluded: Array = []
 				for i in battle.board.cells.size():
 					var pos := battle.board.to_xy(i)
@@ -1017,9 +1018,10 @@ func _run_place_two(path: Array) -> void:
 		_bubble.set_error("火急需要字袋中的字和盘面空格。")
 		return
 	_pending_path = path.duplicate()
-	if battle.reveal_from_bag(mini(2, battle.board.empty_indices().size())).is_empty():
+	var preparation := battle.prepare_interaction(path)
+	if not preparation.ok:
 		_pending_path = []
-		_bubble.set_error("字袋与弃字堆没有可补的字。")
+		_bubble.set_error(str(preparation.reason))
 		return
 	_pair_mode = "place_two"
 	_fuse_stage = 1
@@ -1213,25 +1215,19 @@ func _choose_solo_throw(path: Array, target: Dictionary) -> bool:
 func _choose_word_transfer(path: Array, target: Dictionary) -> bool:
 	if not target.is_empty() or not battle.board.valid_path(path):
 		return false
-	var glyphs := battle.board.glyphs_of(path)
-	var word := Database.get_word_by_glyphs(glyphs)
-	if word == null and glyphs.has("过"):
-		word = Database.get_word_by_glyphs(glyphs.filter(func(g): return g != "过"))
-	if word == null or word.word not in ["投放", "回购"]:
+	var request := battle.play_options(path)
+	var word: WordData = request.word
+	if word == null or request.needs not in ["deploy", "buyback"]:
 		return false
-	var deploying := word.word == "投放"
-	var cards := EffectHandlersActions.deploy_candidates(battle) if deploying else battle.discard.filter(func(c): return c.is_player_owned() and not c.temporary)
+	var deploying: bool = request.needs == "deploy"
+	var cards: Array = request.cards
 	if cards.is_empty():
 		_on_commit(path, {"skip_transfer": true})
 		return true
 	if EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, BattleBalance.i("buy_cost", 2)):
 		_bubble.set_error("%s：需要 2 金币支付额" % word.word)
 		return true
-	var spaces := battle.board.empty_indices()
-	for pos in path:
-		var inst := battle.board.get_xy(pos)
-		if not inst.pinned and inst.temporary_uses == 0:
-			spaces.append(pos)
+	var spaces: Array = request.cells
 	if spaces.is_empty():
 		_bubble.set_error("%s：没有可用落点" % word.word)
 		return true
@@ -1257,7 +1253,7 @@ func _choose_solo_bag(path: Array, target: Dictionary) -> bool:
 	if target.has("bag_uid") or path.size() != 1 or not battle.board.valid_path(path):
 		return false
 	var source := battle.board.get_xy(path[0])
-	if source == null or source.word_only or source.glyph_list().size() != 1 or source.data.solo_handler not in ["precision_draw", "buy_bag_solo"]:
+	if source == null or source.word_only or source.glyph_list().size() != 1 or source.data.solo_handler not in EffectRegistry.SOLO_BAG:
 		return false
 	var cards := battle.solo_bag_candidates(source)
 	if cards.is_empty():
@@ -1358,11 +1354,7 @@ func _choose_compound_copy(path: Array, target: Dictionary) -> bool:
 
 
 func _run_three_tiles(path: Array, word_name: String) -> void:
-	var eligible := {}
-	for i in battle.board.cells.size():
-		var inst: CharInstance = battle.board.cells[i]
-		if inst != null and not inst.pinned and not path.has(battle.board.to_xy(i)):
-			eligible[inst.uid] = true
+	var eligible := EffectTargets.recast_candidates(battle, path)
 	if eligible.size() < BattleBalance.i("recast_target_count", 3):
 		_bubble.set_error("%s：需要三个施词以外的非固定字" % word_name)
 		return
@@ -1396,9 +1388,10 @@ func _run_merge_flow(path: Array) -> void:
 	if not battle.has_adjacent_empty_pair():
 		_on_log("合流：没有两个相邻空格，跳过")
 		return
-	var revealed := battle.reveal_from_bag(1)
+	var preparation := battle.prepare_interaction(path)
+	var revealed: Array = preparation.get("cards", [])
 	if revealed.is_empty():
-		_on_log("合流：字袋为空")
+		_on_log(str(preparation.get("reason", "合流：没有可揭示的字")))
 		return
 	_pending_path = path
 	_merge_active = true
@@ -1440,10 +1433,11 @@ func _abort_merge() -> void:
 # ---------------------------------------------------------------- 转化（揭示 5 选 1 再定点改造）
 func _run_transform(path: Array) -> void:
 	_pending_path = path
-	var revealed := battle.reveal_from_bag(5)
+	var preparation := battle.prepare_interaction(path)
+	var revealed: Array = preparation.get("cards", [])
 	if revealed.is_empty():
 		_pending_path = []
-		_on_log("转化：字袋为空，无法揭示")
+		_on_log(str(preparation.get("reason", "转化：没有可揭示的字")))
 		return
 	var options: Array = []
 	for inst in revealed:
@@ -1630,12 +1624,16 @@ func _check_battle_over() -> void:
 
 			GameState.settle_victory_economy()
 			Relics.on_battle_won()
+		if _room_run: GameState.room_run.finish_live_battle(victory)
 		var ex_result := {}
 		if _expedition:
 			ex_result = GameState.expedition.finish_battle(victory)
 		if not await _wait_step(0.35):
 			return
-		if victory and _expedition and ex_result.get("reward", false):
+		if victory and _room_run:
+			if GameState.room_run.phase=="reward": goto("res://src/screens/reward_screen.gd", {"node": node, "room_run": true})
+			else: goto("res://src/screens/room_map_screen.gd")
+		elif victory and _expedition and ex_result.get("reward", false):
 			# 战后奖励负责「深度」：按现有字袋三选一（分流：四选一），选中的字进字匣
 			goto("res://src/screens/reward_screen.gd", {"node": node, "expedition": true, "count": ex_result.count})
 		elif victory and _expedition:
@@ -1660,7 +1658,10 @@ func _show_defeat() -> void:
 
 
 func _on_defeat_choice(index: int) -> void:
-	if index == 0 and _expedition:
+	if index == 0 and _room_run:
+		load("res://src/expedition/room_run_state.gd").start()
+		goto("res://src/screens/room_map_screen.gd")
+	elif index == 0 and _expedition:
 		Expedition.start()
 		goto("res://src/screens/expedition_map_screen.gd")
 	elif index == 0:
@@ -1888,8 +1889,22 @@ func _layout() -> void:
 		_board_view._presentation.set_illustrated_framing(illustrated_desktop)
 	if illustrated_desktop:
 		_layout_illustrated_desktop(touch)
+	_reserve_status_space()
 	if _effects != null:
 		_effects.set_ui_scale(ui_scale)
+
+
+func _reserve_status_space() -> void:
+	if not _player_status.visible: return
+	# Container minimum sizes can exceed the nominal row after DPI/font scaling.
+	_player_status.size.y = maxf(_player_status.size.y, _player_status.get_combined_minimum_size().y)
+	var occupied := _player_status.get_global_rect().grow(6.0)
+	var preview := _preview_panel.get_global_rect()
+	if not occupied.intersects(preview): return
+	var shift := maxf(0, occupied.end.y - preview.position.y)
+	_preview_panel.position.y += shift
+	_preview_panel.size.y = maxf(0, _preview_panel.size.y - shift)
+	_bubble.size = (_preview_panel.size - _bubble.position * 2).max(Vector2.ZERO)
 
 
 func _update_input() -> void:

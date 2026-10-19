@@ -178,8 +178,36 @@ func _layout_card(card: PanelContainer, scroll: ScrollContainer, description: Ri
 		at.x = anchor.x - card.size.x - 18
 	if at.y + card.size.y > bounds.y - 12:
 		at.y = anchor.y - card.size.y - 12
-	card.position = Vector2(clampf(at.x, 12, maxf(12, bounds.x - card.size.x - 12)), clampf(at.y, 12, maxf(12, bounds.y - card.size.y - 12)))
+	card.position = _avoid_status(at, card.size, bounds, 6 * help_scale)
 	card.modulate.a = 1.0
+
+
+func _avoid_status(preferred: Vector2, dimensions: Vector2, bounds: Vector2, gap: float) -> Vector2:
+	var clamp_point := func(point: Vector2) -> Vector2:
+		return Vector2(clampf(point.x,12,maxf(12,bounds.x-dimensions.x-12)),clampf(point.y,12,maxf(12,bounds.y-dimensions.y-12)))
+	var desired: Vector2 = clamp_point.call(preferred)
+	var obstacles: Array[Rect2] = []
+	for control in get_tree().get_nodes_in_group("effect_help_avoid"):
+		if control is Control and control.get_viewport()==get_viewport() and control.is_visible_in_tree():
+			var rect: Rect2 = control.get_global_rect()
+			if rect.has_area(): obstacles.append(rect.grow(gap))
+	var candidates: Array[Vector2] = [desired]
+	for obstacle: Rect2 in obstacles:
+		candidates.append(clamp_point.call(Vector2(desired.x,obstacle.end.y)))
+		candidates.append(clamp_point.call(Vector2(desired.x,obstacle.position.y-dimensions.y)))
+		candidates.append(clamp_point.call(Vector2(obstacle.end.x,desired.y)))
+		candidates.append(clamp_point.call(Vector2(obstacle.position.x-dimensions.x,desired.y)))
+	var best := desired
+	var best_overlap := INF
+	var best_distance := INF
+	for candidate: Vector2 in candidates:
+		var box := Rect2(candidate,dimensions)
+		var overlap := 0.0
+		for obstacle: Rect2 in obstacles: overlap += box.intersection(obstacle).get_area()
+		var distance := candidate.distance_squared_to(desired)
+		if overlap < best_overlap or is_equal_approx(overlap,best_overlap) and distance < best_distance:
+			best = candidate; best_overlap = overlap; best_distance = distance
+	return best
 
 
 func _process(delta: float) -> void:

@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-16",
+  "purpose": "3x3 prop integration study; quiet floor and one physical type chest",
+  "generation_mode": "built-in image_gen",
+  "references": [
+    {
+      "path": "../reference-battle-style.png",
+      "role": "user supplied visual direction, not current game screenshot"
+    },
+    {
+      "path": "../../../../assets/expedition/map-props.png",
+      "role": "old chest design to replace, negative design comparison"
+    }
+  ],
+  "chest": {
+    "file": "chest.png",
+    "prompt": "chest.prompt.txt",
+    "original_generated_path": "C:/Users/Think/.codex/generated_images/01a132f5-3d05-7763-a9ac-28ad136eb1c9/exec-a3281ccf-8ecd-4403-b1fa-c64c5fc0c0af.png",
+    "size": [
+      1536,
+      1024
+    ],
+    "format": "RGBA",
+    "crop": [
+      64,
+      204,
+      1405,
+      721
+    ],
+    "source_front_foot_midpoint": [
+      688,
+      829
+    ],
+    "source_preserved": true,
+    "render_width": 280
+  },
+  "ground": {
+    "file": "floor.png",
+    "prompt": "floor.prompt.txt",
+    "original_generated_path": "C:/Users/Think/.codex/generated_images/01a1432e-85e4-78e3-8c49-312049a7cf9d/exec-997e91d2-d3be-4233-9b6f-baf7ddc6b8e7.png",
+    "size": [1254, 1254],
+    "format": "RGB",
+    "source_preserved": true,
+    "projection": {
+      "origin": [
+        448,
+        142
+      ],
+      "axis_x": [
+        240,
+        35
+      ],
+      "axis_z": [
+        -112,
+        132
+      ]
+    }
+  },
+  "composition": {
+    "logical_size": [
+      3,
+      3
+    ],
+    "chest_anchor": [
+      1.64,
+      1.63
+    ],
+    "layers": [
+      "ground base and broad slab joints",
+      "quiet painted stone surface",
+      "dust stain",
+      "cast and contact shadows",
+      "independent chest sprite",
+      "foreground contact fragments"
+    ],
+    "runtime_changed": false
+  },
+  "inspection": {
+    "preview": "preview.png",
+    "grid": "preview-grid.png",
+    "old_chest": "preview-old.png",
+    "interactive_compositor": "index.html"
+  }
+}
