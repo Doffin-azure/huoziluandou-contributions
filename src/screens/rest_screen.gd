@@ -134,7 +134,11 @@ func _room_rest_action(action: Dictionary) -> void:
 
 
 func _room_rest_result(result: Dictionary) -> void:
-	if not result.ok: push_error(str(result.reason)); return
+	if not result.ok:
+		if _room_session.current() and _room_session.run.phase == "rest_choose": _room_session.apply({"type":"cancel_pick"})
+		_done = false
+		return
+	if _room_session.run.phase == "rest": _done = false; return
 	_done = true
 	if _room_session.run.phase=="rest_choose": _resume_room_choice()
 	else: _finish()

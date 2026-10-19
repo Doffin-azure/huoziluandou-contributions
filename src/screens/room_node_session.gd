@@ -29,15 +29,16 @@ func pick(screen: Control, title: String, completed: Callable) -> void:
 		var character: CharacterData = Database.get_character_by_glyph(glyph)
 		if character!=null: chars.append(character)
 	var overlay := CollectionOverlay.new()
-	overlay.setup({"title":title,"characters":chars,"counts":GameState.glyph_counts(),"pick_on_click":true})
+	var counts := GameState.glyph_counts()
+	if run.phase == "event_choose": counts = preload("res://src/core/event_effects.gd").remaining_counts(run.pending_event_effect)
+	var subtitle := "还需 %d 枚" % int(run.pending_event_effect.get("remaining",1)) if run.phase == "event_choose" else ""
+	overlay.setup({"title":title,"subtitle":subtitle,"characters":chars,"counts":counts,"pick_on_click":true,"close_text":"取消选择"})
 	overlay.picked.connect(func(character: CharacterData):
-		if generation!=_picker_generation or not _picker_open: return
+		if generation!=_picker_generation or not _picker_open or not is_instance_valid(screen) or screen.is_queued_for_deletion() or not screen.is_inside_tree(): return
 		_picker_open = false; _picker_generation += 1
 		completed.call(apply({"type":"pick","glyph":character.glyph})))
 	overlay.closed.connect(func():
-		if generation!=_picker_generation or not _picker_open or not is_instance_valid(screen): return
-		_picker_open = false
-		# Shop payment and pending event effects are already saved. Closing the
-		# picker cannot silently discard them or charge the player a second time.
-		pick.call_deferred(screen,title,completed))
+		if generation!=_picker_generation or not _picker_open or not is_instance_valid(screen) or screen.is_queued_for_deletion() or not screen.is_inside_tree(): return
+		_picker_open = false; _picker_generation += 1
+		completed.call(apply({"type":"cancel_pick"})))
 	screen.add_child(overlay)

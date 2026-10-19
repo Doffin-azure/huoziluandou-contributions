@@ -15,10 +15,12 @@ var _copy: VBoxContainer
 var _eyebrow: Label
 var _title: Label
 var _body: Label
+var _notice: Label
 var _buttons: Array[Button] = []
 var _choice_labels: Array[Label] = []
 var _leave_button: Button
 var _ui_scale := 1.0
+var _page_margin := 24.0
 var _vertical := false
 var _layout_key := ""
 var _room_session: RefCounted
@@ -77,6 +79,11 @@ func build(root: Control) -> void:
 	_copy.add_child(Ink.hline())
 	_body = Ink.body(_event.body)
 	_copy.add_child(_body)
+	_notice = Ink.caption("")
+	_notice.add_theme_color_override("font_color", JourneyStyle.RED)
+	_notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_notice.hide()
+	_copy.add_child(_notice)
 	_copy.add_child(Ink.spacer(6))
 	_render_event()
 	resized.connect(_layout)
@@ -86,6 +93,7 @@ func build(root: Control) -> void:
 
 
 func _render_event() -> void:
+	_notice.hide()
 	for button in _buttons: _copy.remove_child(button); button.queue_free()
 	_buttons.clear(); _choice_labels.clear()
 	if is_instance_valid(_leave_button):
@@ -113,7 +121,8 @@ func _render_event() -> void:
 		_buttons.append(b)
 		_choice_labels.append(label)
 	# 纯益事件允许额外空手离开；不占三个收益选项的位置。
-	var has_empty: bool = _event.options.any(func(opt): return (opt.get("effects", []) as Array).is_empty())
+	var has_empty: bool = _event.options.any(func(opt):
+		return EventEffects.option_available(opt) and (opt.get("effects", []) as Array).is_empty() and str(opt.get("goto", "")).is_empty() and str(opt.get("spawn", "")).is_empty() and str(opt.get("relic", "")).is_empty() and not bool(opt.get("board", false)))
 	if bool(_event.get("allow_leave", true)) and not has_empty:
 		_leave_button = Ink.button("空手离开")
 		_leave_button.custom_minimum_size.y = 40
@@ -133,29 +142,35 @@ func _layout() -> void:
 	_vertical = size.x / maxf(1, size.y) < 1.1
 	var compact := size.x / maxf(1, size.y) >= 1.95 or size.x < 1100
 	_ui_scale = maxf(1.0, size.y / maxf(1, get_window().size.y))
-	var margin := 24 * _ui_scale
+	var margin := (8 if compact else 24)*_ui_scale
+	_page_margin = margin
 	var width := minf(size.x - margin * 2, 1080 * _ui_scale)
-	var art_width := (width if _vertical else width * 0.40) if _art.visible else 0.0
-	var gap := (28 * _ui_scale if compact else 56.0) if _art.visible and not _vertical else 0.0
+	var art_width := (width if _vertical else width * (0.32 if compact else 0.40)) if _art.visible else 0.0
+	var gap := (18 * _ui_scale if compact else 56.0) if _art.visible and not _vertical else 0.0
 	var copy_width := width if _vertical or not _art.visible else width - art_width - gap
 	_art.size = Vector2(art_width, minf(art_width, 300 * _ui_scale) if _vertical else art_width)
 	_art.position.x = (size.x - width) * 0.5
 	_copy.position.x = _art.position.x if _vertical else _art.position.x + art_width + gap
 	_copy.size.x = copy_width
-	_copy.add_theme_constant_override("separation", int(10 * _ui_scale if compact else 14))
+	_copy.add_theme_constant_override("separation", int(4 * _ui_scale if compact else 14))
+	_eyebrow.visible = not compact
 	_eyebrow.add_theme_font_size_override("font_size", int(14 * _ui_scale))
-	_title.add_theme_font_size_override("font_size", int((32 if compact else 42) * _ui_scale))
-	_body.add_theme_font_size_override("font_size", int((18 if compact else 20) * _ui_scale))
+	_title.add_theme_font_size_override("font_size", int((28 if compact else 42) * _ui_scale))
+	_body.add_theme_font_size_override("font_size", int((16 if compact else 20) * _ui_scale))
+	_notice.add_theme_font_size_override("font_size", int(16 * _ui_scale))
 	for index in _buttons.size():
 		var label := _choice_labels[index]
-		var font_size := int(18 * _ui_scale)
+		var font_size := int((16 if compact else 18) * _ui_scale)
 		label.add_theme_font_size_override("font_size", font_size)
-		label.offset_left = 18 * _ui_scale
-		label.offset_right = -18 * _ui_scale
-		label.offset_top = 6 * _ui_scale
-		label.offset_bottom = -6 * _ui_scale
-		var lines := Ink.serif.get_multiline_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, maxf(1, copy_width - 36 * _ui_scale), font_size)
-		_buttons[index].custom_minimum_size.y = maxf(48 * _ui_scale, lines.y + 12 * _ui_scale)
+		label.offset_left = (12 if compact else 18) * _ui_scale
+		label.offset_right = -(12 if compact else 18) * _ui_scale
+		label.offset_top = 4 * _ui_scale
+		label.offset_bottom = -4 * _ui_scale
+		var lines := Ink.serif.get_multiline_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, maxf(1, copy_width - (24 if compact else 36) * _ui_scale), font_size)
+		_buttons[index].custom_minimum_size.y = maxf(48 * _ui_scale, lines.y + (8 if compact else 12) * _ui_scale)
+	if is_instance_valid(_leave_button):
+		_leave_button.custom_minimum_size.y = 48*_ui_scale
+		_leave_button.add_theme_font_size_override("font_size",int(18*_ui_scale))
 	_place.call_deferred()
 
 
@@ -165,8 +180,8 @@ func _place() -> void:
 	var art_height := _art.size.y if _art.visible else 0.0
 	var art_gap := 24 * _ui_scale if _art.visible and _vertical else 0.0
 	var height := art_height + art_gap + copy_height if _vertical else maxf(art_height, copy_height)
-	var top := maxf(24 * _ui_scale, (size.y - height) * 0.5)
-	_page.custom_minimum_size.y = height + 48 * _ui_scale
+	var top := maxf(_page_margin, (size.y - height) * 0.5)
+	_page.custom_minimum_size.y = height + _page_margin * 2
 	_art.position.y = top
 	_copy.position.y = top + art_height + art_gap if _vertical else top + (height - copy_height) * 0.5
 	_copy.size.y = copy_height
@@ -174,6 +189,7 @@ func _place() -> void:
 
 func _choose(index: int) -> void:
 	if _done or index < 0 or index >= _event.options.size(): return
+	if not EventEffects.option_available(_event.options[index]): return
 	_done = true
 	for button in _buttons: button.disabled = true
 	if is_instance_valid(_leave_button): _leave_button.disabled = true
@@ -185,23 +201,19 @@ func _choose(index: int) -> void:
 		return
 	var result: Dictionary = EventEffects.resolve(_event.options[index].get("effects", []), GameState.rng)
 	if not result.get("ok", false):
-		_done = false
-		for button in _buttons: button.disabled = false
-		push_error("事件结算失败：" + str(result.get("reason", "未知错误")))
+		_restore_choices(str(result.get("reason", "事件结算失败")))
 		return
 	_pending_effect = result.get("pending", {})
 	_continue_effects()
 
 
 func _leave_event() -> void:
-	if _done: return
+	if _done or not bool(_event.get("allow_leave", true)): return
 	_done = true
 	if _room_session != null:
-		var result: Dictionary = _room_session.run.apply({"type": "event_leave"})
+		var result: Dictionary = _room_session.apply({"type": "event_leave"})
 		if not result.get("ok", false):
-			_done = false
-			push_error("空手离开失败：" + str(result.get("reason", "未知错误")))
-			if is_instance_valid(_leave_button): _leave_button.disabled = false
+			_restore_choices(str(result.get("reason", "现在不能离开")))
 			return
 		goto("res://src/screens/room_map_screen.gd")
 		return
@@ -219,19 +231,18 @@ func _continue_effects() -> void:
 
 func _open_removal_picker() -> void:
 	var chars: Array = []
-	var counts: Dictionary = GameState.glyph_counts()
+	var counts: Dictionary = EventEffects.remaining_counts(_pending_effect)
 	for glyph in _pending_effect.get("glyphs", []):
 		var character: CharacterData = Database.get_character_by_glyph(str(glyph))
 		if character != null: chars.append(character)
 	if chars.is_empty():
-		_pending_effect = {}
-		_finish()
+		_restore_choices("字袋中没有符合条件的字，请重新选择。")
 		return
 	_picker_generation += 1
 	var generation := _picker_generation
 	var overlay := CollectionOverlay.new()
 	_pending_removal = true
-	overlay.setup({"title": "撕下哪一页？", "characters": chars, "counts": counts, "pick_on_click": true})
+	overlay.setup({"title": "选择要删去的字", "subtitle": "还需 %d 枚" % int(_pending_effect.get("remaining", 1)), "characters": chars, "counts": counts, "pick_on_click": true, "close_text": "取消选择"})
 	overlay.picked.connect(_on_removed.bind(generation))
 	overlay.closed.connect(_on_picker_closed.bind(generation))
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -240,10 +251,17 @@ func _open_removal_picker() -> void:
 
 func _on_picker_closed(generation: int) -> void:
 	if generation != _picker_generation or not _pending_removal or not is_inside_tree(): return
+	_restore_choices()
+
+
+func _restore_choices(message := "") -> void:
+	_picker_generation += 1
 	_pending_removal = false
 	_pending_effect = {}
 	_done = false
-	for button in _buttons: button.disabled = false
+	_render_event()
+	_notice.text = message
+	_notice.visible = not message.is_empty()
 
 
 func _on_removed(character: CharacterData, generation := -1) -> void:
@@ -252,10 +270,7 @@ func _on_removed(character: CharacterData, generation := -1) -> void:
 	_pending_removal = false
 	var result: Dictionary = EventEffects.resume(_pending_effect, character.glyph, GameState.rng)
 	if not result.get("ok", false):
-		_pending_effect = {}
-		_done = false
-		for button in _buttons: button.disabled = false
-		push_error("事件删字失败：" + str(result.get("reason", "未知错误")))
+		_restore_choices(str(result.get("reason", "事件删字失败")))
 		return
 	_pending_effect = result.get("pending", {})
 	_continue_effects()
@@ -269,13 +284,18 @@ func _finish() -> void:
 
 
 func _room_event_result(result: Dictionary) -> void:
-	if not result.ok: push_error(str(result.reason)); _done = false; _render_event(); return
+	if not result.ok:
+		if _room_session.current() and _room_session.run.phase == "event_choose":
+			_room_session.apply({"type":"cancel_pick"})
+		_restore_choices(str(result.get("reason", "事件选择失败")))
+		return
 	if _room_session.run.phase not in ["event","event_choose"]: _finish(); return
 	_event = _room_session.run.current_event(); _done = false; _render_event()
 	if _room_session.run.phase=="event_choose": _resume_room_choice()
 
 
 func _resume_room_choice() -> void:
+	if not _room_session.current() or _room_session.run.phase != "event_choose": return
 	_done = true
 	_body.text = str(_event.body)+"\n\n选择要删去的字（还需 %d 枚）。" % int(_room_session.run.pending_event_effect.get("remaining",1))
 	_room_session.pick(self,"选择要删去的字",_room_event_result)

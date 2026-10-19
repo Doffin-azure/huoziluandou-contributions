@@ -159,6 +159,15 @@ func _advance_event() -> void:
 	super._advance_event()
 
 
+func _cancel_pick() -> Dictionary:
+	var was_event := phase == "event_choose"
+	var result := super._cancel_pick()
+	if result.get("ok", false) and was_event:
+		pending_spawn = ""
+		pending_spawn_relic = ""
+	return result
+
+
 ## 璇玑字盘：进入后只做一次选词，选中的词给其中不重复的字。
 func _start_event_board() -> void:
 	var board_seed := GameState.rng.randi()

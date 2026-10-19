@@ -174,7 +174,9 @@ func _buy(index: int) -> void:
 		var actions: Array = _room_session.run.legal_actions().filter(func(action):return action.type=="shop_buy" and action.index==index)
 		if not actions.is_empty(): _room_shop_result(_room_session.apply(actions[0]))
 		return
+	if _busy or index < 0 or index >= _offers.size(): return
 	var offer: Dictionary = _offers[index]
+	if offer.kind in ["remove", "copy"] and GameState.deck_size() == 0: return
 	if not GameState.spend_gold(int(offer.price)):
 		return
 	match offer.kind:
@@ -191,16 +193,19 @@ func _buy(index: int) -> void:
 				if is_inside_tree() and index < _offers.size():
 					_finish_offer(index))
 		"remove":
+			_busy = true
 			_pending_offer_index = index
 			_pending_kind = "remove"
 			_choose_char("选择要删除的字")
 		"copy":
+			_busy = true
 			_pending_offer_index = index
 			_pending_kind = "copy"
 			_choose_char("选择要复制的字")
 
 
 func _on_char_chosen(ch: CharacterData) -> void:
+	if _pending_offer_index < 0 or _pending_offer_index >= _offers.size() or _pending_kind.is_empty(): return
 	if _pending_kind == "remove":
 		GameState.remove_character_id(ch.id)
 	elif _pending_kind == "copy":
@@ -208,6 +213,7 @@ func _on_char_chosen(ch: CharacterData) -> void:
 	var idx := _pending_offer_index
 	_pending_kind = ""
 	_pending_offer_index = -1
+	_busy = false
 	if idx >= 0 and idx < _offers.size():
 		_finish_offer(idx)
 
@@ -231,13 +237,25 @@ func _choose_char(title: String) -> void:
 		"characters": chars,
 		"counts": counts,
 		"pick_on_click": true,
+		"close_text": "取消选择",
 	})
 	overlay.picked.connect(_on_char_chosen)
+	overlay.closed.connect(_cancel_char_choice)
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(overlay)
 
 
+func _cancel_char_choice() -> void:
+	if _pending_offer_index < 0 or _pending_kind.is_empty(): return
+	GameState.add_gold(int(_offers[_pending_offer_index].price))
+	_pending_offer_index = -1
+	_pending_kind = ""
+	_busy = false
+	_refresh()
+
+
 func _leave() -> void:
+	if _busy: return
 	if _room_session!=null:
 		var result: Dictionary = _room_session.apply({"type":"shop_leave"})
 		if result.ok: goto("res://src/screens/room_map_screen.gd")
@@ -247,7 +265,12 @@ func _leave() -> void:
 
 
 func _room_shop_result(result: Dictionary) -> void:
-	if not result.ok: push_error(str(result.reason)); _refresh(); return
+	if not result.ok:
+		if _room_session.current() and _room_session.run.phase == "shop_choose": _room_session.apply({"type":"cancel_pick"})
+		_busy = false
+		_hud.secondary_button.disabled = false
+		_refresh()
+		return
 	if result.has("relic"):
 		_busy = true
 		RelicRewardFlow.bind_owned(self,str(result.relic),func(_id):
