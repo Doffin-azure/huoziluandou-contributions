@@ -8,33 +8,45 @@ class_name Relics
 ## 战斗侧所有钩子都只读 BattleState.relics（开战时从 GameState 复制），测试可直接改它。
 
 ## id -> [名称, 说明, 是否需要绑定一枚字]
-## 名称取自活字印刷作坊里的器物；内部 id 不变（存档、测试都用 id）
+## 名称走冥府镇物、葬仪与庭院旧物一路；内部 id 不变（存档、测试都用 id）
 const DEFS := {
-	"strike": ["刻刀", "带【击】的单字、词，每段攻击伤害 +2", false],
-	"breach": ["蚀刻", "每场开局，所有敌人获得 2 层易伤", false],
-	"slab": ["压字石", "选一枚字：它在盘面上始终下落；本场额外使用 5 次，用尽后本场移出", true],
-	"press": ["对开版", "字盘变为 5×5；开局多补 4 枚字", false],
-	"sleep": ["安神香", "休息处治疗额外 +20", false],
-	"clean": ["净版布", "回合补字后，若盘面没有污染字，多补 1 枚", false],
-	"wheel": ["转轮架", "每回合按 上、下、左、右 轮流让全盘下落", false],
-	"powerbank": ["蓄电瓶", "每场开局获得 4 储能", false],
-	"fireman": ["火种", "拾取时获得 4 枚【火】", false],
-	"fertilizer": ["蔓生墨", "选一枚字：本场它变为临时字，每回合结束向四邻空格繁殖临时复制", true],
-	"skyfire": ["天火", "打出【流火】时，额外对敌人造成 50 点伤害", false],
-	"blitz": ["急就章", "每场第一回合结束后，敌人跳过这一次行动", false],
-	"egg": ["字种", "每赢 4 场战斗，获得 1 枚字", false],
-	"buckler": ["铜护板", "每场开局获得 4 持久盾", false],
-	"barrier": ["纸屏风", "每场开局获得 10 临时格挡（第一回合有效）", false],
+	"strike": ["刑卒护指", "带【击】的单字、词，每段攻击伤害 +2", false],
+	"breach": ["定罪朱签", "每场开局，所有敌人获得 2 层易伤", false],
+	"slab": ["坠字石", "选一枚字：它在盘面上始终下落；本场额外使用 5 次，用尽后本场移出", true],
+	"press": ["续碑座", "字盘变为 5×5；开局多补 4 枚字", false],
+	"sleep": ["安魂枕", "休息处治疗额外 +20", false],
+	"clean": ["无垢拓纸", "回合补字后，若盘面没有污染字，多补 1 枚", false],
+	"wheel": ["四方轮", "每回合按 上、下、左、右 轮流让全盘下落", false],
+	"powerbank": ["藏雷珠", "每场开局获得 4 储能", false],
+	"fireman": ["余烬匣", "拾取时获得 4 枚【火】", false],
+	"fertilizer": ["寄字菌", "选一枚字：本场它变为临时字，每回合结束向四邻空格繁殖临时复制", true],
+	"skyfire": ["天火遗诏", "打出【流火】时，额外对敌人造成 50 点伤害", false],
+	"blitz": ["借时香", "每场第一回合结束后，敌人跳过这一次行动", false],
+	"egg": ["孕字卵", "每赢 4 场战斗，获得 1 枚字", false],
+	"buckler": ["龟甲片", "每场开局获得 4 持久盾", false],
+	"barrier": ["护身纸符", "每场开局获得 10 临时格挡（第一回合有效）", false],
+	"empty_case": ["空铅盒", "回合结束时，每有一整行为空，获得 2 持久盾", false],
+	"stay_wax": ["留字蜡", "打出的字有 5% 概率留在原位", false],
+	"amber": ["血珀", "溢出的治疗量转为持久盾", false],
+	"ghost_hand": ["补字鬼手", "每场前 3 枚实际打出的字立即补位", false],
+	"cracked_bottle": ["裂雷瓶", "获得的储能翻倍；每回合结束清空储能", false],
+	"rotting_fruit": ["将腐供果", "每场开局随机一枚字本场变为临时字", false],
+	"chaos_dice": ["乱文骨骰", "拾取时重铸字袋：所有字替换为随机字，并额外补 3 枚", false],
+	"black_water": ["黑水瓶", "事件中封存幽都黑水；部分井、墨、渡口事件出现额外选项", false],
+	"life_lantern": ["命灯", "借来的寿火；连续事件中可抵挡一次反噬", false],
+	"life_debt": ["寿契", "记着未还的寿债；持有期间，讨债事件可能找上门", false],
 }
-## 档次：1 常见 / 2 少见 / 3 稀有。中赏最多2档，大赏包含3档；商店按档定价。
+## 档次：1 常见 / 2 少见 / 3 稀有。中赏最多2档，大赏包含3档。
 const TIER := {
 	"strike": 2, "breach": 2, "slab": 3, "press": 3, "sleep": 1, "clean": 1, "wheel": 2, "powerbank": 1,
-	"fireman": 1, "fertilizer": 3, "skyfire": 2, "blitz": 2, "egg": 2, "buckler": 1, "barrier": 1,
+	"fireman": 1, "fertilizer": 3, "skyfire": 2, "blitz": 2, "egg": 2, "buckler": 1, "barrier": 1, "empty_case": 2, "stay_wax": 2, "amber": 3, "ghost_hand": 2, "cracked_bottle": 2, "rotting_fruit": 2, "chaos_dice": 3, "black_water": 2, "life_lantern": 2, "life_debt": 2,
 }
 const PRICE := {1: 35, 2: 50, 3: 70}
 const EGG_EVERY := 4
 const WHEEL_DIRS := ["up", "down", "left", "right"]
 const WHEEL_TEXT := {"up": "上", "down": "下", "left": "左", "right": "右"}
+## 事件遗物池：只能由事件发放，不进入商店、许愿、普通奖励等普通遗物池。
+const EVENT_ONLY := ["black_water", "life_lantern", "life_debt"]
 
 
 static func name_of(id: String) -> String:
@@ -53,15 +65,35 @@ static func text(id: String) -> String:
 	return "「%s」%s" % [name_of(id), desc_of(id)]
 
 
-## 还没拥有的遗物里随机挑 n 个（商店货架）
-static func roll_choices(owned: Array, rng: RandomNumberGenerator, n := 1) -> Array:
-	var pool: Array = DEFS.keys().filter(func(id): return not owned.has(id))
-	for i in range(pool.size() - 1, 0, -1):
+## 普通遗物池：不含事件专属遗物。商店、许愿、普通奖励都从这里取。
+static func normal_pool() -> Array:
+	return DEFS.keys().filter(func(id): return not EVENT_ONLY.has(id))
+
+
+## 事件遗物池：只给事件使用；事件可以显式指定，也可用 roll_event_choices。
+static func event_pool() -> Array:
+	return EVENT_ONLY.filter(func(id): return DEFS.has(id))
+
+
+static func is_event_relic(id: String) -> bool:
+	return EVENT_ONLY.has(id)
+
+
+## 还没拥有的遗物里随机挑 n 个；pool 默认普通池，事件要用事件池必须显式传入。
+static func roll_choices(owned: Array, rng: RandomNumberGenerator, n := 1, pool := "normal") -> Array:
+	var ids: Array = event_pool() if pool == "event" else normal_pool()
+	ids = ids.filter(func(id): return not owned.has(id))
+	for i in range(ids.size() - 1, 0, -1):
 		var j := rng.randi_range(0, i)
-		var tmp = pool[i]
-		pool[i] = pool[j]
-		pool[j] = tmp
-	return pool.slice(0, mini(n, pool.size()))
+		var tmp = ids[i]
+		ids[i] = ids[j]
+		ids[j] = tmp
+	return ids.slice(0, mini(n, ids.size()))
+
+
+## 事件遗物随机池的便捷入口；一般事件给普通遗物时仍用 roll_choices 的默认池。
+static func roll_event_choices(owned: Array, rng: RandomNumberGenerator, n := 1) -> Array:
+	return roll_choices(owned, rng, n, "event")
 
 
 static func price(id: String) -> int:
@@ -72,8 +104,6 @@ static func sell_price(id: String) -> int:
 	return int(price(id) / 2)
 
 
-# ---------------------------------------------------------------- 战斗钩子
-
 static func board_size(rules: BattleRules, relics: Array) -> int:
 	return maxi(rules.board_size, BattleBalance.i("press_board", 5)) if relics.has("press") else rules.board_size
 
@@ -82,7 +112,7 @@ static func opening_draw(rules: BattleRules, relics: Array) -> int:
 	return rules.opening_draw + (BattleBalance.i("press_draw", 4) if relics.has("press") else 0)
 
 
-## 洗袋之前：化肥母本换成本场临时副本；石板记下绑定的实体。
+## 洗袋之前：寄字菌母本换成本场临时副本；坠字石记下绑定的实体。
 static func prepare_deck(b: BattleState) -> void:
 	if b.relics.has("slab"):
 		var inst := _bag_inst(b, int(b.relic_binds.get("slab", -1)))
@@ -100,6 +130,19 @@ static func prepare_deck(b: BattleState) -> void:
 			b.bag[b.bag.find(src)] = copy
 			b.temp_chars.append(copy)
 			b.breeders[copy.uid] = true
+	if b.relics.has("rotting_fruit"):
+		var candidates: Array = b.bag.filter(func(c): return c.is_player_owned() and not c.temporary and c.uid != b.slab_uid)
+		if not candidates.is_empty():
+			var picked: CharInstance = candidates[b.rng.randi_range(0, candidates.size() - 1)]
+			# 同样保留永久实体，只用本场的临时副本
+			var fruit := picked.clone()
+			fruit.temporary = true
+			fruit.temporary_uses = 0
+			fruit.pinned = false
+			fruit.pinned_exhausted = false
+			b.bag[b.bag.find(picked)] = fruit
+			b.fruit_uid = picked.uid
+			b.temp_chars.append(fruit)
 
 
 static func _bag_inst(b: BattleState, uid: int) -> CharInstance:
@@ -115,20 +158,20 @@ static func _bag_inst(b: BattleState, uid: int) -> CharInstance:
 static func on_battle_start(b: BattleState) -> void:
 	if b.relics.has("barrier"):
 		b.player.add_block(BattleBalance.i("barrier_block", 10))
-		b._log("屏障：临时格挡 +%d" % BattleBalance.i("barrier_block", 10))
+		b._log("护身纸符：临时格挡 +%d" % BattleBalance.i("barrier_block", 10))
 	if b.relics.has("buckler"):
 		b.player.add_persistent_block(BattleBalance.i("buckler_block", 4))
-		b._log("小盾：持久盾 +%d" % BattleBalance.i("buckler_block", 4))
+		b._log("龟甲片：持久盾 +%d" % BattleBalance.i("buckler_block", 4))
 	if b.relics.has("powerbank"):
 		b.add_energy(BattleBalance.i("powerbank_energy", 4))
-		b._log("充电宝：储能 +%d" % BattleBalance.i("powerbank_energy", 4))
+		b._log("藏雷珠：储能 +%d" % BattleBalance.i("powerbank_energy", 4))
 	if b.relics.has("breach"):
 		for e in b.alive_enemies():
 			e.add_status("vulnerable", BattleBalance.i("breach_stacks", 2))
-		b._log("破防：敌人获得 %d 层易伤" % BattleBalance.i("breach_stacks", 2))
+		b._log("定罪朱签：敌人获得 %d 层易伤" % BattleBalance.i("breach_stacks", 2))
 	if b.relics.has("blitz"):
 		b.blitz_turn = 1
-		b._log("闪电战：第一回合结束后，敌人跳过这一次行动")
+		b._log("借时香：第一回合结束后，敌人跳过这一次行动")
 	# 第一回合也按获得顺序发动一次重力（开局补字不走 begin_player_turn 的补字分支）
 	apply_gravity_relics(b)
 
@@ -137,7 +180,27 @@ static func on_battle_start(b: BattleState) -> void:
 static func after_turn_draw(b: BattleState) -> void:
 	if b.relics.has("clean") and not board_dirty(b):
 		if b.draw_to_board(BattleBalance.i("clean_draw", 1)) > 0:
-			b._log("光洁：盘面没有污染字，多补 %d 枚" % BattleBalance.i("clean_draw", 1))
+			b._log("无垢拓纸：盘面没有污染字，多补 %d 枚" % BattleBalance.i("clean_draw", 1))
+
+
+## 回合结束：空铅盒按整行空置数给持久盾。
+static func on_player_turn_end(b: BattleState) -> void:
+	if not b.relics.has("empty_case"):
+		return
+	var empty_rows := 0
+	for y in b.board.size:
+		var empty := true
+		for x in b.board.size:
+			if b.board.get_cell(x, y) != null:
+				empty = false
+				break
+		if empty:
+			empty_rows += 1
+	if empty_rows <= 0:
+		return
+	var gain := empty_rows * 2
+	b.player.add_persistent_block(gain)
+	b._log("空铅盒：%d 行空置，持久盾 +%d" % [empty_rows, gain])
 
 
 static func board_dirty(b: BattleState) -> bool:
@@ -159,7 +222,7 @@ static func apply_gravity_relics(b: BattleState) -> void:
 					"down": b.apply_gravity()
 					"left": b.apply_gravity_left()
 					"right": b.apply_gravity_right()
-				b._log("仓鼠轮：全盘向%s压" % WHEEL_TEXT[dir])
+				b._log("四方轮：全盘向%s压" % WHEEL_TEXT[dir])
 			"slab":
 				slab_fall(b)
 
@@ -194,10 +257,41 @@ static func slab_fall(b: BattleState) -> void:
 static func consume_slab(b: BattleState, inst: CharInstance) -> String:
 	if b.slab_uses > 0:
 		b.slab_uses -= 1
-		b._log("沉重石板：【%s】留在盘上（额外次数还剩 %d）" % [inst.glyph(), b.slab_uses])
+		b._log("坠字石：【%s】留在盘上（额外次数还剩 %d）" % [inst.glyph(), b.slab_uses])
 		return "layer"
-	b._log("沉重石板：【%s】次数用尽，本场移出" % inst.glyph())
+	b._log("坠字石：【%s】次数用尽，本场移出" % inst.glyph())
 	return "exhausted"
+
+
+## 留字蜡：普通永久字被打出后，5% 概率留在原位。
+static func stay_wax(b: BattleState, inst: CharInstance) -> bool:
+	if not b.relics.has("stay_wax") or inst == null:
+		return false
+	if not inst.is_player_owned() or inst.temporary or inst.is_enemy_owned():
+		return false
+	return b.rng.randf() < 0.05
+
+
+## 补字鬼手：前 3 枚实际消耗的字立即补位。
+static func on_cards_consumed(b: BattleState, consumed: Array) -> void:
+	if not b.relics.has("ghost_hand") or b.magic_hand_left <= 0:
+		return
+	var refill := 0
+	for item in consumed:
+		if b.magic_hand_left <= 0:
+			break
+		if bool(item.get("shared", false)):
+			continue
+		if str(item.get("kind", "")) != "real":
+			continue
+		var inst: CharInstance = item.get("inst")
+		if inst == null or not inst.is_player_owned() or inst.temporary:
+			continue
+		b.magic_hand_left -= 1
+		refill += 1
+	if refill > 0:
+		var n := b.draw_to_board(refill)
+		b._log("补字鬼手：补 %d 字（本场还剩 %d 次）" % [n, b.magic_hand_left])
 
 
 ## 回合结束（敌人行动前）：繁殖字向四邻空格生成临时复制；新生的下回合才繁殖
@@ -227,7 +321,7 @@ static func breed(b: BattleState) -> void:
 			b.breeders[child.uid] = true
 			born += 1
 	if born > 0:
-		b._log("化肥：繁殖出 %d 枚临时【%s】" % [born, b.board.cells[parents[0]].glyph() if b.board.cells[parents[0]] != null else ""])
+		b._log("寄字菌：繁殖出 %d 枚临时【%s】" % [born, b.board.cells[parents[0]].glyph() if b.board.cells[parents[0]] != null else ""])
 
 
 ## 一次出字是否带【击】（单字【击】或词里含【击】）
@@ -247,8 +341,8 @@ static func on_wash_heat(b: BattleState, target: Combatant) -> Array:
 	if e == null:
 		return []
 	var real := b.deal_damage(e, BattleBalance.i("skyfire_damage", 50), false)
-	b._log("天火：对%s造成 %d 伤害" % [e.display_name, real])
-	return ["天火：造成 %d 伤害" % real]
+	b._log("天火遗诏：对%s造成 %d 伤害" % [e.display_name, real])
+	return ["天火遗诏：造成 %d 伤害" % real]
 
 
 # ---------------------------------------------------------------- 战外钩子
@@ -266,7 +360,33 @@ static func on_pickup(id: String) -> void:
 				return
 			GameState.relic_counters["fireman_claimed"] = true
 			for i in BattleBalance.i("fireman_count", 4):
-				_grant_glyph("火", "火人")
+				_grant_glyph("火", "余烬匣")
+		"chaos_dice":
+			_rebuild_deck_chaos()
+
+
+## 乱文骨骰：字袋全部换成随机字，并在原数量上多补 3 枚。
+## 旧的实体 uid 会消失，因此绑定类遗物需要重新绑到新字上。
+static func _rebuild_deck_chaos() -> void:
+	var pool: Array = []
+	for cd: CharacterData in Database.characters.values():
+		if cd.is_pollution or cd.pending_design or cd.tags.has("enemy") or cd.tags.has("event") or cd.tags.has("彩蛋"):
+			continue
+		pool.append(cd)
+	if pool.is_empty():
+		return
+	var old_count := GameState.deck.size()
+	var bind_ids: Array = GameState.relics.filter(func(id): return needs_bind(id))
+	GameState.deck.clear()
+	for _i in old_count + 3:
+		var cd: CharacterData = pool[GameState.rng.randi_range(0, pool.size() - 1)]
+		GameState.deck.append(CharInstance.new(cd))
+	GameState.relic_binds.clear()
+	for id in bind_ids:
+		for inst: CharInstance in GameState.deck:
+			if GameState.bind_relic(str(id), inst.id()):
+				break
+	EventBus.deck_changed.emit()
 
 
 ## 战斗胜利后
@@ -284,7 +404,7 @@ static func on_battle_won() -> void:
 			if not pool.is_empty():
 				g = pool[GameState.rng.randi_range(0, pool.size() - 1)].glyph
 		if not g.is_empty():
-			_grant_glyph(g, "发明蛋")
+			_grant_glyph(g, "孕字卵")
 
 
 static func _grant_glyph(g: String, why: String) -> void:

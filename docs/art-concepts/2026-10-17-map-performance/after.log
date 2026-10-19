@@ -1,0 +1,12 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+[MapProfile] meshes=5487 styled=1726
+[MapProfile] outline={ "median_ms": 9.55, "p95_ms": 341.64, "max_ms": 341.64 } occlusion={ "median_ms": 0.23, "p95_ms": 0.25, "max_ms": 0.25 }
+[MapProfile] current-idle frame={ "median_ms": 2.1, "p95_ms": 3.08, "max_ms": 3.37 } render_cpu={ "median_ms": 0.91, "p95_ms": 1.2, "max_ms": 1.63 } gpu={ "median_ms": 1.36, "p95_ms": 1.59, "max_ms": 1.63 } draws=945
+[MapProfile] current-pan frame={ "median_ms": 2.22, "p95_ms": 5.05, "max_ms": 7.65 } render_cpu={ "median_ms": 1.0, "p95_ms": 1.34, "max_ms": 1.51 } gpu={ "median_ms": 0.98, "p95_ms": 1.01, "max_ms": 1.01 } draws=941
+[MapProfile] no-scatter-idle frame={ "median_ms": 2.44, "p95_ms": 2.89, "max_ms": 3.6 } render_cpu={ "median_ms": 1.38, "p95_ms": 1.72, "max_ms": 2.06 } gpu={ "median_ms": 0.98, "p95_ms": 1.01, "max_ms": 1.21 } draws=1602
+[MapProfile] no-volume-idle frame={ "median_ms": 2.07, "p95_ms": 2.65, "max_ms": 2.89 } render_cpu={ "median_ms": 1.21, "p95_ms": 1.58, "max_ms": 1.76 } gpu={ "median_ms": 0.89, "p95_ms": 0.92, "max_ms": 0.92 } draws=1602
+[MapProfile] complete

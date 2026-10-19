@@ -1,0 +1,82 @@
+{
+  "generation": {
+    "tool": "native image_gen.imagegen",
+    "attempts": 1,
+    "original": "C:/Users/Think/.codex/generated_images/01a132f5-3d05-7763-a9ac-28ad136eb1c9/exec-9f595d85-aa78-4a8e-9508-3ed04b4a0470.png",
+    "copied_unmodified": true,
+    "prompt": "materials.prompt.txt",
+    "reference": "../reference-battle-style.png"
+  },
+  "source": {
+    "file": "materials.png",
+    "width": 1254,
+    "height": 1254,
+    "regions": [
+      {
+        "name": "dry_stone",
+        "rect": [
+          0,
+          0,
+          627,
+          627
+        ]
+      },
+      {
+        "name": "damp_stone",
+        "rect": [
+          627,
+          0,
+          627,
+          627
+        ]
+      },
+      {
+        "name": "ink_water",
+        "rect": [
+          0,
+          627,
+          627,
+          627
+        ]
+      },
+      {
+        "name": "bank_wall",
+        "rect": [
+          627,
+          627,
+          627,
+          627
+        ]
+      }
+    ]
+  },
+  "preview": {
+    "size": [
+      1024,
+      720
+    ],
+    "cells": [
+      "SSW",
+      "SSW",
+      "SWW"
+    ],
+    "legend": {
+      "S": "stone",
+      "W": "ink water"
+    },
+    "composition": "Canvas2D clip paths, mirrored world-space material repeat, shore damp material overlay, short illustrated wall",
+    "repeat_span_in_cells": {
+      "stone": 1.5,
+      "water": 2
+    },
+    "cell_footprint": [
+      240,
+      158.4
+    ],
+    "outputs": [
+      "preview.png",
+      "preview-grid.png"
+    ],
+    "notes": "Source quadrants are material swatches, not certified seamless tile edges or a complete shore-autotile set. Grid overlays are inspection only. No game runtime code or assets were changed."
+  }
+}

@@ -12,6 +12,7 @@ var _pending_offer_index := -1
 var _pending_kind := ""
 ## 遗物在柜台上的固定位置（object_stage 的第 7 个货位）
 const RELIC_SLOT := 6
+var _room_session: RefCounted
 
 
 func has_scene_background() -> bool:
@@ -21,7 +22,9 @@ func has_scene_background() -> bool:
 func build(root: Control) -> void:
 	JourneyStyle.apply(self)
 	node = params.get("node", null)
-	_offers = _roll_offers()
+	if params.get("room_run",false) and GameState.room_run!=null:
+		_room_session = preload("res://src/screens/room_node_session.gd").new(GameState.room_run)
+	_offers = _room_session.run.shop_offers.duplicate(true) if _room_session!=null else _roll_offers()
 	for i in _offers.size(): _offers[i]["display_slot"] = i
 	_showcase = preload("res://src/ui/object_stage/object_stage_view.gd").new()
 	_showcase.mode = "shop"
@@ -38,6 +41,7 @@ func build(root: Control) -> void:
 	root.add_child(_hud)
 	_showcase.layout_changed.connect(_layout_offers)
 	_refresh()
+	if _room_session!=null and _room_session.run.phase=="shop_choose": _resume_room_choice.call_deferred()
 
 
 
@@ -62,7 +66,7 @@ func _roll_chars() -> Array:
 	var out: Array = []
 	var pool: Array = []
 	for c in Database.characters.values():
-		if not c.is_pollution and not c.pending_design and not c.tags.has("enemy") and not c.tags.has("彩蛋") and c.rarity <= 2:
+		if not c.is_pollution and not c.pending_design and not c.tags.has("enemy") and not c.tags.has("彩蛋") and not c.tags.has("event") and c.rarity <= 2:
 			pool.append(c)
 	var rng := GameState.rng
 	var picked: Array = []
@@ -79,7 +83,11 @@ func _roll_chars() -> Array:
 
 ## 花 5 金币换三枚新字和遗物；没买的服务原样保留在原位。
 func _refresh_stock() -> void:
-	if _busy or not GameState.spend_gold(Expedition.SHOP_REFRESH_COST):
+	if _busy: return
+	if _room_session!=null:
+		_room_shop_result(_room_session.apply({"type":"shop_refresh"}))
+		return
+	if not GameState.spend_gold(Expedition.SHOP_REFRESH_COST):
 		return
 	var chars := _roll_chars()
 	for i in chars.size(): chars[i]["display_slot"] = i
@@ -96,7 +104,7 @@ func _refresh() -> void:
 	_cards.clear()
 	_hud.status_label.text = "金币 %d" % GameState.gold
 	if _hud.tertiary_button != null:
-		_hud.tertiary_button.disabled = GameState.gold < Expedition.SHOP_REFRESH_COST
+		_hud.tertiary_button.disabled = _busy or GameState.gold < Expedition.SHOP_REFRESH_COST
 	for i in _offers.size():
 		var item: Dictionary = _offers[i]
 		var ch: CharacterData = item.character
@@ -116,7 +124,7 @@ func _refresh() -> void:
 
 func _layout_offers() -> void:
 	for i in _cards.size():
-		var rect: Rect2 = _showcase.object_rect(i, _offers[i].kind != "buy_char")
+		var rect: Rect2 = _showcase.object_rect(int(_offers[i].display_slot), _offers[i].kind != "buy_char")
 		_cards[i].position = rect.position
 		_cards[i].size = rect.size
 
@@ -162,6 +170,10 @@ func _heal_amount() -> int:
 
 
 func _buy(index: int) -> void:
+	if _room_session!=null:
+		var actions: Array = _room_session.run.legal_actions().filter(func(action):return action.type=="shop_buy" and action.index==index)
+		if not actions.is_empty(): _room_shop_result(_room_session.apply(actions[0]))
+		return
 	var offer: Dictionary = _offers[index]
 	if not GameState.spend_gold(int(offer.price)):
 		return
@@ -226,5 +238,32 @@ func _choose_char(title: String) -> void:
 
 
 func _leave() -> void:
+	if _room_session!=null:
+		var result: Dictionary = _room_session.apply({"type":"shop_leave"})
+		if result.ok: goto("res://src/screens/room_map_screen.gd")
+		return
 	GameState.complete_current_node()
 	goto("res://src/screens/map_screen.gd")
+
+
+func _room_shop_result(result: Dictionary) -> void:
+	if not result.ok: push_error(str(result.reason)); _refresh(); return
+	if result.has("relic"):
+		_busy = true
+		RelicRewardFlow.bind_owned(self,str(result.relic),func(_id):
+			_room_session.run._save_if_enabled()
+			_room_shop_result({"ok":true}))
+		return
+	if _room_session.run.phase=="shop_choose": _resume_room_choice(); return
+	_busy = false
+	_offers = _room_session.run.shop_offers.duplicate(true)
+	for i in _offers.size(): _offers[i]["display_slot"] = i
+	_refresh()
+
+
+func _resume_room_choice() -> void:
+	_busy = true; _hud.action_button.disabled = true; _hud.secondary_button.disabled = true
+	_hud.tertiary_button.disabled = true
+	_room_session.pick(self,"选择要删去的字" if _room_session.run.pending_kind=="remove" else "选择要拓印的字",func(result):
+		_hud.secondary_button.disabled = false
+		_room_shop_result(result))

@@ -1,0 +1,12 @@
+{
+  "nodes": 55,
+  "allReachable": true,
+  "fourWayOnly": true,
+  "respectsDrawnWalls": true,
+  "returnPathSteps": 174,
+  "nodeButtons": 55,
+  "horizontalOverflow": false,
+  "errors": [],
+  "animationAdvanced": true,
+  "landscapeOverflow": false
+}

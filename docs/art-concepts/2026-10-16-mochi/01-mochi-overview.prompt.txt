@@ -1,0 +1,32 @@
+Use case: stylized-concept / ui-mockup.
+Asset type: one polished full-screen 16:9 concept-art image for a Chinese word-building roguelike overworld, 1920 x 1080 if supported.
+Input image: reference-battle-style.png is STYLE REFERENCE ONLY. Reinterpret its art direction into a new overworld exploration screen, do not keep its battle layout, huge word board, front-facing arena, or enemy portrait.
+
+PRIMARY REQUEST
+Create the first art-direction sample called 墨池 — 冥府碑林. A continuous ancient Chinese underworld landscape of black ink waterways, abandoned inscription steles, bronze printing workshops and beast-mask gateways, seen from a fixed oblique overhead parallel camera. Mature illustrated game art, suitable for tactical exploration. It must feel painted by the same art team as the reference.
+
+STYLE
+Faithfully preserve the reference's irregular fine black ink outlines, graphic flat color shapes, fine carved ornament lines, restrained old-print grain, worn bronze and paper. Deep teal, blue-green verdigris, ink black, old gold, cinnabar red, warm paper white. Edges and silhouettes drawn clearly. Low-detail dark stone ground with selective fine incised lines, detailed ornament concentrated on important buildings. No realistic 3D, no glossy mobile-game rendering, no painterly impasto, no oil painting, no chibi characters, no neon.
+
+CAMERA AND WORLD
+Fixed oblique overhead view: north/south paths align with the vertical picture axis; east/west paths align horizontally. Show rooftops plus short south-facing building facades. Not a diagonal diamond/isometric grid. Not side view. No floating islands, no isolated tabletop diorama or decorative pedestal. A large continuous same-height stone landscape extending beyond picture boundaries, approximately 12 columns by 8 rows of implicit square movement cells. Traversable stone routes connect clearly across the scene, no height-based traversal. Short broken walls, black ink pools and right-angle canal bends frame clear crossings and open lanes. Large architecture should not block adjacent important cells.
+
+SCREEN COMPOSITION
+Landscape 16:9. Left 75% is the actual exploration map, right 25% is one narrow vertical bronze-framed parchment tool sidebar. A very thin top status bar, not a large paper banner. Map has breathing room and readable routes.
+Sidebar: a modest 2 by 2 small glyph workspace near top, six small glyph-box inventory tokens below, then three short current-effect rows. Restrained bronze and parchment framing. No large combat board. Very limited readable Chinese only: “墨池”, “版面”, “字匣”, “生效词”. Workspace glyphs may read “回”“流”“击”“火”. Top bar can show simple icons and “60/60”, “4”, “26” for life, ink, coins plus a small boss-alert eye icon. Do not invent long strings of pseudo-Chinese. No other large text.
+
+MAP CONTENT AND SCALE
+At left-middle: a small proportioned traveling player in a pale gray short hooded cloak over deep teal clothes, carrying one warm golden lantern. The figure reads clearly against dark ground, approximately one movement-cell footprint, not a heroic close-up.
+A handful of collectible warm paper-white movable-type blocks lie on the ground with isolated real glyphs, visibly distinct from stone.
+Structures and props at tactical exploration scale: small/mid/large progressively larger sealed bronze reward boxes; a resting lamp pavilion; a low bronze type merchant stall; a small question-inscription niche; an ink spring shaped like an inkstone with a spout; paper patches soaking up black ink.
+Weathered inscription steles, broken bronze printing-machine forms, a few black branches and muted red ribbons. Cinnabar foliage can edge the scene; inside the map red is reserved for danger and seals.
+At the distant upper-right OF THE MAP, before the sidebar: a beast-mask bronze gate marking the fixed boss lair. A separate small moving ink-beast guardian patrols a nearby open route. Not a giant boss portrait. Normal small beast-mask sentry and one heavier elite guardian can appear elsewhere, with space between them.
+Light ink fog only along uncharted outer edges. Do not hide the whole playable map.
+
+GAMEPLAY OVERLAYS
+Four fine old-gold square outlines at the player's four orthogonal neighbor cells mark possible movement, no full bright lattice covering the map.
+A thin muted cinnabar broken route near the boss shows its predicted path following cell-aligned right-angle turns, never diagonal arrows. Keep overlay lines distinct from decorative ground cracks.
+Ground contact shadows and foreground overlap give 2.5D thickness, while the low-contrast ground and broad accessible paths stay legible.
+
+FINAL QUALITY
+One cohesive high-finish game-art review image. Not a collage, not multiple panels, not a production sprite atlas. No watermark. Entire image should survive downscaling to 1280 x 720: player, white collectibles, gates, enemies and navigable stone routes remain distinguishable.

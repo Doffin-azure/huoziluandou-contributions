@@ -62,12 +62,8 @@ func _build_fog() -> void:
 func _build_petals() -> void:
 	var mesh := SurfaceTool.new()
 	mesh.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var rim := PackedVector3Array([Vector3(0, -0.55, 0), Vector3(-0.31, -0.16, 0.03), Vector3(-0.30, 0.27, 0), Vector3(0, 0.53, 0.04), Vector3(0.32, 0.22, -0.01), Vector3(0.30, -0.13, 0)])
-	for side in rim.size():
-		for vertex in [Vector3(0, 0, 0.10), rim[side], rim[(side + 1) % rim.size()]]:
-			mesh.set_normal(Vector3.FORWARD)
-			mesh.set_color(Color.WHITE if vertex.z > 0.09 else Color(0.65, 0.65, 0.65))
-			mesh.add_vertex(vertex)
+	var leaf := preload("res://src/title/courtyard/foreground.gd").leaf_mesh()
+	mesh.append_from(leaf,0,Transform3D(Basis(Vector3.RIGHT,PI*.5),Vector3.ZERO))
 	var instances := MultiMesh.new()
 	instances.transform_format = MultiMesh.TRANSFORM_3D
 	instances.use_custom_data = true
@@ -78,11 +74,15 @@ func _build_petals() -> void:
 	for i in PETAL_COUNT:
 		var origin := Vector3(random.randf_range(-5.3, 4.0), random.randf_range(4.0, 6.0), random.randf_range(-12.0, -2.8))
 		_tracks.append({"origin": origin, "duration": random.randf_range(11.0, 19.0), "phase": random.randf(), "size": random.randf_range(0.10, 0.19), "drift": Vector3(random.randf_range(0.15, 1.1), 0, random.randf_range(3.0, 7.0)), "spin": random.randf_range(0.7, 1.5)})
+		if i>=PETAL_COUNT-8:
+			_tracks[-1].origin = Vector3(random.randf_range(-2.4,4.4),random.randf_range(2.5,4.1),random.randf_range(3.0,6.6))
+			_tracks[-1].drift = Vector3(random.randf_range(.1,.4),0,random.randf_range(.7,1.4))
+			_tracks[-1].size = random.randf_range(.13,.25)
 		instances.set_instance_custom_data(i, Color(random.randf(), 0, 0, 1))
 	petals = MultiMeshInstance3D.new()
 	petals.name = "FallingPetals"
 	petals.multimesh = instances
-	petals.custom_aabb = AABB(Vector3(-7, -0.3, -14), Vector3(14, 8, 22))
+	petals.custom_aabb = AABB(Vector3(-7, -0.3, -14), Vector3(14, 8, 24))
 	petals.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var pigment := ShaderMaterial.new()
 	pigment.shader = PETAL_SHADER

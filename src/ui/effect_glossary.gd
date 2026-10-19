@@ -15,7 +15,7 @@ const ENTRIES := {
 	"gilded": ["镀金", "每枚镀金字每次有效单字或组词打出获得1金币。原实体上的镀金跨战保留，临时复制不继承。"],
 	"replay": ["效果重演", "即时效果额外结算1次，不重复消耗组成词的字块；金币、储能等费用仍须再付。持续能力的启用效果不重演。"],
 	"return": ["原格返回", "优先放回原来所在的格子，原格被占用则改放空格。回放只返回当前有空位容纳的原实体；重连在满盘时继续等待空位。"],
-	"vulnerable": ["易伤", "受到的伤害提高50%，向上取整。多层仍为50%增幅；敌方易伤在本场不按回合衰减。"],
+	"vulnerable": ["易伤", "受到的伤害提高50%，向上取整。每回合开始减少1层，耗尽时移除；重复施加延长持续时间，多层仍为50%增幅。"],
 	"corrosion": ["心蚀", "该敌人每次行动后，受到等于心蚀层数的非攻击伤害，可被护盾吸收。层数可以叠加，且不衰减。"],
 	"regen": ["再生", "每回合开始时回复等于当前层数的生命，随后减少1层。层数可以叠加。"],
 	"heart": ["心力", "每层抵挡1次致命伤害，触发时消耗1层并保留当前生命。强心会记录本场成功抵挡致命伤害的次数。"],
@@ -53,10 +53,10 @@ static func entry(meta: String) -> Dictionary:
 		var key := meta.trim_prefix("term:")
 		if ENTRIES.has(key):
 			var description: String = ENTRIES[key][1]
-			if key == "gilded": description = "每枚镀金字有效单打或组词时获得%d金币；原实体跨战保留。" % BattleBalance.i("gild_gold", 1)
-			elif key == "vulnerable": description = "受到的伤害乘以%s，向上取整；层数不改变倍率。" % BattleBalance.f("vulnerable_mult", 1.5)
-			elif key == "counter": description = "敌人行动结束后，反击伤害=剩余临时格挡+%d×反击层数。" % BattleBalance.i("counter_per_stack", 3)
-			elif key == "refined": description = "本场该实体重新入盘时恢复至少%d次额外使用。" % BattleBalance.i("refined_layers", 2)
+			if key == "gilded": description = "每枚镀金字每次有效单字或组词打出获得%d金币。原实体上的镀金跨战保留，临时复制不继承。" % BattleBalance.i("gild_gold", 1)
+			elif key == "vulnerable": description = "受到的伤害乘以%s，向上取整。每回合开始减少1层，耗尽时移除；重复施加延长持续时间，层数不改变伤害倍率。" % BattleBalance.f("vulnerable_mult", 1.5)
+			elif key == "counter": description = "本回合所有敌人行动后，对首个存活敌人反击一次：基础伤害=剩余临时格挡+%d×反击层数。层数可叠加，结算后清除。" % BattleBalance.i("counter_per_stack", 3)
+			elif key == "refined": description = "当次获得%d次额外使用；本场该实体以后每次重新补入盘面，都恢复至少%d次额外使用。仅移动或进入新回合不刷新，战后结束。" % [BattleBalance.i("refined_layers", 2), BattleBalance.i("refined_layers", 2)]
 			return {"title": ENTRIES[key][0], "text": description}
 	elif meta.begins_with("word:"):
 		var word := Database.get_word_by_glyphs_string(meta.trim_prefix("word:"))

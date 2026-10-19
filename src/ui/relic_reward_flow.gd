@@ -46,11 +46,18 @@ static func grant(host: Node, id: String, on_done: Callable) -> void:
 	if not GameState.add_relic(id):
 		on_done.call("")
 		return
+	bind_owned(host, id, on_done)
+
+
+## Also used after a saved route controller has granted the relic exactly once.
+static func bind_owned(host: Node, id: String, on_done: Callable) -> void:
 	if not Relics.needs_bind(id):
 		on_done.call(id)
 		return
 	var counts := {}
-	var bound: Array = GameState.relic_binds.values()
+	var other_binds := GameState.relic_binds.duplicate()
+	other_binds.erase(id)
+	var bound: Array = other_binds.values()
 	for c in GameState.deck:
 		if not bound.has(c.uid):
 			counts[c.id()] = int(counts.get(c.id(), 0)) + 1
@@ -74,12 +81,14 @@ static func grant(host: Node, id: String, on_done: Callable) -> void:
 	picker.picked.connect(func(cd: CharacterData):
 		if state.done: return
 		state.done = true
+		GameState.relic_binds.erase(id)
 		GameState.bind_relic(id, cd.id)
 		on_done.call(id))
 	picker.closed.connect(func():
 		if state.done: return
 		state.done = true
 		var keys: Array = counts.keys()
+		GameState.relic_binds.erase(id)
 		GameState.bind_relic(id, str(keys[GameState.rng.randi_range(0, keys.size() - 1)]))
 		on_done.call(id))
 	picker.set_anchors_preset(Control.PRESET_FULL_RECT)

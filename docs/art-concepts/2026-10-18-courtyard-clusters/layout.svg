@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1040" viewBox="0 0 1600 1040">
+<defs>
+ <pattern id="ground" width="26" height="26" patternUnits="userSpaceOnUse"><rect width="26" height="26" fill="#1a292b"/><path d="M0 26V0H26" fill="none" stroke="#263638" stroke-width=".7"/></pattern>
+ <pattern id="court" width="35" height="35" patternUnits="userSpaceOnUse"><rect width="35" height="35" fill="#595a4d"/><path d="M0 35V0H35" fill="none" stroke="#383e39" stroke-width="1"/></pattern>
+ <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10" fill="none" stroke="#e4c291" stroke-width="1.6"/></marker>
+ <g id="roof"><path d="M-72-36L0-59L72-36L82 33L0 44L-82 33Z" fill="#213c43" stroke="#080f16" stroke-width="4"/><path d="M0-59V44M-72-36L0-7L72-36M-82 33L0-7L82 33" fill="none" stroke="#0b1e26" stroke-width="2"/></g>
+ <g id="lotus"><ellipse rx="17" ry="11" fill="#657b61" stroke="#152d31" stroke-width="2"/><path d="M0 0L14-9" stroke="#263b37" stroke-width="2"/><path d="M8-9L15-17L24-10L18-2Z" fill="#b35b51" stroke="#352b2c" stroke-width="2"/></g>
+ <g id="tree"><path d="M0 28L-7-7L-29-24M-4-3L24-28M-1 12L32-4" fill="none" stroke="#08151d" stroke-width="11"/><path d="M0 28L-7-7L-29-24M-4-3L24-28M-1 12L32-4" fill="none" stroke="#68766a" stroke-width="6"/><path d="M-54-27L-39-45L-10-39L5-22L-13-9L-44-12ZM-6-42L20-56L45-40L51-21L21-13L2-20ZM7-8L34-26L59-11L53 5L22 12Z" fill="#913f3a" stroke="#171d23" stroke-width="3"/></g>
+ <style>text{font-family:'Microsoft YaHei',sans-serif;fill:#cfbfa0}.title{font-size:30px;font-weight:600}.sub{font-size:17px;fill:#8ba49e}.label{font-size:22px;font-weight:500}.small{font-size:16px;fill:#a8b6a6}.num{fill:#f1ddbb;font-size:21px;font-weight:600}.wall{fill:none;stroke:#111f28;stroke-width:13;stroke-linejoin:round}.edge{fill:none;stroke:#54706b;stroke-width:5;stroke-linejoin:round}</style>
+</defs>
+<rect width="1600" height="1040" fill="#0b171e"/>
+<text x="38" y="49" class="title">节点数量保留，空间从「独立方院」改为「荷池组团」</text>
+<text x="38" y="82" class="sub">布置关系草案 · 只画一处分叉的五个节点 · 不是完成的美术图或实机关卡</text>
+<path d="M36 103H1564" stroke="#34494b"/>
+<!-- Before -->
+<rect x="38" y="126" width="405" height="813" rx="6" fill="#10222a" stroke="#30464a"/>
+<text x="65" y="167" class="label">当前空间关系</text>
+<text x="65" y="196" class="small">节点各自围墙，之间用长路联络</text>
+<path d="M240 842V757L128 692V512L240 415M240 757L354 692V512L240 415V329" fill="none" stroke="#687263" stroke-width="11"/>
+<path d="M240 842V757L128 692V512L240 415M240 757L354 692V512L240 415V329" fill="none" stroke="#253c42" stroke-width="4"/>
+<g fill="#626257" stroke="#1b363c" stroke-width="7"><rect x="181" y="246" width="118" height="88"/><rect x="75" y="450" width="106" height="88"/><rect x="300" y="450" width="106" height="88"/><rect x="75" y="660" width="106" height="88"/><rect x="300" y="660" width="106" height="88"/></g>
+<g text-anchor="middle" class="label"><text x="240" y="298">宝藏</text><text x="128" y="503">事件</text><text x="354" y="503">休息</text><text x="128" y="714">战斗</text><text x="354" y="714">战斗</text></g>
+<text x="240" y="875" text-anchor="middle" class="small">前一节点 → 分叉</text>
+<text x="65" y="913" class="small">节点不多，联络空间却被拉得很长</text>
+<!-- After -->
+<text x="516" y="155" class="label">建议：五个节点共享一座内池园林</text>
+<text x="516" y="183" class="small">围合关系连续；水、隔墙和植床分开两条真实路线；建筑集中在视野内</text>
+<path d="M590 233H1466V853H1150V914H958V853H590Z" fill="url(#ground)"/>
+<path d="M590 233H987M1227 233H1466V853H1150M958 853H590V233" class="wall"/>
+<path d="M590 233H987M1227 233H1466V853H1150M958 853H590V233" class="edge"/>
+<!-- Route surfaces. Inaccessible background is earth/planting, not free stone floor. -->
+<g fill="none" stroke="#696957" stroke-width="37" stroke-linejoin="round">
+ <path d="M1054 909V856H883V745H820M1054 856H1189V755H1250"/>
+ <path d="M714 639V563H858V446H830M1350 654V571H1206V446H1246"/>
+ <path d="M733 331V283H960V266H1018M1350 345V294H1254V266H1209"/>
+</g>
+<!-- Authored courtyards -->
+<g fill="url(#court)" stroke="#2c4246" stroke-width="4">
+ <rect x="1000" y="213" width="220" height="123" rx="3"/>
+ <path d="M624 333H831V491H668V470H624Z"/>
+ <path d="M1244 344H1438V505H1324V524H1244Z"/>
+ <path d="M610 639H826V818H610Z"/>
+ <path d="M1248 654H1450V823H1248Z"/>
+</g>
+<!-- Pool and bank: irregular, within the enclosing garden -->
+<path d="M976 356Q1060 326 1123 377L1133 421Q1195 442 1173 512L1165 554Q1201 613 1154 672Q1120 716 1061 704Q1009 758 961 707L935 662Q872 641 905 578L914 531Q875 471 922 431L945 416Z" fill="#112e3a" stroke="#6b7a6b" stroke-width="13"/>
+<path d="M976 356Q1060 326 1123 377L1133 421Q1195 442 1173 512L1165 554Q1201 613 1154 672Q1120 716 1061 704Q1009 758 961 707L935 662Q872 641 905 578L914 531Q875 471 922 431L945 416Z" fill="none" stroke="#071c28" stroke-width="4"/>
+<use href="#lotus" x="1000" y="425"/><use href="#lotus" x="1100" y="474" transform="rotate(15 1100 474)"/><use href="#lotus" x="969" y="606"/><use href="#lotus" x="1079" y="643" transform="scale(1)"/>
+<text x="1044" y="551" text-anchor="middle" font-size="30" fill="#91a9a0">庭 内 莲 池</text>
+<text x="1044" y="580" text-anchor="middle" class="small">池岸组织游线与对景</text>
+<!-- Short roofed corridors, connected to actual courtyards -->
+<path d="M718 558H858V450M1348 566H1206V449" fill="none" stroke="#0a1821" stroke-width="51" stroke-linejoin="miter"/>
+<path d="M718 558H858V450M1348 566H1206V449" fill="none" stroke="#2e4c52" stroke-width="41" stroke-linejoin="miter"/>
+<path d="M718 558H858V450M1348 566H1206V449" fill="none" stroke="#142b35" stroke-width="3"/>
+<g fill="#ab9165"><rect x="742" y="537" width="5" height="42"/><rect x="798" y="537" width="5" height="42"/><rect x="838" y="486" width="40" height="5"/><rect x="838" y="524" width="40" height="5"/><rect x="1270" y="545" width="5" height="42"/><rect x="1322" y="545" width="5" height="42"/><rect x="1185" y="480" width="42" height="5"/><rect x="1185" y="524" width="42" height="5"/></g>
+<!-- Buildings and screens -->
+<use href="#roof" transform="translate(1104 237) scale(.86)"/>
+<use href="#roof" transform="translate(696 364) scale(.65)"/>
+<use href="#roof" transform="translate(1349 384) scale(.83)"/>
+<use href="#roof" transform="translate(654 701) rotate(90) scale(.83)"/>
+<use href="#roof" transform="translate(1374 704) scale(.69)"/>
+<g fill="#647369" stroke="#101f27" stroke-width="3"><rect x="670" y="431" width="69" height="12"/><rect x="1290" y="779" width="76" height="12"/><path d="M751 791L773 751L797 787Z"/><path d="M1396 477L1402 441L1425 478Z"/></g>
+<use href="#tree" transform="translate(797 366) scale(.56)"/><use href="#tree" transform="translate(1390 799) scale(.55)"/><use href="#tree" transform="translate(667 793) scale(.52)"/>
+<!-- Choice and doors -->
+<g fill="#a4463f" stroke="#2b181e" stroke-width="3"><rect x="877" y="819" width="14" height="39" rx="2"/><rect x="1182" y="819" width="14" height="39" rx="2"/></g>
+<g fill="none" stroke="#e0bb88" stroke-width="2.6" marker-end="url(#arrow)"><path d="M1054 905V871H913"/><path d="M1054 871H1160"/></g>
+<text x="1056" y="949" text-anchor="middle" class="small">在实际岔门择路；另一支仍按原规则封闭</text>
+<!-- Functional node badges; buildings do not create extra events -->
+<g text-anchor="middle">
+ <text x="1110" y="313" class="label">⑤ 宝藏水榭</text>
+ <text x="747" y="479" class="label">② 事件小庭</text>
+ <text x="1343" y="499" class="label">④ 休息庭</text>
+ <text x="738" y="731" class="label">① 普通战</text>
+ <text x="1351" y="770" class="label">③ 普通战</text>
+</g>
+<text x="38" y="994" class="sub">浅石色：可行走庭地与短廊　｜　深底色：不可通行的植床／结构空间　｜　朱砂门：分支控制点</text>
+<text x="38" y="1021" class="small">示意仅说明围合、内池和节点关系；具体尺寸、模型净空与通行格需要在样板中共同校验。</text>
+</svg>

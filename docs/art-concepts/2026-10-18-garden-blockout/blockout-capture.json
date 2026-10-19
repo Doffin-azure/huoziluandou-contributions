@@ -1,0 +1,50 @@
+[
+  {
+    "active_chunks": 15,
+    "assembly_cpu_ms": 11.522,
+    "cache_limit": 49,
+    "cached_chunks": 15,
+    "generation_ms": 14.055,
+    "geometry_only": true,
+    "max_cached_chunks": 15,
+    "nodes": 55,
+    "seed": 17,
+    "total_chunks": 112,
+    "viewport_pixels": [
+      1600,
+      1000
+    ]
+  },
+  {
+    "active_chunks": 12,
+    "assembly_cpu_ms": 9.97,
+    "cache_limit": 49,
+    "cached_chunks": 12,
+    "generation_ms": 15.251,
+    "geometry_only": true,
+    "max_cached_chunks": 12,
+    "nodes": 55,
+    "seed": 29,
+    "total_chunks": 114,
+    "viewport_pixels": [
+      1600,
+      1000
+    ]
+  },
+  {
+    "active_chunks": 12,
+    "assembly_cpu_ms": 8.899,
+    "cache_limit": 49,
+    "cached_chunks": 12,
+    "generation_ms": 14.392,
+    "geometry_only": true,
+    "max_cached_chunks": 12,
+    "nodes": 55,
+    "seed": 67,
+    "total_chunks": 108,
+    "viewport_pixels": [
+      1600,
+      1000
+    ]
+  }
+]

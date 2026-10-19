@@ -53,10 +53,8 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 				description = "该敌人接下来%d次行动后，各受到%d点灼烧伤害。" % [stacks, int(unit.status_data.get("burn_damage", 3))]
 			elif id == "heart_corrosion":
 				description = "该敌人每次行动后受到%d点非攻击伤害，可被护盾吸收；层数不衰减。" % stacks
-			if data.decay_per_turn > 0 and unit.is_player:
+			if data.decay_per_turn > 0 and (unit.is_player or id == "vulnerable"):
 				description += "\n每回合衰减 %d 层。" % data.decay_per_turn
-			elif id == "vulnerable" and not unit.is_player:
-				description += "\n本场保留，不按回合衰减。"
 			result.append(entry(str(id), data.name, data.glyph, stacks, description, data.color, data.kind))
 		else:
 			result.append(entry(str(id), str(id), "状", stacks, "未配置状态说明。", Palette.GOLD))

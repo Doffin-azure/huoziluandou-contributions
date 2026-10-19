@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="ExpeditionFlatPalette" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/map/expedition_flat_palette.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+background = Color(0.0392, 0.0824, 0.1137, 1)
+ink = Color(0.0314, 0.0588, 0.0980, 1)
+stone_top = Color(0.2941, 0.3412, 0.3451, 1)
+stone_front = Color(0.2000, 0.2745, 0.2902, 1)
+stone_side = Color(0.1255, 0.2039, 0.2314, 1)
+bronze = Color(0.6667, 0.5176, 0.2941, 1)
+wood_top = Color(0.3098, 0.3373, 0.2863, 1)
+wood_front = Color(0.1608, 0.2431, 0.2314, 1)
+wood_side = Color(0.0784, 0.1725, 0.1922, 1)
+cloth = Color(0.5451, 0.1882, 0.2039, 1)
+seal = Color(0.7059, 0.2824, 0.2392, 1)
+glyph_fill = Color(0.7843, 0.7216, 0.5804, 1)
+glyph_recess = Color(0.0667, 0.1490, 0.1804, 1)
+glyph_edge = Color(0.4431, 0.5137, 0.4667, 1)
+water = Color(0.0902, 0.2314, 0.2510, 1)
+architecture_top = Color(0.2941, 0.4275, 0.4471, 1)
+architecture_front = Color(0.1569, 0.3294, 0.3529, 1)
+architecture_side = Color(0.0784, 0.1804, 0.2314, 1)
+roof = Color(0.0863, 0.1961, 0.2353, 1)
+roof_light_response = 0.65
+garden_soil = Color(0.1059, 0.1686, 0.1373, 1)
+garden_grass = Color(0.1765, 0.3020, 0.2196, 1)
+garden_grass_dark = Color(0.0706, 0.1608, 0.1373, 1)
+garden_moss = Color(0.2863, 0.3608, 0.2392, 1)
+garden_path_edge = Color(0.4824, 0.4588, 0.3490, 1)
+garden_stone = Color(0.3098, 0.3843, 0.3490, 1)
+garden_paper = Color(0.5686, 0.4863, 0.2706, 1)
+distant = Color(0.1137, 0.2549, 0.2941, 1)
+mist = Color(0.2000, 0.2941, 0.3176, 1)
+tree_bark = Color(0.2667, 0.3373, 0.3333, 1)
+tree_bark_shadow = Color(0.0902, 0.1765, 0.2039, 1)
+tree_bark_light = Color(0.4118, 0.4510, 0.3882, 1)
+tree_leaf = Color(0.1765, 0.3020, 0.2745, 1)
+tree_leaf_shadow = Color(0.0784, 0.1804, 0.1961, 1)
+tree_leaf_light = Color(0.2745, 0.4196, 0.3647, 1)
+tree_ink = Color(0.0314, 0.0588, 0.0980, 1)
+outline_pixels = 1.5
+
+patina = Color(0.1647, 0.3529, 0.3765, 1)
+
+tomb_stone = Color(0.2314, 0.3098, 0.3255, 1)
+
+tomb_cut = Color(0.3608, 0.4078, 0.3922, 1)
+
+tomb_engraving = Color(0.0549, 0.1333, 0.1647, 1)
+
+tomb_moss = Color(0.1882, 0.2863, 0.2549, 1)

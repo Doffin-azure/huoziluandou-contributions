@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ExpeditionFlatPalette" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/map/expedition_flat_palette.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+background = Color(0.13, 0.16, 0.18, 1)
+ink = Color(0.08, 0.11, 0.13, 1)
+stone_top = Color(0.42, 0.47, 0.48, 1)
+stone_front = Color(0.25, 0.30, 0.32, 1)
+stone_side = Color(0.20, 0.25, 0.27, 1)
+wood_top = Color(0.46, 0.56, 0.57, 1)
+wood_front = Color(0.28, 0.39, 0.42, 1)
+wood_side = Color(0.20, 0.30, 0.33, 1)
+bronze = Color(0.74, 0.64, 0.47, 1)

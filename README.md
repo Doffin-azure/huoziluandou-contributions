@@ -1,8 +1,14 @@
 # 炼字狱
 
-> 4×4 字盘上的拼词构筑 Roguelike。玩家管理一袋会循环出现的**实体汉字**，按**四邻接**连线拼出真实中文词语，以词义触发攻击、防御、改盘、补字、储能、热度、经济等效果；战后通过加字 / 删字 / 复制 / 镀金改变自己的「可组词概率」，完成 **3 幕 × 8 节点**的冒险。
+> 4×4 字盘上的拼词构筑 Roguelike。玩家管理一袋会循环出现的**实体汉字**，按**四邻接**连线拼出真实中文词语，以词义触发攻击、防御、改盘、补字、储能、热度、经济等效果；战后通过加字 / 删字 / 复制 / 镀金改变自己的「可组词概率」，完成 **3 幕择路冒险**（经典模式保留每幕 8 节点）。
 
 引擎：**Godot 4.7（stable）· GDScript**。所有内容为数据驱动（`Resource`），美术以程序化着色器为主，辅以墨灵贴图。
+
+`codex/courtyard-room-map` 分支的「开始新冒险」现已切换为**从左到右的二维分叉节点图**，沿用最初的朱印、旧金与深青界面。每幕 55 个候选节点，一条路线实际前进 16 站（另含起点）；整幕连线与类型公开，可逐段预选，确认后只进入下一站，不能回头或补拿另一条分支。
+
+战斗、精英、首领、完整事件目录、字肆、休息及宝藏均接入同一份存档控制器；已有事件链、谜题、删字选择和事件战斗继续保留。战后择字三选一，跳过获 16 金币；字肆刷新需 5 金币。标题的「继续冒险」保留旧存档的节点关系、进度、待选奖励和事件状态，仅切换为二维显示。地图不生成园林几何、不渲染 3D 视口；返回复用二维界面，保留浏览位置。见[横向节点图与运行截图](docs/art-concepts/2026-10-19-horizontal-node-map/README.md)。
+
+3D 园林源码和资产保留，原地图屏幕另存为 `src/screens/room_map_3d_screen.gd`，相关样板工具暂作历史美术参考；本轮不继续优化或承诺其运行兼容性。下文固定 24 节点说明对应经典模式。
 
 ---
 
@@ -119,6 +125,9 @@ assets/fonts/  随仓库字体
 | 词效回归 | `<godot> --headless --path . res://tests/word_effect_regression.tscn` | 406 条实体守恒、词效联动、回合/跨战与交互检查 |
 | 战斗界面 | `<godot> --headless --path . res://tests/battle_ui_test.tscn` | 52 条真实场景、输入与异步结算检查 |
 | 词条预览 | `<godot> --headless --path . res://tests/effect_help_test.tscn` | 29 条词条显示、嵌套阅读、点按固定与点击隔离检查 |
+| 效果协议 | `<godot> --headless --path . res://tests/effect_contract_test.tscn` | 52 条注册、只读查询、UI / AI 共用、JSON 与结阵实体守恒检查 |
+| 图谱交互 | `<godot> --headless --path . res://tests/glyph_graph_test.tscn` | 布局防重叠、窗口适配、缩放拖动、范围筛选、寻字与词条联动 |
+| 大地图表现 | `<godot> --headless --path . res://tests/expedition_map_view_test.tscn` | 20 项投影与真实点击、只读渲染、事件抽屉、主题切换及版面扩展检查 |
 | 内容生成 | `<godot> --headless --path . --script res://src/tools/build_content.gd` | 从表格重建 `.tres` |
 | 词效表 | `<godot> --headless --path . res://src/tools/dump_words.tscn` | 导出 161 词效果表 |
 | 字表 | `<godot> --headless --path . res://src/tools/dump_chars.tscn` | 导出 65 字表（含出/入度） |
@@ -133,6 +142,11 @@ assets/fonts/  随仓库字体
 - **主策划案**：`docs/活字战斗_GDD_V1.0.md`（含系统图解）
 - 字表：`docs/附录_字表.md`
 - 字网图谱：`docs/附录_字网图谱.md`
+- 事件内容与结算：[远征事件系统说明](docs/事件系统说明.md) · [庭院事件条目](docs/事件条目_庭院_2026-10-18.md)
+- 图谱交互与美术：[字网图谱交互](docs/字网图谱交互.md)
+- 大地图美术设计：[墨池·冥府碑林设计包](docs/art-concepts/2026-10-16-mochi/README.md)
+- 大地图手绘立片实装：[运行素材与接入说明](assets/expedition/README.md)
+- 效果扩展与 AI 交互：[效果协议与维护说明](docs/效果协议与维护说明.md)
 - 词效设计提案：`docs/词效设计提案_V0.4.md`
 - 裁撤记录：`docs/裁撤记录.md`
 

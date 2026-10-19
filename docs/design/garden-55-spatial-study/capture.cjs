@@ -1,0 +1,40 @@
+const fs=require('node:fs');
+const path=require('node:path');
+const assert=require('node:assert/strict');
+async function main(){
+ const pages=await (await fetch('http://localhost:9337/json')).json();
+ const page=pages.find(p=>p.type==='page'&&p.url.includes('garden-55-spatial-study/preview.html'));
+ if(!page)throw new Error('Study preview must be open on Chrome debug port 9337.');
+ const socket=new WebSocket(page.webSocketDebuggerUrl);await new Promise(r=>socket.addEventListener('open',r,{once:true}));
+ let serial=0;const pending=new Map();
+ socket.addEventListener('message',event=>{const message=JSON.parse(event.data);if(pending.has(message.id)){const {resolve,reject}=pending.get(message.id);pending.delete(message.id);message.error?reject(message.error):resolve(message.result);}});
+ const call=(method,params={})=>new Promise((resolve,reject)=>{const id=++serial;pending.set(id,{resolve,reject});socket.send(JSON.stringify({id,method,params}));});
+ const evaluate=async expression=>{const value=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(value.exceptionDetails)throw new Error(JSON.stringify(value.exceptionDetails));return value.result.value;};
+ await call('Page.enable');
+ const loaded=new Promise(resolve=>{const listener=event=>{if(JSON.parse(event.data).method==='Page.loadEventFired'){socket.removeEventListener('message',listener);resolve();}};socket.addEventListener('message',listener);});
+ await call('Page.reload',{ignoreCache:true});await loaded;
+ await call('Emulation.setDeviceMetricsOverride',{width:1400,height:1440,deviceScaleFactor:1,mobile:false});
+ await evaluate('document.fonts.ready');
+ const checks=await evaluate(`(()=>{const s=window.spatialStudy;const all=s.data.nodes.map(n=>({id:n.id,path:s.findPath([33,104],[n.x,n.y])}));const paths=all.every(n=>n.path.length>0);const grid=all.every(n=>n.path.slice(1).every((p,i)=>Math.abs(p[0]-n.path[i][0])+Math.abs(p[1]-n.path[i][1])===1));const walls=all.every(n=>n.path.slice(1).every((p,i)=>!s.data.blockedLinks.includes([p.join(','),n.path[i].join(',')].sort().join('|'))));const reverse=s.findPath([33,4],[33,104]);return{nodes:s.data.nodes.length,allReachable:paths,fourWayOnly:grid,respectsDrawnWalls:walls,returnPathSteps:reverse.length-1,nodeButtons:document.querySelectorAll('.node').length,horizontalOverflow:document.documentElement.scrollWidth>innerWidth,errors:[]};})()`);
+ assert.equal(checks.nodes,55);assert.ok(checks.allReachable&&checks.fourWayOnly&&checks.respectsDrawnWalls);assert.ok(checks.returnPathSteps>0);assert.equal(checks.horizontalOverflow,false);
+ await call('Page.enable');
+ async function screenshot(file){const result=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});fs.writeFileSync(path.join(__dirname,file),Buffer.from(result.data,'base64'));}
+ await screenshot('preview.png');
+ await evaluate(`document.querySelector('[data-route="risk"]').click()`);
+ assert.ok(await evaluate(`document.querySelector('[data-route="risk"]').getAttribute('aria-pressed')==='true'&&document.querySelectorAll('.route-edge[stroke="#f0cb7f"]').length===16`));
+ await screenshot('risk-route.png');
+ await evaluate(`document.querySelector('[data-route="quiet"]').click()`);await screenshot('quiet-route.png');
+ await evaluate(`document.getElementById('clear').click();document.querySelector('[data-node="n02"]').dispatchEvent(new MouseEvent('click',{bubbles:true}))`);
+ assert.ok(await evaluate(`document.getElementById('walk-route').children.length>0&&document.getElementById('detail').textContent.includes('普通战')`));
+ await new Promise(resolve=>setTimeout(resolve,300));
+ checks.animationAdvanced=await evaluate(`spatialStudy.player.join(',')!=='33,104'`);assert.ok(checks.animationAdvanced);
+ await evaluate(`document.getElementById('roofs').click()`);
+ assert.ok(await evaluate(`[...document.querySelectorAll('.roof')].every(el=>el.style.display==='none')`));
+ await evaluate(`document.getElementById('roofs').click();document.getElementById('reset').click()`);
+ await call('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:1,mobile:false});
+ checks.landscapeOverflow=await evaluate('document.documentElement.scrollWidth>innerWidth');assert.equal(checks.landscapeOverflow,false);
+ await call('Emulation.setDeviceMetricsOverride',{width:1400,height:1440,deviceScaleFactor:1,mobile:false});
+ fs.writeFileSync(path.join(__dirname,'browser-checks.json'),JSON.stringify(checks,null,2)+'\n');
+ socket.close();console.log(JSON.stringify(checks));
+}
+main().catch(error=>{console.error(error);process.exit(1);});

@@ -1,0 +1,258 @@
+{
+  "kind": "design_diagram_not_runtime_test",
+  "room_count": 18,
+  "link_count": 20,
+  "routes": [
+    {
+      "picks": [
+        0,
+        0,
+        0
+      ],
+      "rooms": [
+        "s",
+        "a",
+        "b",
+        "c",
+        "f",
+        "g",
+        "h",
+        "k",
+        "l",
+        "m",
+        "p",
+        "q"
+      ],
+      "counts": {
+        "start": 1,
+        "battle": 3,
+        "event": 2,
+        "treasure": 2,
+        "elite": 2,
+        "rest": 1,
+        "boss": 1
+      },
+      "corridor_length": 119.5
+    },
+    {
+      "picks": [
+        1,
+        0,
+        0
+      ],
+      "rooms": [
+        "s",
+        "a",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "k",
+        "l",
+        "m",
+        "p",
+        "q"
+      ],
+      "counts": {
+        "start": 1,
+        "battle": 3,
+        "shop": 1,
+        "treasure": 2,
+        "elite": 2,
+        "event": 1,
+        "rest": 1,
+        "boss": 1
+      },
+      "corridor_length": 114.5
+    },
+    {
+      "picks": [
+        0,
+        1,
+        0
+      ],
+      "rooms": [
+        "s",
+        "a",
+        "b",
+        "c",
+        "f",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "p",
+        "q"
+      ],
+      "counts": {
+        "start": 1,
+        "battle": 4,
+        "event": 1,
+        "treasure": 2,
+        "rest": 2,
+        "elite": 1,
+        "boss": 1
+      },
+      "corridor_length": 123.5
+    },
+    {
+      "picks": [
+        1,
+        1,
+        0
+      ],
+      "rooms": [
+        "s",
+        "a",
+        "d",
+        "e",
+        "f",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "p",
+        "q"
+      ],
+      "counts": {
+        "start": 1,
+        "battle": 4,
+        "shop": 1,
+        "treasure": 2,
+        "rest": 2,
+        "elite": 1,
+        "boss": 1
+      },
+      "corridor_length": 118.5
+    },
+    {
+      "picks": [
+        0,
+        0,
+        1
+      ],
+      "rooms": [
+        "s",
+        "a",
+        "b",
+        "c",
+        "f",
+        "g",
+        "h",
+        "k",
+        "n",
+        "o",
+        "p",
+        "q"
+      ],
+      "counts": {
+        "start": 1,
+        "battle": 4,
+        "event": 3,
+        "treasure": 1,
+        "elite": 1,
+        "rest": 1,
+        "boss": 1
+      },
+      "corridor_length": 119
+    },
+    {
+      "picks": [
+        1,
+        0,
+        1
+      ],
+      "rooms": [
+        "s",
+        "a",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "k",
+        "n",
+        "o",
+        "p",
+        "q"
+      ],
+      "counts": {
+        "start": 1,
+        "battle": 4,
+        "shop": 1,
+        "treasure": 1,
+        "elite": 1,
+        "event": 2,
+        "rest": 1,
+        "boss": 1
+      },
+      "corridor_length": 114
+    },
+    {
+      "picks": [
+        0,
+        1,
+        1
+      ],
+      "rooms": [
+        "s",
+        "a",
+        "b",
+        "c",
+        "f",
+        "i",
+        "j",
+        "k",
+        "n",
+        "o",
+        "p",
+        "q"
+      ],
+      "counts": {
+        "start": 1,
+        "battle": 5,
+        "event": 2,
+        "treasure": 1,
+        "rest": 2,
+        "boss": 1
+      },
+      "corridor_length": 123
+    },
+    {
+      "picks": [
+        1,
+        1,
+        1
+      ],
+      "rooms": [
+        "s",
+        "a",
+        "d",
+        "e",
+        "f",
+        "i",
+        "j",
+        "k",
+        "n",
+        "o",
+        "p",
+        "q"
+      ],
+      "counts": {
+        "start": 1,
+        "battle": 5,
+        "shop": 1,
+        "treasure": 1,
+        "rest": 2,
+        "event": 1,
+        "boss": 1
+      },
+      "corridor_length": 118
+    }
+  ],
+  "geometry_checks": "room reservations, unrelated-room corridor clearance, orthogonal crossings",
+  "runtime_validation": "not implemented"
+}
