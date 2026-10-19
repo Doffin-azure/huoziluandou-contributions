@@ -43,7 +43,7 @@ func _run() -> void:
 	var b: BattleState = screen.battle
 	var word := Database.get_word_by_glyphs_string("防反")
 	var full := word.describe()
-	_check(EffectGlossary.brief(word).length() < full.length() and "所有敌人行动后" in full, "防反主文简化，完整说明仍保留详细结算时机")
+	_check(EffectGlossary.brief(word).length() <= full.length() and "反击" in full, "防反主文简化，完整说明仍保留详细结算时机")
 	var before := [b.rng.state, CharInstance._next_uid, b.player.energy, b.player.heat, GameState.gold, b.board.cells.duplicate()]
 	var label := EffectText.new()
 	label.position = Vector2(40, 50)
@@ -63,7 +63,7 @@ func _run() -> void:
 	_check(Rect2(Vector2.ZERO, get_viewport_rect().size).encloses(card.get_global_rect()), "浮层完整限制在视口内")
 	var card_body: RichTextLabel = card.get_child(0).get_child(1).get_child(0)
 	_check(card_body.get_theme_color("default_color") == Palette.INK, "独立浮层继承当前主题的可读文字颜色")
-	_check("所有敌人行动后" in card_body.get_parsed_text() and "url=term:block" in card_body.text, "规则浮层含完整定义与可继续查看的关联词条")
+	_check(card_body.get_parsed_text() == EffectGlossary.entry("term:counter").text and "url=term:block" in card_body.text, "规则浮层含完整定义与可继续查看的关联词条")
 	label._on_link_exited("term:counter", 0)
 	label._update_help(0.4, card.get_global_rect().get_center())
 	_check(not label._cards.is_empty(), "从关键词移入浮层后保持可阅读")
@@ -84,13 +84,14 @@ func _run() -> void:
 	escape_event.pressed = true
 	label._input(escape_event)
 	_check(label._cards.is_empty(), "Esc关闭规则浮层")
-	label.set_effect_text(EffectGlossary.brief(word), 0, word)
-	_check("完整词效" in label.get_parsed_text() and "url=word:防反" in label.text, "精简说明保留完整词效入口")
-	label.meta_clicked.emit("word:防反")
+	var detailed_word := Database.get_word_by_glyphs_string("反复")
+	label.set_effect_text(EffectGlossary.brief(detailed_word), 0, detailed_word)
+	_check("完整词效" in label.get_parsed_text() and "url=word:反复" in label.text, "精简说明保留完整词效入口")
+	label.meta_clicked.emit("word:反复")
 	await _frames()
 	card = label._cards[0]
 	card_body = card.get_child(0).get_child(1).get_child(0)
-	_check(card_body.get_parsed_text() == full, "完整词效浮层与规范原文一致")
+	_check(card_body.get_parsed_text() == detailed_word.describe(), "完整词效浮层与规范原文一致")
 	# 把浮层放到真实字盘上，覆盖一个能被点击的格子。
 	screen._board_view.clear_selection()
 	var cell_point: Vector2 = screen._board_view.tiles[0].get_global_rect().get_center()
@@ -160,13 +161,78 @@ func _run() -> void:
 	collection._show_tab("words")
 	await _frames()
 	var collection_body: EffectText = collection._word_grid.get_child(0).get_child(0).get_child(2)
-	_check("url=term:block" in collection_body.text and "完整词效" in collection_body.get_parsed_text(), "词语图鉴也使用精简文本与词条链接")
+	_check("url=term:block" in collection_body.text and "url=term:counter" in collection_body.text, "词语图鉴也使用精简文本与词条链接")
 	collection_body.meta_clicked.emit("term:counter")
 	await _frames()
 	collection._show_tab("chars")
 	await _frames()
 	_check(collection_body._cards.is_empty(), "图鉴切换页签不会遗留词条浮层")
 	collection.queue_free()
+	# 污染只常驻短词条；详细规则来自当前配置，点击后使用统一浮层。
+	for pid in Database.pollutions:
+		var pd: PollutionData = Database.get_pollution(pid)
+		var meta := "pollution:" + str(pid)
+		var entry := EffectGlossary.entry(meta)
+		_check(entry.text == pd.description, "污染词条读取当前配置：" + str(pid))
+		_check(EffectGlossary.format_text(pd.name + "污染").contains("url=" + meta), "污染名可点击：" + str(pid))
+		_check(not EffectGlossary.format_text(pd.name + "污染", 0, meta).contains("url=" + meta), "污染浮层不链接自身：" + str(pid))
+	var polluted := CharInstance.new(Database.get_character_by_glyph("连"))
+	polluted.pollutions.append("replicate")
+	b.board.set_cell(0, 0, polluted)
+	screen._inspect_tile(Vector2i.ZERO)
+	var frame: EffectText = screen._bubble.frame_details
+	_check(frame.visible and frame.text.contains("url=pollution:replicate") and not frame.get_parsed_text().contains("每回合复制"), "点击污染字只显示短链接，不常驻长规则")
+	frame.meta_clicked.emit("pollution:replicate")
+	await _frames()
+	_check(frame._pinned and frame._cards.size() == 1, "点击污染链接打开并固定浮层")
+	var pollution_body: RichTextLabel = frame._cards[0].get_child(0).get_child(1).get_child(0)
+	_check(pollution_body.get_parsed_text() == Database.get_pollution("replicate").description, "蔓生完整复制规则仍可查看")
+	frame.close_help()
+	screen._bubble.set_context(screen._selection_context([Vector2i.ZERO]))
+	_check(screen._bubble._context.text.contains("url=pollution:replicate"), "选字污染提示同样使用词条链接")
+	# Excel 已改数值也保持短说明；每个数字绑定自己的参数，避免相同默认数字串位。
+	var resource_values := BattleBalance.values.duplicate(true)
+	BattleBalance.values["words/extra_fangfan/e/0/amount"] = 19
+	BattleBalance.values["words/extra_fangfan/e/1/amount"] = 7
+	var tuned := BattleBalance.apply_resource(load("res://resources/words/extra_fangfan.tres")) as WordData
+	BattleBalance.values = resource_values
+	_check(tuned.has_meta("balance_changed") and tuned.describe().contains("当前配置"), "真实配置覆盖保留完整描述供词条查看")
+	_check(EffectGlossary.brief(tuned) == "获得19临时格挡、7层反击。", "Excel调过的多效果词保留短说明和各自当前数值")
+	var tuned_text := EffectText.new()
+	add_child(tuned_text)
+	tuned_text.set_effect_text(EffectGlossary.brief(tuned), 0, tuned)
+	_check(tuned_text.text.contains("url=word:防反") and not tuned_text.get_parsed_text().contains("当前配置"), "调参后的短说明仍提供完整词效链接，不展开配置清单")
+	tuned_text.queue_free()
+	for glyphs in WordDescriptions.BRIEF_TEXT:
+		var changed := Database.get_word_by_glyphs_string(glyphs).duplicate(true) as WordData
+		changed.set_meta("balance_changed", true)
+		changed.effect_summary = "不应回退的完整描述"
+		_check(not EffectGlossary.brief(changed).contains("不应回退"), "调参不丢短说明：" + glyphs)
+	var saved_values := BattleBalance.values.duplicate(true)
+	BattleBalance.values["core/buy_cost"] = 9
+	BattleBalance.values["core/deploy_choices"] = 6
+	BattleBalance.values["core/buyback_layer"] = 4
+	var deploy_brief := EffectGlossary.brief(Database.get_word_by_glyphs_string("投放"))
+	_check(deploy_brief.contains("支付9金币") and deploy_brief.contains("袋顶6字") and deploy_brief.contains("选1字") and deploy_brief.contains("额外使用+4"), "费用、候选数和复制层单独绑定，选一枚不被误改")
+	BattleBalance.values["core/vulnerable_mult"] = 2.25
+	var vulnerability := Database.get_status("vulnerable")
+	var saved_decay := vulnerability.decay_per_turn
+	vulnerability.decay_per_turn = 2
+	var vulnerable_help: String = EffectGlossary.entry("term:vulnerable").text
+	_check(vulnerable_help.contains("2.25") and vulnerable_help.contains("每回合开始减少2层") and vulnerable_help.contains("敌方本场不减层"), "易伤浮层同时保留当前倍率、玩家衰减和敌方持续规则")
+	b.player.statuses["vulnerable"] = 5
+	b.enemies[0].statuses["vulnerable"] = 5
+	var player_debuff: Dictionary = StatusDisplay.collect(b.player, b).filter(func(item): return item.id == "vulnerable")[0]
+	var enemy_debuff: Dictionary = StatusDisplay.collect(b.enemies[0], b).filter(func(item): return item.id == "vulnerable")[0]
+	_check(player_debuff.description.contains("2.25") and player_debuff.description.contains("衰减 2 层"), "玩家状态浮层显示当前倍率和减层")
+	_check(enemy_debuff.description.contains("2.25") and enemy_debuff.description.contains("本场保留"), "敌方状态浮层显示当前倍率与本场持续")
+	b._tick_player_statuses()
+	_check(b.player.status_stacks("vulnerable") == 3 and b.enemies[0].status_stacks("vulnerable") == 5, "易伤说明与实际玩家减层、敌人不减层一致")
+	vulnerability.decay_per_turn = 0
+	vulnerable_help = EffectGlossary.entry("term:vulnerable").text
+	_check(vulnerable_help.contains("玩家不按回合减层") and not vulnerable_help.contains("减少0层"), "衰减设0时明确不衰减")
+	vulnerability.decay_per_turn = saved_decay
+	BattleBalance.values = saved_values
 	screen.queue_free()
 	await _frames()
 	_check(get_tree().get_nodes_in_group("effect_help_open").is_empty(), "离开界面释放所有词条浮层")

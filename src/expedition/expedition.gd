@@ -811,7 +811,7 @@ func _gild(glyph_id: String) -> bool:
 			done += 1
 	if done == 0:
 		return false
-	_log("镀金【%s】×%d：单字或组词打出+1金币" % [Database.get_character(glyph_id).glyph, done])
+	_log("镀金【%s】×%d：每次有效单字或组词打出+%d金币" % [Database.get_character(glyph_id).glyph, done, BattleBalance.i("gild_gold", 1)])
 	return true
 
 

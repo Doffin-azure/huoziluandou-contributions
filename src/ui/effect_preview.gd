@@ -59,15 +59,15 @@ static func _active_triggers(effects: Array, b: BattleState, word: WordData = nu
 			lines.append("重复：本词的即时效果额外结算一次，费用再付。")
 		if b.player.status_stacks("next_extra") > 0:
 			lines.append("超载：本词的即时效果额外结算一次，费用再付。" if not EffectResolver.instant_effects(effects).is_empty() else "超载：本词没有可重演的即时效果，仍会消耗一次超载机会。")
-		if word.length() >= 3 and b.has_ability("next_compound"):
+		if word.length() >= BattleBalance.i("long_word_threshold", 3) and b.has_ability("next_compound"):
 			lines.append("复合：本词可选1枚实际消耗的字，在原格留临时副本。")
-		if word.length() >= 3 and b.has_ability("next_copy_layer"):
-			lines.append("超能：本词将按可留材料自动消耗储能，每付1点留1枚临时副本。")
+		if word.length() >= BattleBalance.i("long_word_threshold", 3) and b.has_ability("next_copy_layer"):
+			lines.append("超能：本词将按可留材料自动消耗储能，每付%d点保留1枚临时字。" % BattleBalance.i("copy_layer_cost", 1))
 	if effects.any(func(effect): return effect.is_attack()):
 		if b.player.status_stacks("next_bonus") > 0:
 			lines.append("热力待发：若本次发动攻击，每段+%d，计入超强翻倍，整次攻击后消耗。" % b.player.status_stacks("next_bonus"))
 		if b.player.status_stacks("next_double") > 0:
-			lines.append("超强：本次攻击基础伤害、力量与热力加成翻倍；被护盾全挡也消耗。")
+			lines.append("超强：本次攻击的基础伤害、力量和热力加成×%d，被全挡也消耗。" % BattleBalance.i("double_attack_mult", 2))
 		if b.has_ability("force_once"):
 			lines.append("力：若本次发动攻击，首个伤害段额外+%d，仅一次。" % b.ability_value("force_once"))
 		if b.has_ability("next_energy_bonus"):
@@ -242,9 +242,9 @@ static func _effect(e: EffectData, b: BattleState, path: Array, target: Dictiona
 static func _transfer(cards: Array, uid: int, b: BattleState) -> String:
 	if cards.is_empty():
 		return "没有可选原实体，本次不支付、不补字。"
-	var due := EffectUtil.discounted_cost(b, 2)
-	var payment := "需支付%d，可用支付额%d。" % [due, EffectUtil.available(b)]
+	var due := EffectUtil.discounted_cost(b, BattleBalance.i("buy_cost", 2))
+	var payment := "需付%d金币，可支付%d金币。" % [due, EffectUtil.available(b)]
 	for card in cards:
 		if card.uid == uid:
-			return "已选原实体【%s】，入盘额外使用+1；%s" % ["".join(card.glyph_list()), payment]
+			return "已选己方原字【%s】，额外使用+%d；%s" % ["".join(card.glyph_list()), BattleBalance.i("buyback_layer", 1), payment]
 	return "可选原实体：%s；%s" % [_glyphs(cards), payment]

@@ -111,23 +111,26 @@ func _make_custom_tooltip(for_text: String) -> Object:
 	return Ink.tooltip(for_text)
 
 
-func _details() -> String:
+func _details(link_pollution := false) -> String:
 	if _move == null or entries.is_empty(): return ""
-	var lines: Array[String] = [_move.title, _move.intent_text()]
+	var lines: Array[String] = [_move.title]
 	if _move.kind in [EnemyMoveData.Kind.ATTACK, EnemyMoveData.Kind.MULTI]:
 		var attacks := _move.hits if _move.kind == EnemyMoveData.Kind.MULTI else 1
-		lines.append("每次攻击 %d，共 %d 次；已计入敌方力量，尚未扣除玩家防御。" % [maxi(0, _move.damage + _unit.status_stacks("strength")), attacks])
-	elif _move.kind in [EnemyMoveData.Kind.BUFF, EnemyMoveData.Kind.DEBUFF]:
+		lines.append("攻击%d次，每次%d伤害，尚未扣除你的防御。" % [attacks, maxi(0, _move.damage + _unit.status_stacks("strength"))])
+	else:
+		lines.append(BattleText.enemy_move(_move))
+	if _move.kind in [EnemyMoveData.Kind.BUFF, EnemyMoveData.Kind.DEBUFF]:
 		var status := Database.get_status(_move.status_id)
 		if status != null:
-			lines.append("%s获得【%s】%d 层。\n%s" % ["玩家" if _move.kind == EnemyMoveData.Kind.DEBUFF else "敌人", status.name, _move.status_stacks, status.description])
+			lines.append(str(EffectGlossary.entry("status:" + status.id).get("text", "")))
 	if _move.inject_count > 0:
-		if not _move.inject_glyph.is_empty(): lines.append("向盘面空格注入 %d 枚【%s】。" % [_move.inject_count, _move.inject_glyph])
+		if not _move.inject_glyph.is_empty() and _move.kind != EnemyMoveData.Kind.INJECT: lines.append("向空格塞入%d枚【%s】。" % [_move.inject_count, _move.inject_glyph])
 		var pollution := Database.get_pollution(_move.pollution_id)
-		if pollution != null: lines.append("污染：%s\n%s" % [pollution.name, pollution.description])
+		if pollution != null:
+			lines.append(pollution.name + "污染" if link_pollution else "污染：%s\n%s" % [pollution.name, pollution.description])
 	return "\n".join(lines)
 
 
 func _show_details() -> void:
 	if not entries.is_empty():
-		details_requested.emit("敌方意图", _details(), true)
+		details_requested.emit("敌方意图", _details(true), true)

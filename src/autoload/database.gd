@@ -48,11 +48,14 @@ func reload() -> void:
 	for res in _load_dir(CHAR_DIR, "CharacterData"):
 		for effect in res.solo_effects:
 			effect.kind = effect.semantic_kind()
+		res.description = BattleText.character(res)
 		characters[res.id] = res
 		char_by_glyph[res.glyph] = res
 	for res in _load_dir(WORD_DIR, "WordData"):
 		for effect in res.effects:
 			effect.kind = effect.semantic_kind()
+		res.description = BattleText.word(res)
+		res.effect_summary = res.description
 		words[res.id] = res
 		words_by_glyphs[res.glyph_string()] = res
 	for res in _load_dir(STATUS_DIR, "StatusData"):
@@ -64,11 +67,16 @@ func reload() -> void:
 	for res in _load_dir(ACT_DIR, "ActData"):
 		acts[res.index] = res
 	for res in _load_dir(DECK_DIR, "StarterDeckData"):
-		starter_decks[res.id] = res
+		var starter: StarterDeckData = res.duplicate(true)
+		for entry in starter.entries:
+			if entry.character != null:
+				entry.character = characters.get(entry.character.id, entry.character)
+		starter_decks[starter.id] = starter
 	var balance_warning := EnemyBalance.load_into(enemies, pollutions)
 	if not balance_warning.is_empty():
 		warnings.append(balance_warning)
 		push_warning(balance_warning)
+	_bind_act_enemies()
 
 	if ResourceLoader.exists(RULES_PATH):
 		rules = BattleBalance.apply_resource(load(RULES_PATH))
@@ -78,6 +86,21 @@ func reload() -> void:
 	print("[Database] 字 %d / 词 %d / 敌人 %d / 幕 %d / 污染 %d" % [
 		characters.size(), words.size(), enemies.size(), acts.size(), pollutions.size()
 	])
+
+
+func _bind_act_enemies() -> void:
+	# 地图里的外部 EnemyData 引用仍指向缓存的原始 .tres；调参创建的是新资源。
+	# 先复制地图，再将候选池和固定遭遇统一绑定到完成配置的怪物，避免机制参数缺失变0。
+	for index in acts:
+		var act: ActData = acts[index].duplicate(true)
+		for node in act.nodes:
+			for i in node.enemy_pool.size():
+				var original: EnemyData = node.enemy_pool[i]
+				node.enemy_pool[i] = enemies.get(original.id, original)
+			for i in node.enemies.size():
+				var original: EnemyData = node.enemies[i]
+				node.enemies[i] = enemies.get(original.id, original)
+		acts[index] = act
 
 
 func _load_dir(dir_path: String, _expect_class: String) -> Array:

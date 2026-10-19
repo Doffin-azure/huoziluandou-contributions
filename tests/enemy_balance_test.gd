@@ -48,7 +48,7 @@ func _tuned() -> void:
 	check(b.player.hp == 949, "实际三段攻击扣51生命")
 	check(b.board.cells.filter(func(c): return c != null and c.glyph() == "热").size() == 2, "实际塞2枚热")
 	check(b.player.heat == 5, "机制升热来自Excel")
-	check(b.enemies[0].enemy_data.description.contains("升热5"), "怪物说明同步机制数值")
+	check(b.enemies[0].enemy_data.description.contains("热度+5"), "怪物说明同步机制数值")
 	b = make("nest_moth")
 	b.end_player_turn()
 	check(b.board.free_count() == 14, "结巢注2连")

@@ -434,6 +434,7 @@ func _refresh_piles() -> void:
 
 
 func _on_log(text: String) -> void:
+	text = BattleText.clean(text)
 	if _log_box == null:
 		return
 	var l := Ink.label(text, "Muted")
@@ -452,7 +453,7 @@ func _on_log(text: String) -> void:
 # ---------------------------------------------------------------- 独立词效预览
 func _on_selection_changed(path: Array, glyphs: Array, word: WordData, preview_target: Dictionary = {}) -> void:
 	if path.is_empty():
-		_bubble.frame_details.text = ""
+		_bubble.frame_details.set_effect_text("")
 		_bubble.frame_details.hide()
 	if preview_target.is_empty() and not path.is_empty() and _board_view.pick_mode.is_empty() and not _ready_action.is_empty() and not _ready_action.get("repeat_rotate", false):
 		if not battle.pending_reveal.is_empty():
@@ -507,8 +508,8 @@ func _pollution_cost_text(path: Array) -> String:
 			continue
 		for pid in inst.pollutions:
 			var pd: PollutionData = Database.get_pollution(pid)
-			if pd != null and not names.has(pd.name):
-				names.append(pd.name)
+			if pd != null and not names.has(pd.name + "污染"):
+				names.append(pd.name + "污染")
 	if names.is_empty():
 		return ""
 	return "　⚠ 污染：" + "、".join(names)
@@ -1240,7 +1241,7 @@ func _choose_word_transfer(path: Array, target: Dictionary) -> bool:
 	options.append({"text": "取消"})
 	var overlay := ChoiceOverlay.new()
 	_solo_bag_picker_active = true
-	overlay.setup({"title": "%s：选择原实体" % word.word, "body": "选字、选落点后确认时支付 2；保留原实体属性。", "options": options})
+	overlay.setup({"title": "%s：选择原实体" % word.word, "body": "选好字和空格后支付%d金币，保留原有强化。" % BattleBalance.i("buy_cost", 2), "options": options})
 	overlay.chose.connect(func(index):
 		_solo_bag_picker_active = false
 		if index < 0 or index >= cards.size():
@@ -1693,10 +1694,10 @@ func _open_gild_picker(path: Array) -> void:
 		return
 	var options: Array = []
 	for card in cards:
-		options.append({"text": "【%s】#%d（只强化这一枚）" % [card.glyph(), card.uid]})
+		options.append({"text": "【%s】 · 第%d枚" % [card.glyph(), options.size() + 1]})
 	options.append({"text": "取消"})
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "永久镀金：选择一枚实体字", "body": "镀金后每次单字或组词打出+1金币。同字形的其他实体不受影响。", "options": options})
+	overlay.setup({"title": "选择1字永久镀金", "body": "此字每次打出获得%d金币，组词也算；不影响同字的其他字块。" % BattleBalance.i("gild_gold", 1), "options": options})
 	overlay.chose.connect(func(index):
 		if index >= cards.size(): return
 		_on_commit(path, {"gild_uid": cards[index].uid}))
@@ -1713,7 +1714,7 @@ func _open_deck() -> void:
 	var overlay := CollectionOverlay.new()
 	overlay.setup({
 		"title": "字袋",
-		"subtitle": "%d 枚实体字" % GameState.deck_size(),
+		"subtitle": "字袋共%d字" % GameState.deck_size(),
 		"characters": chars,
 		"counts": counts,
 		"words": Database.words.values(),
@@ -1957,27 +1958,39 @@ func _inspect_tile(pos: Vector2i) -> void:
 	if _bubble.frame_details == null or battle == null: return
 	var inst := battle.board.get_xy(pos)
 	var lines: Array[String] = ["当前字 · 第%d行%d列" % [pos.y + 1, pos.x + 1]]
+	var entries := {}
 	if inst != null:
 		lines[0] += "【%s】" % "".join(inst.glyph_list())
-		if inst.gilded: lines.append("金：此实体已永久镀金；每次有效单字或组词+%d金币，弃字不触发。" % BattleBalance.i("gild_gold", 1))
-		if inst.temporary: lines.append("临：临时字，用后移除，战后消失。")
-		if inst.word_only: lines.append("词：仅组词触发效果，单打只弃掉。")
-		if inst.is_fused(): lines.append("融合：一格包含多个字形，作为一个实体共同使用。")
-		if inst.temporary_uses > 0: lines.append("叠层：还有%d次额外使用，先消耗复制层，最后消耗实体。" % inst.temporary_uses)
-		if inst.refined: lines.append("炼：本场重新入盘时恢复两次额外使用。")
-		if inst.pinned: lines.append("歇：本回合已用，下回合恢复；不能移动。" if inst.pinned_exhausted else "固：本场固定在原格，每回合可用一次；不能移动或换字。")
+		if inst.gilded: lines.append("镀金")
+		if inst.temporary: lines.append("临时字")
+		if inst.word_only: lines.append("仅供组词")
+		if inst.is_fused(): lines.append("融合")
+		if inst.temporary_uses > 0:
+			var label := "额外使用×%d" % inst.temporary_uses
+			lines.append(label)
+			entries["tile:layers"] = {"title": "额外使用", "label": label, "text": EffectGlossary.entry("term:extra_use").text + "剩余%d次。" % inst.temporary_uses}
+		if inst.refined: lines.append("精炼效果")
+		if inst.pinned:
+			var label := "固定 · 已用" if inst.pinned_exhausted else "固定 · 可用"
+			lines.append(label)
+			entries["tile:pinned"] = {"title": "固定", "label": label, "text": EffectGlossary.entry("term:pinned").text + ("本回合已用，下回合恢复。" if inst.pinned_exhausted else "本回合仍可使用。")}
 		for pid in inst.pollutions:
 			var pd := Database.get_pollution(pid)
-			if pd != null: lines.append("%s：%s" % [pd.name, pd.description])
+			if pd == null: continue
+			var label := pd.name + "污染"
+			lines.append(label)
+			var description := EnemyBalance.pollution_description(pd, inst.statuses) if pid == "replicate" and inst.is_enemy_owned() else pd.description
+			entries["pollution:" + str(pid)] = {"title": label, "text": description}
 		for sid in inst.statuses:
 			var sd := Database.get_status(str(sid))
-			if sd != null: lines.append("%s：%s" % [sd.name, sd.description])
+			if sd != null: lines.append(sd.name + "状态")
 	for mark in EnemyMechanics.markers(battle):
 		if mark.cell == pos:
-			var explanation := "%s框 · %s：%s" % [mark.label, mark.source, mark.description]
-			if not lines.has(explanation): lines.append(explanation)
-	var has_effect := inst != null and lines.size() > 1
-	_bubble.frame_details.text = "\n".join(lines) if has_effect else ""
+			var label := "%s · %s" % [mark.name, mark.source]
+			lines.append(label)
+			entries["tile:mark:%d" % entries.size()] = {"title": label, "text": mark.description}
+	var has_effect := lines.size() > 1
+	_bubble.frame_details.set_effect_text("\n".join(lines) if has_effect else "", 0, null, entries)
 	_bubble.frame_details.visible = has_effect
 
 
@@ -2126,7 +2139,7 @@ func _replay_feedback() -> bool:
 		var view := _view_for(event.target)
 		if event.kind == "enemy_action":
 			var move: EnemyMoveData = event.move
-			_bubble.set_text(event.target.display_name, move.title + " · " + move.intent_text(), SpeechBubble.State.PREVIEW)
+			_bubble.set_text(event.target.display_name, "使用「%s」。" % move.title, SpeechBubble.State.PREVIEW)
 			if not await _replay_enemy_action(view, event): return false
 			continue
 		var strike_timing: Dictionary = {}

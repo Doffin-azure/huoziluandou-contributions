@@ -83,7 +83,7 @@ func _ready() -> void:
 	screen._board_view._on_tile_hovered(Vector2i.ZERO)
 	check(not screen._bubble.frame_details.visible, "悬停特殊字不显示说明")
 	screen._board_view._on_tile_pressed(Vector2i.ZERO)
-	check(screen._bubble.frame_details.text.contains("镀金") and screen._bubble.frame_details.text.contains("蔓生") and screen._bubble.frame_details.text.contains("叠层"), "左侧同时解释同一字的镀金、污染、叠层")
+	check(screen._bubble.frame_details.text.contains("镀金") and screen._bubble.frame_details.text.contains("蔓生") and screen._bubble.frame_details.text.contains("额外使用"), "左侧同时解释同一字的镀金、污染、叠层")
 	check(screen._gold_strip.entries.size() == 1, "钱包只有普通金币")
 	var view: TileView = screen._board_view.tiles[0]
 	view.set_selected(false)
@@ -129,7 +129,7 @@ func _ready() -> void:
 	check(screen._bubble.frame_details.text == clicked_details, "悬停其他字不会替换已点击字的说明")
 	screen._board_view._on_tile_pressed(Vector2i(2, 0))
 	screen._board_view._dragging = false
-	check(screen._bubble.frame_details.visible and screen._bubble.frame_details.text.contains("镀金") and not screen._bubble.frame_details.text.contains("蔓生") and not screen._bubble.frame_details.text.contains("叠层"), "点击仅镀金的字只显示镀金效果")
+	check(screen._bubble.frame_details.visible and screen._bubble.frame_details.text.contains("镀金") and not screen._bubble.frame_details.text.contains("蔓生") and not screen._bubble.frame_details.text.contains("额外使用"), "点击仅镀金的字只显示镀金效果")
 	screen._board_view._on_tile_pressed(Vector2i.RIGHT)
 	screen._board_view._dragging = false
 	check(not screen._bubble.frame_details.visible and screen._bubble.frame_details.text.is_empty(), "点击普通字不显示任何额外字框说明")

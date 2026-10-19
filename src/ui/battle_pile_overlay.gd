@@ -30,7 +30,7 @@ func setup(p_title: String, instances: Array) -> void:
 		var notes: Array[String] = []
 		for pid in inst.pollutions:
 			var pollution: PollutionData = Database.get_pollution(pid)
-			notes.append("污染：" + (pollution.name if pollution != null else pid))
+			notes.append(pollution.name + "污染" if pollution != null else "污染：" + pid)
 		if inst.gilded: notes.append("镀金")
 		if inst.is_fused(): notes.append("融合字")
 		if inst.temporary: notes.append("临时字")

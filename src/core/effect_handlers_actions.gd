@@ -494,7 +494,7 @@ static func _gild_glyph(b: BattleState, ctx: Dictionary, eff: EffectData) -> Arr
 		return ["镀金：金币不足"]
 	inst.gilded = true
 	EventBus.deck_changed.emit()
-	return ["镀金：【%s】#%d 永久镀金，每次单字或组词打出+1金币" % [inst.glyph(), inst.uid]]
+	return ["镀金：【%s】#%d 永久镀金，每次有效单字或组词打出+%d金币" % [inst.glyph(), inst.uid, BattleBalance.i("gild_gold", 1)]]
 
 ## 精铸：把盘面一枚己方实体字固定（本场不消耗、可反复使用；不可移动/换字）。
 static func _pin_glyph(b: BattleState, ctx: Dictionary) -> Array:

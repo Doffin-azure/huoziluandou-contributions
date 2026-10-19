@@ -3,60 +3,197 @@ class_name EffectGlossary
 ## 纯展示词典：完整词效仍来自 WordData，不能执行效果或创建实体。
 
 const ENTRIES := {
-	"block": ["临时格挡", "先于持久盾吸收伤害；本回合所有敌人行动后清空。获得的数值可以叠加。"],
-	"shield": ["持久盾", "在临时格挡耗尽后吸收伤害，跨回合保留，直到消耗完毕。"],
-	"strength": ["力量", "每层使本场攻击的每段伤害+1，可以叠加。非攻击伤害不受力量加成。"],
-	"counter": ["反击", "本回合所有敌人行动后，对首个存活敌人反击一次：基础伤害=剩余临时格挡+3×反击层数。层数可叠加，结算后清除。"],
-	"temporary": ["临时字 / 临时复制", "用后移除，不进入字袋或弃字堆循环。生成的临时复制不继承原实体的固定、精炼、额外使用或镀金等强化；需要空格才能放入。单独出字是否有效，以该临时字的说明为准。"],
-	"original": ["己方原实体", "属于玩家、且不是临时复制的真实字块。同字形的两枚字是两个实体；移动或回袋时，原实体保留自己的强化。敌方字与临时字不在此列。"],
-	"extra_use": ["额外使用", "每次有效使用先扣1次额外使用，字留在原格；额外次数耗尽后，再次使用才正常消耗原实体。不同来源的次数可以叠加。"],
-	"refined": ["精炼效果", "当次获得2次额外使用；本场该实体以后每次重新补入盘面，都恢复至少2次额外使用。仅移动或进入新回合不刷新，战后结束。"],
-	"pinned": ["固定", "本场留在原格，不能移动或换字；每回合最多有效使用1次，下回合恢复使用机会。"],
-	"gilded": ["镀金", "每枚镀金字每次有效单字或组词打出获得1金币。原实体上的镀金跨战保留，临时复制不继承。"],
-	"replay": ["效果重演", "即时效果额外结算1次，不重复消耗组成词的字块；金币、储能等费用仍须再付。持续能力的启用效果不重演。"],
-	"return": ["原格返回", "优先放回原来所在的格子，原格被占用则改放空格。回放只返回当前有空位容纳的原实体；重连在满盘时继续等待空位。"],
-	"vulnerable": ["易伤", "受到的伤害提高50%，向上取整。多层仍为50%增幅；敌方易伤在本场不按回合衰减。"],
-	"corrosion": ["心蚀", "该敌人每次行动后，受到等于心蚀层数的非攻击伤害，可被护盾吸收。层数可以叠加，且不衰减。"],
-	"regen": ["再生", "每回合开始时回复等于当前层数的生命，随后减少1层。层数可以叠加。"],
-	"heart": ["心力", "每层抵挡1次致命伤害，触发时消耗1层并保留当前生命。强心会记录本场成功抵挡致命伤害的次数。"],
-	"bounty": ["爆金", "本场目标此后每受到一次攻击，你获得1金币；多段攻击逐段计入，被护盾全挡也触发。"],
-	"burn": ["灼烧", "在目标行动后造成伤害；放火持续2次行动，伤害按施放时热度记录，此后改变热度不改变这次灼烧。与字块的灼热污染不同。"],
-	"scorch": ["灼热污染", "字块上的污染标签。打出这枚字会使玩家受到灼热伤害；净化只移除污染标签，不改变所有权。"],
-	"overflow": ["溢热", "热度增加并超出热容时，会生成带灼热污染的【热】。相关能力只在实际新增污染时触发，抽到或移动旧的【热】不触发。"],
-	"energy": ["储能", "本场可积累并跨回合保留的资源。写明消耗或支付时才扣除；仅按当前储能计算伤害的词不会自动消耗。"],
-	"capacity": ["热容", "容纳热度的阈值。超过热容的新增热度可能产生溢热污染，提高热容不会主动降低已有热度。"],
-	"non_attack": ["非攻击伤害", "不属于攻击，不享受力量或下一次攻击的强化；仍可被护盾吸收，并按受击目标的减伤与易伤结算。"],
-	"double_attack": ["超强翻倍", "下一次攻击的各段基础伤害、力量与热力加成翻倍。蓄力、连载、过火的追加伤害不随之翻倍；被护盾全挡也消耗机会。"],
-	"double_passive": ["可翻倍的被动收益", "只支持这些能力中首项可兑现的收益：加速、流转、能力、连载、蓄能、蓄热、分利、过热、火热、电流过载、电能、心力、护甲。消耗与降温量不重复，没有实际收益时不消耗机会。"],
-	"formation": ["结阵", "之后打出的词先登记，点「发动」再按顺序结算。多词可以共享同一枚【击】；每个词的实时来源和资源按轮到它结算时的状态计算。"]
+	"instant": ["即时效果", "立刻生效一次的伤害、补字、治疗、护盾等效果。"],
+	"ability": ["持续能力", "启用后在指定时间内反复触发的效果，如【蓄能】。效果重演不会重复启用。"],
+	"cleanse": ["净化", "移除字块上的污染，不改变字的归属。不能直接解除签或区域标记。"],
+	"negative": ["负面状态", "中毒、易伤等不利效果。清心只清除玩家状态；字块污染用净化，怪物标记按要求解除。"],
+	"block": [
+		"临时格挡",
+		"先于持久盾抵挡伤害。所有敌人行动后清空。"
+	],
+	"shield": [
+		"持久盾",
+		"临时格挡用完后继续抵挡伤害；剩余数值保留到下回合。"
+	],
+	"strength": [
+		"力量",
+		"每层增加攻击每段的伤害。本场保留。"
+	],
+	"counter": [
+		"反击",
+		"敌人全部行动后，按剩余临时格挡和反击层数攻击一次。"
+	],
+	"temporary": [
+		"临时字",
+		"用后消失，不进字袋或弃字堆；不继承原字的强化。生成时需要空格；仅供组词的临时字不能单打生效。"
+	],
+	"original": [
+		"己方原字",
+		"属于你的非临时字。同字的不同字块分别记录强化；移动或回袋时保留。"
+	],
+	"extra_use": [
+		"额外使用",
+		"每次使用先扣1次额外使用，字留在原位。额外次数用完后，再次使用才消耗该字。"
+	],
+	"refined": [
+		"精炼",
+		"获得额外使用；本场每次从字袋或弃字堆回到盘面时恢复。"
+	],
+	"pinned": [
+		"固定",
+		"本场每回合可用一次，用后留在原位。不能移动或替换，下回合恢复。"
+	],
+	"gilded": [
+		"镀金",
+		"每次打出此字获得金币；组词也生效。永久保留。"
+	],
+	"word_only": [
+		"仅供组词",
+		"只能参与词语。单打只弃字，不发动单字效果。"
+	],
+	"fusion": [
+		"融合",
+		"多个字合成一个字块，占1格，共同移动和使用。镀金只按这个字块计一次。"
+	],
+	"selection": [
+		"选中框",
+		"当前选中的出字路径。取消选择即消失，不增加任何属性。"
+	],
+	"replay": [
+		"效果重演",
+		"词语的即时效果再生效一次。字不再消耗，费用再付；启用持续能力的效果不重演。"
+	],
+	"return": [
+		"返回原位",
+		"优先放回原来的格子，被占则找空格。空格不足时，回放少取回字，重连继续等待。"
+	],
+	"vulnerable": [
+		"易伤",
+		"受到的伤害增加；层数不影响增幅。"
+	],
+	"corrosion": [
+		"心蚀",
+		"敌人每次行动后受到伤害，伤害随层数增加。本场不减层。"
+	],
+	"regen": [
+		"再生",
+		"回合开始时回复生命，再减少层数。"
+	],
+	"heart": [
+		"心力",
+		"每层挡住一次致命伤害。触发后消耗1层，保留受击前生命。"
+	],
+	"bounty": [
+		"爆金",
+		"目标每受到一次攻击，你获得金币；多段攻击逐段计数，被护盾挡住也算。"
+	],
+	"burn": [
+		"灼烧",
+		"敌人每次行动后受到伤害。伤害在施放时确定，之后改变热度不影响。"
+	],
+	"scorch": [
+		"灼热污染",
+		"使用带灼热污染的字会扣除生命；净化可移除此污染。"
+	],
+	"overflow": [
+		"溢热",
+		"热度超过热容时，会生成带灼热污染的【热】。抽到或移动旧【热】不算溢热生成。"
+	],
+	"energy": [
+		"储能",
+		"供字词效果消耗，本场可跨回合积累；只有写明消耗时才会扣除。"
+	],
+	"capacity": [
+		"热容",
+		"热度的安全上限。超过后会生成灼热【热】；提高热容不会降低现有热度。"
+	],
+	"non_attack": [
+		"非攻击伤害",
+		"不受力量或攻击强化加成。仍受护盾、减伤和易伤影响。"
+	],
+	"double_attack": [
+		"超强增幅",
+		"增强下一次攻击，用后消耗1层，可跨回合保留。"
+	],
+	"double_passive": [
+		"能力收益",
+		"支持加速、流转、能力、连载、蓄能、蓄热、分利、过热、火热、电流过载、电能、心力、护甲。只增加收益，不增加费用或降温量。"
+	],
+	"formation": [
+		"结阵",
+		"先选词，再点「发动」依次生效。多个词可以共用同一枚【击】。"
+	]
 }
 
 ## 长词优先，避免把“非攻击伤害”拆成“攻击”等片段。
 const TERMS := {
+	"即时效果": "instant", "持续能力": "ability", "净化": "cleanse", "负面状态": "negative",
 	"临时格挡": "block", "临挡": "block", "持久盾": "shield", "力量": "strength",
 	"反击": "counter", "临时复制": "temporary", "临时副本": "temporary", "临时字": "temporary",
-	"己方原实体": "original", "原实体": "original", "实体字": "original",
-	"额外使用": "extra_use", "精炼效果": "refined", "固定": "pinned", "镀金": "gilded",
-	"效果重演": "replay", "原格返回": "return", "易伤": "vulnerable", "心蚀": "corrosion",
+	"己方原实体": "original", "原实体": "original", "实体字": "original", "己方原字": "original", "原字": "original",
+	"额外使用": "extra_use", "精炼效果": "refined", "精炼": "refined", "固定": "pinned", "镀金": "gilded",
+	"仅供组词": "word_only", "融合": "fusion", "选中框": "selection",
+	"效果重演": "replay", "原格返回": "return", "返回原位": "return", "易伤": "vulnerable", "心蚀": "corrosion",
 	"心力": "heart", "爆金": "bounty", "灼烧": "burn", "灼热污染": "scorch",
 	"再生": "regen",
 	"溢热": "overflow", "储能": "energy", "热容": "capacity",
-	"非攻击伤害": "non_attack", "超强翻倍": "double_attack", "被动收益": "double_passive",
+	"非攻击伤害": "non_attack", "超强翻倍": "double_attack", "超强增幅": "double_attack", "被动收益": "double_passive", "可翻倍收益": "double_passive", "能力收益": "double_passive",
 	"结阵": "formation"
 }
 
 static func brief(word: WordData) -> String:
-	return word.describe() if word.has_meta("balance_changed") else WordDescriptions.BRIEF_TEXT.get(word.word, word.describe())
+	return WordDescriptions.brief(word)
+
+static func vulnerable_damage_text() -> String:
+	return "受到伤害×%s，向上取整。层数不影响倍率。" % BattleBalance.f("vulnerable_mult", 1.5)
+
+static func status_description(id: String) -> String:
+	match id:
+		"vulnerable": return vulnerable_damage_text()
+		"strength": return "每层使攻击每段伤害+%d。本场保留，非攻击伤害不受加成。" % BattleBalance.i("strength_per_stack", 1)
+		"regen": return "回合开始时，回复层数×%d生命。" % BattleBalance.i("regen_per_stack", 1)
+		"poison": return "回合开始时，受到层数×%d伤害，可被护盾抵挡。" % BattleBalance.i("poison_per_stack", 1)
+		"heart_corrosion": return "敌人每次行动后受到层数×%d非攻击伤害。本场不减层。" % BattleBalance.i("corrosion_per_stack", 1)
+		"gold_burst": return "目标每受到一次攻击，你获得%d金币；多段攻击逐段计数，被护盾全挡也算。" % BattleBalance.i("bounty_on_hit", 1)
+		"next_double": return "下一次攻击的基础伤害、力量和热力加成×%d；蓄力、连载、过火不放大。攻击后消耗1层，被全挡也消耗，可跨回合保留。" % BattleBalance.i("double_attack_mult", 2)
+	var data := Database.get_status(id)
+	if id == "next_extra": return "下一个词的即时效果重演，用后消耗1层。字不再消耗，费用再付，可跨回合保留。"
+	if id == "next_bonus": return "下一次攻击每段伤害+1/层；攻击后消耗，可跨回合保留。"
+	if id == "burn": return "敌人行动后受到伤害；伤害和剩余次数见当前状态。"
+	return data.description if data != null else ""
 
 static func entry(meta: String) -> Dictionary:
+	if meta.begins_with("status:"):
+		var id := meta.trim_prefix("status:")
+		var status := Database.get_status(id)
+		if status == null: return {}
+		if id == "vulnerable": return entry("term:vulnerable")
+		var description := status_description(id)
+		if id in ["regen", "poison"]:
+			description += "结算后减少%d层。" % status.decay_per_turn if status.decay_per_turn > 0 else "不按回合减层。"
+		return {"title": status.name, "text": description}
+	if meta.begins_with("pollution:"):
+		var pollution := Database.get_pollution(meta.trim_prefix("pollution:"))
+		if pollution != null:
+			return {"title": pollution.name + "污染", "text": pollution.description}
+		return {}
 	if meta.begins_with("term:"):
 		var key := meta.trim_prefix("term:")
 		if ENTRIES.has(key):
 			var description: String = ENTRIES[key][1]
-			if key == "gilded": description = "每枚镀金字有效单打或组词时获得%d金币；原实体跨战保留。" % BattleBalance.i("gild_gold", 1)
-			elif key == "vulnerable": description = "受到的伤害乘以%s，向上取整；层数不改变倍率。" % BattleBalance.f("vulnerable_mult", 1.5)
-			elif key == "counter": description = "敌人行动结束后，反击伤害=剩余临时格挡+%d×反击层数。" % BattleBalance.i("counter_per_stack", 3)
-			elif key == "refined": description = "本场该实体重新入盘时恢复至少%d次额外使用。" % BattleBalance.i("refined_layers", 2)
+			if key == "gilded": description = "每次打出此字获得%d金币，组词也算；仅弃字不算，融合字只计一次。永久保留，临时复制不继承。" % BattleBalance.i("gild_gold", 1)
+			elif key == "vulnerable":
+				var status := Database.get_status("vulnerable")
+				var decay := status.decay_per_turn if status != null else 1
+				description = vulnerable_damage_text()
+				description += ("玩家每回合开始减少%d层。" % decay if decay > 0 else "玩家不按回合减层。")
+				description += "敌方本场不减层。"
+			elif key == "counter": description = "所有敌人行动后，攻击首个存活敌人一次：伤害=剩余临时格挡+%d×层数。之后清空反击层数。" % BattleBalance.i("counter_per_stack", 3)
+			elif key == "refined": description = "立即获得%d次额外使用。本场每次从字袋或弃字堆重新入盘时，恢复至少%d次；移动或换回合不恢复。" % [BattleBalance.i("refined_layers", 2), BattleBalance.i("refined_layers", 2)]
+			elif key in ["strength", "regen", "corrosion", "bounty", "double_attack"]:
+				var statuses := {"strength": "strength", "regen": "regen", "corrosion": "heart_corrosion", "bounty": "gold_burst", "double_attack": "next_double"}
+				description = str(entry("status:" + statuses[key]).get("text", description))
+			elif key == "burn": description = "【放火】的灼烧持续%d次敌方行动，每次行动后造成伤害。伤害在施放时确定，之后改变热度不影响。" % BattleBalance.i("burn_actions", 2)
 			return {"title": ENTRIES[key][0], "text": description}
 	elif meta.begins_with("word:"):
 		var word := Database.get_word_by_glyphs_string(meta.trim_prefix("word:"))
@@ -67,8 +204,19 @@ static func entry(meta: String) -> Dictionary:
 static func escape(text: String) -> String:
 	return text.replace("[", "[lb]")
 
-static func format_text(text: String, number_size := 0, exclude := "") -> String:
-	var terms: Array = TERMS.keys()
+static func format_text(text: String, number_size := 0, exclude := "", local_entries: Dictionary = {}) -> String:
+	var term_metas: Dictionary = {}
+	for term in TERMS: term_metas[term] = "term:" + TERMS[term]
+	for pollution in Database.pollutions.values():
+		term_metas[pollution.name + "污染"] = "pollution:" + pollution.id
+		term_metas[pollution.name] = "pollution:" + pollution.id
+	for status in Database.statuses.values():
+		term_metas[status.name + "状态"] = "status:" + status.id
+		if not term_metas.has(status.name): term_metas[status.name] = "status:" + status.id
+	for meta in local_entries:
+		var info: Dictionary = local_entries[meta]
+		term_metas[str(info.get("label", info.title))] = str(meta)
+	var terms: Array = term_metas.keys()
 	terms.sort_custom(func(a, b): return a.length() > b.length())
 	var output := ""
 	var cursor := 0
@@ -87,7 +235,7 @@ static func format_text(text: String, number_size := 0, exclude := "") -> String
 		for term in terms:
 			if text.substr(cursor, term.length()) != term:
 				continue
-			var meta: String = "term:" + TERMS[term]
+			var meta: String = term_metas[term]
 			output += link(term, meta) if meta != exclude else escape(term)
 			cursor += term.length()
 			matched = true
