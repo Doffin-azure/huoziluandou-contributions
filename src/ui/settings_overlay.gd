@@ -6,6 +6,7 @@ signal closed
 
 var _style_row: VBoxContainer
 var _panel: PanelContainer
+var _compendium: RelicCompendiumOverlay
 
 
 func _ready() -> void:
@@ -53,6 +54,16 @@ func _build() -> void:
 	scroll.add_child(pad)
 	var col := Ink.vbox(14)
 	pad.add_child(col)
+
+	col.add_child(Ink.hline())
+
+	# ---- 图鉴 ----
+	col.add_child(Ink.label("图鉴", "Subheading"))
+	col.add_child(Ink.caption("浏览全部遗物的名字、档次与效果；不影响当前对局。"))
+	var compendium := Ink.button("遗物图鉴")
+	compendium.custom_minimum_size = Vector2(220, 48 * JourneyStyle.touch_scale(self))
+	compendium.pressed.connect(_open_compendium)
+	col.add_child(compendium)
 
 	col.add_child(Ink.hline())
 
@@ -153,7 +164,16 @@ func _set_style(style_id: String) -> void:
 	_build_style_buttons()
 
 
+func _open_compendium() -> void:
+	if is_instance_valid(_compendium):
+		return
+	_compendium = RelicCompendiumOverlay.new()
+	add_child(_compendium)
+
+
 func _input(event: InputEvent) -> void:
+	if is_instance_valid(_compendium):
+		return
 	if event.is_action_pressed("cancel_selection"):
 		closed.emit()
 		queue_free()
