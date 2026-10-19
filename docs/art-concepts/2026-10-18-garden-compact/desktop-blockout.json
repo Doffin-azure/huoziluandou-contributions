@@ -1,0 +1,417 @@
+{
+  "android_device_tested": false,
+  "checks": 409,
+  "failures": [],
+  "geometry_only": true,
+  "renderer": "forward_plus",
+  "seeds": [
+    {
+      "active_chunks": 25,
+      "assembly_cpu_ms": 67.4320000000003,
+      "cache_limit": 49,
+      "cached_chunks": 49,
+      "draw_calls": 24,
+      "frame_p95_ms": 17.063,
+      "generation_ms": 83.724,
+      "geometry_only": true,
+      "layout_mode": "compact",
+      "max_cached_chunks": 49,
+      "memory_bytes": 182483832.0,
+      "nodes": 55,
+      "packing": {
+        "area": 4646,
+        "area_reduction": 0.43623346681228,
+        "attempt": 0,
+        "compounds": [
+          {
+            "form": "偏院",
+            "members": [
+              "n01",
+              "n02",
+              "n04",
+              "n07"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n03",
+              "n05",
+              "n06",
+              "n08",
+              "n09"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n10",
+              "n11",
+              "n14",
+              "n15",
+              "n18",
+              "n19"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n12",
+              "n13",
+              "n16",
+              "n17",
+              "n20",
+              "n21"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n22",
+              "n25",
+              "n26",
+              "n29",
+              "n30"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n23",
+              "n24",
+              "n27",
+              "n28",
+              "n31",
+              "n32"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n33",
+              "n36",
+              "n37",
+              "n40"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n34",
+              "n35",
+              "n38",
+              "n39",
+              "n41",
+              "n42"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n43",
+              "n44",
+              "n47",
+              "n50",
+              "n51"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n45",
+              "n46",
+              "n48",
+              "n49",
+              "n52",
+              "n53"
+            ]
+          }
+        ],
+        "corridor_length": 914,
+        "logical_edges_preserved": true,
+        "original_area": 8241,
+        "original_corridor_length": 1153
+      },
+      "render_cpu_ms": 0.203999996185303,
+      "render_gpu_ms": 1.56200003623962,
+      "seed": 17,
+      "total_chunks": 74,
+      "viewport_pixels": [
+        1280,
+        720
+      ]
+    },
+    {
+      "active_chunks": 20,
+      "assembly_cpu_ms": 67.5410000000006,
+      "cache_limit": 49,
+      "cached_chunks": 49,
+      "draw_calls": 24,
+      "frame_p95_ms": 18.269,
+      "generation_ms": 74.136,
+      "geometry_only": true,
+      "layout_mode": "compact",
+      "max_cached_chunks": 49,
+      "memory_bytes": 182512370.0,
+      "nodes": 55,
+      "packing": {
+        "area": 4747,
+        "area_reduction": 0.39203381147541,
+        "attempt": 0,
+        "compounds": [
+          {
+            "form": "合院",
+            "members": [
+              "n01",
+              "n02",
+              "n04",
+              "n05",
+              "n08",
+              "n09"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n03",
+              "n06",
+              "n07",
+              "n10",
+              "n11"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n12",
+              "n13",
+              "n15",
+              "n18",
+              "n19"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n14",
+              "n16",
+              "n17",
+              "n20",
+              "n21"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n22",
+              "n25",
+              "n28",
+              "n29"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n23",
+              "n24",
+              "n26",
+              "n27",
+              "n30",
+              "n31"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n32",
+              "n35",
+              "n36",
+              "n39"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n33",
+              "n34",
+              "n37",
+              "n38",
+              "n40",
+              "n41"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n42",
+              "n43",
+              "n46",
+              "n47",
+              "n50",
+              "n51"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n44",
+              "n45",
+              "n48",
+              "n49",
+              "n52",
+              "n53"
+            ]
+          }
+        ],
+        "corridor_length": 894,
+        "logical_edges_preserved": true,
+        "original_area": 7808,
+        "original_corridor_length": 1139
+      },
+      "render_cpu_ms": 0.230000004172325,
+      "render_gpu_ms": 1.80200004577637,
+      "seed": 29,
+      "total_chunks": 70,
+      "viewport_pixels": [
+        1280,
+        720
+      ]
+    },
+    {
+      "active_chunks": 25,
+      "assembly_cpu_ms": 74.8990000000002,
+      "cache_limit": 49,
+      "cached_chunks": 49,
+      "draw_calls": 20,
+      "frame_p95_ms": 18.168,
+      "generation_ms": 82.062,
+      "geometry_only": true,
+      "layout_mode": "compact",
+      "max_cached_chunks": 49,
+      "memory_bytes": 182578676.0,
+      "nodes": 55,
+      "packing": {
+        "area": 4848,
+        "area_reduction": 0.397014925373134,
+        "attempt": 0,
+        "compounds": [
+          {
+            "form": "合院",
+            "members": [
+              "n01",
+              "n02",
+              "n05",
+              "n06",
+              "n09",
+              "n10"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n03",
+              "n04",
+              "n07",
+              "n08",
+              "n11",
+              "n12"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n13",
+              "n14",
+              "n16",
+              "n19",
+              "n20"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n15",
+              "n17",
+              "n18",
+              "n21",
+              "n22"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n23",
+              "n24",
+              "n26",
+              "n27",
+              "n29"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n25",
+              "n28",
+              "n30",
+              "n31"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n32",
+              "n33",
+              "n36",
+              "n37",
+              "n40",
+              "n41"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n34",
+              "n35",
+              "n38",
+              "n39",
+              "n42"
+            ]
+          },
+          {
+            "form": "合院",
+            "members": [
+              "n43",
+              "n44",
+              "n47",
+              "n48",
+              "n51",
+              "n52"
+            ]
+          },
+          {
+            "form": "偏院",
+            "members": [
+              "n45",
+              "n46",
+              "n49",
+              "n50",
+              "n53"
+            ]
+          }
+        ],
+        "corridor_length": 963,
+        "logical_edges_preserved": true,
+        "original_area": 8040,
+        "original_corridor_length": 1190
+      },
+      "render_cpu_ms": 0.128999993205071,
+      "render_gpu_ms": 1.91400003433228,
+      "seed": 67,
+      "total_chunks": 74,
+      "viewport_pixels": [
+        1280,
+        720
+      ]
+    }
+  ]
+}

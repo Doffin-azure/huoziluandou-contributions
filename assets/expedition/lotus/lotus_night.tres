@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ExpeditionLotusPalette" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/map/expedition_lotus_palette.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+
+water_deep = Color(0.0745, 0.1804, 0.2118, 1)
+water_light = Color(0.1412, 0.2941, 0.3137, 1)
+ripple = Color(0.2549, 0.3922, 0.3765, 1)
+leaf = Color(0.1882, 0.3294, 0.2902, 1)
+leaf_light = Color(0.3137, 0.4353, 0.3608, 1)
+leaf_shadow = Color(0.0941, 0.2196, 0.2275, 1)
+withered = Color(0.4627, 0.3882, 0.2784, 1)
+petal_base = Color(0.5529, 0.1882, 0.2235, 1)
+petal_tip = Color(0.7333, 0.3137, 0.2902, 1)
+petal_inner = Color(0.7843, 0.6784, 0.5137, 1)
+seed = Color(0.6902, 0.5490, 0.3137, 1)

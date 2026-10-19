@@ -40,7 +40,9 @@ func _write(path: String, text: String) -> void:
 
 
 func run_scenario(cfg: Dictionary) -> Dictionary:
-	var h := RunHarness.new()
+	if cfg.get("mode","")=="courtyard" and not cfg.has("layout"):
+		cfg = cfg.duplicate(true); cfg["layout"] = "node_graph"
+	var h = load("res://src/expedition/room_run_state.gd").new() if cfg.get("mode", "") == "courtyard" else RunHarness.new()
 	h.reset(cfg)
 	var steps: Array = []
 	for a in cfg.get("actions", []):

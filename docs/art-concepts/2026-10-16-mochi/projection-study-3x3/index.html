@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>墨池 · 统一投影小样</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#192c28;color:#ded4b7;font:14px 'Microsoft YaHei',sans-serif}
+#scene{max-width:1280px;margin:auto}#scene svg{display:block;width:100%;height:auto;touch-action:pan-y}
+.tools{max-width:1056px;margin:0 auto 32px;padding:22px 0;border-top:1px solid #405749;line-height:1.9}
+button,a{color:#ded4b7}button{background:#304c3e;border:1px solid #72836a;padding:7px 15px;margin:0 8px 8px 0;cursor:pointer}
+input{accent-color:#b6a073;vertical-align:middle}label{margin-right:18px;white-space:nowrap}p{margin:8px 0}.quiet{color:#9dac99}
+@media(max-width:1100px){.tools{margin:0 24px}}
+</style>
+<div id="scene"></div>
+<div class="tools">
+<button id="guides">显示／隐藏对齐线</button>
+<button id="left" aria-label="箱子沿横轴向左一格">横向 −1</button><button id="right" aria-label="箱子沿横轴向右一格">横向 +1</button>
+<button id="back">纵深 −1</button><button id="front">纵深 +1</button><button id="reset">复位</button>
+<label>缩放 <input id="zoom" type="range" min="0.8" max="1.12" value="1" step="0.01"></label>
+<button id="svg">保存矢量图</button><button id="png">保存 PNG</button>
+<p>箱子只保留大色面、箱盖缝和一个锁扣。移动后所有边线、落脚点与阴影重新按同一投影计算。</p>
+<p class="quiet">这次只验证结构和简化画法。完整源文件可编辑，未替换游戏中的地图；前后景与镜头视差留待这处画法确认后继续。</p>
+<a href="chest.svg">独立字匣矢量</a> · <a href="preview.svg">完整预览矢量</a> · <a href="README.md">自检与制作说明</a>
+</div>
+<script src="study.js"></script>
+<script>
+const study=ProjectionStudy,params=new URLSearchParams(location.search),state={...study.defaults,guides:params.has('guides')};
+window.previewReady=false;
+function draw(){document.querySelector('#scene').innerHTML=study.render(state);window.previewReady=true}
+function move(dx,dz){state.x=Math.max(.56,Math.min(2.44,state.x+dx));state.z=Math.max(.36,Math.min(2.64,state.z+dz));draw()}
+function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+document.querySelector('#guides').onclick=()=>{state.guides=!state.guides;draw()};
+document.querySelector('#left').onclick=()=>move(-1,0);document.querySelector('#right').onclick=()=>move(1,0);
+document.querySelector('#back').onclick=()=>move(0,-1);document.querySelector('#front').onclick=()=>move(0,1);
+document.querySelector('#reset').onclick=()=>{Object.assign(state,study.defaults);document.querySelector('#zoom').value=1;draw()};
+document.querySelector('#zoom').oninput=e=>{state.zoom=Number(e.target.value);draw()};
+document.querySelector('#svg').onclick=()=>download(new Blob([study.render(state)],{type:'image/svg+xml'}),'mochi-projection-study.svg');
+document.querySelector('#png').onclick=()=>{
+  const url=URL.createObjectURL(new Blob([study.render(state)],{type:'image/svg+xml'})),image=new Image();
+  image.onload=()=>{const c=document.createElement('canvas');c.width=1280;c.height=800;c.getContext('2d').drawImage(image,0,0);URL.revokeObjectURL(url);c.toBlob(blob=>download(blob,'mochi-projection-study.png'))};image.src=url;
+};
+window.studyState=state;
+draw();
+</script>
+</html>

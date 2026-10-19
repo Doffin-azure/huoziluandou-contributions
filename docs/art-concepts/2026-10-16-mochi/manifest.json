@@ -1,0 +1,136 @@
+{
+  "title": "墨池·冥府碑林：大地图美术设计包",
+  "date": "2026-10-16",
+  "timezone": "Asia/Shanghai",
+  "stage": "概念设计与生产规范；未接入运行地图",
+  "reference": {
+    "file": "reference-battle-style.png",
+    "bytes": 2371892,
+    "sha256": "cf4f63ef5fb108ce6bc870c603e3ce2c8612a16d92ca9d6ffe581daca79a91af",
+    "width": 1983,
+    "height": 793
+  },
+  "deliverables": [
+    {
+      "file": "01-mochi-overview.png",
+      "bytes": 3020803,
+      "sha256": "aa4e728ed7add4ae9232a16ca8efd3b336e9fab127b89a067e97b7e8fbb12f67",
+      "width": 1672,
+      "height": 941,
+      "title": "整屏概念图",
+      "generator": "built-in image_gen.imagegen",
+      "generation_calls": 2,
+      "reference": "reference-battle-style.png",
+      "parent_image": null,
+      "prompts": [
+        "01-mochi-overview.prompt.txt",
+        "01-mochi-overview.revision.prompt.txt"
+      ]
+    },
+    {
+      "file": "02-mochi-environment.png",
+      "bytes": 3163654,
+      "sha256": "a6e712516bf8bfe61dfa26b37cdd5f5f48afe3c34ece75fe3c17878deee5f4db",
+      "width": 1672,
+      "height": 941,
+      "title": "去UI场景图",
+      "generator": "built-in image_gen.imagegen",
+      "generation_calls": 1,
+      "reference": "reference-battle-style.png",
+      "parent_image": "01-mochi-overview.png",
+      "prompts": [
+        "02-mochi-environment.prompt.txt"
+      ]
+    },
+    {
+      "file": "03-mochi-terrain.png",
+      "bytes": 2307562,
+      "sha256": "dee76f5cc5eec8e3f4dcf2e1d456eb5f0f1c5d595efe707e5f77b5f472976984",
+      "width": 1672,
+      "height": 941,
+      "title": "地形模块设定页",
+      "generator": "built-in image_gen.imagegen",
+      "generation_calls": 2,
+      "reference": "reference-battle-style.png",
+      "parent_image": "01-mochi-overview.png",
+      "prompts": [
+        "03-mochi-terrain.prompt.txt"
+      ]
+    },
+    {
+      "file": "04-mochi-elements.png",
+      "bytes": 2313076,
+      "sha256": "df0f791cef921907ad7e6d2b6c09cc63abac8c43500e51b6e7cbd53f2a99c65e",
+      "width": 1448,
+      "height": 1086,
+      "title": "交互元素设定页",
+      "generator": "built-in image_gen.imagegen",
+      "generation_calls": 2,
+      "reference": "reference-battle-style.png",
+      "parent_image": "01-mochi-overview.png",
+      "prompts": [
+        "04-mochi-elements.prompt.txt",
+        "04-mochi-elements.revision.prompt.txt"
+      ]
+    }
+  ],
+  "exports": [
+    {
+      "file": "exports/01-mochi-overview-1280x720.png",
+      "bytes": 1741169,
+      "sha256": "065846a4f1877f1cfbfbf11078d291c8b933710bbab4e4cd7efbe99fcd08664e",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "exports/01-mochi-overview-1920x1080.png",
+      "bytes": 3409874,
+      "sha256": "de3ed7d1cf9da0e24f98d6e4b6f33d2b41fb800e8b86733c415cd5e5de5db264",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "exports/02-mochi-environment-1280x720.png",
+      "bytes": 1833008,
+      "sha256": "95f6b8b2b61d18bd23575bded0cf7e24e964189d6f80f6bc104a4859fee30dc8",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "exports/02-mochi-environment-1920x1080.png",
+      "bytes": 3597651,
+      "sha256": "9f1205b6835349e82de7a5653e0d893e0d77dfdb029f07eb384d853c4e8a3414",
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "export_method": "Chrome headless document rasterization at 1920x1080 and 1280x720, device scale 1. Native near-16:9 sources retained; export scaling adds no new artwork detail.",
+  "inventory": {
+    "file": "asset-list.csv",
+    "entries": 39,
+    "asset_families": 38,
+    "joining_reference_entries": 1
+  },
+  "review": {
+    "gallery": "index.html",
+    "guide": "README.md",
+    "visually_inspected": [
+      "four final native images",
+      "overview and environment at 1280x720",
+      "overview at 1920x1080"
+    ],
+    "checks": [
+      "four distinct native images",
+      "four exports match exact named dimensions",
+      "39 unique inventory identifiers",
+      "review JavaScript syntax valid",
+      "no remote resources in gallery"
+    ],
+    "production_followup": [
+      "01 map occupies about 82% in concept; responsive UI target starts at 75/25 and must accommodate 4x4 plate",
+      "Generated UI lettering and effect readouts are illustrative; replace with runtime text",
+      "T12 is a visual joining sample, not an exact engineering 4x4 tile atlas",
+      "Object footprints and pixels need manual production alignment; final modules must be redrawn and seam-tested"
+    ]
+  }
+}

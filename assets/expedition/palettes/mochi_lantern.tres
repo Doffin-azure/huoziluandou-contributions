@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="ExpeditionFlatPalette" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/map/expedition_flat_palette.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+background = Color(0.0353, 0.1137, 0.1255, 1)
+ink = Color(0.025, 0.065, 0.065, 1)
+stone_top = Color(0.1608, 0.2588, 0.2471, 1)
+stone_front = Color(0.1098, 0.1961, 0.1922, 1)
+stone_side = Color(0.0784, 0.1451, 0.1569, 1)
+bronze = Color(0.5686, 0.4745, 0.3176, 1)
+wood_top = Color(0.2392, 0.3412, 0.3098, 1)
+wood_front = Color(0.1608, 0.2588, 0.2431, 1)
+wood_side = Color(0.1059, 0.1882, 0.1843, 1)
+cloth = Color(0.3490, 0.1804, 0.1686, 1)
+seal = Color(0.7020, 0.2667, 0.2157, 1)
+glyph_fill = Color(0.8510, 0.7922, 0.5843, 1)
+glyph_recess = Color(0.1137, 0.2039, 0.1922, 1)
+glyph_edge = Color(0.4314, 0.5686, 0.4784, 1)
+water = Color(0.0588, 0.2039, 0.2314, 1)
+architecture_top = Color(0.3216, 0.4039, 0.3647, 1)
+architecture_front = Color(0.2039, 0.3176, 0.3255, 1)
+architecture_side = Color(0.1451, 0.2353, 0.2745, 1)
+roof = Color(0.0706, 0.1647, 0.1725, 1)
+roof_light_response = 0.65
+distant = Color(0.1098, 0.2549, 0.2863, 1)
+mist = Color(0.2275, 0.4118, 0.4235, 1)
+tree_bark = Color(0.3900, 0.4300, 0.3500, 1)
+tree_bark_shadow = Color(0.1647, 0.2510, 0.2235, 1)
+tree_bark_light = Color(0.5300, 0.5600, 0.4400, 1)
+tree_leaf = Color(0.1200, 0.2500, 0.2300, 1)
+tree_leaf_shadow = Color(0.0550, 0.1300, 0.1300, 1)
+tree_leaf_light = Color(0.2667, 0.4078, 0.3333, 1)
+tree_ink = Color(0.025, 0.065, 0.065, 1)
+outline_pixels = 1.5

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>墨池 · 字匣与地面组合小样</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#172b2d;color:#ded4b5;font:14px 'Microsoft YaHei',sans-serif}
+canvas{display:block;width:100%;max-width:1280px;height:auto;margin:auto}
+.tools{max-width:1080px;margin:0 auto 32px;padding:20px 0;border-top:1px solid #3c5351;line-height:1.9}
+button,a{color:#ded4b5}button{background:#294443;border:1px solid #63736a;padding:8px 16px;cursor:pointer;margin:0 12px 8px 0}
+p{margin:8px 0}.quiet{color:#9fb0a6}
+</style>
+<canvas id="preview" width="1280" height="800" aria-label="三乘三的简化石地，中央摆放旧青铜木字匣，通过相同透视、接触阴影和少量碎石衔接"></canvas>
+<div class="tools">
+<button id="old">切换旧箱子对照</button><button id="contact">显示／隐藏接地层</button><button id="grid">显示／隐藏逻辑格</button><button id="save">保存当前画面</button>
+<p>这次检查字匣怎样落进场景：透视、材质明暗、尺度、接地点与局部遮挡。</p>
+<p class="quiet">地面由简单色块与少量石缝构成，字匣为独立透明素材；阴影和前景碎片分别组合。该页面是美术小样，尚未替换运行中的地图。</p>
+<a href="chest.png">独立字匣素材</a> · <a href="chest.prompt.txt">完整提示词</a> · <a href="README.md">组合说明</a>
+</div>
+<script>
+const canvas=document.querySelector('#preview'),ctx=canvas.getContext('2d');
+const query=new URLSearchParams(location.search);
+let old=query.has('old'),contact=!query.has('no-contact'),grid=query.has('grid');
+const X={x:240,y:35},Z={x:-112,y:132},O={x:448,y:142},anchor={x:1.64,z:1.63};
+const chest=new Image(),legacy=new Image(),floor=new Image();
+window.previewReady=false;
+Promise.all([load(chest,'chest.png'),load(legacy,'../../../../assets/expedition/map-props.png'),load(floor,'floor.png')]).then(()=>{draw();window.previewReady=true});
+function load(image,path){return new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;image.src=path})}
+function p(x,z,h=0){return[O.x+X.x*x+Z.x*z,O.y+X.y*x+Z.y*z-h]}
+function path(points){const q=new Path2D();points.forEach((v,i)=>i?q.lineTo(...v):q.moveTo(...v));q.closePath();return q}
+function poly(points,fill,stroke=null,width=1){const q=path(points);ctx.fillStyle=fill;ctx.fill(q);if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.lineJoin='round';ctx.stroke(q)}}
+function plane(points,fill,stroke=null,width=1){poly(points.map(v=>p(...v)),fill,stroke,width)}
+function line(points,color,width=1){ctx.beginPath();points.forEach((v,i)=>i?ctx.lineTo(...v):ctx.moveTo(...v));ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke()}
+const outline=[[0,0],[3,0],[3,3],[2.3,3],[2.27,2.97],[1.58,2.99],[1.55,3],[.4,3],[.36,2.97],[0,3]];
+function drawGround(){
+  // Surface coordinates are continuous; none of these slab edges follow the logical 3x3 grid.
+  poly([p(3,0),p(3,3),[p(3,3)[0],p(3,3)[1]+20],[p(3,0)[0],p(3,0)[1]+20]],'#263c3e','#152b2c',1.6);
+  const face=outline.slice(2).map(v=>p(...v));
+  poly([...face,...face.slice().reverse().map(v=>[v[0],v[1]+20])],'#304645','#192e2f',1.5);
+  plane(outline,'#49625c');
+  ctx.save();ctx.clip(path(outline.map(v=>p(...v))));
+  const slabs=[
+    [[[0,0],[1.24,0],[1.21,.87],[0,.91]],'#48625d'],
+    [[[1.24,0],[3,0],[3,.91],[1.21,.87]],'#49635d'],
+    [[[0,.91],[.79,.9],[.82,1.96],[0,1.91]],'#455e58'],
+    [[[.79,.9],[2.13,.9],[2.09,1.94],[.82,1.96]],'#4c645e'],
+    [[[2.13,.9],[3,.91],[3,1.96],[2.09,1.94]],'#48615b'],
+    [[[0,1.91],[1.47,1.95],[1.46,3],[0,3]],'#49615b'],
+    [[[1.47,1.95],[2.27,1.95],[2.3,3],[1.46,3]],'#465e59'],
+    [[[2.27,1.95],[3,1.96],[3,3],[2.3,3]],'#4a625b']
+  ];
+  for(const [points,color] of slabs)plane(points,color,'#344f4b',1.2);
+  // One quiet hand-painted surface spans the entire patch, independently of logical cells.
+  ctx.save();ctx.globalAlpha=.62;
+  ctx.transform(X.x,X.y,Z.x,Z.y,O.x,O.y);ctx.drawImage(floor,0,0,3,3);ctx.restore();
+  line([p(.08,.09),p(.35,.092),p(.51,.085)],'rgba(151,161,133,.24)',1);
+  line([p(2.69,2.78),p(2.8,2.82),p(2.84,2.9)],'#354f49',1.1);
+  line([p(.16,2.52),p(.24,2.55),p(.26,2.63)],'#3a534d',1);
+  // A broad, very faint dust stain belongs to the ground, rather than to a framed object tile.
+  if(contact){
+    const at=p(anchor.x,anchor.z-.1),g=ctx.createRadialGradient(at[0],at[1],4,at[0],at[1],176);
+    g.addColorStop(0,'rgba(30,54,49,.13)');g.addColorStop(.6,'rgba(30,54,49,.04)');g.addColorStop(1,'rgba(30,54,49,0)');
+    ctx.fillStyle=g;ctx.fillRect(at[0]-190,at[1]-180,380,360);
+  }
+  ctx.restore();
+  line([p(0,0),p(3,0)],'#849080',1.5);
+  line(outline.slice(2).map(v=>p(...v)),'#182e2e',1.7);
+}
+function footprint(){const a=p(anchor.x,anchor.z);return[[-111,-16],[112,16],[154,-28],[-69,-60]].map(v=>[a[0]+v[0],a[1]+v[1]])}
+function shadows(){
+  const foot=footprint();
+  ctx.save();ctx.filter='blur(7px)';poly(foot.map(v=>[v[0]+13,v[1]+12]),'rgba(14,29,29,.32)');ctx.restore();
+  ctx.save();ctx.filter='blur(2px)';poly(foot,'rgba(11,24,24,.54)');ctx.restore();
+  line(foot.slice(0,2),'rgba(12,25,24,.68)',3.5);
+}
+function prop(){
+  const a=p(anchor.x,anchor.z);
+  if(old){ctx.drawImage(legacy,78,200,177,127,a[0]-125,a[1]-163,280,201);return}
+  // Source pixels are preserved. The front foot midpoint is (688,829) in the original PNG.
+  const crop={x:64,y:204,w:1405,h:721},width=280,scale=width/crop.w;
+  ctx.drawImage(chest,crop.x,crop.y,crop.w,crop.h,a[0]-(688-crop.x)*scale,a[1]-(829-crop.y)*scale,width,crop.h*scale);
+}
+function foregroundContact(){
+  // The small slab lip overlaps the lowest few pixels of the front foot. It is a separate layer.
+  const a=p(anchor.x,anchor.z);const at=(x,y)=>[a[0]+x,a[1]+y];
+  poly([at(72,12),at(96,15),at(106,22),at(86,24),at(72,19)],'#314b47','#213735',1);
+  poly([at(72,12),at(94,10),at(106,16),at(86,19),at(72,17)],'#66796b','#2d453f',1.1);
+  poly([at(-144,-6),at(-131,-9),at(-126,-3),at(-139,0)],'#536c60','#2c453e',1);
+}
+function fallenSeals(){
+  for(const [x,z] of [[.62,2.37],[2.58,.72]]){
+    plane([[x,z],[x+.11,z-.02],[x+.16,z+.03],[x+.04,z+.05]],'#73483c','#4b4035',.8);
+  }
+}
+function guides(){
+  ctx.save();ctx.setLineDash([6,7]);
+  for(let n=0;n<=3;n++){line([p(n,0),p(n,3)],'rgba(231,217,173,.48)',1);line([p(0,n),p(3,n)],'rgba(231,217,173,.48)',1)}
+  ctx.restore();
+  for(let r=0;r<3;r++)for(let c=0;c<3;c++){const a=p(c+.1,r+.1);ctx.font="13px 'Microsoft YaHei'";ctx.fillStyle='#dacdae';ctx.fillText(`${r+1}-${c+1}`,a[0],a[1])}
+  const a=p(anchor.x,anchor.z);ctx.strokeStyle='#decf9e';ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(a[0],a[1],6,0,Math.PI*2);ctx.stroke();
+}
+function draw(){
+  ctx.fillStyle='#172b2d';ctx.fillRect(0,0,1280,800);
+  ctx.fillStyle='#ddd2b3';ctx.font="23px 'Microsoft YaHei'";ctx.fillText('墨池 · 字匣与地面组合小样',112,66);
+  ctx.fillStyle='#96aaa0';ctx.font="14px 'Microsoft YaHei'";ctx.fillText('3 × 3  /  简化石地 · 单个字匣 · 分层接地',112,96);
+  drawGround();fallenSeals();if(contact)shadows();prop();if(contact&&!old)foregroundContact();if(grid)guides();
+  ctx.fillStyle='#cfc5a8';ctx.font="16px 'Microsoft YaHei'";
+  ctx.fillText(old?'旧箱子对照：亮金边与高饱和细节':contact?'旧青铜木字匣  /  统一明暗、接触阴影、局部遮挡':'字匣本体  /  已隐藏独立接地层',112,740);
+  ctx.fillStyle='#91a69a';ctx.font="13px 'Microsoft YaHei'";ctx.fillText(grid?'虚线是逻辑格，石缝不沿格子描边。':'字匣、地面、阴影与前景碎片独立组合。',112,768);
+}
+document.querySelector('#old').onclick=()=>{old=!old;draw()};
+document.querySelector('#contact').onclick=()=>{contact=!contact;draw()};
+document.querySelector('#grid').onclick=()=>{grid=!grid;draw()};
+document.querySelector('#save').onclick=()=>{const a=document.createElement('a');a.download='prop-integration.png';a.href=canvas.toDataURL();a.click()};
+</script>
+</html>

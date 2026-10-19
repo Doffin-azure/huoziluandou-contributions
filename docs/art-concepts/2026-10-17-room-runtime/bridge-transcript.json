@@ -1,0 +1,498 @@
+{
+  "legal_actions": [
+    {
+      "needs": "none",
+      "path": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "score": 0,
+      "type": "play",
+      "word": "连击"
+    },
+    {
+      "needs": "three",
+      "path": [
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "score": 3,
+      "type": "play",
+      "word": "重连"
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "score": 14,
+      "type": "play",
+      "word": "回击"
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          3,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "score": 10,
+      "type": "play",
+      "word": "防反"
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          2,
+          0
+        ]
+      ],
+      "score": 4,
+      "type": "play",
+      "word": null
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          0,
+          1
+        ]
+      ],
+      "score": 0,
+      "type": "play",
+      "word": null
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          1,
+          1
+        ]
+      ],
+      "score": 0,
+      "type": "play",
+      "word": null
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          3,
+          1
+        ]
+      ],
+      "score": 4,
+      "type": "play",
+      "word": null
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          0,
+          2
+        ]
+      ],
+      "score": 4,
+      "type": "play",
+      "word": null
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          1,
+          2
+        ]
+      ],
+      "score": 1,
+      "type": "play",
+      "word": null
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          2,
+          2
+        ]
+      ],
+      "score": 1,
+      "type": "play",
+      "word": null
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          0,
+          3
+        ]
+      ],
+      "score": 0,
+      "type": "play",
+      "word": null
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          2,
+          3
+        ]
+      ],
+      "score": 2,
+      "type": "play",
+      "word": null
+    },
+    {
+      "needs": "none",
+      "path": [
+        [
+          3,
+          3
+        ]
+      ],
+      "score": 4,
+      "type": "play",
+      "word": null
+    },
+    {
+      "type": "end_turn"
+    }
+  ],
+  "observe": {
+    "act": 1,
+    "battle": {
+      "abilities": {},
+      "bag": 2,
+      "board": [
+        [
+          null,
+          null,
+          {
+            "fused": [],
+            "gilded": false,
+            "glyph": "击",
+            "owner": 0,
+            "pinned": false,
+            "pinned_exhausted": false,
+            "pollutions": [],
+            "refined": false,
+            "temp_uses": 0,
+            "temporary": false,
+            "uid": 2,
+            "word_only": false
+          },
+          null
+        ],
+        [
+          {
+            "fused": [],
+            "gilded": false,
+            "glyph": "连",
+            "owner": 0,
+            "pinned": false,
+            "pinned_exhausted": false,
+            "pollutions": [],
+            "refined": false,
+            "temp_uses": 0,
+            "temporary": false,
+            "uid": 11,
+            "word_only": false
+          },
+          {
+            "fused": [],
+            "gilded": false,
+            "glyph": "重",
+            "owner": 0,
+            "pinned": false,
+            "pinned_exhausted": false,
+            "pollutions": [],
+            "refined": false,
+            "temp_uses": 0,
+            "temporary": false,
+            "uid": 9,
+            "word_only": false
+          },
+          null,
+          {
+            "fused": [],
+            "gilded": false,
+            "glyph": "防",
+            "owner": 0,
+            "pinned": false,
+            "pinned_exhausted": false,
+            "pollutions": [],
+            "refined": false,
+            "temp_uses": 0,
+            "temporary": false,
+            "uid": 3,
+            "word_only": false
+          }
+        ],
+        [
+          {
+            "fused": [],
+            "gilded": false,
+            "glyph": "击",
+            "owner": 0,
+            "pinned": false,
+            "pinned_exhausted": false,
+            "pollutions": [],
+            "refined": false,
+            "temp_uses": 0,
+            "temporary": false,
+            "uid": 1,
+            "word_only": false
+          },
+          {
+            "fused": [],
+            "gilded": false,
+            "glyph": "流",
+            "owner": 0,
+            "pinned": false,
+            "pinned_exhausted": false,
+            "pollutions": [],
+            "refined": false,
+            "temp_uses": 0,
+            "temporary": false,
+            "uid": 10,
+            "word_only": false
+          },
+          {
+            "fused": [],
+            "gilded": false,
+            "glyph": "御",
+            "owner": 0,
+            "pinned": false,
+            "pinned_exhausted": false,
+            "pollutions": [],
+            "refined": false,
+            "temp_uses": 0,
+            "temporary": false,
+            "uid": 12,
+            "word_only": false
+          },
+          null
+        ],
+        [
+          {
+            "fused": [],
+            "gilded": false,
+            "glyph": "回",
+            "owner": 0,
+            "pinned": false,
+            "pinned_exhausted": false,
+            "pollutions": [],
+            "refined": false,
+            "temp_uses": 0,
+            "temporary": false,
+            "uid": 6,
+            "word_only": false
+          },
+          null,
+          {
+            "fused": [],
+            "gilded": false,
+            "glyph": "反",
+            "owner": 0,
+            "pinned": false,
+            "pinned_exhausted": false,
+            "pollutions": [],
+            "refined": false,
+            "temp_uses": 0,
+            "temporary": false,
+            "uid": 7,
+            "word_only": false
+          },
+          {
+            "fused": [],
+            "gilded": false,
+            "glyph": "防",
+            "owner": 0,
+            "pinned": false,
+            "pinned_exhausted": false,
+            "pollutions": [],
+            "refined": false,
+            "temp_uses": 0,
+            "temporary": false,
+            "uid": 4,
+            "word_only": false
+          }
+        ]
+      ],
+      "discard": 0,
+      "discard_cards": [],
+      "done": false,
+      "enemies": [
+        {
+          "alive": true,
+          "block": 0,
+          "hp": 30,
+          "intent": "攻击 6",
+          "max_hp": 30,
+          "name": "墨灵",
+          "persistent_block": 0,
+          "statuses": {}
+        }
+      ],
+      "enemy_skip_turns": 0,
+      "flow_speed_rows": {},
+      "formation": {
+        "active": false,
+        "queue": [],
+        "reserved": []
+      },
+      "last_played_glyphs": [],
+      "manual_draw_choices": {},
+      "manual_draw_pending": 0,
+      "pending_reveal": [],
+      "pierce_once": false,
+      "player": {
+        "block": 0,
+        "energy": 0,
+        "equity": 0,
+        "gold": 6,
+        "gold_earned_this_turn": 0,
+        "heat": 0,
+        "heat_capacity": 10,
+        "hp": 60,
+        "max_hp": 60,
+        "next_damage_reduction": 0,
+        "persistent_block": 0,
+        "statuses": {},
+        "temp_funds": 0,
+        "temporary_heat_capacity": 0,
+        "turn_strength": 0
+      },
+      "reconnect_pending": [],
+      "repeat_rotate": {
+        "count": 0,
+        "tile": [
+          -1,
+          -1
+        ]
+      },
+      "turn": 1
+    },
+    "branch_choices": {},
+    "current_room": "opening_1",
+    "deck": {
+      "击": 2,
+      "反": 1,
+      "回": 2,
+      "御": 1,
+      "流": 1,
+      "破": 1,
+      "连": 1,
+      "重": 1,
+      "防": 2
+    },
+    "deck_size": 12,
+    "done": false,
+    "generation_error": "",
+    "gold": 6,
+    "hp": 60,
+    "inventory_actions": [],
+    "log": [
+      "开局 seed=17，字袋 12 枚",
+      "第1幕：选择庭门前进，首领守在终庭。",
+      "进入普通战 · 侧廊石庭"
+    ],
+    "max_hp": 60,
+    "mode": "courtyard",
+    "next_rooms": [],
+    "node": 2,
+    "node_title": "普通战 · 侧廊石庭",
+    "node_type": "battle",
+    "pending_reward": false,
+    "phase": "battle",
+    "plate": [
+      [
+        "",
+        ""
+      ],
+      [
+        "",
+        ""
+      ]
+    ],
+    "position": [
+      0,
+      9
+    ],
+    "resolved": [
+      "start"
+    ],
+    "room_kind": "battle",
+    "schema": 1,
+    "sealed_rooms": [],
+    "seed": 17,
+    "tray": []
+  },
+  "steps": [
+    {
+      "action": {
+        "room": "opening_1",
+        "type": "enter_room"
+      },
+      "result": {
+        "current_room": "opening_1",
+        "ok": true,
+        "phase": "encounter"
+      }
+    },
+    {
+      "action": {
+        "type": "interact"
+      },
+      "result": {
+        "ok": true,
+        "phase": "battle"
+      }
+    }
+  ],
+  "summary": {
+    "act": 1,
+    "branch_choices": {},
+    "current_room": "opening_1",
+    "deck_size": 12,
+    "gold": 6,
+    "hp": 60,
+    "max_hp": 60,
+    "mode": "courtyard",
+    "node": 2,
+    "phase": "battle",
+    "seed": 17,
+    "victory": false,
+    "visited_rooms": 2
+  }
+}

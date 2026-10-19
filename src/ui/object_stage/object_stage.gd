@@ -114,7 +114,7 @@ func _build_light() -> void:
 	add_child(camera)
 	camera.look_at(Vector3(0, 1.5, 0))
 	var lens := CameraAttributesPractical.new()
-	lens.dof_blur_far_enabled = true
+	lens.dof_blur_far_enabled = RenderingServer.get_current_rendering_method() != "gl_compatibility"
 	lens.dof_blur_far_distance = 17.0
 	lens.dof_blur_far_transition = 4.0
 	lens.dof_blur_amount = 0.12
@@ -408,6 +408,12 @@ func take(index: int) -> void:
 	tw.tween_property(objects[index], "position", rests[index] + Vector3(0, 0.8, 2.0), 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 	tw.tween_property(objects[index], "scale", Vector3.ONE * 0.55, 0.22)
 	_motions[index] = tw
+
+
+func restore_object(index: int) -> void:
+	if index<0 or index>=objects.size(): return
+	objects[index].scale = Vector3.ONE
+	select_object(index)
 
 
 func _apply_motion() -> void:

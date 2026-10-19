@@ -1,0 +1,336 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1270" height="1660" viewBox="0 0 1270 1660">
+<style>
+text{font-family:"Noto Serif SC","Source Han Serif SC","SimSun",serif}
+.glyph{font-size:13px;font-weight:700;fill:#f4e7c8;text-anchor:middle;dominant-baseline:central}
+.legend{font-size:12.5px;fill:#5c625c}
+.small{font-size:11.5px;fill:#7b8178}
+.note{font-size:12px;fill:#6b6f66}
+</style>
+<rect width="1270" height="1660" fill="#efe7d3"/>
+<rect x="48" y="150" width="1174" height="1330" fill="none" stroke="#8b9588" stroke-width="3"/>
+<rect x="60" y="162" width="1150" height="1306" fill="none" stroke="#c2bda9" stroke-width="1"/>
+<ellipse cx="420" cy="930" rx="250" ry="210" fill="#7fa9a5" opacity="0.13"/>
+<ellipse cx="880" cy="760" rx="190" ry="150" fill="#7fa9a5" opacity="0.10"/>
+<path d="M 140 1470 C 380 1380 520 1250 640 1090 C 760 930 900 820 1110 640" fill="none" stroke="#a7b3a2" stroke-width="46" opacity="0.12"/>
+<text x="140" y="50" font-size="30" fill="#303a38">庭院行旅 · 多岔路线草案</text>
+<text x="142" y="80" font-size="15" fill="#7b8178">杀戮尖塔式竖向路线 / 15 层 / 6 条主路径 / 约 50 节点 / 每层重新择路</text>
+<rect x="990" y="28" width="150" height="30" rx="4" fill="#d9c8a0"/><text x="1065" y="48" class="legend" text-anchor="middle" fill="#5c4a30">规划层 · 非房间图</text>
+<path d="M 365 1385 C 365 1337.5 365 1337.5 365 1290" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 1385 C 365 1337.5 365 1337.5 365 1290" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 1385 C 365 1337.5 500 1337.5 500 1290" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 1385 C 365 1337.5 500 1337.5 500 1290" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 1385 C 500 1337.5 500 1337.5 500 1290" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 1385 C 500 1337.5 500 1337.5 500 1290" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 1385 C 500 1337.5 365 1337.5 365 1290" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 1385 C 500 1337.5 365 1337.5 365 1290" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 1385 C 635 1337.5 635 1337.5 635 1290" fill="none" stroke="#f7ecd4" stroke-width="6.5" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 1385 C 635 1337.5 635 1337.5 635 1290" fill="none" stroke="#bda06a" stroke-width="3.0" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 1385 C 770 1337.5 770 1337.5 770 1290" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 1385 C 770 1337.5 770 1337.5 770 1290" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 1385 C 770 1337.5 635 1337.5 635 1290" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 1385 C 770 1337.5 635 1337.5 635 1290" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 1385 C 905 1337.5 905 1337.5 905 1290" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 1385 C 905 1337.5 905 1337.5 905 1290" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 1385 C 905 1337.5 770 1337.5 770 1290" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 1385 C 905 1337.5 770 1337.5 770 1290" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 1290 C 365 1242.5 365 1242.5 365 1195" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 1290 C 365 1242.5 365 1242.5 365 1195" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 1290 C 365 1242.5 230 1242.5 230 1195" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 1290 C 365 1242.5 230 1242.5 230 1195" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 1290 C 500 1242.5 365 1242.5 365 1195" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 1290 C 500 1242.5 365 1242.5 365 1195" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 1290 C 635 1242.5 635 1242.5 635 1195" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 1290 C 635 1242.5 635 1242.5 635 1195" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 1290 C 770 1242.5 635 1242.5 635 1195" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 1290 C 770 1242.5 635 1242.5 635 1195" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 1290 C 770 1242.5 905 1242.5 905 1195" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 1290 C 770 1242.5 905 1242.5 905 1195" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 1290 C 905 1242.5 905 1242.5 905 1195" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 1290 C 905 1242.5 905 1242.5 905 1195" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 1290 C 905 1242.5 1040 1242.5 1040 1195" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 1290 C 905 1242.5 1040 1242.5 1040 1195" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 230 1195 C 230 1147.5 365 1147.5 365 1100" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 230 1195 C 230 1147.5 365 1147.5 365 1100" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 1195 C 365 1147.5 365 1147.5 365 1100" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 1195 C 365 1147.5 365 1147.5 365 1100" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 1195 C 365 1147.5 500 1147.5 500 1100" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 1195 C 365 1147.5 500 1147.5 500 1100" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 1195 C 635 1147.5 635 1147.5 635 1100" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 1195 C 635 1147.5 635 1147.5 635 1100" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 1195 C 635 1147.5 500 1147.5 500 1100" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 1195 C 635 1147.5 500 1147.5 500 1100" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 1195 C 905 1147.5 905 1147.5 905 1100" fill="none" stroke="#f7ecd4" stroke-width="7.7" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 1195 C 905 1147.5 905 1147.5 905 1100" fill="none" stroke="#d38b45" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 1040 1195 C 1040 1147.5 1040 1147.5 1040 1100" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 1040 1195 C 1040 1147.5 1040 1147.5 1040 1100" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 1040 1195 C 1040 1147.5 905 1147.5 905 1100" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 1040 1195 C 1040 1147.5 905 1147.5 905 1100" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 1100 C 365 1052.5 230 1052.5 230 1005" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 1100 C 365 1052.5 230 1052.5 230 1005" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 1100 C 365 1052.5 500 1052.5 500 1005" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 1100 C 365 1052.5 500 1052.5 500 1005" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 1100 C 500 1052.5 500 1052.5 500 1005" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 1100 C 500 1052.5 500 1052.5 500 1005" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 1100 C 500 1052.5 635 1052.5 635 1005" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 1100 C 500 1052.5 635 1052.5 635 1005" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 1100 C 635 1052.5 635 1052.5 635 1005" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 1100 C 635 1052.5 635 1052.5 635 1005" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 1100 C 905 1052.5 770 1052.5 770 1005" fill="none" stroke="#f7ecd4" stroke-width="7.7" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 1100 C 905 1052.5 770 1052.5 770 1005" fill="none" stroke="#d38b45" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 1100 C 905 1052.5 1040 1052.5 1040 1005" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 1100 C 905 1052.5 1040 1052.5 1040 1005" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 1040 1100 C 1040 1052.5 1040 1052.5 1040 1005" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 1040 1100 C 1040 1052.5 1040 1052.5 1040 1005" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 230 1005 C 230 957.5 365 957.5 365 910" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 230 1005 C 230 957.5 365 957.5 365 910" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 1005 C 500 957.5 500 957.5 500 910" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 1005 C 500 957.5 500 957.5 500 910" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 1005 C 635 957.5 500 957.5 500 910" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 1005 C 635 957.5 500 957.5 500 910" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 1005 C 635 957.5 770 957.5 770 910" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 1005 C 635 957.5 770 957.5 770 910" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 1005 C 770 957.5 770 957.5 770 910" fill="none" stroke="#f7ecd4" stroke-width="7.7" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 1005 C 770 957.5 770 957.5 770 910" fill="none" stroke="#d38b45" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 1005 C 770 957.5 905 957.5 905 910" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 1005 C 770 957.5 905 957.5 905 910" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 1040 1005 C 1040 957.5 905 957.5 905 910" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 1040 1005 C 1040 957.5 905 957.5 905 910" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 910 C 365 862.5 230 862.5 230 815" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 910 C 365 862.5 230 862.5 230 815" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 910 C 500 862.5 500 862.5 500 815" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 910 C 500 862.5 500 862.5 500 815" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 910 C 500 862.5 635 862.5 635 815" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 910 C 500 862.5 635 862.5 635 815" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 910 C 770 862.5 635 862.5 635 815" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 910 C 770 862.5 635 862.5 635 815" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 910 C 770 862.5 905 862.5 905 815" fill="none" stroke="#f7ecd4" stroke-width="7.7" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 910 C 770 862.5 905 862.5 905 815" fill="none" stroke="#d38b45" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 910 C 905 862.5 905 862.5 905 815" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 910 C 905 862.5 905 862.5 905 815" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 910 C 905 862.5 1040 862.5 1040 815" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 910 C 905 862.5 1040 862.5 1040 815" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 230 815 C 230 767.5 365 767.5 365 720" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 230 815 C 230 767.5 365 767.5 365 720" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 815 C 500 767.5 365 767.5 365 720" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 815 C 500 767.5 365 767.5 365 720" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 815 C 500 767.5 635 767.5 635 720" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 815 C 500 767.5 635 767.5 635 720" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 815 C 635 767.5 635 767.5 635 720" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 815 C 635 767.5 635 767.5 635 720" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 815 C 905 767.5 905 767.5 905 720" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 815 C 905 767.5 905 767.5 905 720" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 815 C 905 767.5 770 767.5 770 720" fill="none" stroke="#f7ecd4" stroke-width="7.7" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 815 C 905 767.5 770 767.5 770 720" fill="none" stroke="#d38b45" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 1040 815 C 1040 767.5 905 767.5 905 720" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 1040 815 C 1040 767.5 905 767.5 905 720" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 720 C 365 672.5 230 672.5 230 625" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 720 C 365 672.5 230 672.5 230 625" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 720 C 365 672.5 500 672.5 500 625" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 720 C 365 672.5 500 672.5 500 625" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 720 C 635 672.5 635 672.5 635 625" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 720 C 635 672.5 635 672.5 635 625" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 720 C 770 672.5 770 672.5 770 625" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 720 C 770 672.5 770 672.5 770 625" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 720 C 770 672.5 635 672.5 635 625" fill="none" stroke="#f7ecd4" stroke-width="7.7" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 720 C 770 672.5 635 672.5 635 625" fill="none" stroke="#d38b45" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 720 C 905 672.5 770 672.5 770 625" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 720 C 905 672.5 770 672.5 770 625" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 720 C 905 672.5 1040 672.5 1040 625" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 720 C 905 672.5 1040 672.5 1040 625" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 230 625 C 230 577.5 365 577.5 365 530" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 230 625 C 230 577.5 365 577.5 365 530" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 625 C 500 577.5 500 577.5 500 530" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 625 C 500 577.5 500 577.5 500 530" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 625 C 500 577.5 365 577.5 365 530" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 625 C 500 577.5 365 577.5 365 530" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 625 C 635 577.5 500 577.5 500 530" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 625 C 635 577.5 500 577.5 500 530" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 625 C 635 577.5 770 577.5 770 530" fill="none" stroke="#f7ecd4" stroke-width="7.7" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 625 C 635 577.5 770 577.5 770 530" fill="none" stroke="#d38b45" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 625 C 770 577.5 770 577.5 770 530" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 625 C 770 577.5 770 577.5 770 530" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 1040 625 C 1040 577.5 905 577.5 905 530" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 1040 625 C 1040 577.5 905 577.5 905 530" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 530 C 365 482.5 365 482.5 365 435" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 530 C 365 482.5 365 482.5 365 435" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 530 C 500 482.5 365 482.5 365 435" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 530 C 500 482.5 365 482.5 365 435" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 530 C 500 482.5 635 482.5 635 435" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 530 C 500 482.5 635 482.5 635 435" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 530 C 770 482.5 770 482.5 770 435" fill="none" stroke="#f7ecd4" stroke-width="7.7" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 530 C 770 482.5 770 482.5 770 435" fill="none" stroke="#d38b45" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 530 C 905 482.5 905 482.5 905 435" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 530 C 905 482.5 905 482.5 905 435" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 530 C 905 482.5 770 482.5 770 435" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 530 C 905 482.5 770 482.5 770 435" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 365 435 C 365 387.5 500 387.5 500 340" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 365 435 C 365 387.5 500 387.5 500 340" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 435 C 635 387.5 635 387.5 635 340" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 435 C 635 387.5 635 387.5 635 340" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 435 C 770 387.5 770 387.5 770 340" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 435 C 770 387.5 770 387.5 770 340" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 435 C 770 387.5 635 387.5 635 340" fill="none" stroke="#f7ecd4" stroke-width="7.7" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 435 C 770 387.5 635 387.5 635 340" fill="none" stroke="#d38b45" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 905 435 C 905 387.5 770 387.5 770 340" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 905 435 C 905 387.5 770 387.5 770 340" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 500 340 C 500 292.5 635 292.5 635 245" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 500 340 C 500 292.5 635 292.5 635 245" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 340 C 635 292.5 635 292.5 635 245" fill="none" stroke="#f7ecd4" stroke-width="7.7" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 340 C 635 292.5 635 292.5 635 245" fill="none" stroke="#d38b45" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 770 340 C 770 292.5 635 292.5 635 245" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 770 340 C 770 292.5 635 292.5 635 245" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 1480 C 635 1432.5 500 1432.5 500 1385" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 1480 C 635 1432.5 500 1432.5 500 1385" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 1480 C 635 1432.5 635 1432.5 635 1385" fill="none" stroke="#f7ecd4" stroke-width="6.5" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 1480 C 635 1432.5 635 1432.5 635 1385" fill="none" stroke="#bda06a" stroke-width="3.0" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<path d="M 635 1480 C 635 1432.5 770 1432.5 770 1385" fill="none" stroke="#f7ecd4" stroke-width="5.3" stroke-linecap="round" opacity="0.85"/>
+<path d="M 635 1480 C 635 1432.5 770 1432.5 770 1385" fill="none" stroke="#7b8f8d" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="" opacity="0.95"/>
+<circle cx="635" cy="1480" r="14" fill="#8c6e47" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="1481" class="glyph">始</text>
+<circle cx="365" cy="1385" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="365" y="1386" class="glyph">战</text>
+<circle cx="500" cy="1385" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="500" y="1386" class="glyph">战</text>
+<circle cx="635" cy="1385" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="1386" class="glyph">事</text>
+<circle cx="770" cy="1385" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="770" y="1386" class="glyph">战</text>
+<circle cx="905" cy="1385" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="905" y="1386" class="glyph">战</text>
+<circle cx="365" cy="1290" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="365" y="1291" class="glyph">战</text>
+<circle cx="500" cy="1290" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="500" y="1291" class="glyph">事</text>
+<circle cx="635" cy="1290" r="21" fill="none" stroke="#d38b45" stroke-width="2.5" stroke-dasharray="4 4"/>
+<circle cx="635" cy="1290" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="1291" class="glyph">战</text>
+<circle cx="770" cy="1290" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="770" y="1291" class="glyph">事</text>
+<circle cx="905" cy="1290" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="905" y="1291" class="glyph">战</text>
+<circle cx="230" cy="1195" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="230" y="1196" class="glyph">事</text>
+<circle cx="365" cy="1195" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="365" y="1196" class="glyph">战</text>
+<circle cx="635" cy="1195" r="14" fill="#b08a3e" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="1196" class="glyph">商</text>
+<circle cx="905" cy="1195" r="18" fill="none" stroke="#d38b45" stroke-width="1.5" opacity="0.7"/>
+<circle cx="905" cy="1195" r="14" fill="#7a2f2a" stroke="#f4e7c8" stroke-width="2"/>
+<text x="905" y="1196" class="glyph">精</text>
+<circle cx="1040" cy="1195" r="14" fill="#4f7f82" stroke="#f4e7c8" stroke-width="2"/>
+<text x="1040" y="1196" class="glyph">宝</text>
+<circle cx="365" cy="1100" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="365" y="1101" class="glyph">战</text>
+<circle cx="500" cy="1100" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="500" y="1101" class="glyph">事</text>
+<circle cx="635" cy="1100" r="14" fill="#4f7a62" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="1101" class="glyph">火</text>
+<circle cx="905" cy="1100" r="18" fill="none" stroke="#d38b45" stroke-width="1.5" opacity="0.7"/>
+<circle cx="905" cy="1100" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="905" y="1101" class="glyph">战</text>
+<circle cx="1040" cy="1100" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="1040" y="1101" class="glyph">事</text>
+<circle cx="230" cy="1005" r="14" fill="#b08a3e" stroke="#f4e7c8" stroke-width="2"/>
+<text x="230" y="1006" class="glyph">商</text>
+<circle cx="500" cy="1005" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="500" y="1006" class="glyph">战</text>
+<circle cx="635" cy="1005" r="14" fill="#7a2f2a" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="1006" class="glyph">精</text>
+<circle cx="770" cy="1005" r="18" fill="none" stroke="#d38b45" stroke-width="1.5" opacity="0.7"/>
+<circle cx="770" cy="1005" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="770" y="1006" class="glyph">事</text>
+<circle cx="1040" cy="1005" r="14" fill="#4f7f82" stroke="#f4e7c8" stroke-width="2"/>
+<text x="1040" y="1006" class="glyph">宝</text>
+<circle cx="365" cy="910" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="365" y="911" class="glyph">事</text>
+<circle cx="500" cy="910" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="500" y="911" class="glyph">战</text>
+<circle cx="770" cy="910" r="18" fill="none" stroke="#d38b45" stroke-width="1.5" opacity="0.7"/>
+<circle cx="770" cy="910" r="14" fill="#4f7a62" stroke="#f4e7c8" stroke-width="2"/>
+<text x="770" y="911" class="glyph">火</text>
+<circle cx="905" cy="910" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="905" y="911" class="glyph">事</text>
+<circle cx="230" cy="815" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="230" y="816" class="glyph">战</text>
+<circle cx="500" cy="815" r="14" fill="#b08a3e" stroke="#f4e7c8" stroke-width="2"/>
+<text x="500" y="816" class="glyph">商</text>
+<circle cx="635" cy="815" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="816" class="glyph">事</text>
+<circle cx="905" cy="815" r="18" fill="none" stroke="#d38b45" stroke-width="1.5" opacity="0.7"/>
+<circle cx="905" cy="815" r="14" fill="#7a2f2a" stroke="#f4e7c8" stroke-width="2"/>
+<text x="905" y="816" class="glyph">精</text>
+<circle cx="1040" cy="815" r="14" fill="#4f7f82" stroke="#f4e7c8" stroke-width="2"/>
+<text x="1040" y="816" class="glyph">宝</text>
+<circle cx="365" cy="720" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="365" y="721" class="glyph">事</text>
+<circle cx="635" cy="720" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="721" class="glyph">战</text>
+<circle cx="770" cy="720" r="18" fill="none" stroke="#d38b45" stroke-width="1.5" opacity="0.7"/>
+<circle cx="770" cy="720" r="14" fill="#4f7a62" stroke="#f4e7c8" stroke-width="2"/>
+<text x="770" y="721" class="glyph">火</text>
+<circle cx="905" cy="720" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="905" y="721" class="glyph">事</text>
+<circle cx="230" cy="625" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="230" y="626" class="glyph">战</text>
+<circle cx="500" cy="625" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="500" y="626" class="glyph">事</text>
+<circle cx="635" cy="625" r="18" fill="none" stroke="#d38b45" stroke-width="1.5" opacity="0.7"/>
+<circle cx="635" cy="625" r="14" fill="#7a2f2a" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="626" class="glyph">精</text>
+<circle cx="770" cy="625" r="14" fill="#b08a3e" stroke="#f4e7c8" stroke-width="2"/>
+<text x="770" y="626" class="glyph">商</text>
+<circle cx="1040" cy="625" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="1040" y="626" class="glyph">战</text>
+<circle cx="365" cy="530" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="365" y="531" class="glyph">事</text>
+<circle cx="500" cy="530" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="500" y="531" class="glyph">战</text>
+<circle cx="770" cy="530" r="18" fill="none" stroke="#d38b45" stroke-width="1.5" opacity="0.7"/>
+<circle cx="770" cy="530" r="14" fill="#4f7f82" stroke="#f4e7c8" stroke-width="2"/>
+<text x="770" y="531" class="glyph">宝</text>
+<circle cx="905" cy="530" r="14" fill="#4f7a62" stroke="#f4e7c8" stroke-width="2"/>
+<text x="905" y="531" class="glyph">火</text>
+<circle cx="365" cy="435" r="14" fill="#a34a3f" stroke="#f4e7c8" stroke-width="2"/>
+<text x="365" y="436" class="glyph">战</text>
+<circle cx="635" cy="435" r="14" fill="#7a2f2a" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="436" class="glyph">精</text>
+<circle cx="770" cy="435" r="18" fill="none" stroke="#d38b45" stroke-width="1.5" opacity="0.7"/>
+<circle cx="770" cy="435" r="14" fill="#7a4a63" stroke="#f4e7c8" stroke-width="2"/>
+<text x="770" y="436" class="glyph">事</text>
+<circle cx="905" cy="435" r="14" fill="#b08a3e" stroke="#f4e7c8" stroke-width="2"/>
+<text x="905" y="436" class="glyph">商</text>
+<circle cx="500" cy="340" r="14" fill="#4f7a62" stroke="#f4e7c8" stroke-width="2"/>
+<text x="500" y="341" class="glyph">火</text>
+<circle cx="635" cy="340" r="18" fill="none" stroke="#d38b45" stroke-width="1.5" opacity="0.7"/>
+<circle cx="635" cy="340" r="14" fill="#4f7a62" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="341" class="glyph">火</text>
+<circle cx="770" cy="340" r="14" fill="#4f7a62" stroke="#f4e7c8" stroke-width="2"/>
+<text x="770" y="341" class="glyph">火</text>
+<circle cx="635" cy="245" r="18" fill="none" stroke="#d38b45" stroke-width="1.5" opacity="0.7"/>
+<circle cx="635" cy="245" r="14" fill="#2f3a40" stroke="#f4e7c8" stroke-width="2"/>
+<text x="635" y="246" class="glyph">首</text>
+<text x="635" y="1516" class="small" text-anchor="middle">起点</text>
+<text x="635" y="1262" class="legend" text-anchor="middle" fill="#b3742f">当前位置</text>
+<text x="635" y="219" class="legend" text-anchor="middle" fill="#3b4a48">终庭</text>
+<text x="168" y="1389" class="small" text-anchor="end">第1层</text>
+<text x="168" y="1199" class="small" text-anchor="end">第3层</text>
+<text x="168" y="1009" class="small" text-anchor="end">第5层</text>
+<text x="168" y="819" class="small" text-anchor="end">第7层</text>
+<text x="168" y="629" class="small" text-anchor="end">第9层</text>
+<text x="168" y="439" class="small" text-anchor="end">第11层</text>
+<text x="168" y="344" class="small" text-anchor="end">第12层</text>
+<rect x="0" y="1508" width="1270" height="152" fill="#efe7d3"/>
+<text x="140" y="1534" font-size="12" fill="#5c625c" font-weight="700">图例</text>
+<circle cx="200" cy="1530" r="8" fill="#a34a3f"/><text x="213" y="1535" class="legend">战斗</text>
+<circle cx="278" cy="1530" r="8" fill="#7a4a63"/><text x="291" y="1535" class="legend">事件</text>
+<circle cx="356" cy="1530" r="8" fill="#b08a3e"/><text x="369" y="1535" class="legend">商店</text>
+<circle cx="434" cy="1530" r="8" fill="#4f7a62"/><text x="447" y="1535" class="legend">火堆</text>
+<circle cx="512" cy="1530" r="8" fill="#4f7f82"/><text x="525" y="1535" class="legend">宝藏</text>
+<circle cx="590" cy="1530" r="8" fill="#7a2f2a"/><text x="603" y="1535" class="legend">精英</text>
+<circle cx="668" cy="1530" r="8" fill="#2f3a40"/><text x="681" y="1535" class="legend">首领</text>
+<path d="M 770 1530 L 808 1530" stroke="#d38b45" stroke-width="4"/><text x="816" y="1535" class="legend">计划路线</text>
+<path d="M 920 1530 L 958 1530" stroke="#7b8f8d" stroke-width="1.8"/><text x="966" y="1535" class="legend">其它可达路径</text>
+<text x="140" y="1566" class="note">规则：每层可重新择路；当前计划只高亮，不提前封印。进入节点后，完成该节点内容才提交这一层；未完成前可退回改选。</text>
+<text x="140" y="1590" class="note">计划路线示例：战 → 战 → 事 → 宝 → 精 → 火 → 宝 → 战 → 火 → 首。该图只表达路线层，节点房间进入后再加载单间园林舞台。</text>
+<text x="140" y="1625" class="small">规模参考：14 个行进层、约 50 个节点、6 条主路径；正式生成可 12～15 层，节点 40～60，按幕调整战斗/事件密度。</text>
+</svg>

@@ -1,0 +1,13 @@
+{
+  "mode": "courtyard",
+  "seed": 17,
+  "actions": [
+    {
+      "type": "enter_room",
+      "room": "opening_1"
+    },
+    {
+      "type": "interact"
+    }
+  ]
+}

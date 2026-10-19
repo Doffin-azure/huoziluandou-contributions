@@ -519,7 +519,7 @@ func top_panel() -> Dictionary:
 func reward_pool() -> Array:
 	var pool: Array = []
 	for cd in Database.characters.values():
-		if not cd.is_pollution and not cd.pending_design and not cd.tags.has("enemy") and not cd.tags.has("彩蛋"):
+		if not cd.is_pollution and not cd.pending_design and not cd.tags.has("enemy") and not cd.tags.has("彩蛋") and not cd.tags.has("event"):
 			pool.append(cd)
 	return pool
 
@@ -935,11 +935,7 @@ func forge(a: int, b: int) -> bool:
 
 
 # ---------------------------------------------------------------- 谜
-const EVENTS := [
-	{"title": "残页", "text": "墨渍里夹着半页旧谱。", "a": "撕下来（气血 −6，得一枚稀有字）", "b": "不碰它"},
-	{"title": "污墨", "text": "一砚发臭的墨，摊主说能换钱。", "a": "收下（❖ +18，字袋混进 1 枚污染字）", "b": "走开"},
-	{"title": "雾中灯", "text": "远处有人提灯。", "a": "跟上去（耗 2 步，地图迷雾散开一大片）", "b": "不跟"},
-]
+const EVENTS: Array = preload("res://src/data/event_catalog.gd").MYSTERY_EVENTS
 
 
 func _roll_event() -> int:

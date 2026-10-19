@@ -1,0 +1,2448 @@
+[
+  {
+    "_interior_source": [
+      {
+        "asset": "screen",
+        "at": [
+          2.0,
+          0.0,
+          0.479999989271164
+        ],
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "type_cabinet",
+        "at": [
+          0.649999976158142,
+          0.0,
+          1.54999995231628
+        ],
+        "scale": 0.72,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "chest",
+        "at": [
+          0.649999976158142,
+          0.0,
+          2.40000009536743
+        ],
+        "scale": 0.4,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "writing_desk",
+        "at": [
+          0.699999988079071,
+          0.0,
+          3.25
+        ],
+        "dressing": true,
+        "scale": 0.7,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          3.15000009536743,
+          0.0,
+          1.39999997615814
+        ],
+        "dressing": true,
+        "scale": 0.7,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "red_maple",
+        "at": [
+          3.15000009536743,
+          0.0,
+          1.39999997615814
+        ],
+        "dressing": true,
+        "scale": 0.32,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_bench",
+        "at": [
+          3.34999990463257,
+          0.0,
+          2.54999995231628
+        ],
+        "dressing": true,
+        "scale": 0.65,
+        "state": "",
+        "turn": 1.5707963267949,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          3.34999990463257,
+          0.0,
+          3.34999990463257
+        ],
+        "scale": 0.36,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "description": "照壁对景，西侧书案与字柜，东侧红枫石床与长凳；中间整备、出门。",
+    "enclosure": "walled",
+    "floor_size": [
+      4,
+      4
+    ],
+    "id": "start_gatehouse",
+    "kind": "start",
+    "lanes": [
+      [
+        [
+          2.0,
+          4.0
+        ],
+        [
+          2.0,
+          1.5
+        ]
+      ]
+    ],
+    "mark": "始",
+    "mark_at": [
+      2.0,
+      3.09999990463257
+    ],
+    "name": "起点 · 照壁门院",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_exit",
+        "offset": 2.0,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "screen",
+        "at": [
+          2.0,
+          0.0,
+          0.479999989271164
+        ],
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "type_cabinet",
+        "at": [
+          0.649999976158142,
+          0.0,
+          1.54999995231628
+        ],
+        "scale": 0.72,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "chest",
+        "at": [
+          0.649999976158142,
+          0.0,
+          2.40000009536743
+        ],
+        "scale": 0.4,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "writing_desk",
+        "at": [
+          0.699999988079071,
+          0.0,
+          3.25
+        ],
+        "dressing": true,
+        "scale": 0.7,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          3.15000009536743,
+          0.0,
+          1.39999997615814
+        ],
+        "dressing": true,
+        "scale": 0.7,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "red_maple",
+        "at": [
+          3.15000009536743,
+          0.0,
+          1.39999997615814
+        ],
+        "dressing": true,
+        "scale": 0.32,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_bench",
+        "at": [
+          3.34999990463257,
+          0.0,
+          2.54999995231628
+        ],
+        "dressing": true,
+        "scale": 0.65,
+        "state": "",
+        "turn": 1.5707963267949,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          3.34999990463257,
+          0.0,
+          3.34999990463257
+        ],
+        "scale": 0.36,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "rail_sides": [],
+    "route_id": "start_gatehouse",
+    "stand": [
+      2.0,
+      2.40000009536743
+    ],
+    "transform": "[X: (1.0, 0.0), Y: (0.0, 1.0), O: (0.0, 0.0)]",
+    "variant": 0,
+    "variants": [
+      "标准单出口",
+      "可整体旋转，仍仅一扇通路门"
+    ],
+    "water_sides": []
+  },
+  {
+    "_interior_source": [
+      {
+        "asset": "stele_plinth",
+        "at": [
+          1.35000002384186,
+          0.0,
+          0.819999992847443
+        ],
+        "scale": 1.1,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "shrine",
+        "at": [
+          1.35000002384186,
+          0.0,
+          0.819999992847443
+        ],
+        "scale": 0.66,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "incense",
+        "at": [
+          1.35000002384186,
+          0.0,
+          1.54999995231628
+        ],
+        "dressing": true,
+        "scale": 0.4,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "hollow_rockery",
+        "at": [
+          3.20000004768372,
+          0.0,
+          0.850000023841858
+        ],
+        "dressing": true,
+        "scale": 0.43,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "bare_locust",
+        "at": [
+          4.25,
+          0.0,
+          0.649999976158142
+        ],
+        "dressing": true,
+        "scale": 0.42,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_bench",
+        "at": [
+          0.620000004768372,
+          0.0,
+          3.0
+        ],
+        "dressing": true,
+        "scale": 0.62,
+        "state": "",
+        "turn": 1.5707963267949,
+        "variant": 0
+      },
+      {
+        "asset": "lotus_tub",
+        "at": [
+          4.34999990463257,
+          0.0,
+          3.25
+        ],
+        "dressing": true,
+        "scale": 0.58,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          0.649999976158142,
+          0.0,
+          0.550000011920929
+        ],
+        "scale": 0.32,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "description": "碑龛与香炉构成问字区，洞石与枯槐对景；坐凳靠墙，月门形成折景。",
+    "enclosure": "walled",
+    "floor_size": [
+      5,
+      4
+    ],
+    "id": "event_bent_court",
+    "kind": "event",
+    "lanes": [
+      [
+        [
+          2.5,
+          4.0
+        ],
+        [
+          2.5,
+          2.5
+        ],
+        [
+          5.0,
+          2.5
+        ]
+      ],
+      [
+        [
+          2.5,
+          2.09999990463257
+        ],
+        [
+          1.35000002384186,
+          2.09999990463257
+        ]
+      ]
+    ],
+    "mark": "谜",
+    "mark_at": [
+      1.35000002384186,
+      2.09999990463257
+    ],
+    "name": "事件 · 问碑小院",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_entry",
+        "offset": 2.5,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "e_exit",
+        "offset": 2.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "E",
+        "span": 2.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "stele_plinth",
+        "at": [
+          1.35000002384186,
+          0.0,
+          0.819999992847443
+        ],
+        "scale": 1.1,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "shrine",
+        "at": [
+          1.35000002384186,
+          0.0,
+          0.819999992847443
+        ],
+        "scale": 0.66,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "hollow_rockery",
+        "at": [
+          3.20000004768372,
+          0.0,
+          0.850000023841858
+        ],
+        "dressing": true,
+        "scale": 0.43,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "bare_locust",
+        "at": [
+          4.25,
+          0.0,
+          0.649999976158142
+        ],
+        "dressing": true,
+        "scale": 0.42,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_bench",
+        "at": [
+          0.620000004768372,
+          0.0,
+          3.0
+        ],
+        "dressing": true,
+        "scale": 0.62,
+        "state": "",
+        "turn": 1.5707963267949,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          0.649999976158142,
+          0.0,
+          0.550000011920929
+        ],
+        "scale": 0.32,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "rail_sides": [],
+    "stand": [
+      1.35000002384186,
+      2.09999990463257
+    ],
+    "variant": 0,
+    "variants": [
+      "东折门",
+      "直通门：出门转到北侧，碑龛移至西侧"
+    ],
+    "water_sides": [
+      "E"
+    ]
+  },
+  {
+    "_interior_source": [
+      {
+        "asset": "square_pavilion",
+        "at": [
+          1.29999995231628,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 0.66,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          3.54999995231628,
+          0.0,
+          3.0
+        ],
+        "scale": 0.67,
+        "state": "fire",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_table",
+        "at": [
+          1.14999997615814,
+          0.0,
+          3.70000004768372
+        ],
+        "dressing": true,
+        "scale": 0.69,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "willow",
+        "at": [
+          4.15000009536743,
+          0.0,
+          0.899999976158142
+        ],
+        "dressing": true,
+        "scale": 0.36,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "low_rockery",
+        "at": [
+          3.54999995231628,
+          0.0,
+          0.899999976158142
+        ],
+        "dressing": true,
+        "scale": 0.3,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lotus_tub",
+        "at": [
+          4.28000020980835,
+          0.0,
+          1.95000004768372
+        ],
+        "dressing": true,
+        "scale": 0.57,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          4.30000019073486,
+          0.0,
+          4.34999990463257
+        ],
+        "dressing": true,
+        "scale": 0.34,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "description": "方亭、临水柳、荷缸与石桌组成休整庭，鬼火位于通路一侧；四边统一栏杆。",
+    "enclosure": "terrace",
+    "floor_size": [
+      5,
+      5
+    ],
+    "id": "rest_lantern_court",
+    "kind": "rest",
+    "lanes": [
+      [
+        [
+          2.5,
+          5.0
+        ],
+        [
+          2.5,
+          0.0
+        ]
+      ],
+      [
+        [
+          2.5,
+          3.5
+        ],
+        [
+          5.0,
+          3.5
+        ]
+      ]
+    ],
+    "mark": "息",
+    "mark_at": [
+      2.65000009536743,
+      3.0
+    ],
+    "name": "火堆 · 息灯水榭",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "open",
+        "id": "s_entry",
+        "offset": 2.5,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 1.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "open",
+        "id": "n_exit",
+        "offset": 2.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "N",
+        "span": 1.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "open",
+        "id": "e_exit",
+        "offset": 3.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "E",
+        "span": 1.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "square_pavilion",
+        "at": [
+          1.29999995231628,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 0.66,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          3.54999995231628,
+          0.0,
+          3.0
+        ],
+        "scale": 0.67,
+        "state": "fire",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_table",
+        "at": [
+          1.14999997615814,
+          0.0,
+          3.70000004768372
+        ],
+        "dressing": true,
+        "scale": 0.69,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "willow",
+        "at": [
+          4.15000009536743,
+          0.0,
+          0.899999976158142
+        ],
+        "dressing": true,
+        "scale": 0.36,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "low_rockery",
+        "at": [
+          3.54999995231628,
+          0.0,
+          0.899999976158142
+        ],
+        "dressing": true,
+        "scale": 0.3,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lotus_tub",
+        "at": [
+          4.28000020980835,
+          0.0,
+          1.95000004768372
+        ],
+        "dressing": true,
+        "scale": 0.57,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          4.30000019073486,
+          0.0,
+          4.34999990463257
+        ],
+        "dressing": true,
+        "scale": 0.34,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "rail_sides": [
+      "N",
+      "E",
+      "S",
+      "W"
+    ],
+    "stand": [
+      2.65000009536743,
+      3.0
+    ],
+    "variant": 0,
+    "variants": [
+      "三门休整庭",
+      "两门：关闭侧门并补齐同款栏杆"
+    ],
+    "water_sides": [
+      "N",
+      "E",
+      "W"
+    ]
+  },
+  {
+    "_interior_source": [
+      {
+        "asset": "covered_walk",
+        "at": [
+          0.819999992847443,
+          0.0,
+          2.5
+        ],
+        "scale": 0.6,
+        "state": "",
+        "turn": 1.5707963267949,
+        "variant": 0
+      },
+      {
+        "asset": "foe",
+        "at": [
+          3.0,
+          0.0,
+          2.34999990463257
+        ],
+        "scale": 0.92,
+        "state": "enemy",
+        "turn": 0.0,
+        "variant": 1
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          5.09999990463257,
+          0.0,
+          0.850000023841858
+        ],
+        "dressing": true,
+        "scale": 0.87,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "crooked_pine",
+        "at": [
+          5.09999990463257,
+          0.0,
+          0.850000023841858
+        ],
+        "dressing": true,
+        "scale": 0.37,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "low_rockery",
+        "at": [
+          4.94999980926514,
+          0.0,
+          4.07999992370605
+        ],
+        "dressing": true,
+        "scale": 0.43,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "type_rack",
+        "at": [
+          0.779999971389771,
+          0.0,
+          0.649999976158142
+        ],
+        "dressing": true,
+        "scale": 0.7,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_bench",
+        "at": [
+          1.04999995231628,
+          0.0,
+          4.15000009536743
+        ],
+        "dressing": true,
+        "scale": 0.72,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "incense",
+        "at": [
+          5.34999990463257,
+          0.0,
+          2.5
+        ],
+        "dressing": true,
+        "scale": 0.47,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "arena": [
+      2.0,
+      1.29999995231628,
+      3.0,
+      2.70000004768372
+    ],
+    "description": "西廊配字架与长凳，怪松与低山压住对角；中央空庭保持交战和通行空间。",
+    "enclosure": "walled",
+    "floor_size": [
+      6,
+      5
+    ],
+    "id": "battle_side_gallery",
+    "kind": "battle",
+    "lanes": [
+      [
+        [
+          3.0,
+          5.0
+        ],
+        [
+          3.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          3.0,
+          2.5
+        ],
+        [
+          6.0,
+          2.5
+        ]
+      ]
+    ],
+    "mark": "战",
+    "mark_at": [
+      3.0,
+      3.29999995231628
+    ],
+    "name": "普通战 · 廊围石庭",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_entry",
+        "offset": 3.0,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "n_exit",
+        "offset": 3.0,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "N",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "e_exit",
+        "offset": 2.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "E",
+        "span": 2.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "covered_walk",
+        "at": [
+          0.819999992847443,
+          0.0,
+          2.5
+        ],
+        "scale": 0.6,
+        "state": "",
+        "turn": 1.5707963267949,
+        "variant": 0
+      },
+      {
+        "asset": "foe",
+        "at": [
+          3.0,
+          0.0,
+          2.34999990463257
+        ],
+        "scale": 0.92,
+        "state": "enemy",
+        "turn": 0.0,
+        "variant": 1
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          5.09999990463257,
+          0.0,
+          0.850000023841858
+        ],
+        "dressing": true,
+        "scale": 0.87,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "crooked_pine",
+        "at": [
+          5.09999990463257,
+          0.0,
+          0.850000023841858
+        ],
+        "dressing": true,
+        "scale": 0.37,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "low_rockery",
+        "at": [
+          4.94999980926514,
+          0.0,
+          4.07999992370605
+        ],
+        "dressing": true,
+        "scale": 0.43,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "type_rack",
+        "at": [
+          0.779999971389771,
+          0.0,
+          0.649999976158142
+        ],
+        "dressing": true,
+        "scale": 0.7,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_bench",
+        "at": [
+          1.04999995231628,
+          0.0,
+          4.15000009536743
+        ],
+        "dressing": true,
+        "scale": 0.72,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "rail_sides": [],
+    "stand": [
+      3.0,
+      3.90000009536743
+    ],
+    "variant": 0,
+    "variants": [
+      "侧廊三门",
+      "素庭四门：去掉西廊，打开西门"
+    ],
+    "water_sides": [
+      "E"
+    ]
+  },
+  {
+    "_interior_source": [
+      {
+        "asset": "stele_plinth",
+        "at": [
+          1.14999997615814,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 1.15,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          1.14999997615814,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 0.58,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stele_plinth",
+        "at": [
+          5.80000019073486,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 1.15,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          5.80000019073486,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 0.49,
+        "state": "",
+        "turn": 0.0,
+        "variant": 3
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          1.10000002384186,
+          0.0,
+          2.29999995231628
+        ],
+        "scale": 0.39,
+        "state": "",
+        "turn": 0.0,
+        "variant": 2
+      },
+      {
+        "asset": "bare_locust",
+        "at": [
+          1.04999995231628,
+          0.0,
+          3.25
+        ],
+        "dressing": true,
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "hollow_rockery",
+        "at": [
+          5.84999990463257,
+          0.0,
+          3.0
+        ],
+        "dressing": true,
+        "scale": 0.49,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "incense",
+        "at": [
+          5.80000019073486,
+          0.0,
+          1.95000004768372
+        ],
+        "dressing": true,
+        "scale": 0.45,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          1.10000002384186,
+          0.0,
+          4.80000019073486
+        ],
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lotus_tub",
+        "at": [
+          5.80000019073486,
+          0.0,
+          4.84999990463257
+        ],
+        "dressing": true,
+        "scale": 0.64,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "elite",
+        "at": [
+          3.5,
+          0.0,
+          3.04999995231628
+        ],
+        "scale": 1.2,
+        "state": "enemy",
+        "turn": 0.0,
+        "variant": 2
+      }
+    ],
+    "arena": [
+      2.0,
+      1.5,
+      3.0,
+      3.0
+    ],
+    "description": "两翼高低碑、枯槐与洞石，香炉和鬼火引向镇门；中央留出交战庭。",
+    "enclosure": "walled",
+    "floor_size": [
+      7,
+      6
+    ],
+    "id": "elite_stele_court",
+    "kind": "elite",
+    "lanes": [
+      [
+        [
+          3.5,
+          6.0
+        ],
+        [
+          3.5,
+          0.0
+        ]
+      ]
+    ],
+    "mark": "镇",
+    "mark_at": [
+      3.5,
+      4.09999990463257
+    ],
+    "name": "精英 · 镇碑夹庭",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_entry",
+        "offset": 3.5,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "beast",
+        "id": "n_exit",
+        "offset": 3.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "N",
+        "span": 2.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "stele_plinth",
+        "at": [
+          1.14999997615814,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 1.15,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          1.14999997615814,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 0.58,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stele_plinth",
+        "at": [
+          5.80000019073486,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 1.15,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          5.80000019073486,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 0.49,
+        "state": "",
+        "turn": 0.0,
+        "variant": 3
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          1.10000002384186,
+          0.0,
+          2.29999995231628
+        ],
+        "scale": 0.39,
+        "state": "",
+        "turn": 0.0,
+        "variant": 2
+      },
+      {
+        "asset": "bare_locust",
+        "at": [
+          1.04999995231628,
+          0.0,
+          3.25
+        ],
+        "dressing": true,
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "hollow_rockery",
+        "at": [
+          5.84999990463257,
+          0.0,
+          3.0
+        ],
+        "dressing": true,
+        "scale": 0.49,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "incense",
+        "at": [
+          5.80000019073486,
+          0.0,
+          1.95000004768372
+        ],
+        "dressing": true,
+        "scale": 0.45,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          1.10000002384186,
+          0.0,
+          4.80000019073486
+        ],
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lotus_tub",
+        "at": [
+          5.80000019073486,
+          0.0,
+          4.84999990463257
+        ],
+        "dressing": true,
+        "scale": 0.64,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "elite",
+        "at": [
+          3.5,
+          0.0,
+          3.04999995231628
+        ],
+        "scale": 1.2,
+        "state": "enemy",
+        "turn": 0.0,
+        "variant": 2
+      }
+    ],
+    "rail_sides": [],
+    "stand": [
+      3.5,
+      4.69999980926514
+    ],
+    "variant": 0,
+    "variants": [
+      "前后夹庭",
+      "镜像碑群；入口可旋转到侧面"
+    ],
+    "water_sides": [
+      "W"
+    ]
+  },
+  {
+    "_interior_source": [
+      {
+        "asset": "small_loft",
+        "at": [
+          1.54999995231628,
+          0.0,
+          1.39999997615814
+        ],
+        "dressing": true,
+        "scale": 0.62,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "hex_pavilion",
+        "at": [
+          7.44999980926514,
+          0.0,
+          1.39999997615814
+        ],
+        "dressing": true,
+        "scale": 0.62,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stele_plinth",
+        "at": [
+          1.54999995231628,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 1.1,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          1.54999995231628,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stele_plinth",
+        "at": [
+          7.44999980926514,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 1.1,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          7.44999980926514,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 0.56,
+        "state": "",
+        "turn": 0.0,
+        "variant": 3
+      },
+      {
+        "asset": "incense",
+        "at": [
+          1.54999995231628,
+          0.0,
+          4.30000019073486
+        ],
+        "dressing": true,
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "incense",
+        "at": [
+          7.44999980926514,
+          0.0,
+          4.30000019073486
+        ],
+        "dressing": true,
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "red_maple",
+        "at": [
+          1.14999997615814,
+          0.0,
+          5.65000009536743
+        ],
+        "dressing": true,
+        "scale": 0.42,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "crooked_pine",
+        "at": [
+          7.84999990463257,
+          0.0,
+          5.65000009536743
+        ],
+        "dressing": true,
+        "scale": 0.42,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          3.0,
+          0.0,
+          2.5
+        ],
+        "scale": 0.55,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          6.0,
+          0.0,
+          2.5
+        ],
+        "scale": 0.55,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_bench",
+        "at": [
+          2.75,
+          0.0,
+          6.05000019073486
+        ],
+        "dressing": true,
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_bench",
+        "at": [
+          6.25,
+          0.0,
+          6.05000019073486
+        ],
+        "dressing": true,
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "boss",
+        "at": [
+          4.5,
+          0.0,
+          3.65000009536743
+        ],
+        "scale": 1.65,
+        "state": "enemy",
+        "turn": 0.0,
+        "variant": 3
+      }
+    ],
+    "arena": [
+      2.0,
+      1.60000002384186,
+      5.0,
+      3.79999995231628
+    ],
+    "description": "小阁与六角亭分立镇门两翼，碑炉、红枫与怪松分层夹景；中央仪式庭留白。",
+    "enclosure": "walled",
+    "floor_size": [
+      9,
+      7
+    ],
+    "id": "boss_terminal_court",
+    "kind": "boss",
+    "lanes": [
+      [
+        [
+          4.5,
+          7.0
+        ],
+        [
+          4.5,
+          0.0
+        ]
+      ]
+    ],
+    "mark": "渊",
+    "mark_at": [
+      4.5,
+      5.0
+    ],
+    "name": "首领 · 墨渊终庭",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_entry",
+        "offset": 4.5,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "beast",
+        "id": "n_exit",
+        "offset": 4.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "N",
+        "span": 3.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "small_loft",
+        "at": [
+          1.54999995231628,
+          0.0,
+          1.39999997615814
+        ],
+        "dressing": true,
+        "scale": 0.62,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "hex_pavilion",
+        "at": [
+          7.44999980926514,
+          0.0,
+          1.39999997615814
+        ],
+        "dressing": true,
+        "scale": 0.62,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stele_plinth",
+        "at": [
+          1.54999995231628,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 1.1,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          1.54999995231628,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stele_plinth",
+        "at": [
+          7.44999980926514,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 1.1,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          7.44999980926514,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 0.56,
+        "state": "",
+        "turn": 0.0,
+        "variant": 3
+      },
+      {
+        "asset": "incense",
+        "at": [
+          1.54999995231628,
+          0.0,
+          4.30000019073486
+        ],
+        "dressing": true,
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "incense",
+        "at": [
+          7.44999980926514,
+          0.0,
+          4.30000019073486
+        ],
+        "dressing": true,
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "red_maple",
+        "at": [
+          1.14999997615814,
+          0.0,
+          5.65000009536743
+        ],
+        "dressing": true,
+        "scale": 0.42,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "crooked_pine",
+        "at": [
+          7.84999990463257,
+          0.0,
+          5.65000009536743
+        ],
+        "dressing": true,
+        "scale": 0.42,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          3.0,
+          0.0,
+          2.5
+        ],
+        "scale": 0.55,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          6.0,
+          0.0,
+          2.5
+        ],
+        "scale": 0.55,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_bench",
+        "at": [
+          2.75,
+          0.0,
+          6.05000019073486
+        ],
+        "dressing": true,
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stone_bench",
+        "at": [
+          6.25,
+          0.0,
+          6.05000019073486
+        ],
+        "dressing": true,
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "boss",
+        "at": [
+          4.5,
+          0.0,
+          3.65000009536743
+        ],
+        "scale": 1.65,
+        "state": "enemy",
+        "turn": 0.0,
+        "variant": 3
+      }
+    ],
+    "rail_sides": [],
+    "stand": [
+      4.5,
+      5.80000019073486
+    ],
+    "variant": 0,
+    "variants": [
+      "水岸终庭",
+      "后门仅在通关后开放；不参与普通随机中转"
+    ],
+    "water_sides": [
+      "E",
+      "W"
+    ]
+  },
+  {
+    "_interior_source": [
+      {
+        "asset": "water_pavilion",
+        "at": [
+          2.0,
+          0.0,
+          1.35000002384186
+        ],
+        "scale": 1.0,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "chest",
+        "at": [
+          2.0,
+          0.0,
+          1.5
+        ],
+        "scale": 0.7,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 1
+      },
+      {
+        "asset": "red_maple",
+        "at": [
+          0.600000023841858,
+          0.0,
+          3.25
+        ],
+        "dressing": true,
+        "scale": 0.29,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lotus_tub",
+        "at": [
+          3.45000004768372,
+          0.0,
+          0.550000011920929
+        ],
+        "dressing": true,
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "incense",
+        "at": [
+          0.5,
+          0.0,
+          0.550000011920929
+        ],
+        "dressing": true,
+        "scale": 0.4,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "type_rack",
+        "at": [
+          3.45000004768372,
+          0.0,
+          2.5
+        ],
+        "dressing": true,
+        "scale": 0.48,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          3.45000004768372,
+          0.0,
+          3.34999990463257
+        ],
+        "scale": 0.34,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "description": "水榭内收宝匣，红枫、荷缸与字架置于四角；侧面保留绕匣通行，开口只设栏端柱。",
+    "enclosure": "terrace",
+    "floor_size": [
+      4,
+      4
+    ],
+    "id": "treasure_water_pavilion",
+    "kind": "treasure",
+    "lanes": [
+      [
+        [
+          2.0,
+          4.0
+        ],
+        [
+          2.0,
+          2.70000004768372
+        ],
+        [
+          2.75,
+          2.70000004768372
+        ],
+        [
+          2.75,
+          0.400000005960464
+        ],
+        [
+          2.0,
+          0.400000005960464
+        ],
+        [
+          2.0,
+          0.0
+        ]
+      ]
+    ],
+    "mark": "藏",
+    "mark_at": [
+      2.0,
+      2.70000004768372
+    ],
+    "name": "宝藏 · 荷池藏榭",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "open",
+        "id": "s_entry",
+        "offset": 2.0,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 1.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "open",
+        "id": "n_exit",
+        "offset": 2.0,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "N",
+        "span": 1.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "water_pavilion",
+        "at": [
+          2.0,
+          0.0,
+          1.35000002384186
+        ],
+        "scale": 1.0,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "chest",
+        "at": [
+          2.0,
+          0.0,
+          1.5
+        ],
+        "scale": 0.7,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 1
+      },
+      {
+        "asset": "red_maple",
+        "at": [
+          0.600000023841858,
+          0.0,
+          3.25
+        ],
+        "dressing": true,
+        "scale": 0.29,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lotus_tub",
+        "at": [
+          3.45000004768372,
+          0.0,
+          0.550000011920929
+        ],
+        "dressing": true,
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "incense",
+        "at": [
+          0.5,
+          0.0,
+          0.550000011920929
+        ],
+        "dressing": true,
+        "scale": 0.4,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "type_rack",
+        "at": [
+          3.45000004768372,
+          0.0,
+          2.5
+        ],
+        "dressing": true,
+        "scale": 0.48,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          3.45000004768372,
+          0.0,
+          3.34999990463257
+        ],
+        "scale": 0.34,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "rail_sides": [
+      "N",
+      "E",
+      "S",
+      "W"
+    ],
+    "stand": [
+      2.0,
+      2.70000004768372
+    ],
+    "variant": 0,
+    "variants": [
+      "前后双门",
+      "汇合四门：补两侧门，关闭短桥展示，保持绕匣通行"
+    ],
+    "water_sides": [
+      "N",
+      "S",
+      "E",
+      "W"
+    ]
+  },
+  {
+    "_interior_source": [
+      {
+        "asset": "stall",
+        "at": [
+          3.0,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 0.82,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "small_loft",
+        "at": [
+          1.14999997615814,
+          0.0,
+          1.01999998092651
+        ],
+        "dressing": true,
+        "scale": 0.5,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "type_cabinet",
+        "at": [
+          0.680000007152557,
+          0.0,
+          2.5
+        ],
+        "dressing": true,
+        "scale": 0.66,
+        "state": "",
+        "turn": 1.5707963267949,
+        "variant": 0
+      },
+      {
+        "asset": "writing_desk",
+        "at": [
+          1.20000004768372,
+          0.0,
+          3.65000009536743
+        ],
+        "dressing": true,
+        "scale": 0.8,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "chest",
+        "at": [
+          1.54999995231628,
+          0.0,
+          2.54999995231628
+        ],
+        "dressing": true,
+        "scale": 0.4,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          5.30000019073486,
+          0.0,
+          1.35000002384186
+        ],
+        "dressing": true,
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "red_maple",
+        "at": [
+          5.30000019073486,
+          0.0,
+          1.35000002384186
+        ],
+        "dressing": true,
+        "scale": 0.29,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "type_rack",
+        "at": [
+          5.30000019073486,
+          0.0,
+          3.04999995231628
+        ],
+        "dressing": true,
+        "scale": 0.66,
+        "state": "",
+        "turn": -1.5707963267949,
+        "variant": 0
+      },
+      {
+        "asset": "lotus_tub",
+        "at": [
+          5.15000009536743,
+          0.0,
+          4.25
+        ],
+        "dressing": true,
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          0.649999976158142,
+          0.0,
+          4.25
+        ],
+        "scale": 0.34,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "description": "小阁为后库，字摊靠后墙；侧面安排书案、货架和箱匣，红枫石床收在另一角。",
+    "enclosure": "walled",
+    "floor_size": [
+      6,
+      5
+    ],
+    "id": "shop_bronze_court",
+    "kind": "shop",
+    "lanes": [
+      [
+        [
+          3.0,
+          5.0
+        ],
+        [
+          3.0,
+          3.0
+        ],
+        [
+          6.0,
+          3.0
+        ]
+      ]
+    ],
+    "mark": "市",
+    "mark_at": [
+      3.0,
+      2.70000004768372
+    ],
+    "name": "商店 · 青铜字肆",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_entry",
+        "offset": 3.0,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "e_exit",
+        "offset": 3.0,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "E",
+        "span": 2.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "stall",
+        "at": [
+          3.0,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 0.82,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "small_loft",
+        "at": [
+          1.14999997615814,
+          0.0,
+          1.01999998092651
+        ],
+        "dressing": true,
+        "scale": 0.5,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "type_cabinet",
+        "at": [
+          0.680000007152557,
+          0.0,
+          2.5
+        ],
+        "dressing": true,
+        "scale": 0.66,
+        "state": "",
+        "turn": 1.5707963267949,
+        "variant": 0
+      },
+      {
+        "asset": "writing_desk",
+        "at": [
+          1.20000004768372,
+          0.0,
+          3.65000009536743
+        ],
+        "dressing": true,
+        "scale": 0.8,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "chest",
+        "at": [
+          1.54999995231628,
+          0.0,
+          2.54999995231628
+        ],
+        "dressing": true,
+        "scale": 0.4,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          5.30000019073486,
+          0.0,
+          1.35000002384186
+        ],
+        "dressing": true,
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "red_maple",
+        "at": [
+          5.30000019073486,
+          0.0,
+          1.35000002384186
+        ],
+        "dressing": true,
+        "scale": 0.29,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lotus_tub",
+        "at": [
+          5.15000009536743,
+          0.0,
+          4.25
+        ],
+        "dressing": true,
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          0.649999976158142,
+          0.0,
+          4.25
+        ],
+        "scale": 0.34,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "rail_sides": [],
+    "stand": [
+      3.0,
+      2.70000004768372
+    ],
+    "variant": 0,
+    "variants": [
+      "东折离店",
+      "镜像到西侧；库存与主物件位置共同迁移"
+    ],
+    "water_sides": [
+      "E"
+    ]
+  }
+]
