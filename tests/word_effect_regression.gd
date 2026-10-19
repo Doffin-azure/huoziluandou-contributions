@@ -130,7 +130,7 @@ func _run_description_previews() -> void:
 		unified = unified and word.describe() == WordDescriptions.TEXT.get(word.word, "") and word.description == word.effect_summary
 		for stale in ["P23初稿", "尚未收敛", "临时草案", "未定稿", "倾向删除"]:
 			unified = unified and not stale in word.describe()
-	_check("word_description_source", unified and WordDescriptions.TEXT.size() == 162, "全部162词共享完整说明，游戏介绍没有旧设计草稿")
+	_check("word_description_source", unified and WordDescriptions.TEXT.size() == Database.words.size(), "全部%d词共享完整说明，游戏介绍没有旧设计草稿" % Database.words.size())
 	var b := _battle()
 	var pos := Vector2i(3, 3)
 	var source := _place(b, pos, "再")

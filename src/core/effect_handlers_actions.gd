@@ -356,6 +356,8 @@ static func _cleanse_adjacent(b: BattleState, ctx: Dictionary, all_tags := false
 		inst.clear_pollutions()
 	else:
 		inst.pollutions.remove_at(0)
+	if inst.pollutions.is_empty():
+		Relics.on_cleansed(b, 1)
 	return ["%s：清除【%s】的 %d 个污染标签（保留原字与归属）" % [name, inst.glyph(), n]]
 
 static func _move_neighbor(b: BattleState, ctx: Dictionary) -> Array:

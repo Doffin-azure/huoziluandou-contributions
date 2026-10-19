@@ -488,6 +488,8 @@ func pickup() -> bool:
 func gain_glyph(g: String, why := "") -> void:
 	if Database.get_character_by_glyph(g) == null:
 		return
+	# 愿文·千字同文：之后拿到的字都变成许愿的字
+	g = Relics.redirect_glyph(Database.get_character_by_glyph(g)).glyph
 	var note := ("%s：" % why) if not why.is_empty() else ""
 	if tray.size() < tray_cap():
 		tray.append(g)
@@ -743,6 +745,37 @@ func _grant_relic(id: String, why: String) -> bool:
 	_log("%s：得到遗物%s" % [why, Relics.text(id)])
 	if Relics.needs_bind(id) and not GameState.deck.is_empty():
 		push_panel({"kind": "relic_bind", "relic": id})
+	elif not Relics.pick_spec(id).is_empty() and not Relics.pick_candidates(id).is_empty():
+		push_panel({"kind": "relic_pick", "relic": id, "left": int(Relics.pick_spec(id)[1])})
+	elif id == "monkey":
+		push_panel({"kind": "relic_wish", "options": Relics.wish_options(relic_rng)})
+	return true
+
+
+## 泥金 / 拓包：挑一枚；挑够了关掉面板
+func pick_relic(glyph_id: String) -> bool:
+	var p := top_panel()
+	if p.get("kind", "") != "relic_pick" or not Relics.apply_pick(p.relic, glyph_id):
+		return false
+	_log("「%s」%s【%s】" % [Relics.name_of(p.relic), "镀金" if Relics.pick_spec(p.relic)[0] == "gild" else "复制", Database.get_character(glyph_id).glyph])
+	p.left = int(p.left) - 1
+	if int(p.left) <= 0 or Relics.pick_candidates(p.relic).is_empty():
+		pop_panel()
+	return true
+
+
+## 愿文：许愿；「千字同文」要带上字形 id
+func choose_wish(index: int, glyph_id := "") -> bool:
+	var p := top_panel()
+	if p.get("kind", "") != "relic_wish" or index < 0 or index >= p.options.size():
+		return false
+	var wish: String = p.options[index]
+	if wish == "endless_glyph" and glyph_id.is_empty():
+		return false
+	pop_panel()
+	if not Relics.grant_wish(wish, glyph_id):
+		return false
+	_log("愿文：许下「%s」" % Relics.WISHES[wish][0])
 	return true
 
 

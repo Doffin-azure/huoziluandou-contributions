@@ -163,6 +163,25 @@ func build(root: Control) -> void:
 	_bind_table_print.call_deferred()
 	_board_view.call_deferred("play_opening")
 	_on_log("战斗开始：%s" % node.title)
+	_offer_question.call_deferred()
+
+
+## 问字签：开局从三枚字里挑一枚，作为本场临时字落盘
+func _offer_question() -> void:
+	var choices: Array = battle.question_choices.duplicate()
+	if choices.is_empty() or not is_inside_tree():
+		return
+	var options: Array = []
+	for g in choices:
+		var cd: CharacterData = Database.get_character_by_glyph(g)
+		options.append({"text": "【%s】" % g, "hint": cd.description if cd != null else ""})
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": Relics.name_of("question"), "body": "挑一枚字，作为本场临时字落到盘上。", "options": options})
+	overlay.chose.connect(func(index: int):
+		battle.take_question(choices[index])
+		_refresh_all(true))
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_mount_overlay(overlay)
 
 
 func _exit_tree() -> void:

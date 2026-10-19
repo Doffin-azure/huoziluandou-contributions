@@ -81,7 +81,7 @@ func _run() -> void:
 	_screen = Router.current
 	var battle: BattleState = _screen.battle
 	var all_mapped := Database.characters.values().all(func(data): return GlyphVfxProfile.GLYPHS.has(data.glyph) and BattleSymbol.SPECS.has(GlyphVfxProfile.for_glyph(data.glyph).symbol))
-	_ok(all_mapped, "词库全部 61 个字均有图标、粒子形状和轨迹配置")
+	_ok(all_mapped, "词库全部 %d 个字均有图标、粒子形状和轨迹配置" % Database.characters.size())
 	_ok(GlyphVfxProfile.for_glyph("火").style != GlyphVfxProfile.for_glyph("热").style and GlyphVfxProfile.for_glyph("电").style != GlyphVfxProfile.for_glyph("蓄").style, "同字系也区分火星/热气、电弧/蓄能聚点")
 	var combined := GlyphVfxProfile.for_play(["电", "火"], Database.get_word_by_glyphs_string("电火"))
 	_ok(combined.parts.size() == 2 and combined.parts[0].symbol != combined.parts[1].symbol, "组合词保留不同字的独立符号")

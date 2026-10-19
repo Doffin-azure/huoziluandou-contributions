@@ -20,6 +20,7 @@ const GLYPHS := {
 	"力": ["ability", "strength", "pulse"], "强": ["ability", "strong_heart", "star"], "精": ["ability", "manual_draw", "star"],
 	"化": ["ability", "next_compound", "merge"], "炼": ["clean", "cleanse", "dissolve"], "铸": ["shield", "armor_plating", "stamp"],
 	"清": ["clean", "cleanse", "wash"], "洗": ["clean", "cleanse", "wash"], "开": ["ability", "unlock", "outward"],
+	"死": ["hit", "hit", "slash"], "亡": ["ink", "vulnerable", "dust"], "月": ["flow", "unknown", "glow"],
 	"灯": ["ability", "lantern", "glow"], "停": ["flow", "ceasefire", "stop"], "息": ["electric", "energy_idle", "settle"],
 	"载": ["draw", "reload", "cards"], "灰": ["ink", "unknown", "dust"], "骨": ["shield", "armor_plating", "dust"],
 	"碍": ["shield", "no_block", "barrier"]

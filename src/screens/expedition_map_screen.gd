@@ -548,6 +548,8 @@ func _refresh_event() -> void:
 		"event": _event_mystery(p)
 		"seal_swap": _event_seal_swap(p)
 		"relic_bind": _event_relic_bind(p)
+		"relic_pick": _event_relic_pick(p)
+		"relic_wish": _event_relic_wish(p)
 		"act_end": _event_act_end()
 		_: _event_idle()
 
@@ -681,6 +683,29 @@ func _event_relic_bind(p: Dictionary) -> void:
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_add(desc)
 	_add(_ghost("从字袋里挑", func(): _pick_deck("「%s」绑哪一枚？" % Relics.name_of(p.relic), func(id): ex.bind_relic(id)), true))
+
+
+func _event_relic_pick(p: Dictionary) -> void:
+	var verb := "镀金" if Relics.pick_spec(p.relic)[0] == "gild" else "复制"
+	_add(Ink.h2("「%s」%s一枚字（还剩 %d 枚）" % [Relics.name_of(p.relic), verb, int(p.left)]))
+	var desc := Ink.body(Relics.desc_of(p.relic) + "。")
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_add(desc)
+	_add(_ghost("从字袋里挑", func(): _pick_deck("「%s」%s哪一枚？" % [Relics.name_of(p.relic), verb], func(id): ex.pick_relic(id)), true))
+
+
+func _event_relic_wish(p: Dictionary) -> void:
+	_add(Ink.h2("愿文 · 许一个愿"))
+	_add(Ink.body("每个愿望都有代价，只能许一次。"))
+	for i in p.options.size():
+		var wish: String = p.options[i]
+		var cb := func(): ex.choose_wish(i)
+		if wish == "endless_glyph":
+			cb = func(): _pick_deck("千字同文：字袋全部变成哪个字？", func(id): ex.choose_wish(i, id))
+		_add(_ghost("「%s」" % Relics.WISHES[wish][0], cb, i == 0))
+		var cap := Ink.caption(Relics.WISHES[wish][1])
+		cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_add(cap)
 
 
 ## 绑定类遗物：被绑的字已不在字袋时提示

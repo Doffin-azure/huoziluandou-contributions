@@ -9,6 +9,7 @@ var max_hp: int = 10
 var hp: int = 10
 var block: int = 0                 ## 临时格挡，敌方行动后清除
 var persistent_block: int = 0      ## 持久盾，跨回合保留
+var overheal_to_persistent := false ## 胶矾：溢出的治疗转为等量持久盾
 var statuses: Dictionary = {}      ## status_id -> stacks
 var status_data: Dictionary = {}   ## 状态的目标独立数据（如灼烧伤害快照）
 var is_player: bool = false
@@ -96,7 +97,10 @@ func take_damage(amount: int) -> int:
 
 func heal(amount: int) -> void:
 	var before := hp
+	var overflow := hp + amount - max_hp
 	hp = min(max_hp, hp + amount)
+	if overheal_to_persistent and overflow > 0:
+		add_persistent_block(overflow)
 	if hp != before:
 		feedback.emit({"kind": "heal", "hp": hp, "max_hp": max_hp, "gain": hp - before})
 

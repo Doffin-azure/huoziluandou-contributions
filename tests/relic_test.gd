@@ -494,7 +494,8 @@ func _test_expedition() -> void:
 	_reset()
 	var ex := Expedition.start(11)
 	_ok(not ex.has_method("can_wish") and not ex.has_method("open_wish"), "许愿机入口与逻辑已删除")
-	_ok(ex.loot_relic_pool("小").is_empty() and ex.loot_relic_pool("中").size() == 12 and ex.loot_relic_pool("大").size() == 15, "中赏12件、大赏15件遗物候选，小赏不投放")
+	var mid_n: int = Relics.TIER.values().filter(func(t): return int(t) <= 2).size()
+	_ok(ex.loot_relic_pool("小").is_empty() and ex.loot_relic_pool("中").size() == mid_n and ex.loot_relic_pool("大").size() == Relics.DEFS.size(), "中赏%d件、大赏%d件遗物候选，小赏不投放" % [mid_n, Relics.DEFS.size()])
 	var clash: Array = Relics.DEFS.keys().filter(func(id): return Database.words.values().any(func(w): return w.word == Relics.name_of(id)) or Expedition.SEALS.has(Relics.name_of(id)))
 	_ok(clash.is_empty(), "遗物名与战斗词、印章不冲突")
 	# 奖励选择复用拾取与绑定流程。
@@ -596,11 +597,11 @@ func _test_all_relics_smoke() -> void:
 					where += arr.filter(func(x): return x.uid == uid).size()
 				where += b.board.cells.filter(func(x): return x != null and x.uid == uid).size()
 				var bred: bool = b.breeders.has(uid)
-				if where > 1 or (where == 0 and not bred and GameState.relic_binds.get("fertilizer", -1) != uid):
+				if where > 1 or (where == 0 and not bred and GameState.relic_binds.get("fertilizer", -1) != uid and uid != b.expired_uid):
 					good = false
 		if good:
 			ok_runs += 1
-	_ok(ok_runs == 5, "15 件遗物同时持有：5 个种子各打 12 回合，不报错、永久实体守恒（%d/5）" % ok_runs)
+	_ok(ok_runs == 5, "%d 件遗物同时持有：5 个种子各打 12 回合，不报错、永久实体守恒（%d/5）" % [all.size(), ok_runs])
 
 
 # ---------------------------------------------------------------- 审查修复
