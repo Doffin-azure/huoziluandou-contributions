@@ -474,11 +474,11 @@ func _build_extra_words() -> void:
 		"%s/words/extra_kaideng.tres" % RES)
 	print("  · 彩蛋词：开灯（额外）")
 
-	# 甲流：流感传开，群伤 + 易伤（设计负责人新增）
+	# 甲流：先传染易伤，再补一击（设计负责人新增）
 	_save(_extra_list("extra_jialiu", "甲流", ["甲", "流"], "攻击", "",
-		"流感传开：对所有敌人造成3点伤害，并使目标获得1层易伤",
-		[ContentBuild.e("damage_all", 3, EffectDataS.Target.ALL_ENEMIES, "", "对所有敌人造成3点伤害", {}),
-		 ContentBuild.e("apply_status_enemy", 1, -1, "vulnerable", "使目标获得1层易伤", {})]),
+		"流感传染：使目标获得2层易伤，再造成8点伤害（这一击已吃易伤）",
+		[ContentBuild.e("apply_status_enemy", 2, -1, "vulnerable", "使目标获得2层易伤", {}),
+		 ContentBuild.e("damage", 8, -1, "", "造成8点伤害", {})]),
 		"%s/words/extra_jialiu.tres" % RES)
 	print("  · 新增词：甲流（额外）")
 

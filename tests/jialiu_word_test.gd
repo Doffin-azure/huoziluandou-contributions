@@ -1,5 +1,5 @@
 extends Node
-## 甲流：对所有敌人造成3点伤害，并使目标获得1层易伤。
+## 甲流：先使目标获得2层易伤，再造成8点伤害（这一击已吃易伤）。
 
 var checks := 0
 var failures := 0
@@ -22,17 +22,16 @@ func _ready() -> void:
 	GameState.player_hp = 1000
 	GameState.relics.clear()
 	var b := BattleState.new(rules)
-	b.start([], [Database.get_enemy("ink_spirit"), Database.get_enemy("paper_guard")], 121)
-	for e in b.enemies:
-		e.block = 0
-		e.hp = 100
-		e.max_hp = 100
+	b.start([], [Database.get_enemy("ink_spirit")], 121)
+	var e: Combatant = b.enemies[0]
+	e.block = 0
+	e.hp = 100
+	e.max_hp = 100
 	for x in 2:
 		b.board.set_xy(Vector2i(x, 0), CharInstance.new(Database.get_character_by_glyph("甲流"[x])))
 	check(b.try_play([Vector2i(0, 0), Vector2i(1, 0)]).ok, "真实出词成功：甲流")
-	check(b.enemies.all(func(e): return e.hp == 97), "所有敌人各受3点伤害")
-	var marked: Array = b.enemies.filter(func(e): return e.status_stacks("vulnerable") == 1)
-	check(marked.size() == 1, "只有目标获得1层易伤")
-	check(w.describe().contains("所有敌人") and w.describe().contains("易伤"), "说明写清群伤和易伤")
+	check(e.status_stacks("vulnerable") == 2, "目标获得2层易伤")
+	check(e.hp == 100 - int(ceil(8 * BattleBalance.f("vulnerable_mult", 1.5))), "先易伤再出手：8点伤害按易伤结算")
+	check(w.describe().contains("易伤") and w.describe().contains("8点伤害"), "说明写清易伤和伤害")
 	print("[jialiu_word_test] PASS=%d FAIL=%d TOTAL=%d" % [checks - failures, failures, checks])
 	get_tree().quit(1 if failures > 0 else 0)
