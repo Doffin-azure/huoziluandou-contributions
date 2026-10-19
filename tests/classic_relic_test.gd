@@ -57,7 +57,7 @@ func _ready() -> void:
 		_overlay(Router.current, CollectionOverlay)._close()
 		await _frames()
 	check(GameState.relics.size() == before + 1, "精英遗物入手")
-	check(Router.current._round == 1 and not Router.current._options.is_empty(), "拿完遗物照常两轮选字")
+	check(Router.current_path.ends_with("reward_screen.gd") and not Router.current._options.is_empty(), "拿完遗物照常选字")
 
 	# 首领：回 30% 气血，二选一
 	GameState.start_new_run("v03")
@@ -74,9 +74,9 @@ func _ready() -> void:
 		_overlay(Router.current, CollectionOverlay)._close()
 		await _frames()
 	check(GameState.relics.size() == 1, "首领遗物入手 1 件")
-	Router.goto("res://src/screens/reward_screen.gd", {"node": _node(MapNodeData.Type.BOSS), "round": 2, "anchor": "火"})
+	Router.goto("res://src/screens/reward_screen.gd", {"node": _node(MapNodeData.Type.BOSS), "relic_done": true})
 	await _frames()
-	check(_overlay(Router.current, ChoiceOverlay) == null, "第二轮不重复发遗物")
+	check(_overlay(Router.current, ChoiceOverlay) == null, "已发过遗物的奖励页不重复发")
 
 	# 第三幕首领后直接通关，不再发遗物、不回血
 	GameState.start_new_run("v03")

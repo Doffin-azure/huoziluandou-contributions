@@ -14,7 +14,7 @@ const BARRIER_HP := 4
 const FIGHT_T := 2
 const AMBUSH_T := 1
 const REST_T := 3
-## 战后奖励第一轮跳过换的金币
+## 战后奖励跳过换的金币
 const SKIP_GOLD := 16
 const SHOP_REFRESH_COST := 5
 ## 印章：效果 / 主要来源
