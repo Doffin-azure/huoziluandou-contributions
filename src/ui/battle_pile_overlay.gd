@@ -1,11 +1,17 @@
 extends Control
 class_name BattlePileOverlay
 ## 只读的战斗牌堆快照。按字形和可见状态归类，完全不读取或展示抽取顺序。
+## 居中的半透明中型窗口，背后的战斗仍可看见；点窗外或 ESC 关闭。
+
+## 窗口占画面的比例；屏幕窄时放宽到至少两列字卡
+const WINDOW_RATIO := Vector2(0.62, 0.72)
+const MIN_WINDOW := Vector2(620, 360)
 
 var title := ""
 var groups: Array[Dictionary] = []
 var total := 0
 var _canvas: Control
+var _window: MarginContainer
 var _scroll: ScrollContainer
 var _grid: GridContainer
 var _close_button: Button
@@ -44,8 +50,10 @@ func setup(p_title: String, instances: Array) -> void:
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# 敌人立绘用绝对 z_index 分层，窗口要压在它们上面
+	z_index = 100
 	var dim := ColorRect.new()
-	dim.color = Color(0.04, 0.06, 0.05, 0.78)
+	dim.color = Color(0.04, 0.06, 0.05, 0.32)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.gui_input.connect(func(event: InputEvent):
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
@@ -54,12 +62,13 @@ func _ready() -> void:
 	_canvas = Control.new()
 	_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_canvas)
-	var margin := Ink.margin(16)
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_canvas.add_child(margin)
+	_window = Ink.margin(0)
+	_window.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_canvas.add_child(_window)
 	var panel := Ink.panel("PanelCard")
-	margin.add_child(panel)
+	# 只让底板半透明，字卡和文字保持不透明
+	panel.self_modulate.a = 0.86
+	_window.add_child(panel)
 	var pad := Ink.margin(16)
 	panel.add_child(pad)
 	var column := Ink.vbox(10)
@@ -105,6 +114,10 @@ func _layout() -> void:
 	var unit := BattleTouchLayout.unit_for(size, get_window().size)
 	_canvas.scale = Vector2.ONE * unit
 	_canvas.size = size / unit
+	var room := _canvas.size - Vector2(32, 32)
+	var want := (_canvas.size * WINDOW_RATIO).max(MIN_WINDOW).min(room)
+	_window.size = want
+	_window.position = ((_canvas.size - want) * 0.5).floor()
 	_layout_grid()
 
 
