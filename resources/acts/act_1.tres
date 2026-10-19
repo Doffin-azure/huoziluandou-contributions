@@ -1,74 +1,73 @@
 [gd_resource type="Resource" script_class="ActData" format=3]
 
-[ext_resource type="Script" path="res://src/data/map_node_data.gd" id="1_c7fvr"]
-[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_w4ip5"]
-[ext_resource type="Resource" path="res://resources/enemies/ink_spirit.tres" id="3_cj5lm"]
-[ext_resource type="Resource" path="res://resources/enemies/paper_guard.tres" id="4_sceld"]
-[ext_resource type="Resource" path="res://resources/enemies/ember_imp.tres" id="5_hbkp8"]
-[ext_resource type="Resource" path="res://resources/enemies/iron_seal.tres" id="6_uan7h"]
-[ext_resource type="Resource" path="res://resources/enemies/boss_word_demon.tres" id="7_w3ema"]
-[ext_resource type="Script" path="res://src/data/act_data.gd" id="8_jf15e"]
+[ext_resource type="Script" path="res://src/data/map_node_data.gd" id="1_sceld"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_hbkp8"]
+[ext_resource type="Resource" path="res://resources/enemies/paper_shell.tres" id="3_uan7h"]
+[ext_resource type="Resource" path="res://resources/enemies/needle_bee.tres" id="4_w3ema"]
+[ext_resource type="Resource" path="res://resources/enemies/tilting_inkwell.tres" id="5_jf15e"]
+[ext_resource type="Resource" path="res://resources/enemies/fold_moth.tres" id="6_yqi7s"]
+[ext_resource type="Resource" path="res://resources/enemies/blank_child.tres" id="7_aj6vd"]
+[ext_resource type="Resource" path="res://resources/enemies/corrosion_beetle.tres" id="8_w8o0w"]
+[ext_resource type="Resource" path="res://resources/enemies/iron_seal.tres" id="9_xmpte"]
+[ext_resource type="Resource" path="res://resources/enemies/proof_boss.tres" id="10_i3ecj"]
+[ext_resource type="Script" path="res://src/data/act_data.gd" id="11_xksqp"]
 
-[sub_resource type="Resource" id="Resource_yqi7s"]
-script = ExtResource("1_c7fvr")
+[sub_resource type="Resource" id="Resource_4wp7u"]
+script = ExtResource("1_sceld")
 title = "初试"
-description = "教授组词与单字的取舍"
-enemies = Array[ExtResource("2_w4ip5")]([ExtResource("3_cj5lm")])
+enemy_pool = Array[ExtResource("2_hbkp8")]([ExtResource("3_uan7h"), ExtResource("4_w3ema")])
+enemies = Array[ExtResource("2_hbkp8")]([ExtResource("3_uan7h")])
 
-[sub_resource type="Resource" id="Resource_aj6vd"]
-script = ExtResource("1_c7fvr")
+[sub_resource type="Resource" id="Resource_xt7pq"]
+script = ExtResource("1_sceld")
 order = 2
 title = "第二条线"
-description = "提供第一条新联动"
-enemies = Array[ExtResource("2_w4ip5")]([ExtResource("4_sceld")])
+enemy_pool = Array[ExtResource("2_hbkp8")]([ExtResource("5_jf15e"), ExtResource("6_yqi7s")])
+enemies = Array[ExtResource("2_hbkp8")]([ExtResource("5_jf15e")])
 
-[sub_resource type="Resource" id="Resource_w8o0w"]
-script = ExtResource("1_c7fvr")
+[sub_resource type="Resource" id="Resource_y314k"]
+script = ExtResource("1_sceld")
 order = 3
 type = 1
 title = "途中小憩"
-description = "叙事与风险、资源取舍"
 
-[sub_resource type="Resource" id="Resource_xmpte"]
-script = ExtResource("1_c7fvr")
+[sub_resource type="Resource" id="Resource_qglrt"]
+script = ExtResource("1_sceld")
 order = 4
 title = "机制之敌"
-description = "开始应对机制性敌人"
-enemies = Array[ExtResource("2_w4ip5")]([ExtResource("5_hbkp8")])
+enemy_pool = Array[ExtResource("2_hbkp8")]([ExtResource("7_aj6vd"), ExtResource("8_w8o0w")])
+enemies = Array[ExtResource("2_hbkp8")]([ExtResource("7_aj6vd")])
 
-[sub_resource type="Resource" id="Resource_i3ecj"]
-script = ExtResource("1_c7fvr")
+[sub_resource type="Resource" id="Resource_avmx1"]
+script = ExtResource("1_sceld")
 order = 5
 type = 2
 title = "市集"
-description = "购字、复制、删字或治疗"
 
-[sub_resource type="Resource" id="Resource_xksqp"]
-script = ExtResource("1_c7fvr")
+[sub_resource type="Resource" id="Resource_g2vsk"]
+script = ExtResource("1_sceld")
 order = 6
 type = 6
 title = "岔路"
-description = "精英（高收益）或事件（较安全）"
-enemies = Array[ExtResource("2_w4ip5")]([ExtResource("6_uan7h")])
+enemy_pool = Array[ExtResource("2_hbkp8")]([ExtResource("9_xmpte")])
+enemies = Array[ExtResource("2_hbkp8")]([ExtResource("9_xmpte")])
 is_optional_branch = true
 
-[sub_resource type="Resource" id="Resource_4wp7u"]
-script = ExtResource("1_c7fvr")
+[sub_resource type="Resource" id="Resource_yfg48"]
+script = ExtResource("1_sceld")
 order = 7
 type = 4
 title = "休整"
-description = "治疗 / 删字 / 修饰，三选一"
 
-[sub_resource type="Resource" id="Resource_xt7pq"]
-script = ExtResource("1_c7fvr")
+[sub_resource type="Resource" id="Resource_y1fcl"]
+script = ExtResource("1_sceld")
 order = 8
 type = 5
 title = "幕末首领"
-description = "验证整套构筑"
-enemies = Array[ExtResource("2_w4ip5")]([ExtResource("7_w3ema")])
+enemy_pool = Array[ExtResource("2_hbkp8")]([ExtResource("10_i3ecj")])
+enemies = Array[ExtResource("2_hbkp8")]([ExtResource("10_i3ecj")])
 
 [resource]
-script = ExtResource("8_jf15e")
+script = ExtResource("11_xksqp")
 title = "第一幕 · 起步"
-theme = "从少量高连通字开始，确立主方向。"
-nodes = Array[ExtResource("1_c7fvr")]([SubResource("Resource_yqi7s"), SubResource("Resource_aj6vd"), SubResource("Resource_w8o0w"), SubResource("Resource_xmpte"), SubResource("Resource_i3ecj"), SubResource("Resource_xksqp"), SubResource("Resource_4wp7u"), SubResource("Resource_xt7pq")])
+nodes = Array[ExtResource("1_sceld")]([SubResource("Resource_4wp7u"), SubResource("Resource_xt7pq"), SubResource("Resource_y314k"), SubResource("Resource_qglrt"), SubResource("Resource_avmx1"), SubResource("Resource_g2vsk"), SubResource("Resource_yfg48"), SubResource("Resource_y1fcl")])

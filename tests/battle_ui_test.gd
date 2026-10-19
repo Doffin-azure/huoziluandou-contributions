@@ -13,6 +13,9 @@ const GLYPHS := ["击", "破", "回", "流", "防", "御", "加", "速", "充", 
 
 
 func _ready() -> void:
+	# Headless windows can start at a dummy size; use the production desktop size
+	# before measuring physical touch targets and dispatching pointer events.
+	get_window().size = Vector2i(1440, 810)
 	_capture = OS.get_cmdline_user_args().has("--capture")
 	_saved_motion = Settings.reduced_motion
 	_saved_release = Settings.drag_release_play
@@ -111,7 +114,9 @@ func _run() -> void:
 		add_child(stage)
 		Router.study_stage = stage
 	Router.host = self
-	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7})
+	var fixture := MapNodeData.new()
+	fixture.enemies.append(Database.get_enemy("ink_spirit"))
+	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7, "node": fixture})
 	await _frames()
 	_screen = Router.current
 	_ok(_screen._board_view.tiles.size() == 16, "真实战斗场景有 16 枚固定视图")
@@ -426,7 +431,7 @@ func _verify_relic_board() -> void:
 	await _frames(12)
 	_screen = Router.current
 	var board: BoardView = _screen._board_view
-	_ok(_screen.battle.board.size == 5 and board.tiles.size() == 25 and board._presentation.actors.size() == 25, "对开版遗物在当前美术下构建 5×5 字盘与全部字块")
+	_ok(_screen.battle.board.size == 5 and board.tiles.size() == 25 and board._presentation.actors.size() == 25, "续碑座遗物在当前美术下构建 5×5 字盘与全部字块")
 	for i in 25:
 		_screen.battle.board.cells[i] = CharInstance.new(Database.get_character_by_glyph(GLYPHS[i % GLYPHS.size()]))
 	_screen.battle.board.set_cell(3, 4, CharInstance.new(Database.get_character_by_glyph("击")))

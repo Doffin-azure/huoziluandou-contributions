@@ -23,19 +23,19 @@ static func add_gold(b: BattleState, amount: int) -> void:
 	b.earn_gold(amount)
 
 
-## 可用支付额 = 临时资金 + 金币（“资金”可直接用于经济效果）
+## 可用支付额 = 普通金币 + 合资可抵扣的储能
 
 static func available(b: BattleState) -> int:
-	var avail: int = b.player.temp_funds + GameState.gold
+	var avail: int = GameState.gold
 	if b.has_ability("joint_funding"):
-		avail += int(b.player.energy / 2)
+		avail += int(b.player.energy / BattleBalance.i("joint_energy_cost", 2))
 	return avail
 
 
 static func discounted_cost(b: BattleState, cost: int) -> int:
 	return maxi(0, cost - b.ability_value("payment_discount_once")) if cost >= 0 else cost
 
-## 先兑现币的费用优惠，再花临时资金、合资储能和金币。失败时保留优惠。
+## 先兑现币的费用优惠，再花合资储能和普通金币。失败时保留优惠。
 
 static func pay(b: BattleState, cost: int) -> bool:
 	var due := discounted_cost(b, cost)
@@ -43,19 +43,19 @@ static func pay(b: BattleState, cost: int) -> bool:
 		return false
 	if cost > 0 and b.has_ability("payment_discount_once"):
 		b.abilities.erase("payment_discount_once")
-	var from_temp: int = mini(b.player.temp_funds, due)
-	b.player.temp_funds -= from_temp
-	var remain: int = due - from_temp
+	var remain: int = due
 	var gold_spent := 0
 	if remain > 0 and b.has_ability("joint_funding"):
-		var sub: int = mini(int(b.player.energy / 2), remain)
-		b.spend_energy(sub * 2)
+		var sub: int = mini(int(b.player.energy / BattleBalance.i("joint_energy_cost", 2)), remain)
+		b.spend_energy(sub * BattleBalance.i("joint_energy_cost", 2))
 		remain -= sub
 	if remain > 0:
 		gold_spent = remain
 		GameState.add_gold(-remain)
 	if gold_spent > 0 and b.has_ability("gold_to_shield"):
 		b.player.add_persistent_block(gold_spent)
+	if due > 0:
+		b.monster_paid = true
 	return true
 
 static func simple_ability(b: BattleState, id: String, msg: String) -> Array:

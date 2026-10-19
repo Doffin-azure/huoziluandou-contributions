@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_0u5jh"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_wuhxi"]
+
+[sub_resource type="Resource" id="Resource_mcgg7"]
+script = ExtResource("1_0u5jh")
+kind = 29
+handler = "anti_death"
+note = "彩蛋：本局获得一次满血复活机会（一局只给一次）。"
+
+[resource]
+script = ExtResource("2_wuhxi")
+id = "extra_fansiwang"
+word = "反死亡"
+glyphs = Array[String](["反", "死", "亡"])
+description = "彩蛋：本局获得一次满血复活机会（一局只给一次）。"
+effects = Array[ExtResource("1_0u5jh")]([SubResource("Resource_mcgg7")])
+group = "彩蛋"
+design_stage = "设计负责人新增"
+effect_summary = "彩蛋：本局获得一次满血复活机会（一局只给一次）。"
+effect_handler_id = "anti_death"
+priority = "彩蛋"
+implemented = true

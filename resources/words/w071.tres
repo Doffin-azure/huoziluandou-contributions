@@ -3,24 +3,26 @@
 [ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_05qhn"]
 [ext_resource type="Script" path="res://src/data/word_data.gd" id="2_21vlh"]
 
-[sub_resource type="Resource" id="Resource_hlmvq"]
+[sub_resource type="Resource" id="Economy_0"]
 script = ExtResource("1_05qhn")
 kind = 29
-handler = "invest_equity"
+handler = "gild_glyph"
 amount = 3
-note = "支付3点费用，获得3股权；战后返还未消耗股权对应的金币。"
+args = {"cost": 3}
+note = "支付3金币，选择字袋中一枚未镀金的实体字永久镀金；该字每次单独打出或参与组词获得1金币。"
 
 [resource]
 script = ExtResource("2_21vlh")
 id = "w071"
 word = "投资"
 glyphs = Array[String](["投", "资"])
-description = "支付3点费用，获得3股权；战后返还未消耗股权对应的金币。"
-effects = Array[ExtResource("1_05qhn")]([SubResource("Resource_hlmvq")])
+description = "支付3金币，选择字袋中一枚未镀金的实体字永久镀金；该字每次单独打出或参与组词获得1金币。"
+effects = Array[ExtResource("1_05qhn")]([SubResource("Economy_0")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "支付3点费用，获得3股权；战后返还未消耗股权对应的金币。"
-effect_handler_id = "invest_equity"
+effect_summary = "支付3金币，选择字袋中一枚未镀金的实体字永久镀金；该字每次单独打出或参与组词获得1金币。"
+effect_handler_id = "gild_glyph"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P1·重点机制"
 implemented = true
+interaction = "choose_glyph_gild"

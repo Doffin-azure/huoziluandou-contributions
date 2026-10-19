@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>墨池 · 3×3 纹理小样</title>
+<style>
+  *{box-sizing:border-box}body{margin:0;background:#10282d;color:#dfd5b8;font:14px 'Microsoft YaHei',sans-serif}
+  canvas{display:block;width:100%;max-width:1024px;height:auto;margin:auto}
+  .tools{max-width:960px;margin:0 auto 32px;padding:18px 20px;border-top:1px solid #355457;line-height:1.9}
+  button,a{color:#dfd5b8}button{cursor:pointer;background:#254348;border:1px solid #67817a;padding:7px 15px;margin-right:10px}
+  p{margin:8px 0}.quiet{color:#9baea6}
+</style>
+<canvas id="preview" width="1024" height="720" aria-label="五格石地、四格墨水与相接的石岸，三行三列纹理小样"></canvas>
+<div class="tools">
+  <button id="grid">显示／隐藏逻辑网格</button><button id="save">保存当前预览</button>
+  <p>3×3 地形小样 · 石地／潮湿石地／墨水／岸壁</p>
+  <p class="quiet">每格256×256世界纹理单位，纵向压缩为斜俯视。素材采用镜像重复；岸线由九格布局组合，湿地层沿岸混合。这是小样合成器，尚未接入游戏。</p>
+  <a href="materials.png">原始材质图</a> · <a href="materials.prompt.txt">生成提示词</a>
+</div>
+<script>
+const canvas=document.querySelector('#preview'),ctx=canvas.getContext('2d');
+const tile=240,world=tile*3,origin={x:152,y:100},squash=.66,drop=17;
+const cells=['SSW','SSW','SWW'];
+let grid=new URLSearchParams(location.search).has('grid');
+const source=new Image();
+window.previewReady=false;
+source.onload=()=>{draw();window.previewReady=true};
+source.src='materials.png';
+function quadrant(index){let half=source.width/2;return[(index%2)*half+4,Math.floor(index/2)*half+4,half-8,half-8]}
+function layer(index,span=1.5){
+  const c=document.createElement('canvas');c.width=c.height=world;const p=c.getContext('2d'),q=quadrant(index);
+  const repeat=tile*span;
+  for(let r=0;r<Math.ceil(world/repeat);r++)for(let col=0;col<Math.ceil(world/repeat);col++){
+    p.save();p.translate(col*repeat+(col%2?repeat:0),r*repeat+(r%2?repeat:0));
+    p.scale(col%2?-1:1,r%2?-1:1);p.drawImage(source,...q,0,0,repeat,repeat);p.restore();
+  }
+  return c;
+}
+function groundPath(){
+  const p=new Path2D(),a=tile*2,b=tile*2,c=tile,rad=19;
+  p.moveTo(0,0);p.lineTo(a-rad,0);p.quadraticCurveTo(a,0,a,rad);
+  p.lineTo(a,b-rad);p.quadraticCurveTo(a,b,a-rad,b);
+  p.lineTo(c+rad,b);p.quadraticCurveTo(c,b,c,b+rad);
+  p.lineTo(c,world);p.lineTo(0,world);p.closePath();return p;
+}
+function shorePath(){
+  const p=new Path2D(),a=tile*2,b=tile*2,c=tile,rad=19;
+  p.moveTo(a,0);p.lineTo(a,b-rad);p.quadraticCurveTo(a,b,a-rad,b);
+  p.lineTo(c+rad,b);p.quadraticCurveTo(c,b,c,b+rad);p.lineTo(c,world);return p;
+}
+function projected(x,y,height=0){return[origin.x+x,origin.y+y*squash+height]}
+function wall(){
+  // Only the south-facing piece has visible height at this fixed viewpoint.
+  const a=projected(tile+19,tile*2),b=projected(tile*2-19,tile*2);
+  const q=quadrant(3);
+  ctx.save();ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.lineTo(b[0],b[1]+drop);ctx.lineTo(a[0],a[1]+drop);ctx.closePath();ctx.clip();
+  ctx.drawImage(source,q[0],q[1]+q[3]*.10,q[2],q[3]*.31,a[0],a[1],b[0]-a[0],drop);
+  ctx.fillStyle='rgba(5,19,21,.27)';ctx.fillRect(a[0],a[1],b[0]-a[0],drop);
+  ctx.restore();
+}
+function draw(){
+  ctx.fillStyle='#10282d';ctx.fillRect(0,0,1024,720);
+  ctx.save();ctx.translate(origin.x,origin.y+drop);ctx.scale(1,squash);
+  ctx.drawImage(layer(2,2),0,0);ctx.restore();wall();
+  ctx.save();ctx.translate(origin.x,origin.y);ctx.scale(1,squash);ctx.clip(groundPath());
+  ctx.drawImage(layer(0),0,0);
+  const damp=layer(1),mask=document.createElement('canvas');mask.width=mask.height=world;const m=mask.getContext('2d');
+  m.drawImage(damp,0,0);m.globalCompositeOperation='destination-in';
+  const gradient=m.createLinearGradient(0,0,world,world);gradient.addColorStop(0,'rgba(0,0,0,0)');gradient.addColorStop(.45,'rgba(0,0,0,.08)');gradient.addColorStop(1,'rgba(0,0,0,.80)');
+  m.fillStyle=gradient;m.fillRect(0,0,world,world);ctx.drawImage(mask,0,0);
+  // Damp edging is a separate material blend, independent of the tile seams.
+  ctx.strokeStyle='rgba(8,34,34,.37)';ctx.lineWidth=19;ctx.stroke(shorePath());
+  ctx.restore();
+  ctx.save();ctx.translate(origin.x,origin.y);ctx.scale(1,squash);
+  ctx.strokeStyle='#111e20';ctx.lineWidth=4;ctx.lineJoin='round';ctx.stroke(shorePath());
+  ctx.restore();
+  if(grid){
+    ctx.save();ctx.translate(origin.x,origin.y);ctx.scale(1,squash);
+    ctx.strokeStyle='rgba(237,218,166,.55)';ctx.lineWidth=1.5;ctx.setLineDash([8,7]);
+    for(let n=0;n<=3;n++){ctx.beginPath();ctx.moveTo(n*tile,0);ctx.lineTo(n*tile,world);ctx.stroke();ctx.beginPath();ctx.moveTo(0,n*tile);ctx.lineTo(world,n*tile);ctx.stroke()}
+    ctx.restore();
+    ctx.fillStyle='#eadcba';ctx.font="14px 'Microsoft YaHei',sans-serif";
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++){const p=projected(c*tile+12,r*tile+23);ctx.fillText(`${r+1}-${c+1}`,p[0],p[1])}
+  }
+  ctx.textAlign='left';ctx.fillStyle='#dfd5b8';ctx.font="20px 'Microsoft YaHei',sans-serif";ctx.fillText('墨池 · 3×3 纹理拼接小样',152,47);
+  ctx.fillStyle='#9eb1a9';ctx.font="14px 'Microsoft YaHei',sans-serif";ctx.fillText(grid?'网格仅用于检查九格的位置与拼接':'五格石地 · 四格墨水 · 局部岸线',152,650);
+}
+document.querySelector('#grid').onclick=()=>{grid=!grid;draw()};
+document.querySelector('#save').onclick=()=>{const a=document.createElement('a');a.download=grid?'preview-grid.png':'preview.png';a.href=canvas.toDataURL();a.click()};
+</script>
+</html>

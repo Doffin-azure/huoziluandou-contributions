@@ -15,6 +15,7 @@ var _wood: Material
 var _frame: Material
 var _floor: Material
 var _socket: StandardMaterial3D
+var _gold: StandardMaterial3D
 var _red: StandardMaterial3D
 var _atlas: Texture2D
 var _face_shader: Shader
@@ -76,6 +77,9 @@ func _ready() -> void:
 	_socket = StandardMaterial3D.new()
 	_socket.albedo_color = Color("21170e")
 	_socket.roughness = 0.92
+	_gold = StandardMaterial3D.new()
+	_gold.albedo_color = Color("d7a832")
+	_gold.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_red = StandardMaterial3D.new()
 	_red.albedo_color = Palette.VERMILION
 	_red.roughness = 0.75
@@ -278,6 +282,9 @@ func _sync_tiles() -> void:
 			tint *= Color(0.55, 0.55, 0.55)
 		actor.face.set_shader_parameter("tint", tint)
 		actor.border.visible = tile.is_selected or tile.instance.gilded
+		for edge in actor.border.get_children():
+			if edge is MeshInstance3D:
+				edge.material_override = _red if tile.is_selected else _gold
 		actor.marker.visible = tile.is_selected
 		actor.order.text = tile._order.text
 		actor.badges.visible = not tile.is_selected

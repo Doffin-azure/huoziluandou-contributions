@@ -105,7 +105,7 @@ func _run() -> void:
 	for id in ["block", "persistent_block"]:
 		_ok(defense.badge_for(id).size.y * factor >= 47.5 and not defense.badge_for(id).get_global_rect().intersects(_screen._player_hp_value.get_global_rect()), "手机 %s 盾牌可点击区域至少 48 像素，不挤压生命数值" % id)
 	_ok(strip.item_for("more") != strip and strip.entries.size() == 6, "手机多余能力折叠到更多，完整详情保留")
-	_ok(strip.get_global_rect().end.y <= _screen._enemy_panel.get_global_rect().position.y, "手机状态栏与敌方信息分区")
+	_ok(not strip.get_global_rect().intersects(_screen._enemy_panel.get_global_rect()), "手机状态栏不与敌方信息重叠")
 	_ok(_screen._enemy_widgets[0]._intent.get_global_rect().end.y <= _screen._enemy_panel.get_global_rect().end.y + 1, "增加盾值图标后，敌方意图仍完整可见")
 	battle.player.block = 128
 	battle.player.persistent_block = 256

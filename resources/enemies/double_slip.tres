@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_f1eqo"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_gfmxu"]
+
+[sub_resource type="Resource" id="Resource_5xlm0"]
+script = ExtResource("1_f1eqo")
+kind = 7
+title = "翻签"
+description = "循环行动：翻签 → 合简 → 扑击"
+damage = 0
+mechanic_action = "flip"
+
+[sub_resource type="Resource" id="Resource_ogxq5"]
+script = ExtResource("1_f1eqo")
+title = "合简"
+description = "循环行动：翻签 → 合简 → 扑击"
+damage = 12
+mechanic_action = "pair"
+
+[sub_resource type="Resource" id="Resource_nivg0"]
+script = ExtResource("1_f1eqo")
+title = "扑击"
+description = "循环行动：翻签 → 合简 → 扑击"
+damage = 9
+
+[resource]
+script = ExtResource("2_gfmxu")
+id = "double_slip"
+name = "双面简"
+glyph = "双"
+description = "标记同一行两枚非固定己方实体A、B和原坐标。玩家阶段内使两者完整互换原坐标，或用一个词同时使用两者，即完成，怪物受5机制伤害，合简降至7；仅将其中一枚单打／移出盘面，合简为9，无奖励；未完成则12。完整解优先于离盘降级，不能因组词消耗目标而误判为9。无合法目标时翻签得4盾，合简固定9。"
+max_hp = 50
+mechanic = "pair"
+act = 2
+moves = Array[ExtResource("1_f1eqo")]([SubResource("Resource_5xlm0"), SubResource("Resource_ogxq5"), SubResource("Resource_nivg0")])

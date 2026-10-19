@@ -2,7 +2,7 @@ extends Control
 ## 词效回归：实体守恒、回合/跨战边界、结阵联动和实际 HUD 多阶段交互。
 
 ## 固定数量防止脚本异常中断某个测试函数后得到假通过。
-const EXPECTED_CHECKS := 411
+const EXPECTED_CHECKS := 417
 var checks: Array = []
 
 func _ready() -> void:
@@ -19,6 +19,7 @@ func _ready() -> void:
 	_run_solo_balance_four()
 	_run_word_balance()
 	_run_regen()
+	_run_vulnerable()
 	_run_description_previews()
 	_run_reconnect_return()
 	_run_flow_row_limits()
@@ -56,8 +57,6 @@ func _battle() -> BattleState:
 	GameState.player_hp = 60
 	GameState.gold = 100
 	GameState.permanent_damage_reduction = 0
-	GameState.gold_growth_percent = 0
-	GameState.reinvest_gold = 0
 	GameState.deck.clear()
 	var rules: BattleRules = Database.rules.duplicate()
 	rules.opening_draw = 0
@@ -126,13 +125,41 @@ func _run_regen() -> void:
 		stacks.append(b.player.status_stacks("regen"))
 	_check("regen_turn_tick", hp == [43, 45, 46] and stacks == [2, 1, 0], "再生每回合回复层数生命并减 1 层：血 %s，层 %s" % [str(hp), str(stacks)])
 
+func _run_vulnerable() -> void:
+	var b := _battle()
+	var enemy: Combatant = b.enemies[0]
+	_word(b, "破防")
+	_check("vulnerable_apply", enemy.status_stacks("vulnerable") == 2 and enemy.take_damage(3) == 5, "破防施加2层易伤，3伤向上取整为5伤")
+	b.end_player_turn()
+	_check("vulnerable_first_decay", enemy.status_stacks("vulnerable") == 1 and enemy.take_damage(3) == 5, "新回合易伤2变1，伤害增幅保持50%")
+	b.end_player_turn()
+	_check("vulnerable_expire", not enemy.statuses.has("vulnerable") and enemy.take_damage(3) == 3, "再过一回合易伤耗尽，移除状态并恢复正常伤害")
+	_word(b, "破防")
+	_word(b, "破防")
+	_check("vulnerable_stacks_duration", enemy.status_stacks("vulnerable") == 4 and enemy.take_damage(3) == 5, "重复破防叠加持续层数，不提高易伤倍率")
+	b.enemy_skip_turns = 1
+	b.end_player_turn()
+	_check("vulnerable_skip_turn_decay", enemy.status_stacks("vulnerable") == 3, "停火跳过敌方行动时，易伤仍每回合衰减一次")
+	b.player.add_status("vulnerable", 2)
+	var stacks: Array = []
+	for i in 2:
+		b.end_player_turn()
+		stacks.append(b.player.status_stacks("vulnerable"))
+	_check("vulnerable_both_sides_decay", stacks == [1, 0] and enemy.status_stacks("vulnerable") == 1, "玩家与敌方易伤都每回合减少1层，不重复衰减")
+	var other := _enemy(b)
+	other.add_status("vulnerable", 1)
+	b.end_player_turn()
+	_check("vulnerable_multi_enemy_expire", not enemy.statuses.has("vulnerable") and not other.statuses.has("vulnerable"), "多个敌人的易伤各自到期，不会保留零层状态")
+	var word := Database.get_word_by_glyphs_string("破防")
+	_check("vulnerable_copy_synced", word.describe() == BattleText.word(word) and "易伤" in EffectGlossary.brief(word) and "每回合开始减少1层" in word.effects[0].note and "敌我双方每回合开始减少1层" in EffectGlossary.entry("term:vulnerable").text, "破防资源、完整说明、精简说明和wiki词条都使用衰减规则")
+
 func _run_description_previews() -> void:
 	var unified := true
 	for word in Database.words.values():
-		unified = unified and word.describe() == WordDescriptions.TEXT.get(word.word, "") and word.description == word.effect_summary
+		unified = unified and word.describe() == BattleText.word(word) and word.description == word.effect_summary
 		for stale in ["P23初稿", "尚未收敛", "临时草案", "未定稿", "倾向删除"]:
 			unified = unified and not stale in word.describe()
-	_check("word_description_source", unified and WordDescriptions.TEXT.size() == 162, "全部162词共享完整说明，游戏介绍没有旧设计草稿")
+	_check("word_description_source", unified and WordDescriptions.TEXT.size() == Database.words.size(), "全部%d词共享完整说明，游戏介绍没有旧设计草稿" % Database.words.size())
 	var b := _battle()
 	var pos := Vector2i(3, 3)
 	var source := _place(b, pos, "再")
@@ -198,10 +225,10 @@ func _run_description_previews() -> void:
 	_check("preview_pending_temporary_effects", "首个伤害段额外+2" in text and "每段额外+6" in text and "获得4临挡、2储能" in text and _preview_signature(b) == before, "即将使用的词显示已武装的力、蓄力和合收益，不提前消费")
 	b.enable_ability("counter", 2)
 	var entries := StatusDisplay.collect(b.player, b)
-	_check("preview_counter_stacks", entries.any(func(item): return item.id == "ability:counter" and "+6" in item.description and "所有敌人行动后" in item.description), "反击状态提示按当前层数解释追加伤害和时机")
+	_check("preview_counter_stacks", entries.any(func(item): return item.id == "ability:counter" and "+6" in item.description and "敌人全部行动后" in item.description), "反击状态提示按当前层数解释追加伤害和时机")
 	b.enemies[0].add_status("vulnerable", 2)
 	entries = StatusDisplay.collect(b.enemies[0], b)
-	_check("preview_enemy_vulnerable_lifetime", entries.any(func(item): return item.id == "vulnerable" and "不按回合衰减" in item.description and not "每回合衰减 1" in item.description), "敌方易伤提示遵循当前持续规则")
+	_check("preview_enemy_vulnerable_lifetime", entries.any(func(item): return item.id == "vulnerable" and "每回合衰减 1 层" in item.description and not "不按回合衰减" in item.description), "敌方易伤提示每回合减少1层")
 
 func _run_word_balance() -> void:
 	var builder := load("res://src/tools/build_content.gd") as Script
@@ -210,8 +237,8 @@ func _run_word_balance() -> void:
 	for text in ContentBuild.BALANCE_SPECS:
 		var spec: Dictionary = ContentBuild.BALANCE_SPECS[text]
 		var word := Database.get_word_by_glyphs_string(text)
-		synced = synced and word != null and word.effect_summary == spec.desc and word.interaction == spec.interaction and word.effects[0].handler == spec.handler and word.effects[0].amount == spec.amount and word.effects[0].args == spec.args
-	_check("word_balance_specs", synced, "21词资源与生成器的效果、数值、参数、描述和交互同步")
+		synced = synced and word != null and word.effect_summary == BattleText.word(word) and word.interaction == spec.interaction and word.effects[0].handler == spec.handler and word.effects[0].amount == spec.amount and word.effects[0].args == spec.args
+	_check("word_balance_specs", synced, "当前数值词资源与生成器的效果、数值、参数、描述和交互同步")
 	var b := _battle()
 	for i in 3:
 		_word(b, "加强")
@@ -361,12 +388,9 @@ func _run_word_balance() -> void:
 	_check("overheat_rearms", b.has_ability("heat_overload_bonus_armed") and b.ability_value("next_draw_bonus") == 2 and not b.has_ability("heat_overload_bonus"), "过热本场每回合重新武装首次溢热奖励")
 	b = _battle()
 	_word(b, "复利")
-	_word(b, "投资")
 	_word(b, "复利")
-	_word(b, "投资")
 	b.begin_player_turn(false)
-	_word(b, "投资")
-	_check("compound_battle_lifetime", b.player.equity == 11 and b.has_ability("compound_equity"), "复利每回合首投+1，重施不刷新当回合资格，三次投资共11股权")
+	_check("immediate_profit_no_passive", GameState.gold == 104 and not b.has_ability("compound_equity"), "复利只即时给普通金币，没有股权或被动首投奖励")
 
 func _occurrences(b: BattleState, inst: CharInstance) -> int:
 	var n := 0
@@ -1483,8 +1507,10 @@ func _run_logic() -> void:
 	var chosen := CharInstance.new(Database.get_character_by_glyph("御"))
 	b.bag.append(chosen)
 	b.reveal_from_bag(1)
-	_word(b, "转化", 1, {"tile": Vector2i(2, 2), "transform_uid": chosen.uid})
-	_check("pin_transform", b.board.get_xy(Vector2i(2, 2)) == inst, "精铸后转化仍替换固定字，原字仍在=%s，预期true" % (b.board.get_xy(Vector2i(2, 2)) == inst))
+	var transform_source := _place(b, Vector2i(0, 1), "转")
+	_place(b, Vector2i(1, 1), "化")
+	var invalid_transform := b.try_play([Vector2i(0, 1), Vector2i(1, 1)], {"tile": Vector2i(2, 2), "transform_uid": chosen.uid})
+	_check("pin_transform", not invalid_transform.ok and b.board.get_xy(Vector2i(2, 2)) == inst and b.board.get_xy(Vector2i(0, 1)) == transform_source and b.pending_reveal.has(chosen), "转化在消耗前拒绝固定目标，保留原字、施词字及揭示字")
 
 	b = _battle()
 	_word(b, "加速")
@@ -1544,9 +1570,11 @@ func _run_logic() -> void:
 	_check("repeat_immediate_only", b.player.heat_capacity - cap_before == 4 and b.base_draw_penalty == 0 and b.next_draw_penalty == 1, "重复触发重载：热容增加=%d，补字惩罚=%d；按只重演即时效果应4/1（仅下回合）" % [b.player.heat_capacity - cap_before, b.next_draw_penalty])
 
 	b = _battle()
-	_word(b, "再投资")
+	var gild_card := CharInstance.new(Database.get_character_by_glyph("击"))
+	GameState.deck.append(gild_card)
+	_word(b, "再投资", 0, {"gild_uid": gild_card.uid})
 	GameState.settle_victory_economy()
-	_check("reinvest_next_battle", GameState.gold == 94 and GameState.reinvest_gold == 6, "再投资后当场胜利结算，金币=%d、待返本金=%d；按下一场返还应94/6" % [GameState.gold, GameState.reinvest_gold])
+	_check("gild_immediate_cost", GameState.gold == 97 and gild_card.gilded, "再投资即时支付3金币并镀金，无当场返还")
 
 func _new_screen():
 	GameState.start_new_run("v03")
@@ -1915,18 +1943,14 @@ func _run_boundaries() -> void:
 	_check("double_draw_fixed_cell", b.drawn_this_turn == 2 and b.player.heat == 1, "回的原格补字同样触发超速和真实补字统计")
 
 	b = _battle()
-	_word(b, "再投资")
+	var gild_next := CharInstance.new(Database.get_character_by_glyph("击"))
+	GameState.deck.append(gild_next)
+	_word(b, "再投资", 0, {"gild_uid": gild_next.uid})
 	var second := BattleState.new(b.rules)
-	second.start([], [b.enemies[0].enemy_data], 7)
-	_word(second, "再投资")
+	second.start(GameState.make_battle_deck(), [b.enemies[0].enemy_data], 7)
 	GameState.settle_victory_economy()
-	_check("reinvest_mixed_due", GameState.gold == 100 and GameState.reinvest_gold == 6, "第二场只兑付第一场投资，新投资保留到第三场")
 	GameState.settle_victory_economy()
-	_check("reinvest_no_double_refund", GameState.gold == 100 and GameState.reinvest_gold == 6, "已兑付批次不能重复返还")
-	var third := BattleState.new(b.rules)
-	third.start([], [b.enemies[0].enemy_data], 7)
-	GameState.settle_victory_economy()
-	_check("reinvest_next_due", GameState.gold == 112 and GameState.reinvest_gold == 0, "第三场兑付第二场投资")
+	_check("gild_cross_battle", gild_next.gilded and GameState.gold == 97, "永久镀金跨战保留，胜利重复结算不生金币")
 
 	b = _battle()
 	_pad(b)
@@ -1994,14 +2018,15 @@ func _run_boundaries() -> void:
 	encounter.enemies.append(Database.get_enemy("ink_spirit"))
 	h.node = encounter
 	h._start_battle(encounter)
-	_word(h.battle_h.battle, "再投资")
+	var run_card: CharInstance = GameState.deck[0]
+	_word(h.battle_h.battle, "再投资", 0, {"gild_uid": run_card.uid})
 	h.battle_h.battle.enemies[0].hp = 0
 	h._end_battle()
-	_check("run_reinvest_current", GameState.gold == 94 and GameState.reinvest_gold == 6, "整局无头接口当前胜利不提前兑付投资")
+	_check("run_gild_current", GameState.gold == 97 and run_card.gilded, "整局接口镀金即时扣费，无投资返还")
 	h._start_battle(encounter)
 	h.battle_h.battle.enemies[0].hp = 0
 	h._end_battle()
-	_check("run_reinvest_persists", GameState.gold == 106 and GameState.reinvest_gold == 0, "整局无头接口下一场保留并兑付投资")
+	_check("run_gild_persists", GameState.gold == 97 and run_card.gilded, "整局接口下战保留镀金，不产生自动收益")
 
 	b = _battle()
 	var pool := ["放", "防", "盾", "冷"]
@@ -2068,7 +2093,7 @@ func _run_ui_word_balance() -> void:
 		picker._on_choose(0)
 		screen._board_view._on_tile_pressed(Vector2i(3, 3))
 		_check("ui_transfer_ready_" + text, not screen._ready_action.is_empty() and screen.battle.board.get_cell(3, 3) == null and GameState.gold == 10, "选完落点仍等待确认")
-		_check("ui_transfer_selected_preview_" + text, "已选原实体【电】" in screen._bubble._effect_text and "需支付2" in screen._bubble._effect_text, "确认前预览显示实际选中实体及当前费用")
+		_check("ui_transfer_selected_preview_" + text, "已选己方原字【电】" in screen._bubble._effect_text and "需付2" in screen._bubble._effect_text, "确认前预览显示实际选中实体及当前费用")
 		screen._on_primary()
 		await _wait_for_screen_idle(screen)
 		_check("ui_transfer_commit_" + text, screen.battle.board.get_cell(3, 3) == original and original.gilded and original.temporary_uses == 1 and GameState.gold == 8 and _occurrences(screen.battle, original) == 1 and not screen._busy, "确认才支付2，保留原实体属性并加一次使用")

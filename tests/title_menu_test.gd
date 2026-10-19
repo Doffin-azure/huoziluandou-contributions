@@ -65,7 +65,9 @@ func _run() -> void:
 	_ok(Router.current_path.ends_with("/title_screen.gd") and title.has_scene_background(), "normal project entry opens the courtyard title")
 	var names: Array = []
 	for button in title._buttons: names.append(button.text)
-	_ok(names == ["开始新冒险", "墨途远征", "自定义构筑", "字库图鉴", "字网图谱", "设置", "离开"], "all existing title actions retained without review controls")
+	var expected: Array = ["开始新冒险","字库图鉴","设置","离开","自定义构筑","字网图谱","旧版远征"]
+	if FileAccess.file_exists("user://courtyard-run.tres"): expected.insert(1,"继续冒险")
+	_ok(names == expected, "all existing title actions retained in the branded menu")
 	_ok(GameState.rng.state == rng_before, "title rendering leaves gameplay RNG untouched")
 	_ok(title._buttons[0].has_focus(), "keyboard focus starts on the primary action")
 	await _shot("title-production-desktop")

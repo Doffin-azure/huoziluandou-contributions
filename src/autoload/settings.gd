@@ -18,6 +18,7 @@ var visual_style: String = "taopunk"
 var board_font_path := ""
 var reduced_motion: bool = false
 var sfx_volume := 0.65
+var music_volume := 0.6
 
 var _cfg := ConfigFile.new()
 
@@ -30,6 +31,7 @@ func _ready() -> void:
 		board_font_path = str(_cfg.get_value("visual", "board_font", ""))
 		reduced_motion = bool(_cfg.get_value("visual", "reduced_motion", false))
 		sfx_volume = clampf(float(_cfg.get_value("audio", "sfx_volume", 0.65)), 0.0, 1.0)
+		music_volume = clampf(float(_cfg.get_value("audio", "music_volume", 0.6)), 0.0, 1.0)
 		if stored_style != visual_style or _cfg.has_section_key("visual", "style"):
 			_save()
 
@@ -59,6 +61,7 @@ func _save() -> void:
 	_cfg.set_value("visual", "board_font", board_font_path)
 	_cfg.set_value("visual", "reduced_motion", reduced_motion)
 	_cfg.set_value("audio", "sfx_volume", sfx_volume)
+	_cfg.set_value("audio", "music_volume", music_volume)
 	_cfg.save(storage_path)
 
 
@@ -70,6 +73,12 @@ func set_reduced_motion(value: bool) -> void:
 
 func set_sfx_volume(value: float) -> void:
 	sfx_volume = clampf(value, 0.0, 1.0)
+	_save()
+	changed.emit()
+
+
+func set_music_volume(value: float) -> void:
+	music_volume = clampf(value, 0.0, 1.0)
 	_save()
 	changed.emit()
 

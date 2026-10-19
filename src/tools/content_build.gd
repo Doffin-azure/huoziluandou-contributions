@@ -29,7 +29,7 @@ const BALANCE_SPECS := {
 		"interaction": "choose_bag_deploy"
 	},
 	"资金": {
-		"handler": "temp_funds",
+		"handler": "gold",
 		"amount": 5,
 		"desc": WordDescriptionsS.TEXT["资金"],
 		"target": 0,
@@ -203,15 +203,6 @@ const BALANCE_SPECS := {
 		"timing": "persistent",
 		"args": {},
 		"interaction": ""
-	},
-	"复利": {
-		"handler": "compound_equity",
-		"amount": 1,
-		"desc": WordDescriptionsS.TEXT["复利"],
-		"target": 0,
-		"timing": "persistent",
-		"args": {},
-		"interaction": ""
 	}
 }
 
@@ -262,7 +253,7 @@ static func handler_note(handler: String, amount: int, status: String, args: Dic
 		"heat": return "热度 %+d" % amount if amount != 0 else "热度不变"
 		"heat_clear": return "清空当前热度"
 		"gold": return "获得 %d 金币" % amount
-		"temp_funds": return "获得 %d 点临时资金（本回合有效）" % amount
+		"gold": return "获得 %d 点金币" % amount
 		"apply_status_self": return "获得状态【%s】×%d" % [status_name(status), max(1, amount)]
 		"apply_status_enemy": return "使敌人获得【%s】×%d" % [status_name(status), max(1, amount)]
 		"remove_enemy_block": return "移除敌人全部护盾"
@@ -281,14 +272,13 @@ static func handler_note(handler: String, amount: int, status: String, args: Dic
 		"conditional_draw_half_hp": return "低于半血补 %d 字，否则补 %d 字" % [int(args.get("low", amount)), int(args.get("high", 1))]
 		"break_shield_damage": return "造成 %d 伤；拆盾效率×2；击碎护盾再补 1 字" % amount
 		"permanent_damage_reduction": return "本局永久：每次实际生命伤害 -%d" % amount
-		"permanent_gold_growth": return "本局每场胜利后金币 +%d%%" % amount
 		"transform_board": return "随机揭示 %d 枚实体字，选 1 枚替换盘面指定字" % int(args.get("reveal", 5))
 		"split_grow": return "删除一个盘面字，四周生长可组词临时字"
 		"empower_glyph": return "选择一个字，本场它被打出时额外触发单字效果"
 		"refine_remove": return "热度 -%d、金币 +%d，并移出一张牌" % [int(args.get("heat", 3)), int(args.get("gold", 4))]
 		"fuse_cards": return "选两张相邻己方牌融合为一格（本场不可拆）"
 		"refine_layer": return "选两枚同字原实体，第一枚本场每次入盘恢复 2 次额外使用，第二枚回袋"
-		"gild_glyph": return "选一个字永久镀金；每次参与多字词 +1 金币"
+		"gild_glyph": return "选一枚字袋实体永久镀金；每次单字或组词打出+1金币"
 		"precision_place": return "支付 %d 金币，把弃字堆一枚字放进指定空格" % amount
 		"recast_board": return "把盘面上已有的字全部重新替换"
 		"recast_copy": return "从弃字堆选一张，把临时复制放进指定空格"
@@ -313,6 +303,7 @@ static func status_name(id: String) -> String:
 		_: return id
 
 static func word_effects(word: String) -> Array:
+	if word == "复利": return [e("gold", 2), e("draw_random", 1)]
 	if BALANCE_SPECS.has(word):
 		var spec: Dictionary = BALANCE_SPECS[word]
 		return [e(spec.handler, spec.amount, spec.target, "", spec.desc, spec.args, -1, spec.timing)]
@@ -372,19 +363,19 @@ static func word_effects(word: String) -> Array:
 		"金币": return [e("gold", 3)]
 		"投币": return [e("spend_gold_damage", 5, T.ENEMY, "", "支付最多 3 金币，每金币造成 5 伤", {"max": 3})]
 		"收购": return [e("capture_glyph", 4, T.ENEMY_GLYPH, "", "支付 4 金币，净化并永久收编一枚敌方实体字", {})]
-		"复利投资": return [e("permanent_gold_growth", 20, -1, "", "首次打出后，本局每场胜利使现有金币额外增长 20%", {}, -1, "persistent")]
+		"复利投资": return [e("gild_glyph", 0, -1, "", WordDescriptionsS.TEXT[word], {"cost": 0}), e("gold", 3)]
 		# ---- 蓄放进阶 ----
 		"放热": return [e("energy_to_heat_damage", 2, T.ENEMY, "", "消耗全部储能：转为热度并对敌每点 2 伤", {"per": 2})]
 		"热能": return [e("heat_to_energy", 1, -1, "", "当前热度转为等量储能")]
 		"电流": return [e("flow_energy_or_draw", 2, -1, "", "本回合已补字则储能 +2，否则补 2 字", {})]
-		# ---- 经济 / 股权 ----
-		"投资": return [e("invest_equity", 3, -1, "", "支付 3 金币锁定为 3 股权（战后返还本金）", {})]
-		"利息": return [e("equity_interest", 1, -1, "", "持有≥2股权时，支付 1 股权获得 2 金币并补 1 字", {})]
-		"炼金": return [e("alchemy", 3, -1, "", "消耗全部股权：每点 +3 金币并补 1 字", {"per": 3})]
-		"纯金": return [e("pure_gold", 1, -1, "", "把本回合剩余临时资金转为正式金币", {})]
+		# ---- 普通金币 / 镀金 ----
+		"投资": return [e("gild_glyph", 3, -1, "", WordDescriptionsS.TEXT[word], {"cost": 3})]
+		"利息": return [e("gold", 2)]
+		"炼金": return [e("gold", 3), e("draw_random", 1)]
+		"纯金": return [e("gold", 3)]
 		"合金": return [e("alloy", 6, -1, "", "获得 6 持久盾与 2 金币", {"gold": 2})]
 		"铸币": return [e("mint", 2, -1, "", "获得 2 金币，并在原格生成一枚临时【币】", {"gold": 2})]
-		"再投资": return [e("reinvest", 6, -1, "", "锁定最多 6 金币，下一场胜利后返还 2 倍", {"max": 6}, -1, "persistent")]
+		"再投资": return [e("gild_glyph", 3, -1, "", WordDescriptionsS.TEXT[word], {"cost": 3}), e("draw_random", 2)]
 		"重金": return [e("bounty", 12, T.ENEMY, "", "支付 5 金币悬赏，本回合击杀返 12，否则本金不返", {"cost": 5})]
 		# ---- 热暴 P3 ----
 		"爆冷": return [e("cold_snap", 4, T.ENEMY, "", "4 伤 + 上回合每失 1 生命额外 2 伤，清空热度", {"per": 2})]

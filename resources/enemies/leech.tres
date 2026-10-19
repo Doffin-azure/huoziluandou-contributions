@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_dydvn"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_c4ueh"]
+
+[sub_resource type="Resource" id="Resource_vpe1d"]
+script = ExtResource("1_dydvn")
+title = "汲电"
+description = "循环行动：汲电 → 汲电"
+damage = 8
+mechanic_action = "leech"
+
+[sub_resource type="Resource" id="Resource_2x4vx"]
+script = ExtResource("1_dydvn")
+title = "汲电"
+description = "循环行动：汲电 → 汲电"
+damage = 10
+mechanic_action = "leech"
+
+[resource]
+script = ExtResource("2_c4ueh")
+id = "leech"
+name = "漏电水蛭"
+glyph = "漏"
+description = "只有该次攻击实际扣到玩家生命，才偷最多2储能；偷到每1点使怪物得2盾，盾最高8。满盾仍能偷，但不超盾上限；没储能不改扣生命。心力挡住致命伤导致实际生命未减少时，不偷能。"
+max_hp = 52
+mechanic = "leech"
+act = 2
+moves = Array[ExtResource("1_dydvn")]([SubResource("Resource_vpe1d"), SubResource("Resource_2x4vx")])
+is_elite = true

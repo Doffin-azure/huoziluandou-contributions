@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/map/expedition_pond_shape_tile.gd" id="1"]
+
+[node name="HalfWaterStraightShore" type="Node3D"]
+scale = Vector3(0.5, 0.5, 0.5)
+script = ExtResource("1")
+corner_values = Vector4(1, 1, -1, -1)

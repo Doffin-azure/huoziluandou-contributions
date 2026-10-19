@@ -1,0 +1,199 @@
+{
+  "android_device_tested": false,
+  "failures": [],
+  "measurements": [
+    {
+      "batch_groups": 470,
+      "batch_instances": 481,
+      "draw_calls": 647,
+      "frame_median_ms": 16.665,
+      "frame_p95_ms": 17.129,
+      "generation_ms": 1284.898,
+      "memory_bytes": 320456355.0,
+      "profile": {
+        "active_local_lights": 4,
+        "assembly_ms": 5069.021,
+        "build_count": 1,
+        "fallback_bake_ms": 0.0,
+        "fallback_bakes": 0,
+        "fog_ms": 1.839,
+        "outline_ms": 1.307,
+        "outline_warmup_ms": 1221.449,
+        "resource_load_ms": 119.361,
+        "resume_ms": 0.0,
+        "stages": {
+          "batching_ms": 1981.474,
+          "buildings_ms": 346.706,
+          "ground_ms": 738.823,
+          "scenery_ms": 119.536,
+          "walls_ms": 346.166
+        }
+      },
+      "render_cpu_ms": 1.49300003051758,
+      "render_gpu_ms": 3.50099992752075,
+      "scenario": "local-entry",
+      "seed": 17,
+      "viewport_size": [
+        1600,
+        1000
+      ],
+      "wall_draw_groups": 548
+    },
+    {
+      "frame_median_ms": 16.674,
+      "frame_p95_ms": 17.387,
+      "frames": 210,
+      "scenario": "walking-to-first-hall",
+      "seed": 17
+    },
+    {
+      "batch_groups": 2985,
+      "batch_instances": 1699,
+      "draw_calls": 975,
+      "frame_median_ms": 16.672,
+      "frame_p95_ms": 17.3,
+      "generation_ms": 1284.898,
+      "memory_bytes": 378538281.0,
+      "profile": {
+        "active_local_lights": 4,
+        "assembly_ms": 5069.021,
+        "build_count": 1,
+        "fallback_bake_ms": 0.0,
+        "fallback_bakes": 0,
+        "fog_ms": 2.552,
+        "outline_ms": 0.491,
+        "outline_warmup_ms": 1221.449,
+        "resource_load_ms": 119.361,
+        "resume_ms": 25.593,
+        "stages": {
+          "batching_ms": 1981.474,
+          "buildings_ms": 346.706,
+          "ground_ms": 738.823,
+          "scenery_ms": 119.536,
+          "walls_ms": 346.166
+        }
+      },
+      "render_cpu_ms": 2.75099992752075,
+      "render_gpu_ms": 3.9909999370575,
+      "scenario": "local-rear-court",
+      "seed": 17,
+      "viewport_size": [
+        1600,
+        1000
+      ],
+      "wall_draw_groups": 548
+    },
+    {
+      "batch_groups": 3677,
+      "batch_instances": 2476,
+      "draw_calls": 3513,
+      "frame_median_ms": 16.645,
+      "frame_p95_ms": 17.168,
+      "generation_ms": 1284.898,
+      "memory_bytes": 387070489.0,
+      "profile": {
+        "active_local_lights": 4,
+        "assembly_ms": 5069.021,
+        "build_count": 1,
+        "fallback_bake_ms": 0.0,
+        "fallback_bakes": 0,
+        "fog_ms": 2.552,
+        "outline_ms": 0.491,
+        "outline_warmup_ms": 1221.449,
+        "resource_load_ms": 119.361,
+        "resume_ms": 25.593,
+        "stages": {
+          "batching_ms": 1981.474,
+          "buildings_ms": 346.706,
+          "ground_ms": 738.823,
+          "scenery_ms": 119.536,
+          "walls_ms": 346.166
+        }
+      },
+      "render_cpu_ms": 4.73799991607666,
+      "render_gpu_ms": 4.33900022506714,
+      "scenario": "whole-garden-stress",
+      "seed": 17,
+      "viewport_size": [
+        1600,
+        1000
+      ],
+      "wall_draw_groups": 548
+    },
+    {
+      "batch_groups": 399,
+      "batch_instances": 399,
+      "draw_calls": 601,
+      "frame_median_ms": 16.668,
+      "frame_p95_ms": 17.275,
+      "generation_ms": 1111.196,
+      "memory_bytes": 367323993.0,
+      "profile": {
+        "active_local_lights": 4,
+        "assembly_ms": 4874.22,
+        "build_count": 1,
+        "fallback_bake_ms": 0.0,
+        "fallback_bakes": 0,
+        "fog_ms": 2.747,
+        "outline_ms": 1.301,
+        "outline_warmup_ms": 1202.525,
+        "resource_load_ms": 208.116,
+        "resume_ms": 0.0,
+        "stages": {
+          "batching_ms": 2014.984,
+          "buildings_ms": 335.211,
+          "ground_ms": 786.887,
+          "scenery_ms": 117.357,
+          "walls_ms": 279.027
+        }
+      },
+      "render_cpu_ms": 1.45500004291534,
+      "render_gpu_ms": 3.34299993515015,
+      "scenario": "local-entry",
+      "seed": 67,
+      "viewport_size": [
+        1600,
+        1000
+      ],
+      "wall_draw_groups": 478
+    },
+    {
+      "batch_groups": 2777,
+      "batch_instances": 2810,
+      "draw_calls": 3912,
+      "frame_median_ms": 16.65,
+      "frame_p95_ms": 17.386,
+      "generation_ms": 1111.196,
+      "memory_bytes": 387155337.0,
+      "profile": {
+        "active_local_lights": 4,
+        "assembly_ms": 4874.22,
+        "build_count": 1,
+        "fallback_bake_ms": 0.0,
+        "fallback_bakes": 0,
+        "fog_ms": 2.747,
+        "outline_ms": 1.301,
+        "outline_warmup_ms": 1202.525,
+        "resource_load_ms": 208.116,
+        "resume_ms": 0.0,
+        "stages": {
+          "batching_ms": 2014.984,
+          "buildings_ms": 335.211,
+          "ground_ms": 786.887,
+          "scenery_ms": 117.357,
+          "walls_ms": 279.027
+        }
+      },
+      "render_cpu_ms": 4.77500009536743,
+      "render_gpu_ms": 4.48699998855591,
+      "scenario": "whole-garden-stress",
+      "seed": 67,
+      "viewport_size": [
+        1600,
+        1000
+      ],
+      "wall_draw_groups": 478
+    }
+  ],
+  "renderer": "forward_plus"
+}

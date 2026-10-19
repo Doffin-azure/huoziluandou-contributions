@@ -12,6 +12,11 @@ var _actor: InkGuardianActor
 var _attack_actor: EnemyAttackActor
 ## Articulated actor contract: framing, play_action, feedback, origin, effect, defeated.
 const CHARACTER_ACTORS := {
+	# 策划资源 ID 与美术样例 ID 共用同一角色。
+	"paper_shell": preload("res://src/battle/paper_shell_actor.gd"),
+	"needle_bee": preload("res://src/battle/needle_wasp_actor.gd"),
+	"tilting_inkwell": preload("res://src/battle/tilting_inkstone_actor.gd"),
+	"fold_moth": preload("res://src/battle/fold_page_moth_actor.gd"),
 	"paper_shell_soldier": preload("res://src/battle/paper_shell_actor.gd"),
 	"needle_wasp": preload("res://src/battle/needle_wasp_actor.gd"),
 	"tilting_inkstone": preload("res://src/battle/tilting_inkstone_actor.gd"),
@@ -85,7 +90,18 @@ func _fit_actor() -> void:
 	queue_redraw()
 
 
+func _visual_move(move: EnemyMoveData) -> EnemyMoveData:
+	# 仅给动画副本补标签；战斗意图、伤害和随机数保持策划结算。
+	var tags := {"gravity": "tilt", "rotate": "rotate", "fold": "fold_attack", "refill8": "guard"}
+	if not tags.has(move.mechanic_action): return move
+	var visual: EnemyMoveData = move.duplicate()
+	visual.set_meta("visual_action", tags[move.mechanic_action])
+	if move.mechanic_action == "refill8": visual.kind = EnemyMoveData.Kind.BLOCK
+	return visual
+
+
 func play_action(move: EnemyMoveData) -> Dictionary:
+	move = _visual_move(move)
 	if has_character_actor(): return _character_actor.call("play_action",move)
 	return _actor.play_action(move) if _actor != null and _actor.visible else {}
 
@@ -126,6 +142,7 @@ func apply_character_feedback(event: Dictionary) -> bool:
 
 
 func play_attack_hit(move: EnemyMoveData, hit_index: int) -> Dictionary:
+	move = _visual_move(move)
 	if has_character_actor(): return _character_actor.call("play_action",move,hit_index)
 	return _attack_actor.play_action(move, hit_index) if has_attack_actor() else {}
 

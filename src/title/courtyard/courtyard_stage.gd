@@ -16,11 +16,14 @@ var inspection := 0.0
 var _motion: Tween
 var contours: MeshInstance3D
 var atmosphere: Node3D
+var foreground: Node3D
 
 
 func _ready() -> void:
 	render_style.apply(geometry, landscape)
 	_build_daylight()
+	foreground = preload("res://src/title/courtyard/foreground.gd").new()
+	foreground.name = "LanternTerrace"; add_child(foreground); foreground.build()
 	_build_water()
 	_build_planar_reflection()
 	_build_contours()
@@ -58,6 +61,7 @@ func _build_daylight() -> void:
 	var sky_material := ShaderMaterial.new()
 	sky_material.shader = load("res://src/title/courtyard/painted_sky.gdshader")
 	sky_material.set_shader_parameter("paper_texture", load("res://assets/title/courtyard/materials/white_plaster_rough_01_diffuse.jpg"))
+	sky_material.set_shader_parameter("gilt_clouds",preload("res://assets/title/courtyard/gilt-clouds.svg"))
 	var sky := Sky.new()
 	sky.sky_material = sky_material
 	environment = Environment.new()
@@ -70,7 +74,7 @@ func _build_daylight() -> void:
 	# Linear tonemapping keeps the chosen paint colours predictable; no filmic desaturation.
 	environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	environment.tonemap_exposure = 1.0
-	environment.ssao_enabled = true
+	environment.ssao_enabled = RenderingServer.get_current_rendering_method() == "forward_plus"
 	environment.ssao_radius = 0.25
 	environment.ssao_intensity = 0.65
 	environment.ssr_enabled = false
@@ -184,6 +188,10 @@ func set_key_strength(value: float) -> void:
 
 func set_accent_strength(value: float) -> void:
 	accent.light_energy = value
+
+
+func set_terrace_strength(value: float) -> void:
+	for lamp: OmniLight3D in foreground.lamps: lamp.light_energy = clampf(value,0.0,4.0)
 
 
 func set_reflections(enabled: bool) -> void:

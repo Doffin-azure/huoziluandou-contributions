@@ -50,3 +50,14 @@ build/
 
 # pi agent 本地配置（skills/extensions）
 .pi/
+
+# Android packages and local signing material
+*.apk
+*.aab
+*.keystore
+*.jks
+__pycache__/
+*.pyc
+
+# Documentation preview import sidecars are generated locally by the editor.
+docs/**/*.import

@@ -1,7 +1,7 @@
 extends RefCounted
 class_name MapGen
-## 墨途远征地图生成（v0.3）：逐行移植 ni-h/work/mapgen-open.html 的 build / sim / gen，
-## 同一种子与 HTML 原型生成同一张图（tests/expedition_test 校验）；伏兵领地与封印为 v0.3 补充规则。
+## 游戏地图使用 garden_v2 园林布局；build/gen_proto 保留 HTML 原型的逐格对照。
+## 伏兵领地、封印和远征时间规则在布局落位之后校验。
 ## 格子用整数 k = 行 * W + 列。
 
 const W := 12
@@ -19,7 +19,7 @@ const THEMES := {
 		{"g": "纸", "n": [4, 6], "kind": "slow", "color": "c9b88a", "desc": "吸墨纸：经过要多耗 1 步，首领不受影响"}]},
 	"熔铸坊": {"ink": "4a2f28", "glyphs": "火热炼铸金精重强", "foes": ["爆", "热", "甲"], "boss": "铸", "mech": [
 		{"g": "焰", "n": [3, 5], "kind": "flavor", "color": "d2542a", "desc": "烈焰格：可以走，每次经过气血 −3"},
-		{"g": "炉", "n": [1, 2], "kind": "flavor", "color": "8a3a1f", "desc": "熔炉：投 2～3 个字许愿，相关的字越多越可能熔出遗物，否则熔成稀有字；一次性"}]},
+		{"g": "炉", "n": [1, 2], "kind": "flavor", "color": "8a3a1f", "desc": "熔炉：投两枚字匣里的字，换一枚稀有字；一次性"}]},
 	"潮汐渠": {"ink": "2b3a45", "glyphs": "流回转清冷急分合", "foes": ["冷", "急", "流"], "boss": "潮", "mech": [
 		{"g": "流", "n": [2, 3], "kind": "slide", "color": "3d7fb0", "desc": "水流：顺着箭头滑出去，不耗步；首领不能用"},
 		{"g": "潮", "n": [2, 3], "kind": "gate", "cycle": [4, 4], "color": "5a7f9a", "desc": "涨潮格：开 4 步、淹 4 步，淹着时谁都过不去"}]},
@@ -38,6 +38,9 @@ const SHAPES := [[[0, 0], [0, 1]], [[0, 0], [1, 0]], [[0, 0], [0, 1], [0, 2]], [
 	[[0, 0], [0, 1], [1, 0]], [[0, 0], [0, 1], [1, 1]], [[0, 1], [1, 0], [1, 1]], [[0, 0], [0, 1], [0, 2], [1, 1]],
 	[[0, 0], [1, 0], [2, 0], [1, 1]], [[0, 0], [1, 0], [1, 1], [1, 2]]]
 const CONTENT_TYPES := "大中小休市谜"
+const GARDEN_BACKUPS := {
+	"墨池":[1047301,2199392,9740107],"熔铸坊":[8273602,2304348],
+	"潮汐渠":[2199314,1361488,733186,5132031],"雷池":[5969558,12148575,4608159,2304348]}
 
 
 ## mulberry32，与 HTML 原型逐位一致
@@ -153,7 +156,7 @@ static func shut(mc: Dictionary, t: int) -> bool:
 
 ## 移动机关第 t 步能不能用：导线和电闸同相位（电闸开着时通电），其余总能用
 static func mover_live(mc: Dictionary, t: int) -> bool:
-	return mc.kind != "wire" or (t % (mc.cycle[0] + mc.cycle[1])) < mc.cycle[0]
+	return mc.get("kind", "") != "wire" or (t % (mc.cycle[0] + mc.cycle[1])) < mc.cycle[0]
 
 
 ## 首领速度，e = 起身后过了几步；acc_scale 用于「更漏」「冷却」
@@ -186,6 +189,7 @@ class Builder:
 	var mech := {}
 	var obst := {}
 	var glyph := {}
+	var garden: Dictionary = {}
 
 	func _init(seed_value: int, theme_name: String) -> void:
 		seed = seed_value
@@ -204,7 +208,7 @@ class Builder:
 	func make_pocket(depth: int, far: int) -> bool:
 		var cs: Array = []
 		for k in MapGen.N:
-			if not resv.has(k) and ink[k] == 0 and MapGen.man(k, start) >= far:
+			if not resv.has(k) and not garden.get("pocket_forbidden",{}).has(k) and ink[k] == 0 and MapGen.man(k, start) >= far:
 				cs.append(k)
 		cs = R.shuf(cs)
 		for b in cs:
@@ -240,8 +244,13 @@ class Builder:
 				if not cells.has(n) and n != o:
 					walls[n] = true
 		for n in walls:
-			if resv.has(n) or keep.has(n):
+			if resv.has(n) or keep.has(n) or garden.get("pocket_forbidden",{}).has(n):
 				return false
+		var alcoves: Array = []
+		if not garden.is_empty():
+			var source: Script = load("res://src/expedition/garden_layout.gd")
+			alcoves = source.alcove_runs(cells,o)
+			if not source.alcove_fits(garden,alcoves): return false
 		var open_n := 0
 		for n in MapGen.nbrs(o):
 			if not walls.has(n) and not cells.has(n):
@@ -263,6 +272,7 @@ class Builder:
 			if not walls.has(n):
 				resv[n] = true
 		pockets.append({"b": cells[0], "cells": cells, "o": o, "depth": depth})
+		if not garden.is_empty(): load("res://src/expedition/garden_layout.gd").register_alcove(garden,alcoves)
 		return true
 
 	func put(k: int, o: Dictionary) -> void:
@@ -308,12 +318,20 @@ class Builder:
 	func run() -> Dictionary:
 		var wake: int = P.wakeLo + R.ri(P.wakeHi - P.wakeLo + 1)
 		start = MapGen.kk(3 + R.ri(2), 2 + R.ri(2))
+		if not garden.is_empty():
+			start = int(garden.get("start",start))
+			for k in MapGen.N:
+				ink[k] = 1 if garden.terrain_base[k]!=0 and not garden.bridges.has(k) else 0
+				if ink[k]!=0: pwall[k] = true
+			resv.merge(garden.reserved)
+			used.merge(garden.no_content)
 		resv[start] = true
 		for n in MapGen.nbrs(start):
 			resv[n] = true
 		# 大赏 1～2 个（深 2 格，口上站精英）、中赏 1～2 个（深 1 格）
 		var n_big := 1 + R.ri(2)
 		var n_mid := 1 + R.ri(2)
+		if not garden.is_empty(): n_big = 1; n_mid = 1
 		if not make_pocket(2, 7):
 			return {"fail": "大赏凹槽放不下"}
 		if n_big > 1 and not make_pocket(2, 6):
@@ -323,6 +341,7 @@ class Builder:
 				return {"fail": "中赏凹槽放不下"}
 		# 墨渍团块：随机形状撒到 15%～20%，团块之间尽量留空隙
 		var target := int(round(MapGen.N * (P.inkLo + R.next() * (P.inkHi - P.inkLo))))
+		if not garden.is_empty(): target = 0
 		var guard := 0
 		while ink.count(1) < target:
 			guard += 1
@@ -408,15 +427,29 @@ class Builder:
 		for k in floor_k:
 			max_d = maxi(max_d, ds[k])
 		var lair_c: Array = outside.filter(func(k): return free_cell(k) and bigs.all(func(p): return MapGen.man(k, p.b) >= 4) and MapGen.man(k, start) >= 8)
+		if not garden.is_empty():
+			# Keep upstream's random rim lair, but mount its building before
+			# placing services so its full footprint participates in layout.
+			lair_c = outside.filter(func(k): return free_cell(k) and MapGen.is_rim(k) and ds[k]>=MapGen.LAIR_MIN_PATH \
+				and not pocket.has(k) and node.keys().all(func(x): return node[x].t not in ["大","险"] or MapGen.man(x,k)>=3))
+			lair_c = MapGen.Rng.new(seed*4099+29).shuf(lair_c)
 		if lair_c.is_empty():
 			return {"fail": "首领巢穴没位置"}
 		var lair: int = lair_c[0]
 		for k in lair_c:
 			if ds[k] > ds[lair]:
 				lair = k
-		put(lair, {"t": "巢"})
+		var lair_node := {"t":"巢"}
+		if not garden.is_empty():
+			lair_node = {}
+			for candidate: int in lair_c:
+				lair_node = mounted_node(candidate,"巢")
+				if not lair_node.is_empty(): lair = candidate; break
+			if lair_node.is_empty(): return {"fail":"首领门阙没有安全占地"}
+		put(lair,lair_node)
 		var n_rest := 1 + R.ri(2)
 		var n_shop := 1 + R.ri(2)
+		if not garden.is_empty(): n_rest = 1; n_shop = 1
 		if place_n("休", n_rest, 0.35, 0.85, outside, ds, max_d, lair) < 1:
 			return {"fail": "休息点没位置"}
 		if place_n("市", n_shop, 0.2, 0.7, outside, ds, max_d, lair) < 1:
@@ -424,9 +457,13 @@ class Builder:
 		var smalls: Array = R.shuf(outside.filter(func(k): return free_cell(k) and ds[k] >= 3))
 		for k in smalls.slice(0, 2 + R.ri(2)):
 			put(k, {"t": "小"})
-		var evs: Array = R.shuf(outside.filter(func(k): return free_cell(k) and ds[k] >= 4))
+		var evs: Array = preferred_entries("谜",R.shuf(outside.filter(func(k): return free_cell(k) and ds[k] >= 4)))
 		if not evs.is_empty():
-			put(evs[0], {"t": "谜"})
+			for k in evs:
+				var event := mounted_node(k,"谜")
+				if event.is_empty(): continue
+				put(k,event)
+				break
 		var fi := 0
 		for k in R.shuf(outside.filter(func(k): return free_cell(k) and ds[k] >= 3 and MapGen.man(k, lair) >= 3)):
 			if fi >= 3:
@@ -518,12 +555,27 @@ class Builder:
 			"node": node, "lair": lair, "amb": amb, "glyph": glyph, "obst": obst, "mech": mech, "ds": dp, "content": content,
 			"cuts": cuts, "avgDeg": avg_deg, "detour": detour, "inkPct": int(round(ink.count(1) * 100.0 / MapGen.N)),
 			"count": {"大": bigs.size(), "中": mids.size(), "休": n_rest, "市": n_shop, "伏": amb.size()}}
+		if not garden.is_empty():
+			load("res://src/expedition/garden_layout.gd").finalize(garden,ink)
+			m["layout"] = garden
+			m["generation_version"] = garden.version
+			m["cuts"] = []
+			var final_outside := outside_of()
+			var final_mask := floor_mask()
+			deg_sum = 0
+			for k in final_outside:
+				if k!=start and _cuts(final_mask,k,final_outside): m.cuts.append(k)
+				for n in MapGen.nbrs(k):
+					if ink[n]==0: deg_sum += 1
+			avg_deg = float(deg_sum)/final_outside.size()
+			m.avgDeg = avg_deg
+			cuts = m.cuts
 		var terr := {}
 		for a in amb:
 			terr[a] = a
 		m["fog"] = MapGen.sim(m, "fog", true, terr)
 		var got: int = m.fog.got
-		m["pass"] = cuts.is_empty() and avg_deg >= P.minDeg and detour <= P.maxDetour and amb.size() >= 3 \
+		m["pass"] = cuts.is_empty() and avg_deg >= (2.5 if not garden.is_empty() else P.minDeg) and detour <= P.maxDetour and amb.size() >= 3 \
 			and got >= 0.45 * content.size() and got <= 0.75 * content.size()
 		return m
 
@@ -544,12 +596,67 @@ class Builder:
 	func place_n(t: String, n: int, lo: float, hi: float, outside: Array, ds: PackedInt32Array, max_d: int, lair: int) -> int:
 		var c := 0
 		var cand: Array = outside.filter(func(k): return free_cell(k) and ds[k] >= lo * max_d and ds[k] <= hi * max_d and MapGen.man(k, lair) >= 3 and _spread(k))
-		for k in R.shuf(cand):
+		if not garden.is_empty():
+			for slot in garden.get("facility_slots",{}).get(t,[]):
+				var k: int = slot.entry
+				if not cand.has(k) and free_cell(k) and ds[k]>=3 and MapGen.man(k,lair)>=3 and _spread(k): cand.append(k)
+		for k in preferred_entries(t,R.shuf(cand)):
 			if c >= n:
 				break
-			put(k, {"t": t, "beacon": c == 0})
+			if not free_cell(k): continue
+			var placed := mounted_node(k,t)
+			if placed.is_empty(): continue
+			placed["beacon"] = c==0
+			put(k,placed)
 			c += 1
 		return c
+
+	func preferred_entries(type: String, candidates: Array) -> Array:
+		if garden.is_empty(): return candidates
+		var result: Array = []
+		for slot in garden.get("facility_slots",{}).get(type,[]):
+			if candidates.has(slot.entry): result.append(slot.entry)
+		for k in candidates:
+			if not result.has(k): result.append(k)
+		return result
+
+	func mounted_node(k: int, type: String) -> Dictionary:
+		if garden.is_empty(): return {"t":type}
+		if garden.get("facility_reserved",{}).get(k,type)!=type: return {}
+		var layout_source: Script = load("res://src/expedition/garden_layout.gd")
+		var profiles: Script = load("res://src/expedition/garden_asset_layout.gd")
+		var p := MapGen.rc(k)
+		var bodies: Array[Vector2i] = []
+		for slot in garden.get("facility_slots",{}).get(type,[]):
+			if slot.entry==k: bodies.append(MapGen.rc(slot.body))
+		for delta: Vector2i in [Vector2i(-1,0),Vector2i(0,1),Vector2i(0,-1),Vector2i(1,0)]:
+			if not bodies.has(p+delta): bodies.append(p+delta)
+		for q: Vector2i in bodies:
+			if not MapGen.inb(q.x,q.y): continue
+			var delta := q-p
+			var body := MapGen.kk(q.x,q.y)
+			var own_slot: bool = garden.get("facility_reserved",{}).get(body,"")==type
+			if not free_cell(body) or (resv.has(body) and not own_slot) or MapGen.man(body,start)<=1: continue
+			var at := Vector3(q.y+.5,0,q.x+.5)
+			# Move edge facilities inward so eaves do not cut through the enclosure.
+			if q.y==0: at.x += .30
+			if q.y==MapGen.W-1: at.x -= .30
+			if q.x==0: at.z += .30
+			if q.x==MapGen.H-1: at.z -= .30
+			var turn := atan2(-float(delta.y),-float(delta.x))
+			if not layout_source.room_for(garden,profiles.envelope(type,at,turn)): continue
+			ink[body] = 1
+			if find_cut()!=-1:
+				ink[body] = 0
+				continue
+			garden.terrain_base[body] = 2
+			garden.no_ambush[body] = true
+			resv[body] = true
+			pwall[body] = true
+			used[body] = true
+			layout_source.register_facility(garden,type,at,turn,k)
+			return {"t":type,"body_cell":body,"mount_offset":at-Vector3(p.y+.5,0,p.x+.5),"mount_turn":turn}
+		return {}
 
 	func _spread(k: int) -> bool:
 		for x in node:
@@ -667,10 +774,11 @@ static func sim(m: Dictionary, mode: String, chase: bool, terr: Dictionary, slid
 			if mc.kind == "slide" and not S.used.has(nx):
 				S.used[nx] = true
 				var p := rc(S.pos)
-				var left: int = slide_n if slide_n > 0 else INF
+				var left: int = slide_n if slide_n > 0 else (SLIDE_N if m.has("layout") else INF)
 				while left > 0 and inb(p.x + mc.dir.x, p.y + mc.dir.y) and pm[kk(p.x + mc.dir.x, p.y + mc.dir.y)] != 0:
 					p += mc.dir
 					left -= 1
+
 				S.pos = kk(p.x, p.y)
 			# 新机关每个只让模拟用一次，免得渗墨点来回弹
 			if mc.kind in ["warp", "hoist", "wire"] and not S.used.has(nx) and mover_live(mc, S.t):
@@ -721,8 +829,57 @@ static func gen_proto(seed_value: int, theme_name := "随机") -> Dictionary:
 	return {}
 
 
-## 游戏用：原型合格之后，再按 v0.3 规则排伏兵领地并复核初见模拟
+## 游戏用：园林结构、内容、伏兵及初见节奏依次校验，失败时有旧图回退。
 static func generate(seed_value: int, theme_name := "随机") -> Dictionary:
+	var layout_source: Script = load("res://src/expedition/garden_layout.gd")
+	var rejected: Dictionary = {}
+	for i in 128:
+		# Failed candidates must not make nearby requested seeds converge onto
+		# the same first acceptable map.
+		var candidate_seed := seed_value+i*104729
+		var builder := Builder.new(candidate_seed,theme_name)
+		# Layout has its own RNG and chooses a spawn in the entrance court.
+		builder.garden = layout_source.plan(candidate_seed,builder.tn)
+		var m := builder.run()
+		if m.has("fail") or not m.pass:
+			var reason: String = m.get("fail","路网或初见节奏未通过")
+			rejected[reason] = int(rejected.get(reason,0))+1
+			continue
+		roll_wake(m)
+		# Garden footprints already own the lair placement; add upstream movers
+		# after that layout, without relocating its solid building onto a path.
+		if place_movers(m) and assign_ambush(m):
+			m["tries"] = i+1
+			m["generation_report"] = {"requested_seed":seed_value,"attempts":i+1,"rejections":rejected,"kind":m.layout.kind}
+			return m
+		rejected["伏兵领地未通过"] = int(rejected.get("伏兵领地未通过",0))+1
+	var courtyard_backup := _garden_backup(seed_value,theme_name,layout_source,rejected)
+	if not courtyard_backup.is_empty(): return courtyard_backup
+	var fallback := generate_legacy(seed_value,theme_name)
+	if fallback.is_empty(): fallback = generate_legacy(11,theme_name)
+	fallback["generation_version"] = "legacy_fallback"
+	fallback["generation_report"] = {"requested_seed":seed_value,"attempts":128,"rejections":rejected,"fallback":true}
+	return fallback
+
+
+static func _garden_backup(requested: int, theme_name: String, layout_source: Script, rejected: Dictionary) -> Dictionary:
+	var theme: String = theme_name if THEMES.has(theme_name) else Rng.new(requested).pick(THEME_ORDER)
+	# Preserve variety in the random rim lair even when normal candidates run
+	# out; presentation and gameplay still derive only from the requested seed.
+	var seeds: Array = GARDEN_BACKUPS[theme]
+	var seed_value: int = seeds[Rng.new(requested*4099+29).ri(seeds.size())]
+	var builder := Builder.new(seed_value,theme)
+	builder.garden = layout_source.plan(seed_value,theme,0)
+	var map := builder.run()
+	if map.has("fail") or not map.pass: return {}
+	roll_wake(map)
+	if not place_movers(map) or not assign_ambush(map): return {}
+	map["tries"] = 129
+	map["generation_report"] = {"requested_seed":requested,"attempts":129,"rejections":rejected,"kind":map.layout.kind,"curated_fallback":true}
+	return map
+
+
+static func generate_legacy(seed_value: int, theme_name := "随机") -> Dictionary:
 	for i in 400:
 		var m := build(seed_value + i, theme_name)
 		if m.has("fail") or not m.pass:
@@ -734,9 +891,9 @@ static func generate(seed_value: int, theme_name := "随机") -> Dictionary:
 	return {}
 
 
-## 游戏里首领的节奏：第 7～10 步被惊动（这时首领棋子出现在地图上），再过 7～10 步起身开追。
+## 游戏里首领的节奏：第 8～11 步自然惊动（这时首领棋子出现在地图上），再过 7～10 步起身开追。
 ## 原型（gen_proto / build 里的初筛）仍用 P.wakeLo～wakeHi 和 P.buffer，地图对照测试不受影响。
-const WAKE_GAME := Vector2i(7, 10)
+const WAKE_GAME := Vector2i(8, 11)
 const BUFFER_GAME := Vector2i(7, 10)
 
 
@@ -771,6 +928,7 @@ static func place_movers(m: Dictionary) -> bool:
 	var land := func(k: int) -> bool:
 		return m.ink[k] == 0 and not m.pocket.has(k) and not mouth.has(k) and not m.node.has(k) and not m.glyph.has(k) \
 			and not m.obst.has(k) and not m.mech.has(k) and k != m.start and m.ds[k] < INF and man(k, m.lair) >= 3 \
+			and not (m.has("layout") and m.layout.no_content.has(k)) \
 			and not m.mech.values().any(func(o): return o.get("to", -1) == k)
 	var free := func(k: int) -> bool:
 		return land.call(k) and not m.mech.keys().any(func(x): return man(x, k) < 2)
@@ -907,6 +1065,7 @@ static func assign_ambush(m: Dictionary) -> bool:
 			forbid[m.mech[k].to] = true
 	for k in m.obst:
 		forbid[k] = true
+	for k in m.get("layout",{}).get("no_ambush",{}): forbid[k] = true
 	var target := 3 + R.ri(4)
 	var ambs: Array = []
 	var terr := {}

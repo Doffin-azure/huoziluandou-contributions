@@ -3,7 +3,7 @@ class_name BattleSymbol
 ## 实心墨印符号：重轮廓、切口与留白；单色构型，不依赖纹理和描边装饰。
 const SPECS := {
 	"health": ["heart", ""], "heat": ["flame", ""], "energy": ["bolt", ""], "gold": ["coin", ""],
-	"block": ["shield", ""], "persistent_block": ["shield", "lock"], "temp_funds": ["coin", "clock"], "equity": ["chart", "coin"],
+	"block": ["shield", ""], "persistent_block": ["shield", "lock"],
 	"bag": ["bag", ""], "discard": ["cards", "return"],
 	"armor_plating": ["armor", ""], "guard_inject": ["shield", "minus"], "prevent_interference": ["shield", "cross"],
 	"convert_block": ["armor", "shield"], "counter": ["sword", "return"], "next_heat_to_block": ["snow", "shield"],
@@ -16,7 +16,7 @@ const SPECS := {
 	"next_double_draw": ["cards", "double"], "next_overfire": ["flame", "arrow"], "electric_overload": ["bolt", "flame"],
 	"fireproof": ["shield", "flame"], "blastproof": ["shield", "star"], "joint_funding": ["chain", "coin"],
 	"profit_share": ["fork", "coin"], "next_energy_bonus": ["sword", "bolt"], "gravity_always": ["grid", "down"],
-	"compound_equity": ["chart", "return"], "ceasefire": ["sword", "stop"], "serial": ["chain", "arrow"],
+	"ceasefire": ["sword", "stop"], "serial": ["chain", "arrow"],
 	"repeat_zero": ["loop", "clock"], "split_mind": ["fork", "cross"], "vigor": ["leaf", ""],
 	"vigor_next": ["leaf", "cards"], "auto_refill": ["cards", "flame"], "repeat": ["loop", "copy"],
 	"next_serial_bonus": ["chain", "sword"], "next_draw_bonus": ["cards", "arrow"], "warm_heart": ["heart", "flame"],
@@ -47,7 +47,7 @@ static func color_for(id: String, negative := false) -> Color:
 	var key := id.trim_prefix("ability:")
 	if negative or key in ["health", "heat", "hit", "blast", "strength", "poison", "burn", "vulnerable", "heart_corrosion"]:
 		return Palette.VERMILION_DK
-	if key in ["gold", "temp_funds", "equity", "bounty", "compound_equity", "joint_funding", "profit_share", "inject_bounty"]:
+	if key in ["gold", "bounty", "joint_funding", "profit_share", "inject_bounty"]:
 		return Palette.GOLD_DK
 	return Palette.INK
 

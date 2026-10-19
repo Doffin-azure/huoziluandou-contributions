@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_r307s"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_07r53"]
+
+[sub_resource type="Resource" id="Resource_orjpl"]
+script = ExtResource("1_r307s")
+title = "炉息"
+description = "循环行动：炉息 → 喷焰"
+mechanic_action = "heat6"
+
+[sub_resource type="Resource" id="Resource_3m080"]
+script = ExtResource("1_r307s")
+title = "喷焰"
+description = "循环行动：炉息 → 喷焰"
+damage = 8
+mechanic_action = "heat8"
+
+[resource]
+script = ExtResource("2_07r53")
+id = "furnace_beast"
+name = "炉腹兽"
+glyph = "炉"
+description = "每次攻击后升热2，并向盘面空格注入1枚带灼热污染的【热】；可组成热流、电热等词，单打或组词打出时失去1生命，净化免除污染代价。攻击前热度≥8则伤害+4；攻击后的升热不追溯增强本次伤害，溢热仍按正常规则生成字袋污染。"
+max_hp = 44
+mechanic = "furnace"
+act = 2
+moves = Array[ExtResource("1_r307s")]([SubResource("Resource_orjpl"), SubResource("Resource_3m080")])

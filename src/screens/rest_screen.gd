@@ -3,10 +3,13 @@ extends ScreenBase
 
 var node: MapNodeData
 var _done := false
+var _room_session: RefCounted
 
 
 func build(root: Control) -> void:
 	node = params.get("node", null)
+	if params.get("room_run",false) and GameState.room_run!=null:
+		_room_session = preload("res://src/screens/room_node_session.gd").new(GameState.room_run)
 
 	var main := JourneyStyle.page(root)
 	var stats := JourneyStyle.label("气血 %d / %d" % [GameState.player_hp, GameState.player_max_hp], "Stat", JourneyStyle.GOLD)
@@ -23,6 +26,9 @@ func build(root: Control) -> void:
 	row.add_child(_option_card("删", "删字", "永久移除一枚字，精炼字袋。", _do_remove))
 	row.add_child(_option_card("镌", "修饰", "强化一枚字的单字效果。", _do_upgrade))
 	main.add_child(JourneyStyle.section("此处可歇脚", "三项整备，只选其一"))
+	if _room_session!=null:
+		main.add_child(JourneyStyle.button("不休整，继续前行",func(): _room_rest_action({"type":"leave_service"})))
+		if _room_session.run.phase=="rest_choose": _resume_room_choice.call_deferred()
 
 
 func _option_card(seal: String, title: String, desc: String, cb: Callable) -> Control:
@@ -53,6 +59,7 @@ func _heal_amount() -> int:
 
 
 func _do_heal() -> void:
+	if _room_session!=null: _room_rest_action({"type":"rest","kind":"heal"}); return
 	if _done:
 		return
 	_done = true
@@ -61,12 +68,14 @@ func _do_heal() -> void:
 
 
 func _do_remove() -> void:
+	if _room_session!=null: _room_rest_action({"type":"rest","kind":"remove"}); return
 	if _done:
 		return
 	_choose_char("选择要删除的字", "remove")
 
 
 func _do_upgrade() -> void:
+	if _room_session!=null: _room_rest_action({"type":"rest","kind":"upgrade"}); return
 	if _done:
 		return
 	_choose_char("选择要修饰的字", "upgrade")
@@ -117,9 +126,27 @@ func _apply_upgrade(ch: CharacterData) -> void:
 
 
 func _finish() -> void:
+	if _room_session!=null: goto("res://src/screens/room_map_screen.gd"); return
 	GameState.complete_current_node()
 	goto("res://src/screens/map_screen.gd")
 
 
 func _open_deck() -> void:
 	if not _done: CollectionOverlay.open_deck(self)
+
+
+func _room_rest_action(action: Dictionary) -> void:
+	if _done: return
+	_room_rest_result(_room_session.apply(action))
+
+
+func _room_rest_result(result: Dictionary) -> void:
+	if not result.ok: push_error(str(result.reason)); return
+	_done = true
+	if _room_session.run.phase=="rest_choose": _resume_room_choice()
+	else: _finish()
+
+
+func _resume_room_choice() -> void:
+	_done = true
+	_room_session.pick(self,"选择要删去的字" if _room_session.run.pending_kind=="remove" else "选择要修饰的字",_room_rest_result)

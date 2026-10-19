@@ -61,7 +61,7 @@ func _build_light() -> void:
 	environment.ambient_light_color = Color("598579")
 	environment.ambient_light_energy = 0.45
 	environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
-	environment.ssao_enabled = true
+	environment.ssao_enabled = RenderingServer.get_current_rendering_method() == "forward_plus"
 	environment.ssao_radius = 0.25
 	environment.ssao_intensity = 1.0
 	var world := WorldEnvironment.new()
@@ -86,7 +86,7 @@ func _build_light() -> void:
 	glow.shadow_enabled = false
 	add_child(glow)
 	if mode == "shop":
-		environment.volumetric_fog_enabled = true
+		environment.volumetric_fog_enabled = RenderingServer.get_current_rendering_method() == "forward_plus"
 		environment.volumetric_fog_density = 0.009
 		environment.volumetric_fog_albedo = Color("9bb4a3")
 		environment.volumetric_fog_ambient_inject = 0.15
@@ -114,7 +114,7 @@ func _build_light() -> void:
 	add_child(camera)
 	camera.look_at(Vector3(0, 1.5, 0))
 	var lens := CameraAttributesPractical.new()
-	lens.dof_blur_far_enabled = true
+	lens.dof_blur_far_enabled = RenderingServer.get_current_rendering_method() != "gl_compatibility"
 	lens.dof_blur_far_distance = 17.0
 	lens.dof_blur_far_transition = 4.0
 	lens.dof_blur_amount = 0.12
@@ -330,8 +330,8 @@ func clear_objects() -> void:
 
 func add_object(glyph: String, slot: int, rank := 0, service := false) -> int:
 	var node := Node3D.new()
-	var shop_slots := [Vector3(-4.2, 0.82, 0.2), Vector3(-1.4, 0.82, 0.2), Vector3(1.4, 0.82, 0.2), Vector3(4.15, 0.65, 0.7), Vector3(5.6, 0.65, 0.7), Vector3(4.8, 1.75, -0.55)]
-	node.position = shop_slots[slot % 6] if mode == "shop" else Vector3((slot - (reward_count - 1) * 0.5) * minf(2.85, 8.8 / reward_count), 1.0, 0.1)
+	var shop_slots := [Vector3(-4.2, 0.82, 0.2), Vector3(-1.4, 0.82, 0.2), Vector3(1.4, 0.82, 0.2), Vector3(4.15, 0.65, 0.7), Vector3(5.6, 0.65, 0.7), Vector3(4.8, 1.75, -0.55), Vector3(-6.2, 0.65, 0.9)]
+	node.position = shop_slots[slot % shop_slots.size()] if mode == "shop" else Vector3((slot - (reward_count - 1) * 0.5) * minf(2.85, 8.8 / reward_count), 1.0, 0.1)
 	add_child(node)
 	var w := Workshop.new()
 	var scale_factor := 0.53 if service else 1.0
@@ -408,6 +408,12 @@ func take(index: int) -> void:
 	tw.tween_property(objects[index], "position", rests[index] + Vector3(0, 0.8, 2.0), 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 	tw.tween_property(objects[index], "scale", Vector3.ONE * 0.55, 0.22)
 	_motions[index] = tw
+
+
+func restore_object(index: int) -> void:
+	if index<0 or index>=objects.size(): return
+	objects[index].scale = Vector3.ONE
+	select_object(index)
 
 
 func _apply_motion() -> void:

@@ -58,7 +58,7 @@ func _run() -> void:
 			var battle: Control = Router.current
 			_ok(battle.size.x >= 1280 and battle.size.y >= 720 and battle._board_view.size.x >= 300, "main scene anchors provide a full battle canvas and visible board")
 			_ok(Palette.STYLE_ID == "taopunk" and Router.study_stage._illustrated_backdrop.visible and not Router.study_stage.shared_table_active(), "normal entry uses approved backdrop and disables the legacy table")
-			_ok(battle._board_view._presentation.actors.size() == 16 and battle._enemy_widgets[0]._visual._actor != null, "normal entry connects the 3D board and illustrated guardian actor")
+			_ok(battle._board_view._presentation.actors.size() == 16 and battle._enemy_widgets[0]._visual.has_character_actor(), "normal entry connects the 3D board and production monster art actor")
 			if OS.get_cmdline_user_args().has("--capture"):
 				RenderingServer.force_draw(false)
 				get_viewport().get_texture().get_image().save_png("res://shots/integrated-normal-battle.png")

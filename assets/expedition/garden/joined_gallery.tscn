@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/map/garden_bridge_kit.gd" id="1"]
+[node name="joined_gallery" type="Node3D"]
+script = ExtResource("1")
+kind = "gallery"
+span_length = 7.0

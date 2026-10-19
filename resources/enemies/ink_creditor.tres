@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_rcjr0"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_74ykh"]
+
+[sub_resource type="Resource" id="Resource_fo44m"]
+script = ExtResource("1_rcjr0")
+kind = 1
+title = "挂账"
+description = "循环行动：挂账 → 催账 → 扑击"
+damage = 0
+block = 8
+
+[sub_resource type="Resource" id="Resource_5t1i4"]
+script = ExtResource("1_rcjr0")
+title = "催账"
+description = "循环行动：挂账 → 催账 → 扑击"
+damage = 10
+mechanic_action = "bill"
+
+[sub_resource type="Resource" id="Resource_twtmx"]
+script = ExtResource("1_rcjr0")
+title = "扑击"
+description = "循环行动：挂账 → 催账 → 扑击"
+damage = 8
+
+[resource]
+script = ExtResource("2_74ykh")
+id = "ink_creditor"
+name = "赊墨商"
+glyph = "赊"
+description = "催账前一阶段内，第一次成功支付折扣后大于0的通用费用，取得收讫印。催账前有印则移除怪物最多8普通盾，催账降至6。合资储能和普通金币支付均有效；失败、取消、折后0费均无效。每次挂账重置旧印。"
+max_hp = 48
+mechanic = "credit"
+act = 2
+moves = Array[ExtResource("1_rcjr0")]([SubResource("Resource_fo44m"), SubResource("Resource_5t1i4"), SubResource("Resource_twtmx")])

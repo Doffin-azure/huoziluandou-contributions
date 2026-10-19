@@ -8,6 +8,7 @@ extends SceneTree
 ##
 ## 运行：godot --headless --script res://src/tools/build_content.gd
 
+const WordDescriptionsS := preload("res://src/data/word_descriptions.gd")
 const CharacterDataS := preload("res://src/data/character_data.gd")
 const EffectDataS := preload("res://src/data/effect_data.gd")
 const WordDataS := preload("res://src/data/word_data.gd")
@@ -48,6 +49,7 @@ func _initialize() -> void:
 	_build_words_from_ledger()
 	_build_extra_words()
 	_build_enemies()
+	EnemyRoster.save_enemies()
 	_build_acts()
 	_build_starter_deck()
 	_build_rules()
@@ -100,8 +102,10 @@ func _build_pollutions() -> void:
 		 "desc": "打出附着刺痛的字时，失去 2 点生命。"},
 		{"id": "block", "name": "堵塞", "glyph": "堵", "hp": 0, "draw": 1, "color": "6b6354",
 		 "desc": "打出附着堵塞的字后，下一次正常补字数量 -1（一次性）。"},
+		{"id": "replicate", "name": "蔓生", "glyph": "连", "hp": 0, "draw": 0, "color": "59853d",
+		 "desc": "敌方【连】在注入后的下个玩家回合结束起，每枚仍在盘面的未净化实体每回合复制1枚；新复制的字本次不再复制，同一来源盘面最多4枚。可单打或组成连击、心连心消耗；净化停止复制。"},
 		{"id": "scorch", "name": "灼热", "glyph": "灼", "hp": 1, "draw": 0, "color": "b0522e",
-		 "desc": "自我过热生成的【热】带有灼热，打出时失去 1 点生命；本场循环，战后清除。"},
+		 "desc": "打出附着灼热的字时失去1点生命。敌方注入的字消耗后消失；自我过热生成的【热】在本场循环，战后清除。净化可免除污染代价。"},
 	]
 	for d in defs:
 		var p: PollutionData = PollutionDataS.new()
@@ -123,7 +127,7 @@ func _build_statuses() -> void:
 		{"id": "strength", "name": "力量", "glyph": "力", "kind": 0, "color": "b8523a", "decay": 0,
 		 "desc": "本场每层使你的攻击每段伤害+1。"},
 		{"id": "vulnerable", "name": "易伤", "glyph": "脆", "kind": 1, "color": "7a4a63", "decay": 1,
-		 "desc": "受到的伤害提高 50%。"},
+		 "desc": "受到的伤害提高50%（向上取整）；多层仍为50%增幅。"},
 		{"id": "poison", "name": "中毒", "glyph": "毒", "kind": 1, "color": "5f7d6a", "decay": 1,
 		 "desc": "回合开始损失等量生命。"},
 		{"id": "next_bonus", "name": "热力强化", "glyph": "增", "kind": 0, "color": "3c4a6b", "decay": 0,
@@ -207,10 +211,18 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"强": return {"h": "turn_strength", "a": 1, "note": "本回合伤害 +1，回合结束后清除"}
 		"流": return {"h": "draw_bonus_next", "a": 1, "note": "下回合多抽 1 字"}
 		"蚀": return {"h": "damage", "a": 2, "note": "对敌造成 2 伤害"}
+		"础": return {"h": "anchor_self", "target": EffectDataS.Target.EMPTY_TILE, "pre": true, "note": "选择任意空格安放；固定本场，不受重力/位移影响；每回合可使用一次。"}
+		# 事件污染字：只占字袋，打出时付出代价。
+		"债": return {"h": "self_hp_loss", "a": 3, "note": "打出时失去 3 生命。"}
+		"契": return {"effects": [
+			{"h": "self_hp_loss", "a": 2, "note": "打出时失去 2 生命。"},
+			{"h": "self_draw_penalty", "a": 1, "note": "下一次正常补字 -1。"},
+		], "note": "打出时失去 2 生命，下一次正常补字 -1。"}
+		"忘": return {"h": "self_draw_penalty", "a": 1, "note": "打出后，下一次正常补字 -1。"}
 		# 下一批（复合 / 独立定位）
 		"充": return {"effects": [{"h": "energy", "a": 1, "note": "储能 +1"}, {"h": "draw_bonus_next", "a": 1, "note": "下回合多补 1 字"}], "note": "储能 +1，下回合多补 1 字"}
 		"爆": return {"effects": [{"h": "damage", "a": 2, "note": "造成 2 伤害"}, {"h": "heat", "a": 1, "note": "热度 +1"}], "note": "造成 2 伤，热度 +1"}
-		"资": return {"h": "temp_funds", "a": 2, "note": "获得 2 点临时资金（本回合有效）"}
+		"资": return {"h": "gold", "a": 2, "note": "获得 2 点金币"}
 		"收": return {"h": "draw_excluding_source", "a": 1, "note": "随机补 1 字，排除本次打出的实体；没有其他可补字时不补"}
 		"障": return {"h": "block_temp", "a": 2, "note": "获得 2 点临时格挡"}
 		"合": return {"h": "combine_next_word", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次成功组词后，获得 2 点临时格挡和 1 点储能，仅一次"}
@@ -225,12 +237,15 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"超": return {"h": "next_gap", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次成功组词允许横向或纵向跨过一个空格，最多一次；不能跨过有字的格子"}
 		"精": return {"h": "precision_draw", "a": 0, "target": EffectDataS.Target.BAG_GLYPH, "note": "从字袋揭示 2 枚实体字，选择 1 枚补入原格，另一枚留在字袋；只有 1 枚时直接补入，空袋时只弃字"}
 		"化": return {"h": "heat_to_energy_solo", "a": 1, "target": EffectDataS.Target.NONE, "note": "消耗 2 热度，获得 1 储能；不足 2 热度时只弃掉本字"}
+		"死": return {"h": "damage", "a": 7, "note": "造成 7 伤害"}
+		"亡": return {"h": "apply_status_enemy", "a": 1, "status": "vulnerable", "note": "使目标获得 1 层易伤"}
+		"月": return {"h": "moon_pull", "a": 0, "note": "其他字向【月】原位聚拢"}
 		"购": return {"h": "buy_bag_solo", "a": 2, "target": EffectDataS.Target.BAG_GLYPH, "note": "支付 2 金币，从字袋选择 1 枚己方实体字补入原格，保留原属性；空袋时只弃字，不支付"}
 	return {}
 
 
 func _spec_effect(spec: Dictionary) -> EffectData:
-	return ContentBuild.e(spec.get("h", ""), int(spec.get("a", 0)), int(spec.get("target", -1)), spec.get("status", ""), spec.get("note", ""), spec.get("args", {}))
+	return ContentBuild.e(spec.get("h", ""), int(spec.get("a", 0)), int(spec.get("target", -1)), spec.get("status", ""), spec.get("note", ""), spec.get("args", {}), -1, "immediate", bool(spec.get("pre", false)))
 
 func _build_curated_characters() -> void:
 	# glyph, id, pinyin, tags, rarity, is_pollution
@@ -302,9 +317,17 @@ func _build_curated_characters() -> void:
 		["骨", "gu", "gu", ["彩蛋"], 3, false],
 		["开", "kai", "kai", ["彩蛋"], 3, false],
 		["灯", "deng", "deng", ["彩蛋"], 3, false],
+		# 遗物带来的字：判词【死】、佚卷【亡】、望月砚【月】，不进奖励池
+		["死", "si", "si", ["彩蛋"], 3, false],
+		["亡", "wang", "wang", ["彩蛋"], 3, false],
+		["月", "yue", "yue", ["彩蛋"], 3, false],
 		["碍", "ai", "ai", ["enemy"], 2, false],
 		["秽", "hui3", "hui", ["enemy"], 2, false],
 		["污", "pollution", "wu", ["pollution"], 0, true],
+		["础", "chu", "chu", ["event", "space"], 3, false, "打出后可选择任意空格安放；固定本场，不受重力/位移影响；每回合可使用一次。"],
+		["债", "debt", "zhai", ["pollution", "event"], 0, true, "打出时失去 3 生命。"],
+		["契", "contract", "qi", ["pollution", "event"], 0, true, "打出时失去 2 生命，下一次正常补字 -1。"],
+		["忘", "oblivion", "wang", ["pollution", "event"], 0, true, "打出后，下一次正常补字 -1。"],
 	]
 	for d in defs:
 		if CUT_GLYPHS.has(d[0]):
@@ -336,7 +359,7 @@ func _make_character(glyph: String, id: String, pinyin: String, tags: Array, rar
 		c.description = "可单字打出（暂无单字效果，用于腾出空格）。"
 	if is_pollution:
 		c.removable = false
-		c.description = "污染源字。"
+		if c.description.is_empty(): c.description = "污染源字。"
 	_char_by_glyph[glyph] = c
 	_save(c, "%s/characters/%s.tres" % [RES, id])
 	return c
@@ -379,7 +402,7 @@ func _build_words_from_ledger() -> void:
 		w.word = word
 		w.glyphs = glyphs
 		w.group = GROUP_OVERRIDES.get(word, row[3])
-		w.interaction = INTERACTIONS.get(word, "")
+		w.interaction = "choose_glyph_gild" if word in ["投资", "再投资", "复利投资"] else INTERACTIONS.get(word, "")
 		w.design_stage = row[4]
 		w.effect_summary = row[5]
 		w.priority = row[11]
@@ -391,6 +414,9 @@ func _build_words_from_ledger() -> void:
 			w.description = spec.desc
 			w.effect_summary = spec.desc
 			w.interaction = spec.interaction
+		if word in ["资金", "投资", "再投资", "复利投资", "复利", "利息", "炼金", "纯金", "投币", "合资"] and WordDescriptionsS.TEXT.has(word):
+			w.description = WordDescriptionsS.TEXT[word]
+			w.effect_summary = w.description
 		w.effects = _teffects(effects_list)
 		w.implemented = not effects_list.is_empty()
 		w.rarity = 1
@@ -450,7 +476,7 @@ func _build_extra_words() -> void:
 
 	# 精金：永久镀金
 	_save(_extra("extra_jinjin", "精金", ["精", "金"], "经济", "choose_glyph_gild",
-		"选择一枚己方实体字，将其永久镀金；此后它每次参与有效多字词获得 1 金币",
+		"选择一枚己方实体字，将其永久镀金；此后它每次单字或组词打出获得1金币",
 		ContentBuild.e("gild_glyph", 0, -1, "", "选择一枚己方字永久镀金", {})),
 		"%s/words/extra_jinjin.tres" % RES)
 
@@ -473,6 +499,17 @@ func _build_extra_words() -> void:
 		ContentBuild.e("lights_on", 0, -1, "", "来电了", {})),
 		"%s/words/extra_kaideng.tres" % RES)
 	print("  · 彩蛋词：开灯（额外）")
+
+	# 死亡 / 反死亡：判词【死】+ 佚卷【亡】的彩蛋（遗物说明里不点破）
+	_save(_extra("extra_siwang", "死亡", ["死", "亡"], "彩蛋", "",
+		"彩蛋：打出后你立即死亡；有复活机会时满血站起",
+		ContentBuild.e("death_word", 0, -1, "", "打出后你立即死亡", {})),
+		"%s/words/extra_siwang.tres" % RES)
+	_save(_extra("extra_fansiwang", "反死亡", ["反", "死", "亡"], "彩蛋", "",
+		"彩蛋：本局获得一次满血复活机会（一局只给一次）",
+		ContentBuild.e("anti_death", 0, -1, "", "本局获得一次满血复活", {})),
+		"%s/words/extra_fansiwang.tres" % RES)
+	print("  · 彩蛋词：死亡 / 反死亡（额外）")
 
 	# 方向与空间：左 / 右 / 左右 / 左转 / 右转 / 左击 / 右击（设计负责人新增）
 	_save(_extra_list("extra_zuoyou", "左右", ["左", "右"], "空间", "choose_row_pair",
@@ -926,39 +963,7 @@ func _typed_nodes(list: Array) -> Array[MapNodeData]:
 	return out
 
 func _build_acts() -> void:
-	var T := MapNodeDataS.Type
-	var battles := {
-		1: ["ink_spirit", "paper_guard", "ember_imp"],
-		2: ["rust_scribe", "bronze_seal", "paper_guard"],
-		3: ["ember_imp", "rust_scribe", "bronze_seal"],
-	}
-	var elites := {1: "iron_seal", 2: "bronze_seal", 3: "iron_seal"}
-	var bosses := {1: "boss_word_demon", 2: "boss_lead_plate", 3: "boss_chaos_press"}
-	var titles := {1: "第一幕 · 起步", 2: "第二幕 · 成型", 3: "第三幕 · 兑现"}
-	var themes := {
-		1: "从少量高连通字开始，确立主方向。",
-		2: "从一个词扩展到联动体系，敌人开始污染盘面。",
-		3: "在压力下完成联动与收尾。",
-	}
-	for act_i in [1, 2, 3]:
-		var act: ActData = ActDataS.new()
-		act.index = act_i
-		act.title = titles[act_i]
-		act.theme = themes[act_i]
-		var pool: Array = []
-		for eid in battles[act_i]:
-			pool.append(Database_enemy(eid))
-		var nodes: Array = []
-		nodes.append(_node(1, T.BATTLE, "初试", "教授组词与单字的取舍", [pool[0]]))
-		nodes.append(_node(2, T.BATTLE, "第二条线", "提供第一条新联动", [pool[1]]))
-		nodes.append(_node(3, T.EVENT, "途中小憩", "叙事与风险、资源取舍", []))
-		nodes.append(_node(4, T.BATTLE, "机制之敌", "开始应对机制性敌人", [pool[2]]))
-		nodes.append(_node(5, T.SHOP, "市集", "购字、复制、删字或治疗", []))
-		nodes.append(_node(6, T.FORK, "岔路", "精英（高收益）或事件（较安全）", [Database_enemy(elites[act_i])], true))
-		nodes.append(_node(7, T.REST, "休整", "治疗 / 删字 / 修饰，三选一", []))
-		nodes.append(_node(8, T.BOSS, "幕末首领", "验证整套构筑", [Database_enemy(bosses[act_i])]))
-		act.nodes = _typed_nodes(nodes)
-		_save(act, "%s/acts/act_%d.tres" % [RES, act_i])
+	EnemyRoster.save_acts()
 
 
 # ---------------------------------------------------------------- 初始字袋 / 规则
