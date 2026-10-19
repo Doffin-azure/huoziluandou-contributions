@@ -17,9 +17,13 @@ func _ok(condition: bool, description: String) -> void:
 
 func _ready() -> void:
 	_test_isolation()
+	_test_pools()
 	_test_press()
 	_test_strike_breach()
 	_test_opening_defense()
+	_test_empty_case()
+	_test_chaos_dice()
+	_test_batch_two()
 	_test_blitz()
 	_test_gravity_order()
 	_test_slab()
@@ -35,6 +39,26 @@ func _ready() -> void:
 	GameState.relic_counters.clear()
 	print("[relic_test] PASS=%d FAIL=%d" % [_pass, _fail])
 	get_tree().quit(1 if _fail > 0 else 0)
+
+
+# ---------------------------------------------------------------- 池子
+func _test_pools() -> void:
+	_reset()
+	var normal: Array = Relics.normal_pool()
+	var event: Array = Relics.event_pool()
+	_ok(event.size() == 3 and normal.size() == Relics.DEFS.size() - 3 and event.has("life_debt") and not normal.any(func(id): return event.has(id)), "普通池与事件池分离：%d / %d" % [normal.size(), event.size()])
+	for id in event:
+		_ok(Relics.is_event_relic(id) and not normal.has(id), "事件遗物不进入普通池：%s" % Relics.name_of(id))
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 90210
+	var rolled := {}
+	for _i in 300:
+		for id in Relics.roll_choices([], rng, 3):
+			rolled[id] = true
+	var leaked: Array = rolled.keys().filter(func(id): return event.has(id))
+	_ok(leaked.is_empty(), "普通随机池 300 次不会滚出事件遗物 %s" % [leaked])
+	var event_rolled := Relics.roll_event_choices([], rng, 3)
+	_ok(event_rolled.size() == 3 and event_rolled.all(func(id): return event.has(id)), "事件随机池只会滚出事件遗物 %s" % [event_rolled])
 
 
 # ---------------------------------------------------------------- 工具
@@ -174,7 +198,7 @@ func _test_strike_breach() -> void:
 	_ok(b.enemies[0].hp == 200 - 6, "破防：易伤 ×1.5 照原规则向上取整（4 → 6）")
 	b.end_player_turn()
 	b.end_player_turn()
-	_ok(b.enemies[0].status_stacks("vulnerable") == 2, "破防：敌方易伤和原规则一样不随回合衰减")
+	_ok(b.enemies[0].status_stacks("vulnerable") == 0, "破防：敌方易伤每回合衰减 1 层，两回合后清空")
 
 	b = _battle(["strike", "breach"])
 	_place(b, Vector2i(0, 0), "击")
@@ -207,6 +231,77 @@ func _test_opening_defense() -> void:
 	ex.apply_battle_setup(s)
 	_ok(s.player.hp == GameState.player_hp and s.player.block == 2, "屏障：伏兵开场突袭 8 伤先被临挡吸收（剩 %d）" % s.player.block)
 	GameState.expedition = null
+
+
+# ---------------------------------------------------------------- 第二批
+func _test_batch_two() -> void:
+	# 血珀：溢出的治疗转持久盾
+	var b := _battle(["amber"], [], 0)
+	b.player.hp = 50
+	_ok(b.heal_player(20) == 10 and b.player.hp == 60 and b.player.persistent_block == 10, "血珀：治疗 20，溢出的 10 转为持久盾（%d / %d）" % [b.player.hp, b.player.persistent_block])
+	b.player.persistent_block = 0
+	b.player.hp = 60
+	b.heal_player(7)
+	_ok(b.player.persistent_block == 7, "血珀：满血治疗全部转盾（%d）" % b.player.persistent_block)
+
+	# 裂雷瓶：获得储能翻倍，回合结束清空
+	b = _battle(["cracked_bottle"], [], 0)
+	b.add_energy(3)
+	_ok(b.player.energy == 6, "裂雷瓶：获得 3 储能变为 6（%d）" % b.player.energy)
+	b.end_player_turn()
+	_ok(b.player.energy == 0, "裂雷瓶：回合结束清空储能（%d）" % b.player.energy)
+
+	# 将腐供果：开局随机一枚字换成本场临时副本，永久字不变
+	_reset(["rotting_fruit"])
+	var deck_before: int = GameState.deck.size()
+	var permanent_uid: int = GameState.deck[0].uid
+	b = _battle(["rotting_fruit"], GameState.make_battle_deck(), 0)
+	var temps: Array = b.bag.filter(func(c): return c.temporary)
+	_ok(temps.size() == 1 and GameState.deck.size() == deck_before, "将腐供果：开局一枚临时副本，永久字袋不变（%d）" % temps.size())
+	_ok(GameState.deck.all(func(c): return not c.temporary), "将腐供果：不会把永久实体改成临时")
+
+	# 留字蜡：5% 留场判定，固定种子下会命中但不会必然
+	b = _battle(["stay_wax"], [], 0)
+	b.rng.seed = 424242
+	var wax_hits := 0
+	for _i in 500:
+		if Relics.stay_wax(b, _inst("火")):
+			wax_hits += 1
+	_ok(wax_hits > 0 and wax_hits < 100, "留字蜡：500 次判定命中 %d 次" % wax_hits)
+
+	# 补字鬼手：前 3 枚实际打出的字补位
+	b = _battle(["ghost_hand"], [], 0, 0, 0)
+	_ok(b.magic_hand_left == 3, "补字鬼手：开局 3 次")
+	_play_word(b, "回击")
+	_ok(b.magic_hand_left == 1, "补字鬼手：打出 2 字后剩 1 次（%d）" % b.magic_hand_left)
+	_play_word(b, "火")
+	_ok(b.magic_hand_left == 0, "补字鬼手：第 3 枚后次数用尽（%d）" % b.magic_hand_left)
+
+
+# ---------------------------------------------------------------- 乱文骨骰
+func _test_chaos_dice() -> void:
+	_reset()
+	var before: int = GameState.deck.size()
+	var old_uids: Array = GameState.deck.map(func(c): return c.uid)
+	_ok(GameState.add_relic("chaos_dice"), "乱文骨骰可以拾取")
+	_ok(GameState.deck.size() == before + 3, "乱文骨骰：字袋变为原数量 +3（%d → %d）" % [before, GameState.deck.size()])
+	var old_left := old_uids.filter(func(uid): return GameState.deck.any(func(c): return c.uid == uid))
+	_ok(old_left.is_empty(), "乱文骨骰：旧字实体全部被替换")
+	_ok(GameState.deck.all(func(c): return c.data != null and not c.data.is_pollution and not c.data.tags.has("event")), "乱文骨骰：只生成普通字")
+
+
+# ---------------------------------------------------------------- 空铅盒
+func _test_empty_case() -> void:
+	var b := _battle(["empty_case"], [], 0)
+	_clear_board(b)
+	Relics.on_player_turn_end(b)
+	_ok(b.player.persistent_block == 8, "空铅盒：4 行全空 → 持久盾 +8（%d）" % b.player.persistent_block)
+	var c := _battle(["empty_case"], [], 0)
+	_clear_board(c)
+	for x in c.board.size:
+		_place(c, Vector2i(x, 0), "火")
+	Relics.on_player_turn_end(c)
+	_ok(c.player.persistent_block == 6, "空铅盒：只有 3 行全空 → 持久盾 +6（%d）" % c.player.persistent_block)
 
 
 # ---------------------------------------------------------------- 闪电战
@@ -431,7 +526,7 @@ func _test_clean() -> void:
 	_ok(b.board.cells.filter(func(c): return c != null).size() == before + 3, "光洁：盘上有污染字（敌方注入）也算不干净")
 
 
-# ---------------------------------------------------------------- 天火
+# ---------------------------------------------------------------- 天火遗诏
 func _test_skyfire() -> void:
 	for has_relic in [false, true]:
 		var b := _battle(["skyfire"] if has_relic else [])
@@ -440,17 +535,17 @@ func _test_skyfire() -> void:
 		b.player.heat = 5
 		var r := _play_word(b, "流火")
 		if has_relic:
-			_ok(r.ok and e.hp == 150, "天火：流火追加 50 伤害（%d）" % (200 - e.hp))
-			_ok(b.player.heat == 3 and b.bag.any(func(c): return c.glyph() == "热"), "天火：流火原效果保留（热回袋、热度 -2）")
+			_ok(r.ok and e.hp == 150, "天火遗诏：流火追加 50 伤害（%d）" % (200 - e.hp))
+			_ok(b.player.heat == 3 and b.bag.any(func(c): return c.glyph() == "热"), "天火遗诏：流火原效果保留（热回袋、热度 -2）")
 		else:
-			_ok(r.ok and e.hp == 200 and b.player.heat == 3, "没有天火：流火只洗热、降热")
+			_ok(r.ok and e.hp == 200 and b.player.heat == 3, "没有天火遗诏：流火只洗热、降热")
 	var b2 := _battle(["skyfire", "breach"])
 	_play_word(b2, "流火")
-	_ok(b2.enemies[0].hp == 200 - 75, "天火 + 破防：50 也吃易伤（75）")
+	_ok(b2.enemies[0].hp == 200 - 75, "天火遗诏 + 破防：50 也吃易伤（75）")
 	var b3 := _battle(["skyfire", "strike"])
 	b3.player.add_status("strength", 3)
 	_play_word(b3, "流火")
-	_ok(b3.enemies[0].hp == 150, "天火：算法术伤害，不吃力量、打击增强")
+	_ok(b3.enemies[0].hp == 150, "天火遗诏：算法术伤害，不吃力量、打击增强")
 
 
 # ---------------------------------------------------------------- 战外：好好睡 / 火人 / 发明蛋
@@ -467,17 +562,17 @@ func _test_out_of_battle() -> void:
 	_reset()
 	var n := GameState.deck_size()
 	GameState.add_relic("fireman")
-	_ok(GameState.deck_size() == n + 4 and GameState.glyph_counts().get("火", 0) >= 4, "火种（主线）：字袋 +4 枚【火】")
+	_ok(GameState.deck_size() == n + 4 and GameState.glyph_counts().get("火", 0) >= 4, "余烬匣（主线）：字袋 +4 枚【火】")
 	_reset()
 	ex = Expedition.start(4)
 	GameState.add_relic("fireman")
-	_ok(ex.tray.count("火") == 4, "火种（远征）：4 枚【火】先进字匣")
+	_ok(ex.tray.count("火") == 4, "余烬匣（远征）：4 枚【火】先进字匣")
 	ex.tray = ["一", "二", "三", "四", "五"]
 	GameState.relics.clear()
 	GameState.relic_counters.clear()
 	var deck_n := GameState.deck_size()
 	GameState.add_relic("fireman")
-	_ok(ex.tray.size() == 6 and GameState.deck_size() == deck_n + 3, "火种（远征）：字匣满了按原规则进字袋")
+	_ok(ex.tray.size() == 6 and GameState.deck_size() == deck_n + 3, "余烬匣（远征）：字匣满了按原规则进字袋")
 	GameState.expedition = null
 	_reset(["egg"])
 	n = GameState.deck_size()
@@ -494,8 +589,9 @@ func _test_expedition() -> void:
 	_reset()
 	var ex := Expedition.start(11)
 	_ok(not ex.has_method("can_wish") and not ex.has_method("open_wish"), "许愿机入口与逻辑已删除")
-	var mid_n: int = Relics.TIER.values().filter(func(t): return int(t) <= 2).size()
-	_ok(ex.loot_relic_pool("小").is_empty() and ex.loot_relic_pool("中").size() == mid_n and ex.loot_relic_pool("大").size() == Relics.DEFS.size(), "中赏%d件、大赏%d件遗物候选，小赏不投放" % [mid_n, Relics.DEFS.size()])
+	var normal: Array = Relics.normal_pool()
+	var mid_n: int = normal.filter(func(id): return int(Relics.TIER[id]) <= 2).size()
+	_ok(ex.loot_relic_pool("小").is_empty() and ex.loot_relic_pool("中").size() == mid_n and ex.loot_relic_pool("大").size() == normal.size(), "中赏%d件、大赏%d件遗物候选，小赏不投放" % [mid_n, normal.size()])
 	var clash: Array = Relics.DEFS.keys().filter(func(id): return Database.words.values().any(func(w): return w.word == Relics.name_of(id)) or Expedition.SEALS.has(Relics.name_of(id)))
 	_ok(clash.is_empty(), "遗物名与战斗词、印章不冲突")
 	# 奖励选择复用拾取与绑定流程。
@@ -597,16 +693,17 @@ func _test_all_relics_smoke() -> void:
 					where += arr.filter(func(x): return x.uid == uid).size()
 				where += b.board.cells.filter(func(x): return x != null and x.uid == uid).size()
 				var bred: bool = b.breeders.has(uid)
-				if where > 1 or (where == 0 and not bred and GameState.relic_binds.get("fertilizer", -1) != uid and uid != b.expired_uid):
+				var fruit: bool = b.fruit_uid == uid
+				if where > 1 or (where == 0 and not bred and not fruit and GameState.relic_binds.get("fertilizer", -1) != uid):
 					good = false
 		if good:
 			ok_runs += 1
-	_ok(ok_runs == 5, "%d 件遗物同时持有：5 个种子各打 12 回合，不报错、永久实体守恒（%d/5）" % [all.size(), ok_runs])
+	_ok(ok_runs == 5, "%d 件遗物同时持有：5 个种子各打 12 回合，不报错、永久实体守恒（%d/5）" % [Relics.DEFS.size(), ok_runs])
 
 
 # ---------------------------------------------------------------- 审查修复
 func _test_review_fixes() -> void:
-	# 刻刀：【连击】重演不加 +2
+	# 刑卒护指：【连击】重演不加 +2
 	var hits: Array = []
 	for has_strike in [false, true]:
 		var b := _battle(["strike"] if has_strike else [])
@@ -614,23 +711,23 @@ func _test_review_fixes() -> void:
 		var hp: int = b.enemies[0].hp
 		_play_word(b, "连击", 1)
 		hits.append(hp - b.enemies[0].hp)
-	_ok(hits[0] == hits[1], "刻刀：【连击】重演不吃 +2（%d / %d）" % hits)
-	# 字种：用遗物随机数，不动远征主随机数
+	_ok(hits[0] == hits[1], "刑卒护指：【连击】重演不吃 +2（%d / %d）" % hits)
+	# 孕字卵：用遗物随机数，不动远征主随机数
 	_reset(["egg"])
 	var ex := Expedition.start(41)
 	GameState.relics.append("egg")
 	GameState.relic_counters["egg"] = 3
 	var st := ex.rng.state
 	Relics.on_battle_won()
-	_ok(ex.rng.state == st, "字种：发字用遗物随机数，不改远征主随机数")
+	_ok(ex.rng.state == st, "孕字卵：发字用遗物随机数，不改远征主随机数")
 	GameState.expedition = null
-	# 火种：卖掉再拿不重复给火
+	# 余烬匣：卖掉再拿不重复给火
 	_reset()
 	GameState.add_relic("fireman")
 	var n := GameState.deck_size()
 	GameState.remove_relic("fireman")
 	GameState.add_relic("fireman")
-	_ok(GameState.deck_size() == n, "火种：卖掉再拿到，不再给 4 枚【火】")
+	_ok(GameState.deck_size() == n, "余烬匣：卖掉再拿到，不再给 4 枚【火】")
 	# 删字：同字形先删没被绑定的
 	_reset(["slab"])
 	var gid: String = GameState.deck[0].id()
@@ -638,6 +735,6 @@ func _test_review_fixes() -> void:
 	GameState.relic_binds["slab"] = copies[0].uid
 	if copies.size() > 1:
 		GameState.remove_character_id(gid)
-		_ok(GameState.relic_bound_inst("slab") != null, "删字：同字形有多枚时先删没被绑定的，压字石不失效")
+		_ok(GameState.relic_bound_inst("slab") != null, "删字：同字形有多枚时先删没被绑定的，坠字石不失效")
 	else:
 		_ok(true, "（起始字袋第一枚没有重复，跳过）")

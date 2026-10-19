@@ -1,0 +1,39 @@
+Use case: stylized-concept.
+Asset type: a professional video game prop and character concept sheet, intended for a Chinese underworld exploration map.
+Input image 1 is the sole STYLE reference: match its mature hand-drawn dark teal / patinated bronze / cinnabar Chinese beast-mask stone-inscription aesthetic, black ink contours, flat gouache-like color shapes, fine engraved bronze ornament, restrained antique print grain. Input image 2 is the approved MAP SAMPLE: derive the actual prop families, lantern traveler, roofs, stalls, stone shrines, and silhouettes from it. It is not a target for editing; create one NEW concept sheet.
+Primary request: one wide 4:3 illustration at 2560 × 1920 pixels. Warm light gray-beige paper page. A neat exactly FIVE COLUMN by FOUR ROW grid, 20 spacious equal design cells, hairline separators, small header "墨池 · 交互元素". This is ONE cohesive designed sheet, NOT a montage of scene screenshots. Keep every prop isolated with generous surrounding paper space, each panel has one tiny short asset ID. Fine illustration detail but readable silhouettes.
+
+CAMERA: every object uses the same fixed hand-drawn elevated oblique orthographic camera, showing top and a short FRONT elevation; camera faces the rectangular front straight on. Ground footprints are wide horizontal RECTANGLES with 128:80 proportions, NOT diamonds, NOT isometric diamond tiles, no diagonally rotated bases. Below each main object is one faint teal rectangular 1×1 footprint and a tiny ground-contact cross; label "1×1". Props may extend vertically beyond a footprint, never stand on adjacent ground cells. For state variants, show small side by side versions within the same design cell, with small readable "可用 / 已用" or "完整 / 解除" captions only. Small props have less detail, not less care.
+
+EXACT PANEL ORDER, read LEFT TO RIGHT then TOP TO BOTTOM:
+Row 1:
+1 A01: gray-white hooded cloak traveler, dark teal clothes, warm golden lantern held low; a small FRONT/SIDE/BACK turnaround group, mature human proportions, no cute big head.
+2 A02: slender dark teal patinated bronze beast-mask patrol guard, standing humanoid or ghostly silhouette, clear small enemy silhouette.
+3 A03: broad-shouldered heavy elite guardian, heavy beast-mask armor, distinguishable by shoulder width and planted stance.
+4 A04: small mobile Ink Abyss boss figure, crown-like high crest and curling ink tendrils, compact beast-mask form, moving character entirely separate from a building.
+5 N10: FIXED BOSS LAIR, beast-faced bronze and stone gate with cinnabar hanging strips, large upright ritual gate on one footed square platform; no boss character inside.
+
+Row 2:
+6 N01: SMALL REWARD, low single-layer bronze seal box, simple single latch; closed and open variants.
+7 N02: MEDIUM REWARD, noticeably taller stacked printing-seal coffer, two visible tiers; closed and open variants.
+8 N03: LARGE REWARD, tall upright three-tier seal-lock chest, striking vertical silhouette and heavier bronze beast ornament; closed and open variants. Distinguish three reward tiers by SHAPE and HEIGHT, not merely color.
+9 N04: paper-white BLANK movable-type tile standing on small dark pedestal, and the empty low pedestal after collection. Blank tile has absolutely NO printed Chinese character, actual glyph is added in runtime.
+10 N08: removable ink barrier, solid irregular black ink membrane stretched between low stone sockets with a cinnabar seal strip; beside it show cleared version with broken hanging seal, no membrane, only a low traversable base. Both structural states explicit.
+
+Row 3:
+11 N05: rest point lantern pavilion, small dark teal tiled roof and slender bronze posts, warm hanging lamp; available lit pavilion and used state with lamp lowered/closed, same outline family.
+12 N06: bronze type-seller stall, curved dark teal canopy, little wooden/bronze type drawers and trays; open stall and shuttered/folded used stall.
+13 N07: question shrine / carved standing stone niche, no actual question-mark icon required; open illuminated inset and closed stone shutter variant.
+14 M01: ink-spring mechanism, shallow inkstone basin with engraved beast spout; flowing black-teal ink variant and dry basin variant, no water-white waterfall.
+15 M02: ink-absorbing PAPER PATH, a few thin flat pale paper sheets lying directly on floor, soaked dark ink edges, visibly FLAT and walkable, NOT an upright prop.
+
+Row 4:
+16 D01: TWO broken engraved stone steles, one taller shattered crown, one lower broken slab, blackened stone and small bronze joints.
+17 D02: TWO barren crooked tree forms, tall but thin with sparse cinnabar dead twigs, bases no larger than one grid footprint.
+18 D03: hanging cinnabar cloth strips with a bronze hook, and low-sway version; two red fabric silhouettes for independent decoration.
+19 D04: two compact ritual bronze standing lamps, lit with restrained amber flame and extinguished with dark closed cap.
+20 O: INFORMATION OVERLAY MARKS: four tiny examples on faint wide RECTANGULAR footprints: thin antique-gold reachable-grid CORNER brackets; thin paper-white selected-grid corner brackets; cinnabar seal slash; a cinnabar dashed route taking ONE RIGHT ANGLE using horizontal and vertical segments. These must be orthogonal rectangular marks, absolutely NOT diamond outlines. Short labels O1 O2 O3 O4.
+
+PALETTE: ink black #101c1c, deep teal #123f43, patinated bronze-green #3d6458, aged gold #b98a43, cinnabar #ad272b, paper white #e3d7b7. Dark props must remain clearly readable on paper. Engraving is concentrated at key focal props, not every empty surface.
+TYPOGRAPHY: short asset IDs and a few supplied Chinese state words only. No paragraphs, no pseudo-Chinese filler text. No watermark or signature.
+AVOID: photorealism, 3D renders, plastic shading, cute chibi, pixel art, watercolor wash, blue neon, generic medieval European objects, diamond tiles, world maps, game-screen HUD, large glows. Preserve all twenty cells and all specified paired states.

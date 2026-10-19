@@ -10,6 +10,7 @@ var _items: Dictionary = {}
 
 
 func _ready() -> void:
+	add_to_group("effect_help_avoid")
 	add_theme_constant_override("separation", 4)
 	resized.connect(_rebuild)
 	_rebuild()

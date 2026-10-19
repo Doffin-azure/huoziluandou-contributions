@@ -17,7 +17,7 @@ var _tile_bgs: Dictionary = {}   ## glyph -> Panel
 
 func build(root: Control) -> void:
 	for c in Database.characters.values():
-		if c.is_pollution or c.pending_design or c.tags.has("enemy") or c.tags.has("彩蛋"):
+		if c.is_pollution or c.pending_design or c.tags.has("enemy") or c.tags.has("彩蛋") or c.tags.has("event"):
 			continue
 		_pool.append(c)
 	_pool.sort_custom(func(a, b):
@@ -188,5 +188,8 @@ func _on_start() -> void:
 			glyphs.append(g)
 	if glyphs.is_empty():
 		return
-	GameState.start_new_run("v03", glyphs)
-	goto("res://src/screens/map_screen.gd")
+	var run = load("res://src/expedition/room_run_state.gd").new()
+	run.reset({"seed":int(Time.get_unix_time_from_system())^int(Time.get_ticks_usec()),"deck":glyphs,"layout":"node_graph"})
+	run.autosave = not bool(GameState.get_meta("courtyard_preview",false))
+	if run.autosave: run.save_run()
+	goto("res://src/screens/room_map_screen.gd")

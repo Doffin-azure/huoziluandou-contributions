@@ -2,7 +2,6 @@ extends RefCounted
 class_name RelicRewardFlow
 ## 经典模式的遗物发放：精英 / 首领 / 事件 / 商店共用。
 ## 弹出遗物候选，选中后入手；绑定类遗物再从字袋挑一枚字，关掉选择窗就随机绑定。
-## 泥金、拓包要从字袋挑字（关窗随机挑）；愿文要先许愿，「千字同文」再挑字。
 
 ## 商店遗物统一价
 const SHOP_PRICE := 45
@@ -47,17 +46,27 @@ static func grant(host: Node, id: String, on_done: Callable) -> void:
 	if not GameState.add_relic(id):
 		on_done.call("")
 		return
+	bind_owned(host, id, on_done)
+
+
+## 拾取后的选择：绑定类挑一枚绑定；贴金纸 / 替身草人挑字；阴司愿帖许愿
+
+
+## Also used after a saved route controller has granted the relic exactly once.
+static func bind_owned(host: Node, id: String, on_done: Callable) -> void:
 	if not Relics.pick_spec(id).is_empty():
 		_pick_loop(host, id, int(Relics.pick_spec(id)[1]), on_done)
 		return
-	if id == "monkey":
+	if id == "monkey" and not GameState.relic_counters.has("monkey"):
 		_wish(host, on_done)
 		return
 	if not Relics.needs_bind(id):
 		on_done.call(id)
 		return
 	var counts := {}
-	var bound: Array = GameState.relic_binds.values()
+	var other_binds := GameState.relic_binds.duplicate()
+	other_binds.erase(id)
+	var bound: Array = other_binds.values()
 	for c in GameState.deck:
 		if not bound.has(c.uid):
 			counts[c.id()] = int(counts.get(c.id(), 0)) + 1
@@ -81,19 +90,21 @@ static func grant(host: Node, id: String, on_done: Callable) -> void:
 	picker.picked.connect(func(cd: CharacterData):
 		if state.done: return
 		state.done = true
+		GameState.relic_binds.erase(id)
 		GameState.bind_relic(id, cd.id)
 		on_done.call(id))
 	picker.closed.connect(func():
 		if state.done: return
 		state.done = true
 		var keys: Array = counts.keys()
+		GameState.relic_binds.erase(id)
 		GameState.bind_relic(id, str(keys[GameState.rng.randi_range(0, keys.size() - 1)]))
 		on_done.call(id))
 	picker.set_anchors_preset(Control.PRESET_FULL_RECT)
 	host.add_child(picker)
 
 
-## 泥金 / 拓包：挑 left 枚字；关掉窗口就随机挑剩下的
+## 贴金纸 / 替身草人：挑 left 枚字；关掉窗口就随机挑剩下的
 static func _pick_loop(host: Node, id: String, left: int, on_done: Callable) -> void:
 	var counts := Relics.pick_candidates(id)
 	if left <= 0 or counts.is_empty():
@@ -105,14 +116,14 @@ static func _pick_loop(host: Node, id: String, left: int, on_done: Callable) -> 
 		_pick_loop(host, id, left - 1, on_done))
 
 
-## 愿文：从 3 个愿望里选 1 个
+## 阴司愿帖：从 3 个愿望里选 1 个
 static func _wish(host: Node, on_done: Callable) -> void:
 	var wishes := Relics.wish_options(GameState.rng)
 	var options: Array = []
 	for w in wishes:
 		options.append({"text": "「%s」" % Relics.WISHES[w][0], "hint": Relics.WISHES[w][1]})
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "愿文 · 许一个愿", "body": "每个愿望都有代价，只能许一次。", "options": options})
+	overlay.setup({"title": "阴司愿帖 · 许一个愿", "body": "每个愿望都有代价，只能许一次。", "options": options})
 	overlay.chose.connect(func(index: int):
 		var wish: String = wishes[index]
 		if wish != "endless_glyph":

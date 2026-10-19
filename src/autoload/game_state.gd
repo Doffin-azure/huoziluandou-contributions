@@ -8,6 +8,8 @@ var deck: Array = []          ## Array[CharInstance] 永久字袋
 var player_max_hp: int = 60
 var player_hp: int = 60
 var gold: int = 6
+## 事件链临时气血：只在当前连续事件中有效，优先吸收事件伤害。
+var event_temp_hp: int = 0
 
 var act_index: int = 1
 var node_index: int = 1        ## 当前可挑战的下一个节点序号（1..8）
@@ -25,7 +27,9 @@ var custom_deck: Array = []
 
 ## 墨途远征的局内状态；经典冒险为 null
 var expedition: Expedition = null
-## 遗物（见 src/core/relics.gd）：按获得顺序；绑定类记永久实体 uid；计数器（发明蛋）
+## New courtyard mode has independent room IDs and progression; legacy expedition stays intact.
+var room_run: RefCounted = null
+## 遗物（见 src/core/relics.gd）：按获得顺序；绑定类记永久实体 uid；计数器（孕字卵）
 var relics: Array = []
 var relic_binds: Dictionary = {}
 var relic_counters: Dictionary = {}
@@ -44,6 +48,7 @@ func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> voi
 	rules = Database.rules
 	deck.clear()
 	expedition = null
+	room_run = null
 	relics.clear()
 	relic_binds.clear()
 	relic_counters.clear()
@@ -51,6 +56,7 @@ func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> voi
 	player_max_hp = rules.player_max_hp
 	player_hp = player_max_hp
 	gold = rules.starting_gold
+	event_temp_hp = 0
 	if not custom_glyphs.is_empty():
 		# 自定义模式 / 调试：按给定字形列表建袋
 		custom_deck = custom_glyphs.duplicate()
@@ -81,7 +87,7 @@ func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> voi
 func add_character(data: CharacterData, count: int = 1) -> void:
 	if data == null:
 		return
-	# 愿文·千字同文：之后拿到的字都变成许愿的字；点金笔：新字也镀金
+	# 阴司愿帖·千字同文：之后拿到的字都变成许愿的字；金缕衣：新字也镀金
 	data = Relics.redirect_glyph(data)
 	for i in count:
 		var inst := CharInstance.new(data)
@@ -188,13 +194,33 @@ func spend_gold(amount: int) -> bool:
 
 
 func heal(amount: int) -> void:
-	Relics.store_overheal(player_hp + amount - player_max_hp)
 	player_hp = min(player_max_hp, player_hp + amount)
 	EventBus.hp_changed.emit(player_hp, player_max_hp)
 
 
+func add_event_temp_hp(amount: int) -> void:
+	event_temp_hp = maxi(0, event_temp_hp + maxi(0, amount))
+	EventBus.hp_changed.emit(player_hp, player_max_hp)
+
+
+func clear_event_temp_hp() -> void:
+	if event_temp_hp == 0: return
+	event_temp_hp = 0
+	EventBus.hp_changed.emit(player_hp, player_max_hp)
+
+
+func spend_event_temp_hp(amount: int) -> void:
+	if amount <= 0: return
+	event_temp_hp = maxi(0, event_temp_hp - amount)
+	EventBus.hp_changed.emit(player_hp, player_max_hp)
+
+
 func damage(amount: int) -> void:
-	player_hp = max(0, player_hp - amount)
+	var remaining := maxi(0, amount)
+	var absorbed := mini(event_temp_hp, remaining)
+	event_temp_hp -= absorbed
+	remaining -= absorbed
+	player_hp = max(0, player_hp - remaining)
 	EventBus.hp_changed.emit(player_hp, player_max_hp)
 
 

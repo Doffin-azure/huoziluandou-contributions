@@ -488,7 +488,7 @@ func pickup() -> bool:
 func gain_glyph(g: String, why := "") -> void:
 	if Database.get_character_by_glyph(g) == null:
 		return
-	# 愿文·千字同文：之后拿到的字都变成许愿的字
+	# 阴司愿帖·千字同文：之后拿到的字都变成许愿的字
 	g = Relics.redirect_glyph(Database.get_character_by_glyph(g)).glyph
 	var note := ("%s：" % why) if not why.is_empty() else ""
 	if tray.size() < tray_cap():
@@ -521,7 +521,7 @@ func top_panel() -> Dictionary:
 func reward_pool() -> Array:
 	var pool: Array = []
 	for cd in Database.characters.values():
-		if not cd.is_pollution and not cd.pending_design and not cd.tags.has("enemy") and not cd.tags.has("彩蛋"):
+		if not cd.is_pollution and not cd.pending_design and not cd.tags.has("enemy") and not cd.tags.has("彩蛋") and not cd.tags.has("event"):
 			pool.append(cd)
 	return pool
 
@@ -633,7 +633,8 @@ func loot_options(tier: String) -> Array:
 func loot_relic_pool(tier: String) -> Array:
 	if tier not in ["中", "大"]: return []
 	var max_tier := 2 if tier == "中" else 3
-	return Relics.DEFS.keys().filter(func(id): return not GameState.has_relic(id) and int(Relics.TIER[id]) <= max_tier)
+	# 事件专属遗物不进开赏池（Relics.EVENT_ONLY）
+	return Relics.normal_pool().filter(func(id): return not GameState.has_relic(id) and int(Relics.TIER[id]) <= max_tier)
 
 
 func roll_loot_relic(tier: String) -> String:
@@ -752,7 +753,7 @@ func _grant_relic(id: String, why: String) -> bool:
 	return true
 
 
-## 泥金 / 拓包：挑一枚；挑够了关掉面板
+## 贴金纸 / 替身草人：挑一枚；挑够了关掉面板
 func pick_relic(glyph_id: String) -> bool:
 	var p := top_panel()
 	if p.get("kind", "") != "relic_pick" or not Relics.apply_pick(p.relic, glyph_id):
@@ -764,7 +765,7 @@ func pick_relic(glyph_id: String) -> bool:
 	return true
 
 
-## 愿文：许愿；「千字同文」要带上字形 id
+## 阴司愿帖：许愿；「千字同文」要带上字形 id
 func choose_wish(index: int, glyph_id := "") -> bool:
 	var p := top_panel()
 	if p.get("kind", "") != "relic_wish" or index < 0 or index >= p.options.size():
@@ -775,7 +776,7 @@ func choose_wish(index: int, glyph_id := "") -> bool:
 	pop_panel()
 	if not Relics.grant_wish(wish, glyph_id):
 		return false
-	_log("愿文：许下「%s」" % Relics.WISHES[wish][0])
+	_log(Relics.name_of("monkey") + "：许下「%s」" % Relics.WISHES[wish][0])
 	return true
 
 
@@ -968,11 +969,7 @@ func forge(a: int, b: int) -> bool:
 
 
 # ---------------------------------------------------------------- 谜
-const EVENTS := [
-	{"title": "残页", "text": "墨渍里夹着半页旧谱。", "a": "撕下来（气血 −6，得一枚稀有字）", "b": "不碰它"},
-	{"title": "污墨", "text": "一砚发臭的墨，摊主说能换钱。", "a": "收下（❖ +18，字袋混进 1 枚污染字）", "b": "走开"},
-	{"title": "雾中灯", "text": "远处有人提灯。", "a": "跟上去（耗 2 步，地图迷雾散开一大片）", "b": "不跟"},
-]
+const EVENTS: Array = preload("res://src/data/event_catalog.gd").MYSTERY_EVENTS
 
 
 func _roll_event() -> int:

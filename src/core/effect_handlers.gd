@@ -4,6 +4,10 @@ class_name EffectHandlers
 ## 复杂实现见 EffectHandlersActions；共享工具见 EffectUtil。
 
 static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
+	return EffectRegistry.execute(handler, eff, ctx)
+
+
+static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 	var b: BattleState = ctx.get("battle")
 	if b == null:
 		return []
@@ -22,6 +26,12 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["加强：本场第 %d 次打出，获得 %d 层力量" % [b.strengthen_plays, gained]]
 		"damage":
 			return EffectUtil.damage(b, enemy, amount)
+		"self_hp_loss":
+			var lost := src.take_damage(amount) if src != null else 0
+			return ["失去 %d 生命" % lost]
+		"self_draw_penalty":
+			b.next_draw_penalty += amount
+			return ["下一次正常补字 -%d" % amount]
 		"chip_shield_damage":
 			if enemy == null:
 				return ["破：没有目标"]
@@ -49,7 +59,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			b.add_heat(-amount)
 			if b.damage_dealt_this_turn <= 0:
 				var rested := BattleBalance.i("rest_heal", 1) + b.take_solo_gain_bonus(ctx)
-				src.heal(rested)
+				b.heal_player(rested) if src == b.player else src.heal(rested)
 				return ["息：热度 -%d，本回合未造成伤害，回复 %d 生命" % [amount, rested]]
 			return ["息：热度 -%d" % amount]
 		"throw_neighbor":
@@ -179,7 +189,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			b.enable_ability("guard_inject", b.ability_value("guard_inject") + amount)
 			return ["护：下次敌方塞字减少 %d 个" % amount]
 		"heal":
-			src.heal(amount)
+			b.heal_player(amount) if src == b.player else src.heal(amount)
 			return ["回复 %d 点生命" % amount]
 		"draw_random":
 			var n := b.draw_to_board(amount)
@@ -593,6 +603,8 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return EffectHandlersActions._gild_glyph(b, ctx, eff)
 		"pin_glyph":
 			return EffectHandlersActions._pin_glyph(b, ctx)
+		"anchor_self":
+			return EffectHandlersActions._anchor_self(b, ctx)
 		"precision_place":
 			return EffectHandlersActions._precision_place(b, ctx, eff)
 		"split_mind":

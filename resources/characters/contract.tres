@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_contract"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_contract"]
+
+[sub_resource type="Resource" id="Resource_contract_hp"]
+script = ExtResource("2_contract")
+kind = 29
+handler = "self_hp_loss"
+amount = 2
+note = "打出时失去 2 生命。"
+
+[sub_resource type="Resource" id="Resource_contract_draw"]
+script = ExtResource("2_contract")
+kind = 29
+handler = "self_draw_penalty"
+amount = 1
+note = "下一次正常补字 -1。"
+
+[resource]
+script = ExtResource("1_contract")
+id = "contract"
+glyph = "契"
+pinyin = "qi"
+description = "打出时失去 2 生命，下一次正常补字 -1。"
+tags = Array[String](["pollution", "event"])
+solo_effects = Array[ExtResource("2_contract")]([SubResource("Resource_contract_hp"), SubResource("Resource_contract_draw")])
+solo_handler = "self_hp_loss"
+rarity = 0
+removable = false
+is_pollution = true

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_debt"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_debt"]
+
+[sub_resource type="Resource" id="Resource_debt"]
+script = ExtResource("2_debt")
+kind = 29
+handler = "self_hp_loss"
+amount = 3
+note = "打出时失去 3 生命。"
+
+[resource]
+script = ExtResource("1_debt")
+id = "debt"
+glyph = "债"
+pinyin = "zhai"
+description = "打出时失去 3 生命。"
+tags = Array[String](["pollution", "event"])
+solo_effects = Array[ExtResource("2_debt")]([SubResource("Resource_debt")])
+solo_handler = "self_hp_loss"
+rarity = 0
+removable = false
+is_pollution = true

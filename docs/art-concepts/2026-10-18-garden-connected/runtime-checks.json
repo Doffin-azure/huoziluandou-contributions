@@ -1,0 +1,36 @@
+{
+  "android_device_tested": false,
+  "checks": 146,
+  "failures": [],
+  "renderer": "forward_plus",
+  "seeds": [
+    {
+      "cache_limit": 49,
+      "loaded_regions": 34,
+      "profile": {
+        "active_local_lights": 4,
+        "assembly_ms": 3387.451,
+        "build_count": 1,
+        "fog_ms": 3.629,
+        "outline_ms": 1.53,
+        "outline_warmup_ms": 1199.768,
+        "resume_ms": 7.608
+      },
+      "seed": 29
+    },
+    {
+      "cache_limit": 49,
+      "loaded_regions": 32,
+      "profile": {
+        "active_local_lights": 2,
+        "assembly_ms": 2768.715,
+        "build_count": 1,
+        "fog_ms": 3.569,
+        "outline_ms": 1.516,
+        "outline_warmup_ms": 1213.182,
+        "resume_ms": 7.718
+      },
+      "seed": 67
+    }
+  ]
+}

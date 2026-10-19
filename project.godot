@@ -10,6 +10,7 @@ config_version=5
 
 [application]
 
+run/max_fps.mobile=30
 config/name="炼字狱"
 config/description="炼字成词，破狱而行。汉字构筑 Roguelike。"
 run/main_scene="res://scenes/main.tscn"

@@ -223,7 +223,7 @@ func _verify_mobile() -> void:
 			_ok(cards.size() == 3 and cards.all(func(card): return card.get_global_rect().end.x <= bounds.end.x + 1), "phone reward retains three readable glyphs")
 		await _shot(page + "-phone")
 		if page == "expedition_map":
-			_ok(screen._mobile and screen._map_grid.get_child(0).size.x * ratio >= 47.9, "phone expedition map cells retain 48px touch size")
+			_ok(screen._map_view.size.distance_to(screen.size) < 1.0 and not screen._actor_panel.visible, "phone expedition keeps the world full screen with inventory collapsed")
 			var tick: int = screen.ex.t
 			var rng: int = screen.ex.rng.state
 			screen._mobile_tabs.show_tab("构筑")
@@ -237,10 +237,10 @@ func _verify_mobile() -> void:
 			var steps: Array = MapGen.nbrs(screen.ex.pos).filter(func(k): return screen.ex.can_step(k))
 			if not steps.is_empty():
 				var destination: int = steps[0]
-				screen._map_grid.get_child(destination).pressed.emit()
+				screen._map_view.cell_pressed.emit(destination)
 				await _frames(12)
-				_ok(screen.ex.pos == destination and screen.ex.t > tick, "enlarged expedition cell still forwards movement to the existing rules")
-				_ok(screen._map_scroll.get_global_rect().encloses(screen._map_grid.get_child(screen.ex.pos).get_global_rect()), "map scroll keeps the player cell fully visible after movement")
+				_ok(screen.ex.pos == destination and screen.ex.t > tick, "world cell click still forwards movement to the existing rules")
+				_ok(screen._map_view.following, "moving in the world resumes camera following")
 	var picker := CollectionOverlay.new()
 	picker.setup({"title": "字袋", "characters": [GameState.deck[0].data], "counts": GameState.glyph_counts()})
 	Router.current.add_child(picker)

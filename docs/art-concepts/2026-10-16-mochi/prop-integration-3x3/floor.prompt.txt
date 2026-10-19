@@ -1,0 +1,10 @@
+Use case: stylized-concept.
+Asset type: one quiet, seamless-leaning game ground material, square orthographic top-down texture, opaque.
+Primary request: paint an almost flat, low-contrast blue-green grey stone surface. It is a supporting ground plane for the attached hand-painted chest, deliberately much simpler than the chest. Broad quiet worn stone color with only two or three extremely faint wiped-brush scuffs and a whisper of fine dry-brush grain.
+Reference image 1 (chest): use only its restrained matte blue-green material colors and painted surface quality. Do NOT depict the chest or its outline, shadow, plants, metalwork, or ribbon.
+Reference image 2 (battle art): use only its flat painted-color treatment and subtle old-print grain. Do NOT reproduce any composition, interface, objects, writing, or ornaments.
+Composition: the entire square is the same flat solid material, straight overhead, no perspective, no center subject, edge-to-edge. Equal lighting throughout; no central highlight, vignette, cast shadow, directional lighting gradient, or atmospheric depth. The edges should be visually interchangeable for gentle repeated tiling.
+Palette: base color close to #49625c. Keep local light/dark changes within roughly eight percent. Muted blue-grey green, no vivid greens, no gold.
+Materials: one large unjointed stone surface, broad flat hand-painted color washes, very sparse barely visible fine grain. It must feel calm even at full size. There is no need to add content.
+Avoid: paving grid, bricks, stone block boundaries, crack networks, cracks, marble veining, scattered rocks, sand, rubble, cobbles, moss clumps, water, wet puddles, vegetation, contour outline, decorative pattern, visible writing, icons, border, wall, cliff face, 3D render, photoreal shading, shiny surfaces, gold trim.
+Output: exactly one square opaque texture, no labels and no contact sheet.

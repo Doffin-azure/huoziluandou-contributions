@@ -58,3 +58,6 @@ build/
 *.jks
 __pycache__/
 *.pyc
+
+# Documentation preview import sidecars are generated locally by the editor.
+docs/**/*.import

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="1024" viewBox="0 0 2048 1024">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#071a25"/>
+      <stop offset=".32" stop-color="#123b47"/>
+      <stop offset=".49" stop-color="#396963"/>
+      <stop offset=".59" stop-color="#214e50"/>
+      <stop offset=".82" stop-color="#102f38"/>
+      <stop offset="1" stop-color="#081e29"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h2048v1024H0z"/>
+  <!-- Quiet cloud bands; the left/right edges stay identical for panorama wrapping. -->
+  <g fill="#47766a" opacity=".20">
+    <path d="M100 432q130-28 231-8t206-5q-88 37-202 25T100 432z"/>
+    <path d="M873 394q140-25 240 2t283-5q-75 37-246 24T873 394z"/>
+    <path d="M1502 460q91-25 178-7t211-2q-104 31-231 21T1502 460z"/>
+  </g>
+  <circle cx="1270" cy="301" r="45" fill="#c2ad75"/>
+  <path d="M1270 256a45 45 0 0 1 0 90 43 43 0 0 0 15-82z" fill="#a69467"/>
+  <g fill="#8da38b" opacity=".45">
+    <circle cx="196" cy="143" r="1.2"/><circle cx="630" cy="204" r="1"/>
+    <circle cx="1450" cy="167" r="1.1"/><circle cx="1780" cy="228" r="1"/>
+  </g>
+</svg>

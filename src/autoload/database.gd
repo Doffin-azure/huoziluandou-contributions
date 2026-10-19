@@ -23,6 +23,7 @@ var starter_decks: Dictionary = {}   ## id -> StarterDeckData
 var rules: BattleRules = null
 
 var warnings: Array[String] = []
+var revision := 0
 
 
 func _ready() -> void:
@@ -30,6 +31,7 @@ func _ready() -> void:
 
 
 func reload() -> void:
+	revision += 1
 	characters.clear()
 	char_by_glyph.clear()
 	words.clear()

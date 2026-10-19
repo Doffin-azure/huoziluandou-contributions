@@ -2,7 +2,7 @@ extends Control
 ## 词效回归：实体守恒、回合/跨战边界、结阵联动和实际 HUD 多阶段交互。
 
 ## 固定数量防止脚本异常中断某个测试函数后得到假通过。
-const EXPECTED_CHECKS := 409
+const EXPECTED_CHECKS := 417
 var checks: Array = []
 
 func _ready() -> void:
@@ -19,6 +19,7 @@ func _ready() -> void:
 	_run_solo_balance_four()
 	_run_word_balance()
 	_run_regen()
+	_run_vulnerable()
 	_run_description_previews()
 	_run_reconnect_return()
 	_run_flow_row_limits()
@@ -124,6 +125,34 @@ func _run_regen() -> void:
 		stacks.append(b.player.status_stacks("regen"))
 	_check("regen_turn_tick", hp == [43, 45, 46] and stacks == [2, 1, 0], "再生每回合回复层数生命并减 1 层：血 %s，层 %s" % [str(hp), str(stacks)])
 
+func _run_vulnerable() -> void:
+	var b := _battle()
+	var enemy: Combatant = b.enemies[0]
+	_word(b, "破防")
+	_check("vulnerable_apply", enemy.status_stacks("vulnerable") == 2 and enemy.take_damage(3) == 5, "破防施加2层易伤，3伤向上取整为5伤")
+	b.end_player_turn()
+	_check("vulnerable_first_decay", enemy.status_stacks("vulnerable") == 1 and enemy.take_damage(3) == 5, "新回合易伤2变1，伤害增幅保持50%")
+	b.end_player_turn()
+	_check("vulnerable_expire", not enemy.statuses.has("vulnerable") and enemy.take_damage(3) == 3, "再过一回合易伤耗尽，移除状态并恢复正常伤害")
+	_word(b, "破防")
+	_word(b, "破防")
+	_check("vulnerable_stacks_duration", enemy.status_stacks("vulnerable") == 4 and enemy.take_damage(3) == 5, "重复破防叠加持续层数，不提高易伤倍率")
+	b.enemy_skip_turns = 1
+	b.end_player_turn()
+	_check("vulnerable_skip_turn_decay", enemy.status_stacks("vulnerable") == 3, "停火跳过敌方行动时，易伤仍每回合衰减一次")
+	b.player.add_status("vulnerable", 2)
+	var stacks: Array = []
+	for i in 2:
+		b.end_player_turn()
+		stacks.append(b.player.status_stacks("vulnerable"))
+	_check("vulnerable_both_sides_decay", stacks == [1, 0] and enemy.status_stacks("vulnerable") == 1, "玩家与敌方易伤都每回合减少1层，不重复衰减")
+	var other := _enemy(b)
+	other.add_status("vulnerable", 1)
+	b.end_player_turn()
+	_check("vulnerable_multi_enemy_expire", not enemy.statuses.has("vulnerable") and not other.statuses.has("vulnerable"), "多个敌人的易伤各自到期，不会保留零层状态")
+	var word := Database.get_word_by_glyphs_string("破防")
+	_check("vulnerable_copy_synced", word.describe() == WordDescriptions.TEXT["破防"] and word.effects[0].note == word.describe() and "每回合减1层" in WordDescriptions.BRIEF_TEXT["破防"] and "每回合开始减少1层" in EffectGlossary.ENTRIES.vulnerable[1], "破防资源、完整说明、精简说明和wiki词条都使用衰减规则")
+
 func _run_description_previews() -> void:
 	var unified := true
 	for word in Database.words.values():
@@ -199,7 +228,7 @@ func _run_description_previews() -> void:
 	_check("preview_counter_stacks", entries.any(func(item): return item.id == "ability:counter" and "+6" in item.description and "所有敌人行动后" in item.description), "反击状态提示按当前层数解释追加伤害和时机")
 	b.enemies[0].add_status("vulnerable", 2)
 	entries = StatusDisplay.collect(b.enemies[0], b)
-	_check("preview_enemy_vulnerable_lifetime", entries.any(func(item): return item.id == "vulnerable" and "不按回合衰减" in item.description and not "每回合衰减 1" in item.description), "敌方易伤提示遵循当前持续规则")
+	_check("preview_enemy_vulnerable_lifetime", entries.any(func(item): return item.id == "vulnerable" and "每回合衰减 1 层" in item.description and not "不按回合衰减" in item.description), "敌方易伤提示每回合减少1层")
 
 func _run_word_balance() -> void:
 	var builder := load("res://src/tools/build_content.gd") as Script
@@ -1478,8 +1507,10 @@ func _run_logic() -> void:
 	var chosen := CharInstance.new(Database.get_character_by_glyph("御"))
 	b.bag.append(chosen)
 	b.reveal_from_bag(1)
-	_word(b, "转化", 1, {"tile": Vector2i(2, 2), "transform_uid": chosen.uid})
-	_check("pin_transform", b.board.get_xy(Vector2i(2, 2)) == inst, "精铸后转化仍替换固定字，原字仍在=%s，预期true" % (b.board.get_xy(Vector2i(2, 2)) == inst))
+	var transform_source := _place(b, Vector2i(0, 1), "转")
+	_place(b, Vector2i(1, 1), "化")
+	var invalid_transform := b.try_play([Vector2i(0, 1), Vector2i(1, 1)], {"tile": Vector2i(2, 2), "transform_uid": chosen.uid})
+	_check("pin_transform", not invalid_transform.ok and b.board.get_xy(Vector2i(2, 2)) == inst and b.board.get_xy(Vector2i(0, 1)) == transform_source and b.pending_reveal.has(chosen), "转化在消耗前拒绝固定目标，保留原字、施词字及揭示字")
 
 	b = _battle()
 	_word(b, "加速")

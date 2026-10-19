@@ -695,7 +695,7 @@ func _event_relic_pick(p: Dictionary) -> void:
 
 
 func _event_relic_wish(p: Dictionary) -> void:
-	_add(Ink.h2("愿文 · 许一个愿"))
+	_add(Ink.h2(Relics.name_of("monkey") + " · 许一个愿"))
 	_add(Ink.body("每个愿望都有代价，只能许一次。"))
 	for i in p.options.size():
 		var wish: String = p.options[i]

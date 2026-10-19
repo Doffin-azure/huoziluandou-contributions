@@ -127,7 +127,7 @@ func _build_statuses() -> void:
 		{"id": "strength", "name": "力量", "glyph": "力", "kind": 0, "color": "b8523a", "decay": 0,
 		 "desc": "本场每层使你的攻击每段伤害+1。"},
 		{"id": "vulnerable", "name": "易伤", "glyph": "脆", "kind": 1, "color": "7a4a63", "decay": 1,
-		 "desc": "受到的伤害提高 50%。"},
+		 "desc": "受到的伤害提高50%（向上取整）；多层仍为50%增幅。"},
 		{"id": "poison", "name": "中毒", "glyph": "毒", "kind": 1, "color": "5f7d6a", "decay": 1,
 		 "desc": "回合开始损失等量生命。"},
 		{"id": "next_bonus", "name": "热力强化", "glyph": "增", "kind": 0, "color": "3c4a6b", "decay": 0,
@@ -211,6 +211,14 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"强": return {"h": "turn_strength", "a": 1, "note": "本回合伤害 +1，回合结束后清除"}
 		"流": return {"h": "draw_bonus_next", "a": 1, "note": "下回合多抽 1 字"}
 		"蚀": return {"h": "damage", "a": 2, "note": "对敌造成 2 伤害"}
+		"础": return {"h": "anchor_self", "target": EffectDataS.Target.EMPTY_TILE, "pre": true, "note": "选择任意空格安放；固定本场，不受重力/位移影响；每回合可使用一次。"}
+		# 事件污染字：只占字袋，打出时付出代价。
+		"债": return {"h": "self_hp_loss", "a": 3, "note": "打出时失去 3 生命。"}
+		"契": return {"effects": [
+			{"h": "self_hp_loss", "a": 2, "note": "打出时失去 2 生命。"},
+			{"h": "self_draw_penalty", "a": 1, "note": "下一次正常补字 -1。"},
+		], "note": "打出时失去 2 生命，下一次正常补字 -1。"}
+		"忘": return {"h": "self_draw_penalty", "a": 1, "note": "打出后，下一次正常补字 -1。"}
 		# 下一批（复合 / 独立定位）
 		"充": return {"effects": [{"h": "energy", "a": 1, "note": "储能 +1"}, {"h": "draw_bonus_next", "a": 1, "note": "下回合多补 1 字"}], "note": "储能 +1，下回合多补 1 字"}
 		"爆": return {"effects": [{"h": "damage", "a": 2, "note": "造成 2 伤害"}, {"h": "heat", "a": 1, "note": "热度 +1"}], "note": "造成 2 伤，热度 +1"}
@@ -237,7 +245,7 @@ func _solo_spec(glyph: String) -> Dictionary:
 
 
 func _spec_effect(spec: Dictionary) -> EffectData:
-	return ContentBuild.e(spec.get("h", ""), int(spec.get("a", 0)), int(spec.get("target", -1)), spec.get("status", ""), spec.get("note", ""), spec.get("args", {}))
+	return ContentBuild.e(spec.get("h", ""), int(spec.get("a", 0)), int(spec.get("target", -1)), spec.get("status", ""), spec.get("note", ""), spec.get("args", {}), -1, "immediate", bool(spec.get("pre", false)))
 
 func _build_curated_characters() -> void:
 	# glyph, id, pinyin, tags, rarity, is_pollution
@@ -316,6 +324,10 @@ func _build_curated_characters() -> void:
 		["碍", "ai", "ai", ["enemy"], 2, false],
 		["秽", "hui3", "hui", ["enemy"], 2, false],
 		["污", "pollution", "wu", ["pollution"], 0, true],
+		["础", "chu", "chu", ["event", "space"], 3, false, "打出后可选择任意空格安放；固定本场，不受重力/位移影响；每回合可使用一次。"],
+		["债", "debt", "zhai", ["pollution", "event"], 0, true, "打出时失去 3 生命。"],
+		["契", "contract", "qi", ["pollution", "event"], 0, true, "打出时失去 2 生命，下一次正常补字 -1。"],
+		["忘", "oblivion", "wang", ["pollution", "event"], 0, true, "打出后，下一次正常补字 -1。"],
 	]
 	for d in defs:
 		if CUT_GLYPHS.has(d[0]):
@@ -347,7 +359,7 @@ func _make_character(glyph: String, id: String, pinyin: String, tags: Array, rar
 		c.description = "可单字打出（暂无单字效果，用于腾出空格）。"
 	if is_pollution:
 		c.removable = false
-		c.description = "污染源字。"
+		if c.description.is_empty(): c.description = "污染源字。"
 	_char_by_glyph[glyph] = c
 	_save(c, "%s/characters/%s.tres" % [RES, id])
 	return c

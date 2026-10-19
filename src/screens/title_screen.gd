@@ -2,17 +2,18 @@ extends ScreenBase
 ## Courtyard title menu. Scenery owns presentation; this screen retains existing run entry.
 const CourtyardView := preload("res://src/title/courtyard_view.gd")
 var _courtyard: Control
-var _menu: VBoxContainer
+var _menu: GridContainer
 var _buttons: Array[Button] = []
-var _title: Label
-var _subtitle: Label
-var _space: Control
 var _expedition := false
 var _entry_timer: Timer
 var _menu_tween: Tween
 var _starting := false
 var _modal_count := 0
 var _veil: ColorRect
+var _wordmark: TextureRect
+var _ornament: Control
+var _utilities: HBoxContainer
+var _main_buttons: Array[Button] = []
 
 
 func has_scene_background() -> bool:
@@ -22,21 +23,25 @@ func has_scene_background() -> bool:
 func build(root: Control) -> void:
 	_courtyard = CourtyardView.new()
 	root.add_child(_courtyard)
-	_menu = VBoxContainer.new()
+	_ornament = preload("res://src/title/title_menu_ornament.gd").new()
+	root.add_child(_ornament); _ornament.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_wordmark = TextureRect.new(); _wordmark.name = "LianziyuWordmark"
+	_wordmark.texture = preload("res://assets/title/branding/lianziyu-wordmark-v1.png")
+	_wordmark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; _wordmark.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_wordmark.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(_wordmark)
+	_menu = GridContainer.new(); _menu.columns = 1
 	root.add_child(_menu)
-	_title = _label("炼字狱", 54, Color("e6d9b4"))
-	_menu.add_child(_title)
-	_subtitle = _label("以字为剑 · 铸词为阵", 16, Color("97a79b"))
-	_menu.add_child(_subtitle)
-	_space = Control.new()
-	_menu.add_child(_space)
 	_menu.add_child(_button("开始新冒险", _on_start, true))
-	for entries in [[["墨途远征", _on_expedition], ["自定义构筑", _on_custom]], [["字库图鉴", _on_library], ["字网图谱", _on_graph]], [["设置", _open_settings], ["离开", _quit]]]:
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 12)
-		for entry in entries:
-			row.add_child(_button(entry[0], entry[1]))
-		_menu.add_child(row)
+	if FileAccess.file_exists("user://courtyard-run.tres"):
+		_menu.add_child(_button("继续冒险", _on_continue_rooms))
+	_menu.add_child(_button("字库图鉴",_on_library))
+	_menu.add_child(_button("设置",_open_settings))
+	_menu.add_child(_button("离开",_quit))
+	_main_buttons.assign(_buttons)
+	_ornament.setup(_main_buttons)
+	_utilities = HBoxContainer.new(); root.add_child(_utilities)
+	for entry in [["自定义构筑",_on_custom],["字网图谱",_on_graph],["旧版远征",_on_expedition]]:
+		_utilities.add_child(_button(entry[0],entry[1]))
 	_veil = ColorRect.new()
 	_veil.color = Color(0.025, 0.06, 0.075, 0.0)
 	_veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -52,15 +57,6 @@ func build(root: Control) -> void:
 	_buttons[0].grab_focus.call_deferred()
 
 
-func _label(text: String, font_size: int, color: Color) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.add_theme_font_override("font", Ink.serif)
-	label.add_theme_font_size_override("font_size", font_size)
-	label.add_theme_color_override("font_color", color)
-	return label
-
-
 func _button(text: String, callback: Callable, primary := false) -> Button:
 	var button := Button.new()
 	button.text = text
@@ -69,7 +65,7 @@ func _button(text: String, callback: Callable, primary := false) -> Button:
 	button.focus_mode = Control.FOCUS_ALL
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	button.add_theme_font_override("font", Ink.serif)
-	var color := Color("e6d8ad") if primary else Color("a1b5ab")
+	var color := Color("e6d8ad") if primary else Color("d0bd92")
 	button.add_theme_color_override("font_color", color)
 	button.add_theme_color_override("font_disabled_color", color)
 	button.add_theme_color_override("font_hover_color", Color("f1e6c5"))
@@ -78,9 +74,9 @@ func _button(text: String, callback: Callable, primary := false) -> Button:
 	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
 		var style := StyleBoxFlat.new()
 		style.bg_color = Color.TRANSPARENT
-		style.content_margin_left = 14
+		style.content_margin_left = 26
 		style.content_margin_right = 6
-		style.border_width_left = 2 if state in ["hover", "focus"] or primary and state == "normal" else 0
+		style.border_width_left = 0
 		style.border_color = Color("b5503c")
 		button.add_theme_stylebox_override(state, style)
 	button.set_meta("primary", primary)
@@ -94,20 +90,27 @@ func _layout() -> void:
 	# Reserve physical touch targets instead of scaling the entire menu down on phones.
 	var touch_scale := JourneyStyle.touch_scale(self)
 	var compact := size.y / touch_scale < 600
-	_title.add_theme_font_size_override("font_size", int((42 if compact else 54) * touch_scale))
-	_subtitle.add_theme_font_size_override("font_size", int((14 if compact else 16) * touch_scale))
-	_space.custom_minimum_size.y = (16 if compact else 28) * touch_scale
-	_menu.add_theme_constant_override("separation", int(4 * touch_scale))
+	_menu.columns = 2 if compact else 1
+	_menu.add_theme_constant_override("v_separation", int(6 * touch_scale))
+	_menu.add_theme_constant_override("h_separation", int(36 * touch_scale))
 	for button in _buttons:
 		button.custom_minimum_size.y = 48 * touch_scale
-		button.add_theme_font_size_override("font_size", int((23 if button.get_meta("primary") else 20) * touch_scale))
-	var width := minf(360 * touch_scale, size.x - 40 * touch_scale)
+		var utility := button.get_parent()==_utilities
+		button.add_theme_font_size_override("font_size", int((14 if utility else 23) * touch_scale))
+	var width := minf(300 * touch_scale, size.x*.40) if not compact else size.x*.51
 	_menu.custom_minimum_size.x = width
 	_menu.size.x = width
 	_menu.reset_size()
 	var height := _menu.get_combined_minimum_size().y
-	var top := minf(size.y * 0.21, maxf(12 * touch_scale, (size.y - height) * 0.5))
-	_menu.position = Vector2(maxf(20 * touch_scale, size.x * 0.075), top)
+	var margin := 18*touch_scale
+	_utilities.add_theme_constant_override("separation",int(6*touch_scale))
+	_utilities.reset_size(); _utilities.position = Vector2(maxf(margin,size.x*.10),size.y-margin-_utilities.size.y)
+	var logo_top: float = margin+(0.0 if compact else size.y*.03)
+	var logo_height := minf(size.y*.44,maxf(64,_utilities.position.y-height-logo_top-margin-12*touch_scale))
+	var logo_width := minf(size.x*.53,logo_height*1.776)
+	_wordmark.position = Vector2(size.x*.035,logo_top); _wordmark.size = Vector2(logo_width,logo_height)
+	_menu.position = Vector2(maxf(margin+22,size.x*.13),_wordmark.position.y+logo_height+12*touch_scale)
+	_ornament.queue_redraw()
 
 
 func _can_interact() -> bool:
@@ -123,6 +126,7 @@ func _on_start() -> void:
 	if not _can_interact(): return
 	_starting = true
 	_lock_buttons()
+	_wordmark.hide(); _ornament.hide(); _utilities.hide()
 	var duration: float = _courtyard.enter()
 	if _menu_tween != null: _menu_tween.kill()
 	_menu_tween = create_tween()
@@ -139,8 +143,8 @@ func _finish_start() -> void:
 		Expedition.start()
 		goto("res://src/screens/expedition_map_screen.gd")
 		return
-	GameState.start_new_run("v03")
-	goto("res://src/screens/map_screen.gd")
+	load("res://src/expedition/room_run_state.gd").start()
+	goto("res://src/screens/room_map_screen.gd")
 
 
 func _on_expedition() -> void:
@@ -156,6 +160,7 @@ func _cancel_entry() -> void:
 	_starting = false
 	if _menu_tween != null: _menu_tween.kill()
 	_menu.modulate.a = 1.0
+	_wordmark.show(); _ornament.show(); _utilities.show()
 	_veil.color.a = 0.0
 	_courtyard.reset_camera()
 	_lock_buttons()
@@ -201,3 +206,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _starting and event.is_action_pressed("cancel_selection"):
 		_cancel_entry()
 		get_viewport().set_input_as_handled()
+
+
+func _on_continue_rooms() -> void:
+	if not _can_interact(): return
+	var run = load("res://src/expedition/room_run_state.gd").restore(load("res://src/expedition/room_run_state.gd").SAVE_PATH,true)
+	if run!=null: goto("res://src/screens/room_map_screen.gd")

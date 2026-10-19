@@ -1,0 +1,15 @@
+const fs=require('fs'),path=require('path');
+const root=__dirname;
+const rooms=JSON.parse(fs.readFileSync(path.join(root,'room-templates.json'),'utf8'));
+const kinds=['start','event','rest','battle','elite','boss','treasure','shop'];
+const names=['碑门小室','问字折庭','息灯荷庭','侧廊石庭','镇碑夹庭','墨渊终庭','荷池藏台','青铜字肆'];
+const cards=rooms.map((room,i)=>{
+ const image=String(i+1).padStart(2,'0')+'-'+kinds[i]+'.png';
+ const ports=room.ports.map(p=>p.side+' '+(p.role==='entry'?'入':'出')).join(' / ');
+ return `<article><a href="${image}" title="查看1600×1000原图"><img src="${image}" alt="${room.name}原生Godot房间样板"></a><div class="caption"><h2><span>${String(i+1).padStart(2,'0')}</span> ${names[i]} <b>${room.floor_size.join('×')}</b></h2><p>${room.description}</p><div class="ports">${ports}</div></div></article>`;
+}).join('');
+const html=`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>八类房间 · 园林样板</title><style>
+*{box-sizing:border-box}body{margin:0;padding:30px;background:#0a151d;color:#c8b894;font:15px/1.6 'Microsoft YaHei',sans-serif}header{display:flex;align-items:end;justify-content:space-between;gap:32px;margin-bottom:22px;border-bottom:1px solid #345058;padding-bottom:18px}h1{font-size:30px;font-weight:500;margin:0;color:#d1b782}header p{margin:5px 0 0;color:#93aaa6}header aside{text-align:right;color:#a08759;font-size:13px;white-space:nowrap}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}article{background:#10232a;border:1px solid #314b50;min-width:0}img{display:block;width:100%;aspect-ratio:8/5;object-fit:contain;background:#0a151d}.caption{padding:12px 16px 14px}h2{font-size:18px;font-weight:500;margin:0 0 7px}h2 span{font-size:13px;color:#8b9e99;margin-right:5px}h2 b{float:right;font-weight:400;color:#c3a56b}.caption p{font-size:13px;color:#a5b3ad;margin:0;min-height:42px}.ports{font-size:12px;letter-spacing:1px;color:#ba9d66;margin-top:7px}footer{display:flex;gap:24px;justify-content:space-between;margin-top:20px;font-size:13px;color:#93aaa6}footer p{margin:0;max-width:62%}a{color:#d1b782}nav{max-width:36%}nav a{display:inline-block;margin:0 0 7px 16px}@media(max-width:1500px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:760px){body{padding:16px}.grid{grid-template-columns:1fr}header,footer{display:block}header aside{text-align:left;margin-top:10px}footer p,nav{max-width:none}nav a{margin:10px 16px 0 0}}
+</style><header><div><h1>八类房间 · 冥府园林样板</h1><p>现有模型原生组装 · 统一丹青与朱砂配色 · 独立工作台实景截图</p></div><aside>单位：当前地面格<br>完整房间、门位与站位可在Godot中继续编辑</aside></header><main class="grid">${cards}</main><footer><p>为看清室内布局，临镜墙作预览剖低、前景门框淡化；完整围墙和门仍保留。四类门位变体可在工作台切换。通行线是设计预留，尚未替换正式随机地图与导航。</p><nav><a href="09-battle-four-doors.png">普通战四门变体</a><a href="10-ports-and-lanes.png">门位与通行示意</a><a href="11-treasure-opened.png">宝匣开启状态</a><a href="README.md">制作说明</a></nav></footer></html>`;
+fs.writeFileSync(path.join(root,'index.html'),html);
+console.log('Room gallery: '+rooms.length+' native views.');

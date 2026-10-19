@@ -1,0 +1,81 @@
+{
+  "image": "architecture-materials-v2.png",
+  "source": "C:/Users/Think/.codex/generated_images/01a14225-d98f-7ec1-8487-9756d6bd45de/exec-7e8117af-a5b9-4049-8056-492a689d9078.png",
+  "generator": "native image_gen.imagegen",
+  "attempts": 1,
+  "width": 1254,
+  "height": 1254,
+  "columns": 2,
+  "rows": 2,
+  "references": [
+    "../../docs/art-concepts/2026-10-16-mochi/reference-battle-style.png",
+    "../../docs/art-concepts/2026-10-16-mochi/02-mochi-environment.png"
+  ],
+  "surfaces": [
+    {
+      "id": "bronze_beast_wall",
+      "region": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "uv_rect": [
+        0,
+        0,
+        0.5,
+        0.5
+      ],
+      "use": "正视兽面青铜墙面；适合门阙或建筑正立面"
+    },
+    {
+      "id": "bronze_roof_tiles",
+      "region": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "uv_rect": [
+        0.5,
+        0,
+        0.5,
+        0.5
+      ],
+      "use": "暗青铜鱼鳞屋瓦；适合真实斜屋顶平面"
+    },
+    {
+      "id": "printing_drawer_wall",
+      "region": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "uv_rect": [
+        0,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "use": "青铜活字匣抽屉立面；无可读字"
+    },
+    {
+      "id": "stone_brick_wall",
+      "region": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "uv_rect": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "use": "暗青石砖立面；适合墙体、基座、岸壁"
+    }
+  ],
+  "notes": "原生输出原样复制，未重绘、裁切或缩放。四材质为平面颜色纹理，不是完整建筑或无缝地形拼接 atlas。采样每个区域内缩 1~2 像素可避免线性过滤串色。"
+}
