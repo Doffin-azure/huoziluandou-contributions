@@ -34,7 +34,7 @@ func _ready() -> void:
 
 
 func set_offer(caption: String, price: int, enabled: bool) -> void:
-	text = caption + (" · %d金币" % price if price >= 0 else "")
+	text = caption + (" · %d铜钱" % price if price >= 0 else "")
 	disabled = not enabled
 	model.set_offer(caption, price, enabled)
 	_caption.text = "%s\n%d金" % [caption, price]

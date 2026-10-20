@@ -43,6 +43,10 @@ const ENTRIES := {
 		"固定",
 		"本场每回合可用一次，用后留在原位。不能移动或替换，下回合恢复。"
 	],
+	"gold": [
+		"铜钱",
+		"战斗内货币。支付词效费用、商店与服务时消耗；战外结算时余金按每 5 点 1 分换算分数，不会转成别的资源。"
+	],
 	"gilded": [
 		"镀金",
 		"每次打出此字获得铜钱；组词也生效。永久保留。"
@@ -140,6 +144,7 @@ const TERMS := {
 	"效果重演": "replay", "原格返回": "return", "返回原位": "return", "易伤": "vulnerable", "心蚀": "corrosion",
 	"心力": "heart", "爆金": "bounty", "灼烧": "burn", "灼热污染": "scorch",
 	"再生": "regen",
+	"铜钱": "gold", "金币": "gold",
 	"溢热": "overflow", "储能": "energy", "热度": "heat", "热容": "capacity",
 	"非攻击伤害": "non_attack", "超强翻倍": "double_attack", "超强增幅": "double_attack", "被动收益": "double_passive", "可翻倍收益": "double_passive", "能力收益": "double_passive",
 	"结阵": "formation"

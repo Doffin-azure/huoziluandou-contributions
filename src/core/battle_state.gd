@@ -47,6 +47,7 @@ var reconnect_pending: Array = [] ## 重连：暂存原实体与原格 [{inst, p
 var empowered_glyphs: Dictionary = {}   ## 强化：本场额外触发单字效果的字
 var removed_this_battle: Array = []     ## 炼化：本场移出循环的牌
 var pierce_once := false                ## 墨途远征「重击」：本场第一次攻击无视护盾
+var ruin_revived := false               ## 生死簿：本场已经用过的复活（每场一次）
 var enemy_skip_turns := 0               ## 墨途远征「停火」：敌方跳过的行动次数
 ## 遗物（src/core/relics.gd）：开战时从 GameState 复制，按获得顺序
 var relics: Array = []
@@ -120,6 +121,7 @@ func start(deck: Array, enemy_datas: Array, seed_value: int = -1, track_achievem
 	empowered_glyphs.clear()
 	removed_this_battle.clear()
 	pierce_once = false
+	ruin_revived = false
 	enemy_skip_turns = 0
 	blackout_requested = false
 	end_turn_requested = false
@@ -223,8 +225,17 @@ func is_over() -> bool:
 	return not player.is_alive() or first_alive_enemy() == null
 
 ## 反死亡：本局存着的复活机会，倒下时满血站起来（也能抵消死亡、金像这类特殊死亡）
+## 生死簿：每场战斗一次，倒下时以「遗物参数·生死簿：复活保留生命百分比」复活（先用本场的，留住反死亡次数）
 func _check_revive() -> void:
-	if player == null or player.is_alive() or GameState.revive_charges <= 0:
+	if player == null or player.is_alive():
+		return
+	if relics.has("ruin") and not ruin_revived:
+		ruin_revived = true
+		var percent := BattleBalance.i("ruin_revive_percent", 20)
+		player.hp = maxi(1, int(round(player.max_hp * percent / 100.0)))
+		_log("生死簿：以 %d 气血复活" % player.hp)
+		return
+	if GameState.revive_charges <= 0:
 		return
 	GameState.revive_charges -= 1
 	player.hp = player.max_hp
@@ -597,6 +608,7 @@ func deal_damage(target: Combatant, amount: int, is_attack: bool = true) -> int:
 		if is_attack and target.status_stacks("gold_burst") > 0:
 			earn_gold(BattleBalance.i("bounty_on_hit", 1))
 			_log("爆金：%s 受击，获得 1 铜钱" % target.display_name)
+		Relics.on_enemy_wounded(self, target)
 		_check_bounty()
 	return real
 
@@ -941,8 +953,8 @@ func _execute_play_inner(play: Dictionary, shared: Dictionary) -> Dictionary:
 			var gild_gain := earn_gold(BattleBalance.i("gild_gold", 1)) if inst_g.gilded else 0
 			if gild_gain > 0:
 				if achievement != null: achievement.emit_metrics([{"metric": "gild_gold", "amount": gild_gain}])
-				result.messages.append("镀金：【%s】+%d 金币" % [inst_g.glyph(), gild_gain])
-				_log("镀金：【%s】+%d 金币" % [inst_g.glyph(), gild_gain])
+				result.messages.append("镀金：【%s】+%d 铜钱" % [inst_g.glyph(), gild_gain])
+				_log("镀金：【%s】+%d 铜钱" % [inst_g.glyph(), gild_gain])
 
 	# 心力：每打出一颗【心】，叠加一层心力
 	if has_ability("heart_power") and not discard_only:
@@ -1685,6 +1697,7 @@ func _tick_after_action(e: Combatant) -> void:
 			e.status_data.erase("burn_damage")
 		_log("灼烧：对 %s 造成 %d 伤害" % [e.display_name, real_b])
 		damage_dealt_this_turn += real_b
+		Relics.on_enemy_wounded(self, e)
 		_check_bounty()
 
 	# 心蚀：敌方每次行动后扣等量层数的血（不衰减）
@@ -1693,6 +1706,7 @@ func _tick_after_action(e: Combatant) -> void:
 		var real_hc := e.take_damage(hc * BattleBalance.i("corrosion_per_stack", 1))
 		_log("心蚀：对 %s 造成 %d 伤害" % [e.display_name, real_hc])
 		damage_dealt_this_turn += real_hc
+		Relics.on_enemy_wounded(self, e)
 		_check_bounty()
 
 

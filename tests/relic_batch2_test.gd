@@ -230,16 +230,59 @@ func _test_glyph_relics() -> void:
 
 # ---------------------------------------------------------------- 死 / 亡 / 死亡 / 反死亡
 func _test_death() -> void:
+	_ok(BattleBalance.warning.is_empty() and BattleBalance.i("judge_brush_vulnerable", -1) > 0 and BattleBalance.i("ruin_revive_percent", -1) > 0, "战斗数值表接入判官笔/生死簿参数（warning=%s）" % BattleBalance.warning)
 	_reset()
 	GameState.add_relic("death")
 	GameState.add_relic("ruin")
 	_ok(GameState.deck.any(func(c): return c.glyph() == "死") and GameState.deck.any(func(c): return c.glyph() == "亡"), "判官笔、生死簿：拾取时得到【死】【亡】")
-	var b := _battle([])
+	var si := Database.get_character_by_glyph("死")
+	var wang := Database.get_character_by_glyph("亡")
+	_ok(si.is_pollution and wang.is_pollution and si.solo_effects.is_empty() and wang.solo_effects.is_empty(), "【死】【亡】记为污染字且没有单字效果")
+
+	# 单打无收益，只腾出空格
+	var b := _battle(["death"], [], 0, 0)
 	var hp: int = b.enemies[0].hp
 	_clear_board(b)
 	_place(b, Vector2i.ZERO, "死")
-	b.try_play([Vector2i.ZERO])
-	_ok(b.enemies[0].hp == hp - 7, "【死】单字造成 7 伤害")
+	var solo := b.try_play([Vector2i.ZERO])
+	_ok(solo.ok and b.enemies[0].hp == hp and b.board.get_xy(Vector2i.ZERO) == null, "【死】单打无效果，只腾出空格")
+
+	# 判官笔：敌人首次跌破半血追加 4 层易伤，每个敌人每场一次
+	b = _battle(["death"], [], 0, 0)
+	var e: Combatant = b.enemies[0]
+	b.deal_damage(e, 101, true)
+	var brush_stacks := BattleBalance.i("judge_brush_vulnerable", 4)
+	_ok(e.hp == 99 and e.status_stacks("vulnerable") == brush_stacks, "判官笔：跌破半血追加 %d 层易伤（hp %d，当前 %d 层）" % [brush_stacks, e.hp, e.status_stacks("vulnerable")])
+	b.deal_damage(e, 1, true)
+	_ok(e.status_stacks("vulnerable") == brush_stacks, "判官笔：每个敌人每场只触发一次")
+	b = _battle([], [], 0, 0)
+	b.deal_damage(b.enemies[0], 101, true)
+	_ok(b.enemies[0].status_stacks("vulnerable") == 0, "没有判官笔时不会触发半血易伤")
+
+	# 生死簿：倒下时以 20% 最大生命复活，每场一次
+	b = _battle(["ruin"], [], 0, 0)
+	b.player.take_damage(999)
+	var ruin_percent := BattleBalance.i("ruin_revive_percent", 20)
+	var expect := int(round(b.player.max_hp * ruin_percent / 100.0))
+	var revived := not b.is_over()
+	_ok(revived and b.player.hp == expect, "生死簿：倒下时以 20%% 气血复活（%d／%d）" % [b.player.hp, b.player.max_hp])
+	b.player.take_damage(999)
+	_ok(b.is_over() and not b.is_victory(), "生死簿：每场只救一次")
+
+	# 生死簿优先消耗，保留本局反死亡的满血复活
+	b = _battle(["ruin"], [], 0, 0)
+	GameState.revive_charges = 1
+	b.player.take_damage(999)
+	b.is_over()
+	_ok(b.player.hp == expect and GameState.revive_charges == 1, "生死簿优先于反死亡，保留本局复活次数")
+	b.player.take_damage(999)
+	b.is_over()
+	_ok(b.player.hp == b.player.max_hp and GameState.revive_charges == 0, "第二次倒下才消耗反死亡的满血复活")
+	GameState.revive_charges = 0
+
+	# 彩蛋词本身的流程（不带生死簿）
+	b = _battle([], [], 0, 0)
+	GameState.revive_charges = 0
 	var r := _play_word(b, "反死亡", 1)
 	_ok(r.ok and GameState.revive_charges == 1, "【反死亡】：本局获得一次复活")
 	_play_word(b, "反死亡", 2)

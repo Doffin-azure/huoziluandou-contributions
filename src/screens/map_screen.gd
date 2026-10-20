@@ -51,7 +51,7 @@ func build(root: Control) -> void:
 
 func _build_header() -> Control:
 	var unit := JourneyStyle.touch_scale(self)
-	# 顶部状态行必须保持一行；HFlow 在桌面窄宽度下会把气血、金币、字袋、菜单
+	# 顶部状态行必须保持一行；HFlow 在桌面窄宽度下会把气血、铜钱、字袋、菜单
 	# 逐项换行，标题面板因此被撑成大块空白。
 	var row: Container = Ink.hbox(int(10 * unit))
 	if not _mobile:

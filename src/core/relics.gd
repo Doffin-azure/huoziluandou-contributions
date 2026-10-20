@@ -41,8 +41,8 @@ const DEFS := {
 	"goldleaf": ["泥金笔", "拾取时选两枚字，永久镀金", false],
 	"moon": ["月字模", "每场开局盘上多一枚临时【月】：它在场时，每次出字后其他字向它聚拢；打出【月】再聚拢一次；下回合消失", false],
 	"slot": ["叠字钱", "可以连出三枚相连的相同字，获得 50 铜钱", false],
-	"death": ["判官笔", "拾取时获得 1 枚【死】", false],
-	"ruin": ["生死簿", "拾取时获得 1 枚【亡】", false],
+	"death": ["判官笔", "拾取时获得 1 枚【死】；敌人生命首次降到一半以下时，获得 4 层易伤", false],
+	"ruin": ["生死簿", "拾取时获得 1 枚【亡】；每场战斗被击败时，以 20% 最大生命复活一次", false],
 	"rubbing": ["复字拓片", "拾取时选一枚字复制，保留镀金和强化", false],
 	"midas": ["金字碑", "所有己方字永久镀金，之后拿到的也镀金；一场战斗累计赚到 20 铜钱时，你化为金像，立即死去", false],
 	"monkey": ["许愿笺", "拾取时许一个愿：从 3 个有代价的愿望里选 1 个", false],
@@ -75,12 +75,12 @@ const EGG_EVERY := 4
 const WHEEL_DIRS := ["up", "down", "left", "right"]
 const WHEEL_TEXT := {"up": "上", "down": "下", "left": "左", "right": "右"}
 ## 事件遗物池：只能由事件发放，不进入商店、许愿、普通奖励等普通遗物池。
-const EVENT_ONLY := ["black_water", "life_lantern", "life_debt"]
+const EVENT_ONLY := ["black_water", "life_lantern", "life_debt", "death", "ruin"]
 ## 效果和配套事件还没做的遗物：不进任何池、不进图鉴；定义保留，旧存档里有也不报错
 const HIDDEN := ["black_water", "life_lantern"]
 ## 一局只生效一次的拾取效果：卖掉再买、再从事件拿到都不重复给（字、重铸、挑字、许愿）
 const ONCE_PICKUP := ["fireman", "chaos_dice", "death", "ruin", "goldleaf", "rubbing", "monkey"]
-## 连字环不自动打的词效：花金币、花储能、买字一类（"要付费的词留给你"）
+## 连字环不自动打的词效：花铜钱、花储能、买字一类（"要付费的词留给你"）
 const CHAIN_PAID_HANDLERS := ["spend_gold_damage", "bounty", "buyback", "buy_bag_solo", "energy_discharge",
 	"energy_to_bonus", "energy_to_heat_block", "energy_to_heat_damage", "solo_release"]
 
@@ -393,6 +393,20 @@ static func play_has_strike(glyphs: Array) -> bool:
 
 static func strike_bonus(b: BattleState, target: Combatant) -> int:
 	return BattleBalance.i("strike_damage", 2) if b.strike_active and b.relics.has("strike") and target != null and not target.is_player else 0
+
+
+## 判官笔：敌人生命**首次**降到一半以下时，追加易伤（每个敌人每场一次）
+static func on_enemy_wounded(b: BattleState, e: Combatant) -> void:
+	if e == null or e.is_player or not e.is_alive() or not b.relics.has("death"):
+		return
+	if e.hp * 2 > e.max_hp:
+		return
+	if bool(e.status_data.get("judge_brush", false)):
+		return
+	e.status_data["judge_brush"] = true
+	var stacks := BattleBalance.i("judge_brush_vulnerable", 4)
+	e.add_status("vulnerable", stacks)
+	b._log("判官笔：【%s】跌破半血，获得 %d 层易伤" % [e.display_name, stacks])
 
 
 ## 流火结算后

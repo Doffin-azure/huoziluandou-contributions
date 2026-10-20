@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource("1_rvlj1")
 plays_per_turn = 0
+heat_capacity = 6

@@ -4035,8 +4035,8 @@
           "rules/default_rules/heat_capacity",
           "基础规则",
           "初始热容",
-          10,
-          10,
+          6,
+          6,
           1,
           9999,
           "点",
@@ -4804,6 +4804,30 @@
           "场",
           "src/core/relics.gd: n % EGG_EVERY",
           "src/core/relics.gd"
+        ],
+        [
+          "core/judge_brush_vulnerable",
+          "判官笔",
+          "判官笔：敌人跌破半血易伤层数",
+          4,
+          4,
+          0,
+          999,
+          "层",
+          "处理器 on_enemy_wounded；敌人生命首次降到一半以下时追加易伤，每个敌人每场一次",
+          "src/core/relics.gd"
+        ],
+        [
+          "core/ruin_revive_percent",
+          "生死簿",
+          "生死簿：复活保留生命百分比",
+          20,
+          20,
+          1,
+          100,
+          "%",
+          "处理器 _check_revive；每场战斗第一次倒下时以最大生命的该百分比复活，优先于反死亡的满血复活",
+          "src/core/battle_state.gd"
         ]
       ],
       "parameter_table": true
@@ -14202,7 +14226,7 @@
       "source": "res://resources/rules/default_rules.tres"
     },
     "rules/default_rules/heat_capacity": {
-      "default": 10,
+      "default": 6,
       "min": 1,
       "max": 9999,
       "integer": true,
@@ -15271,6 +15295,30 @@
       "core": "egg_interval",
       "handlers": [],
       "source": "src/core/relics.gd"
+    },
+    "core/judge_brush_vulnerable": {
+      "default": 4,
+      "min": 0,
+      "max": 999,
+      "integer": true,
+      "label": "判官笔：敌人跌破半血易伤层数",
+      "name": "判官笔",
+      "group": "遗物参数",
+      "core": "judge_brush_vulnerable",
+      "handlers": [],
+      "source": "src/core/relics.gd"
+    },
+    "core/ruin_revive_percent": {
+      "default": 20,
+      "min": 1,
+      "max": 100,
+      "integer": true,
+      "label": "生死簿：复活保留生命百分比",
+      "name": "生死簿",
+      "group": "遗物参数",
+      "core": "ruin_revive_percent",
+      "handlers": [],
+      "source": "src/core/battle_state.gd"
     },
     "core/buyback_layer": {
       "default": 1,

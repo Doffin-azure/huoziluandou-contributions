@@ -119,7 +119,7 @@ static func legacy_preview(e: EffectData, b: BattleState, path: Array, target: D
 	var heat := b.player.heat
 	match e.handler:
 		"gold_percent_damage":
-			return "当前%d金币，对应%d基础伤害（%d%%，向下取整），不消耗金币。" % [GameState.gold, floori(maxi(0, GameState.gold) * maxi(0, e.amount) / 100.0), e.amount]
+			return "当前%d铜钱，对应%d基础伤害（%d%%，向下取整），不消耗铜钱。" % [GameState.gold, floori(maxi(0, GameState.gold) * maxi(0, e.amount) / 100.0), e.amount]
 		"repeat_last":
 			if b.last_played_glyphs.is_empty():
 				return "尚未打出任何字，无法复制；本次只弃掉【再】。"

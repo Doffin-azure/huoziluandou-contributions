@@ -1337,7 +1337,7 @@ func _choose_word_transfer(path: Array, target: Dictionary) -> bool:
 	options.append({"text": "取消"})
 	var overlay := ChoiceOverlay.new()
 	_solo_bag_picker_active = true
-	overlay.setup({"title": "%s：选择原实体" % word.word, "body": "选好字和空格后支付%d金币，保留原有强化。" % BattleBalance.i("buy_cost", 2), "options": options, "scroll_options":true, "cancel_index":cards.size()})
+	overlay.setup({"title": "%s：选择原实体" % word.word, "body": "选好字和空格后支付%d铜钱，保留原有强化。" % BattleBalance.i("buy_cost", 2), "options": options, "scroll_options":true, "cancel_index":cards.size()})
 	overlay.chose.connect(func(index):
 		_solo_bag_picker_active = false
 		if index < 0 or index >= cards.size():

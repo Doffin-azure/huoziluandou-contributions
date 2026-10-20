@@ -38,7 +38,9 @@ const EVENTS := [
 				{"type": "gold", "amount": 25},
 				{"type": "damage", "amount": 5},
 			]},
-			{"text": "绕道而行", "effects": []},
+			{"text": "拾起残簿（获得遗物「生死簿」）", "requires": {"type": "lacks_relic", "relic": "ruin"}, "effects": [
+				{"type": "gain_relic", "relic": "ruin"},
+			]},
 		],
 	},
 	{
@@ -363,7 +365,9 @@ const EVENTS := [
 				{"type": "gain_pollution", "character": "oblivion", "count": 1},
 			]},
 			{"text": "闭门不出（回复 15 气血）", "effects": [{"type": "heal", "amount": 15}]},
-			{"text": "从窗缝接字（获得 12 铜钱）", "effects": [{"type": "gold", "amount": 12}]},
+			{"text": "收下那支勾魂笔（获得遗物「判官笔」）", "requires": {"type": "lacks_relic", "relic": "death"}, "effects": [
+				{"type": "gain_relic", "relic": "death"},
+			]},
 		],
 	},
 	{

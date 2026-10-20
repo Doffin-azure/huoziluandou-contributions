@@ -47,7 +47,7 @@ func _test_pools() -> void:
 	_reset()
 	var normal: Array = Relics.normal_pool()
 	var event: Array = Relics.event_pool()
-	_ok(event == ["life_debt"] and normal.size() == Relics.DEFS.size() - 3 and event.has("life_debt") and not normal.any(func(id): return event.has(id)), "普通池与事件池分离：%d / %d" % [normal.size(), event.size()])
+	_ok(event.has("life_debt") and event.has("death") and event.has("ruin") and normal.size() == Relics.DEFS.size() - event.size() - 2 and not normal.any(func(id): return event.has(id)), "普通池与事件池分离：%d / %d" % [normal.size(), event.size()])
 	for id in event:
 		_ok(Relics.is_event_relic(id) and not normal.has(id), "事件遗物不进入普通池：%s" % Relics.name_of(id))
 	var rng := RandomNumberGenerator.new()
@@ -59,7 +59,7 @@ func _test_pools() -> void:
 	var leaked: Array = rolled.keys().filter(func(id): return event.has(id) or Relics.is_hidden(id))
 	_ok(leaked.is_empty(), "普通随机池 300 次不会滚出事件遗物或隐藏遗物 %s" % [leaked])
 	var event_rolled := Relics.roll_event_choices([], rng, 3)
-	_ok(event_rolled == ["life_debt"], "事件随机池只会滚出已实现的事件遗物 %s" % [event_rolled])
+	_ok(event_rolled.size() == event.size() and event_rolled.all(func(id): return event.has(id)), "事件随机池只会滚出事件遗物 %s" % [event_rolled])
 	_ok(Relics.is_hidden("black_water") and Relics.is_hidden("life_lantern") and not Relics.visible_ids().has("black_water") and not Relics.visible_ids().has("life_lantern"), "黑水墨、命灯未实现：隐藏，不进图鉴")
 	_ok(Relics.visible_ids().size() == Relics.DEFS.size() - 2, "图鉴可见 %d 件" % Relics.visible_ids().size())
 

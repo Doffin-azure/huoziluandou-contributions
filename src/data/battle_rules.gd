@@ -14,7 +14,7 @@ class_name BattleRules
 @export_group("节奏")
 @export var hand_size_hint: int = 6     ## 仅用于 UI 提示（GDD 中的 6 个空格）
 @export_group("V0.2 新规则")
-@export var heat_capacity: int = 10       ## 初始热容
+@export var heat_capacity: int = 6       ## 初始热容
 @export var allow_zero_effect_words: bool = true  ## P0 待决：合法零效词是否允许出掉
 @export var gold_cap_per_battle: int = 0          ## 战内铜钱收入上限；0 = 不限制（原型阶段开放）
 

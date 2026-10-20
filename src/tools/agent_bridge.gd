@@ -6,7 +6,7 @@ extends Node
 ##   "seed": 1,
 ##   "deck": [{"glyph":"击","count":2}, ...],     // 也可写 ["击","击","防",...]
 ##   "enemies": ["ink_spirit"],
-##   "rules": {"opening_draw":10, "turn_draw":3, "plays_per_turn":0, "heat_capacity":10},
+##   "rules": {"opening_draw":10, "turn_draw":3, "plays_per_turn":0, "heat_capacity":6},
 ##   "board": ["击","防","","", ...],             // 可选：16 格强制盘面
 ##   "actions": [ {"type":"play","path":[[0,0],[1,0]]}, {"type":"end_turn"} ],
 ##   "auto": false,                                // true=应用完 actions 后由贪心 bot 续跑

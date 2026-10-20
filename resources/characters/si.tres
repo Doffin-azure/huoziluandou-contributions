@@ -1,21 +1,14 @@
 [gd_resource type="Resource" script_class="CharacterData" format=3]
 
 [ext_resource type="Script" path="res://src/data/character_data.gd" id="1_i6oj0"]
-[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_yr5lw"]
-
-[sub_resource type="Resource" id="Resource_dw7ko"]
-script = ExtResource("2_yr5lw")
-handler = "damage"
-amount = 7
-note = "造成 7 伤害"
 
 [resource]
 script = ExtResource("1_i6oj0")
 id = "si"
 glyph = "死"
 pinyin = "si"
-description = "造成 7 伤害"
+description = "污染字：没有单字效果，可单打腾出空格。"
 tags = Array[String](["彩蛋"])
-solo_effects = Array[ExtResource("2_yr5lw")]([SubResource("Resource_dw7ko")])
-solo_handler = "damage"
-rarity = 3
+rarity = 0
+removable = false
+is_pollution = true

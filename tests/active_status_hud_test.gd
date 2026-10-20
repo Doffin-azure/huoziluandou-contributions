@@ -70,7 +70,7 @@ func _run() -> void:
 		var item: Dictionary = strip.entries.filter(func(entry): return entry.id == id)[0]
 		_ok(button != strip and button.get_child_count() == 2 and button.get_node("Glyph").text == item.glyph and button.get_node("Stacks").text == str(item.stacks), "%s 使用汉字与右下角数量，1 点也显示" % id)
 		_ok(button.tooltip_text.contains("点") and not button.tooltip_text.contains("层"), "%s 的实际单位和说明保留" % id)
-	_ok(strip.item_for("heat").tooltip_text.contains("热容 10") and strip.item_for("heat").get_node("Stacks").text == "3", "热容详情保留，方牌只显示汉字与实际热度")
+	_ok(strip.item_for("heat").tooltip_text.contains("热容 6") and strip.item_for("heat").get_node("Stacks").text == "3", "热容详情保留，方牌只显示汉字与实际热度")
 	_ok(strip.entries.any(func(item): return item.id == "draw_bonus_next" and item.stacks == 1) and strip.entries.any(func(item): return item.id == "ability:longword_draw"), "抽牌修正和无层数的持续能力仍按真实生效状态显示")
 	_ok(not strip.get_global_rect().intersects(_screen._player_hp_value.get_global_rect()) and not strip.get_global_rect().intersects(_screen._gold_strip.get_global_rect()), "桌面统一状态栏不挤压气血和铜钱")
 	var defense: DefenseDisplay = _screen._player_defense

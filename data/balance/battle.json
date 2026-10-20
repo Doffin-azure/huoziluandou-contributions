@@ -3721,8 +3721,8 @@
         "rules/default_rules/heat_capacity",
         "基础规则",
         "初始热容",
-        10,
-        10,
+        6,
+        6,
         1,
         9999,
         "点",
@@ -4332,6 +4332,30 @@
         "场",
         "src/core/relics.gd: n % EGG_EVERY",
         "src/core/relics.gd"
+      ],
+      [
+        "core/judge_brush_vulnerable",
+        "判官笔",
+        "判官笔：敌人跌破半血易伤层数",
+        4,
+        4,
+        0,
+        999,
+        "层",
+        "处理器 on_enemy_wounded；敌人生命首次降到一半以下时追加易伤，每个敌人每场一次",
+        "src/core/relics.gd"
+      ],
+      [
+        "core/ruin_revive_percent",
+        "生死簿",
+        "生死簿：复活保留生命百分比",
+        20,
+        20,
+        1,
+        100,
+        "%",
+        "处理器 _check_revive；每场战斗第一次倒下时以最大生命的该百分比复活，优先于反死亡的满血复活",
+        "src/core/battle_state.gd"
       ]
     ],
     "战斗机制": [
