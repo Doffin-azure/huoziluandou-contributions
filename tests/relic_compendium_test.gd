@@ -53,7 +53,7 @@ func _run() -> void:
 	var page := library._relic_page
 	_ok(page.is_visible_in_tree() and not library._scroll.visible, "遗物是图鉴内的独立子页面")
 	var cards := page._grid.get_children()
-	_ok(cards.size() == Relics.DEFS.size(), "全部 38 件遗物均有卡片")
+	_ok(cards.size() == Relics.DEFS.size(), "全部 %d 件遗物均有卡片" % Relics.DEFS.size())
 	var seen := {}
 	var names_ok := true
 	var descriptions_ok := true

@@ -49,6 +49,8 @@ const DEFS := {
 	"palindrome": ["反字模", "二字词可以倒着连出，发动原词效果；正着本身成词时按正着算", false],
 	"binding": ["串字绳", "同一行最左和最右两格视作相邻，可以跨边连词", false],
 	"proof": ["校勘尺", "本场每净化 2 枚污染字，随机补 1 字", false],
+	# ---- 补充
+	"vial": ["还魂墨", "每场开局回复 3 气血", false],
 }
 ## 拾取时要从字袋挑字的遗物：[动作, 挑几枚]。绑定类（压字石、蔓生墨）另见 DEFS 第三项。
 const PICK := {"goldleaf": ["gild", 2], "rubbing": ["copy", 1]}
@@ -66,6 +68,7 @@ const TIER := {
 	"fireman": 1, "fertilizer": 3, "skyfire": 2, "blitz": 2, "egg": 2, "buckler": 1, "barrier": 1, "empty_case": 2, "stay_wax": 2, "amber": 3, "ghost_hand": 2, "cracked_bottle": 2, "rotting_fruit": 2, "chaos_dice": 3, "black_water": 2, "life_lantern": 2, "life_debt": 2,
 	"chain": 3, "question": 2, "goldleaf": 2, "moon": 2, "slot": 2, "death": 1, "ruin": 1, "rubbing": 1,
 	"midas": 3, "monkey": 3, "palindrome": 2, "binding": 2, "proof": 1,
+	"vial": 1,
 }
 const PRICE := {1: 35, 2: 50, 3: 70}
 const EGG_EVERY := 4
@@ -194,6 +197,9 @@ static func on_battle_start(b: BattleState) -> void:
 	if b.relics.has("buckler"):
 		b.player.add_persistent_block(BattleBalance.i("buckler_block", 4))
 		b._log("铜护板：持久盾 +%d" % BattleBalance.i("buckler_block", 4))
+	if b.relics.has("vial"):
+		var healed := b.heal_player(BattleBalance.i("vial_heal", 3))
+		b._log("还魂墨：回复 %d 气血" % healed)
 	if b.relics.has("powerbank"):
 		b.add_energy(BattleBalance.i("powerbank_energy", 4))
 		b._log("蓄电瓶：储能 +%d" % BattleBalance.i("powerbank_energy", 4))

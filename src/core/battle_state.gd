@@ -935,7 +935,11 @@ func _execute_play_inner(play: Dictionary, shared: Dictionary) -> Dictionary:
 			for wid in words_played_this_turn:
 				distinct[wid] = true
 			abilities["vigor_next"] = distinct.size()
-		if _is_attack_word(word):
+		if _replays_attack(word):
+			# 连击重演了一个攻击词（可能是上回合的）：本回合算打出过攻击词，【回防】等条件能接上；
+			# 但不改写「上一个攻击词」，免得下一次连击重演的是连击自己
+			attack_words_this_turn += 1
+		elif _is_attack_word(word):
 			attack_words_this_turn += 1
 			last_attack_word = word
 			last_attack_glyphs = glyphs.duplicate()
@@ -1169,6 +1173,16 @@ func _is_attack_word(word: WordData) -> bool:
 		return false
 	for e in word.effects:
 		if e.is_attack():
+			return true
+	return false
+
+
+## 这个词是否带【连击】式重演，且确实有攻击词可重演
+func _replays_attack(word: WordData) -> bool:
+	if word == null or last_attack_word == null or last_attack_effects.is_empty():
+		return false
+	for e in word.effects:
+		if e.handler == "replay_last_attack":
 			return true
 	return false
 
