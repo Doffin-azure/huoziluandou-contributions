@@ -96,8 +96,9 @@ func run_checks() -> void:
 	room = prepare("treasure"); Router.current.refresh(); await frames(18)
 	check(Router.current_path.ends_with("reward_screen.gd") and Router.current._hud.heading=="荷池 · 藏字","treasure opens full reward stage")
 	await snap("treasure.png")
+	deck_before = GameState.deck_size()
 	Router.current._accept_pick(); await frames(15)
-	check(run.resolved.has(room) and run.tray.size()==1,"treasure selection reaches tray exactly once")
+	check(run.resolved.has(room) and GameState.deck_size()==deck_before+1,"treasure selection reaches deck exactly once")
 	check_cached()
 	var report := {"checks":checks,"failures":failures,"renderer":RenderingServer.get_current_rendering_method()}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT))

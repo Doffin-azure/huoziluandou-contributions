@@ -49,14 +49,9 @@ func build(root: Control) -> void:
 	_hud = preload("res://src/ui/object_stage/object_hud.gd").new()
 	_hud.heading = "幕末 · 馈赠" if is_boss else "战后 · 择字"
 	if _room_run and GameState.room_run.graph.rooms[GameState.room_run.current_room].kind=="treasure": _hud.heading = "荷池 · 藏字"
-	_hud.instruction = "选择一枚活字收入字匣，满时收入字袋。" if _expedition or _room_run else "选择字匣中的一枚活字，收入字袋。"
+	_hud.instruction = "选择一枚活字收入字匣，满时收入字袋。" if _expedition else "选择一枚活字收入字袋。"
 	_hud.status = "气血 %d / %d    金币 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
-	_hud.action_text = "收入字匣" if _expedition or _room_run else "收入字袋"
-	if _room_run:
-		_hud.status += "    字匣 %d / 6" % _reward_owner.tray.size()
-		if _reward_owner.tray.size()>=6:
-			_hud.instruction = "字匣已满，选中的活字将收入字袋。"
-			_hud.action_text = "收入字袋"
+	_hud.action_text = "收入字匣" if _expedition else "收入字袋"
 	_hud.secondary_text = "收下这幕的馈赠" if is_boss else "跳过 · 获得 %d 金币" % Expedition.SKIP_GOLD
 	if _room_run: _hud.secondary_text = "跳过 · 获得 %d 金币" % Expedition.SKIP_GOLD
 	_hud.on_action = _accept_pick

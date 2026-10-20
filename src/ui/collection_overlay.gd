@@ -13,6 +13,8 @@ var _word_grid: GridContainer
 var _scroll: ScrollContainer
 var _counts: Dictionary = {}
 var _relic_page: RelicCompendiumOverlay
+var _closing := false
+var _picked := false
 
 
 func setup(p_cfg: Dictionary) -> void:
@@ -62,7 +64,7 @@ func _build() -> void:
 		st.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		head.add_child(st)
 	head.add_child(Ink.expander())
-	var close := Ink.button("关闭")
+	var close := Ink.button(str(cfg.get("close_text", "关闭")))
 	close.theme_type_variation = "GhostButton"
 	close.custom_minimum_size = Vector2(90, 48 * JourneyStyle.touch_scale(self))
 	close.pressed.connect(_close)
@@ -156,11 +158,14 @@ func _populate_chars() -> void:
 
 
 func _on_dim_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		accept_event()
 		_close()
 
 
 func _on_card_clicked(ch: CharacterData) -> void:
+	if _closing or _picked: return
+	if cfg.get("pick_on_click", false): _picked = true
 	picked.emit(ch)
 	if cfg.get("pick_on_click", false):
 		_close()
@@ -191,14 +196,16 @@ func _populate_words() -> void:
 
 
 func _close() -> void:
+	if _closing: return
+	_closing = true
 	closed.emit()
 	queue_free()
 
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("cancel_selection"):
-		_close()
 		get_viewport().set_input_as_handled()
+		_close()
 
 
 func _layout_columns() -> void:

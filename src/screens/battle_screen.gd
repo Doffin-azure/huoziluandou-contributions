@@ -105,7 +105,6 @@ func build(root: Control) -> void:
 	battle.start(GameState.make_battle_deck(), enemy_datas, int(params.get("seed", -1)))
 	_expedition = params.get("expedition", false) and GameState.expedition != null
 	_room_run = params.get("room_run", false) and GameState.room_run != null
-	if _room_run: GameState.room_run.apply_battle_setup(battle)
 	if _expedition:
 		GameState.expedition.apply_battle_setup(battle)
 	_topbar = _build_topbar()
