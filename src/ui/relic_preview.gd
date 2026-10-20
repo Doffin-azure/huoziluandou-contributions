@@ -22,20 +22,20 @@ func _ready() -> void:
 	var environment := Environment.new()
 	environment.background_mode = Environment.BG_CLEAR_COLOR
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color("598579")
-	environment.ambient_light_energy = 0.6
+	environment.ambient_light_color = RelicArt.AMBIENT_COLOR
+	environment.ambient_light_energy = RelicArt.AMBIENT_ENERGY
 	var backdrop := WorldEnvironment.new()
 	backdrop.environment = environment
 	world.add_child(backdrop)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-42, -34, -12)
-	sun.light_color = Color("ffe1ad")
-	sun.light_energy = 1.05
+	sun.light_color = RelicArt.SUN_COLOR
+	sun.light_energy = RelicArt.SUN_ENERGY
 	world.add_child(sun)
 	var fill := OmniLight3D.new()
 	fill.position = Vector3(-3, 4, 4)
-	fill.light_color = Color("ffdcaa")
-	fill.light_energy = 1.8
+	fill.light_color = RelicArt.FILL_COLOR
+	fill.light_energy = RelicArt.FILL_ENERGY
 	fill.omni_range = 12
 	world.add_child(fill)
 	_pivot = Node3D.new()

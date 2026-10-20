@@ -26,23 +26,22 @@ func _run() -> void:
 	var environment := Environment.new()
 	environment.background_mode = Environment.BG_CLEAR_COLOR
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color("598579")
-	environment.ambient_light_energy = 0.45
+	environment.ambient_light_color = RelicArt.AMBIENT_COLOR
+	environment.ambient_light_energy = RelicArt.AMBIENT_ENERGY
 	var backdrop := WorldEnvironment.new()
 	backdrop.environment = environment
 	world.add_child(backdrop)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-42, -34, -12)
-	sun.light_color = Color("ffe1ad")
-	sun.light_energy = 0.85
-	sun.shadow_enabled = true
+	sun.light_color = RelicArt.SUN_COLOR
+	sun.light_energy = RelicArt.SUN_ENERGY
 	sun.shadow_bias = 0.015
 	sun.shadow_normal_bias = 0.3
 	world.add_child(sun)
 	var fill := OmniLight3D.new()
 	fill.position = Vector3(-3, 4, 4)
-	fill.light_color = Color("ffdcaa")
-	fill.light_energy = 1.8
+	fill.light_color = RelicArt.FILL_COLOR
+	fill.light_energy = RelicArt.FILL_ENERGY
 	fill.omni_range = 12
 	world.add_child(fill)
 	var camera := Camera3D.new()
@@ -95,6 +94,8 @@ func _run() -> void:
 	var sources := {}
 	for source in ["relic_specimen.gd", "relic_expansion.gd", "relic_mesh.gd", "relic_pigment.gdshader"]:
 		var source_path: String = "res://src/ui/object_stage/" + source
+		sources[source_path] = FileAccess.get_sha256(source_path)
+	for source_path in ["res://src/ui/relic_art.gd", "res://src/ui/relic_preview.gd", "res://src/tools/bake_relic_icons.gd"]:
 		sources[source_path] = FileAccess.get_sha256(source_path)
 	var file := FileAccess.open(OUTPUT + "manifest.json", FileAccess.WRITE)
 	file.store_string(JSON.stringify({"source": "res://src/ui/object_stage/relic_specimen.gd", "source_sha256": FileAccess.get_sha256("res://src/ui/object_stage/relic_specimen.gd"), "sources": sources, "renderer": "Godot orthographic shop pigments", "icons": manifest}, "\t"))

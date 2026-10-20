@@ -1,6 +1,12 @@
 extends RefCounted
 class_name RelicArt
 ## Transparent renders of the same specimens used on the shop counter.
+const AMBIENT_COLOR := Color("598579")
+const AMBIENT_ENERGY := 0.6
+const SUN_COLOR := Color("ffe1ad")
+const SUN_ENERGY := 1.05
+const FILL_COLOR := Color("ffdcaa")
+const FILL_ENERGY := 1.8
 const TEXTURES := {
 	"strike": preload("res://assets/relics/icons/strike.png"),
 	"breach": preload("res://assets/relics/icons/breach.png"),
