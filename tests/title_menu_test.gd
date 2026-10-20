@@ -74,6 +74,11 @@ func _run() -> void:
 	_press(title, "字库图鉴")
 	await _frames()
 	_ok(title._modal_count == 1 and title.find_children("*", "CollectionOverlay", true, false).size() == 1, "library button opens the real collection overlay")
+	var library: CollectionOverlay = title.find_children("*", "CollectionOverlay", true, false)[0]
+	_ok(is_instance_valid(library._relic_page), "production library includes the relic subpage")
+	library._show_tab("relics")
+	await _frames()
+	_ok(library._relic_page.is_visible_in_tree() and library._relic_page._grid.get_child_count() == Relics.DEFS.size(), "production relic tab shows every relic")
 	_press(title, "设置")
 	title._on_start()
 	title._on_custom()
