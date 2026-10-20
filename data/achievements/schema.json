@@ -1,0 +1,596 @@
+{
+  "version": 2,
+  "contract": "huozi.achievements.v2",
+  "categories": [
+    "组词入门",
+    "战斗技巧",
+    "储能热度",
+    "字块养成",
+    "污染解签",
+    "首领旅途"
+  ],
+  "scopes": {
+    "累计": "lifetime",
+    "单局": "run",
+    "单战": "battle",
+    "单回合": "turn",
+    "单次": "action"
+  },
+  "tiers": {
+    "素玉": {
+      "base": "#C7CDB1",
+      "edge": "#E2DDC4",
+      "etch": "#6A8D78",
+      "finish": "温润白玉，少量天然沁色"
+    },
+    "青玉": {
+      "base": "#71988C",
+      "edge": "#C0CDB1",
+      "etch": "#345F5B",
+      "finish": "青玉细纹，保留自然磨痕"
+    },
+    "金縫": {
+      "base": "#89A394",
+      "edge": "#B59A60",
+      "etch": "#375E56",
+      "finish": "青白玉，局部细金补缝"
+    },
+    "墨玉": {
+      "base": "#315F5A",
+      "edge": "#94B09C",
+      "etch": "#C3CEB0",
+      "finish": "深青玉，收敛金线与旧刻痕"
+    }
+  },
+  "metrics": [
+    {
+      "id": "word_plays",
+      "name": "成功组词",
+      "method": "累加",
+      "scopes": [
+        "累计",
+        "单战",
+        "单回合"
+      ],
+      "rule": "每个成功结算的多字词计1次。单打、无效连线、效果重演不计；结阵在实际发动时计。",
+      "hook": "AchievementBattle.finish_play：成功多字词快照",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "unique_words",
+      "name": "不同词语",
+      "method": "去重计数",
+      "scopes": [
+        "累计",
+        "单局",
+        "单战"
+      ],
+      "rule": "按词语ID去重。效果重演不新增；失败连线不计。",
+      "hook": "AchievementBattle.finish_play：WordData.id 去重",
+      "unit": "种",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "battle_wins",
+      "name": "战斗胜利",
+      "method": "累加",
+      "scopes": [
+        "累计",
+        "单局"
+      ],
+      "rule": "战斗胜利结算成功计1次；同一 battle_id 只计一次。",
+      "hook": "BattleScreen._check_outcome → AchievementBattle.finish",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "run_wins",
+      "name": "冒险通关",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "正式冒险完成最终胜利结算计1次；同一 run_id 只计一次。",
+      "hook": "RoomRun / Expedition 最终通关；EventBus.run_ended",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "attack_damage",
+      "name": "一次攻击伤害",
+      "method": "取最大",
+      "scopes": [
+        "单次"
+      ],
+      "rule": "同一次攻击所有实际命中段的扣血与吸盾之和。排除溢出伤害、污染伤害、灼烧等非攻击伤害。",
+      "hook": "BattleState.deal_damage / begin、end_attack_sequence：实际扣血与吸盾",
+      "unit": "伤害",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "persistent_shield",
+      "name": "持久盾峰值",
+      "method": "取最大",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "玩家持久盾变化后记录当前值。临时格挡不计。",
+      "hook": "Combatant.feedback + AchievementBattle.sample：玩家持久盾",
+      "unit": "点",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "flawless_wins",
+      "name": "无损获胜",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "战斗胜利且本战实际失去生命为0。自伤与污染伤害也计入失血，先受伤再治疗不算无损。",
+      "hook": "玩家 Combatant.feedback 累计实际失血 + 战斗胜利",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "energy_peak",
+      "name": "储能峰值",
+      "method": "取最大",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "玩家储能变化后记录当前值。只记实际获得，不记预览。",
+      "hook": "BattleState.add_energy / spend_energy；出字前后采样",
+      "unit": "点",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "energy_spent",
+      "name": "单次出字耗能",
+      "method": "取最大",
+      "scopes": [
+        "单次"
+      ],
+      "rule": "同一 play_id 内实际支付的储能合计，含效果重演的再次支付。金币抵扣消耗的储能也计；退款不倒扣。",
+      "hook": "BattleState.spend_energy → 当前 play_id 汇总",
+      "unit": "点",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "heat_peak",
+      "name": "热度峰值",
+      "method": "取最大",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "热度变化后记录实际当前值；提高热容不算热度增加。",
+      "hook": "BattleState.add_heat；出字与回合边界采样",
+      "unit": "点",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "overflow_created",
+      "name": "溢热生成",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "仅计溢热实际生成的自生灼热【热】。满盘未生成、抽回旧字、怪物塞字不计。",
+      "hook": "BattleOps.overflow：成功放入自生热后",
+      "unit": "字",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "heat_cooled",
+      "name": "单次出字降温",
+      "method": "取最大",
+      "scopes": [
+        "单次"
+      ],
+      "rule": "同一 play_id 内实际减少的热度合计；不能把不足的热度算进去。",
+      "hook": "BattleState.add_heat：同次出字实际减少值",
+      "unit": "点",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "burn_kills",
+      "name": "灼烧击败",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "敌人因既有灼烧结算死亡计1次。灼热字造成玩家伤害不计。",
+      "hook": "BattleState._enemy_act：灼烧扣血死亡",
+      "unit": "名",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "attack_hits",
+      "name": "一次攻击段数",
+      "method": "取最大",
+      "scopes": [
+        "单次"
+      ],
+      "rule": "一次攻击实际结算的命中段数。被盾全挡仍计1段；目标死亡后未结算的剩余段不计。",
+      "hook": "BattleState.deal_damage：每段实际结算后",
+      "unit": "段",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "gilded_tiles",
+      "name": "永久镀金",
+      "method": "累加",
+      "scopes": [
+        "累计",
+        "单局"
+      ],
+      "rule": "己方原字首次获得永久镀金时计1枚；同一字块重复镀金不计。",
+      "hook": "GameState.gild_character：己方原字 false → true",
+      "unit": "字",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "gild_gold",
+      "name": "镀金收益",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "仅计镀金实际发放金币。单打与组词均计；融合字块按实际发放数计。其他金币来源不计。",
+      "hook": "BattleState 出字镀金收益：earn_gold 实际返回值",
+      "unit": "金币",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "refine_uses",
+      "name": "精炼成功",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "【精炼】成功作用于目标字块计1次。无目标、取消、不满足条件不计。",
+      "hook": "BattleState.refine_pair：成功返回前",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "pinned_used",
+      "name": "固定字使用",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "有效单打或组词使用固定字，每枚字块每个 play_id 计1次。只固定但未使用不计。",
+      "hook": "AchievementBattle.begin、finish_play：固定字参与快照",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "fusion_success",
+      "name": "融合成功",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "实际把两枚字合为一个字块计1次，取消或条件失败不计。",
+      "hook": "BattleState.fuse_cards：成功返回前",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "extra_use_spent",
+      "name": "额外使用消耗",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "额外使用次数实际扣除1时计1次。固定字每回合使用机会不计。",
+      "hook": "BattleState 出字消耗：temporary_uses 实际扣除",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "temporary_word_tiles",
+      "name": "临时字组词",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "成功多字词中的临时字，每个 play_id 每枚字块计1次。普通临时字单打不计。",
+      "hook": "AchievementBattle.finish_play：成功多字词临时字快照",
+      "unit": "字",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "pollution_cleansed",
+      "name": "净化污染",
+      "method": "累加",
+      "scopes": [
+        "累计",
+        "单战"
+      ],
+      "rule": "实际移除的污染标签数。1字清除2种污染计2；普通签、区域标记与销毁字块不算净化。",
+      "hook": "BattleOps.cleanse_board / 邻字净化：实际移除标签数",
+      "unit": "种污染",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "polluted_word_tiles",
+      "name": "污染字组词",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "成功多字词中的带污染字块数。1字多污染只计1，同一 play_id 去重；普通签单独不算污染。",
+      "hook": "AchievementBattle.finish_play：出字前污染快照",
+      "unit": "字",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "replicate_removed",
+      "name": "蔓生未复制即移除",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "敌方蔓生字首次复制前，被玩家使用、净化或清除时计1枚。怪物死亡自动移除不计。",
+      "hook": "复制成功标记母字；出字后检查使用、净化与移除",
+      "unit": "字",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "fold_tasks",
+      "name": "折页解签",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "折页蛾签字按任务要求完成有效使用并触发解签奖励计1次；单纯移动、怪物死亡不计。",
+      "hook": "EnemyMechanics.update_targets：折页任务成功发奖",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "proof_tasks",
+      "name": "红蓝签完成",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "对校官的一组红蓝签任务全部达成时计1次；单独清掉一签不计。",
+      "hook": "EnemyMechanics.update_targets：红蓝签全部完成",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "rail_tasks",
+      "name": "压轨解签",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "铅轨机压轨任务全部完成并触发清轨奖励计1次；死亡自动清标不计。",
+      "hook": "EnemyMechanics.after_action：压轨清轨奖励",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "enemy_kills",
+      "name": "击败指定敌人",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "指定资源ID的敌人实际死亡计1名。召唤物按各自ID；同一敌人实例只计一次。",
+      "hook": "敌人 Combatant.feedback：实际死亡，每实例只记一次",
+      "unit": "名",
+      "filters": "boss_lead_plate,boss_word_demon,boss_chaos_press",
+      "status": "已接入"
+    },
+    {
+      "id": "nodes_completed",
+      "name": "完成旅途节点",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "完成一次可结算节点计1次。移动、重访、打开面板不计；同一 run_id/node_id 只计一次。",
+      "hook": "RoomRun / Expedition / GameState 节点结算",
+      "unit": "个",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "unique_events",
+      "name": "不同事件",
+      "method": "去重计数",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "完成选择并结算的事件按事件ID去重。打开后退出、同事件重复出现不新增。",
+      "hook": "RunHarness / RoomRun / Expedition / EventScreen 事件提交",
+      "unit": "种",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "shop_purchases",
+      "name": "商店购买",
+      "method": "累加",
+      "scopes": [
+        "单局"
+      ],
+      "rule": "成功付费购买1件商品计1次。刷新、出售、回购同一交易重放不计。",
+      "hook": "商店提交成功：稳定 achievement_offer 交易ID",
+      "unit": "件",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "relics_held",
+      "name": "持有遗物",
+      "method": "取最大",
+      "scopes": [
+        "单局"
+      ],
+      "rule": "以当前持有的不同遗物ID数量记录峰值。重复遗物与失去后重得不叠加。",
+      "hook": "GameState.add_relic / remove_relic：当前不同ID数量",
+      "unit": "件",
+      "filters": "",
+      "status": "已接入"
+    }
+  ],
+  "art": {
+    "shape": "natural_jade",
+    "shape_label": "玉符自然轮廓",
+    "style": "hand_drawn_nephrite",
+    "size": 512,
+    "padding": 40,
+    "background": "transparent",
+    "palette": [
+      "#0C3540",
+      "#5F8F82",
+      "#C4CDB1",
+      "#B99B61"
+    ],
+    "states": {
+      "locked": "同一玉符压暗，仍展示名称与条件",
+      "unlocked": "恢复玉材原色，显示已解锁",
+      "new": "解锁提示排队显示，查看总览后标记已读"
+    },
+    "files": "独立资源为512×512透明PNG或SVG；图标路径留空时使用已确认v6玉符图集；64像素检查辨识度。",
+    "forbidden": "不使用六边金属框、厚重徽章、鲜红高亮或重复主体；名称用繁体，图形不靠换色区分。"
+  },
+  "sheets": [
+    {
+      "name": "成就配置",
+      "columns": [
+        {
+          "name": "成就ID"
+        },
+        {
+          "name": "名称"
+        },
+        {
+          "name": "分类"
+        },
+        {
+          "name": "品质"
+        },
+        {
+          "name": "玩家说明模板"
+        },
+        {
+          "name": "目标值"
+        },
+        {
+          "name": "统计范围"
+        },
+        {
+          "name": "统计指标"
+        },
+        {
+          "name": "筛选值"
+        },
+        {
+          "name": "前置成就"
+        },
+        {
+          "name": "隐藏"
+        },
+        {
+          "name": "启用"
+        },
+        {
+          "name": "徽章ID"
+        },
+        {
+          "name": "排序"
+        }
+      ]
+    },
+    {
+      "name": "徽章美术",
+      "columns": [
+        {
+          "name": "徽章ID"
+        },
+        {
+          "name": "中心图形"
+        },
+        {
+          "name": "玉雕细节"
+        },
+        {
+          "name": "轮廓"
+        },
+        {
+          "name": "图标路径"
+        },
+        {
+          "name": "输出尺寸"
+        },
+        {
+          "name": "小图要求"
+        }
+      ]
+    },
+    {
+      "name": "指标字典",
+      "columns": [
+        {
+          "name": "指标ID"
+        },
+        {
+          "name": "名称"
+        },
+        {
+          "name": "统计方式"
+        },
+        {
+          "name": "允许范围"
+        },
+        {
+          "name": "触发与去重口径"
+        },
+        {
+          "name": "接入位置"
+        },
+        {
+          "name": "单位"
+        },
+        {
+          "name": "接入状态"
+        }
+      ]
+    }
+  ],
+  "runtime_status": "tracking_enabled"
+}

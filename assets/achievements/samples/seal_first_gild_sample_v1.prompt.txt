@@ -1,0 +1,22 @@
+Achievement: first_gild / 字上生金 / 铜蚀
+Badge: seal_first_gild
+Status: visual sample, not assigned to the Excel asset path yet.
+Tool: built-in image_gen (generation followed by a style edit).
+Delivery: high-resolution transparent PNG sample. Production target remains 512×512 with 40px clear padding and a circular motif safe zone of diameter352px; final size/padding export remains pending style review.
+
+INITIAL GENERATION
++Use case: stylized-concept.
+Asset type: one game achievement badge, an actual isolated UI art asset, not a mockup or presentation board.
+Create a single original badge for the achievement “字上生金” (first permanent gilding of a movable-type letter), following a Nine Sols / 九日 inspired Taoist science-fiction visual language: restrained hand-drawn Eastern ritual machinery, archaic bronze and precise incised mechanical lines, spare ink-like linework. Do not copy any existing logo or emblem.
+Exact composition: a regular six-sided hexagon with a vertex at top and bottom, perfectly symmetrical outer silhouette, centered straight-on, flat frontal view. Transparent background including every pixel outside the hexagon. Output square 512 × 512 PNG if supported, generous clear padding equal to 40px on a 512px canvas. Hexagon total height about 432px. All main motif details fit within a centered circular safe zone of diameter 352px at this scale.
+Subject: ONE large square Chinese movable-type printing block in the center, nearly flat low relief, with a legible single incised character “字”. The square type block has ONE narrow bright gold cut edge, clearly communicating gilding. A few broad, intentional angular etching lines connect the tile to the old bronze face like a ritual circuit; balanced negative space, no dense background patterns.
+Material: unlocked lowest-tier old copper etched metal. Muted old copper base #72513B, warm cut outer edge #C3986B, deep dark recessed etching #2E221B. Only the central movable-type tile edge carries restrained bright gold. Low reflectivity, subtle worn patina and a few carefully placed scratches. Single thin border, not multiple ornamental frame layers. Etch lines should read as carved recesses, not glowing neon.
+At 512px the external rim is about 12px thick and meaningful etching strokes are at least 6px thick. Strong readable silhouette and very clear central symbol at 64px.
+Style: refined 2D hand-painted game inventory icon, crisp shapes, graphic readability, modest physical texture, subtle low relief. No isometric view, no thick extrusion, no photoreal product photography.
+Avoid: additional badges, text labels, subtitles, achievement title, lettering other than the single “字”, numbers, watermark, stars, trophies, ribbons, gems, wings, dragon decorations, excessive filigree, neon glow, floating particles, drop shadow outside the silhouette, checkerboard painted into the background, background rectangle.
+
+STYLE EDIT
++Use case: style-transfer.
+Edit the provided achievement badge. Keep the same original regular point-up hexagonal silhouette, central square movable-type block with the exact single Chinese character “字”, narrow gilded edge around that block, old copper color family, and genuinely transparent background.
+Change the rendering toward flat hand-drawn Nine Sols / 九日 inspired Taoist science-fiction game UI art. The present result feels like a photographed heavy 3D cast medal; reduce it to a refined 2D etched bronze seal. Make the border a SINGLE slim rim about 12px thick at the intended 512px size. Remove the thick beveled extrusion, photorealistic rough mineral surface, excessive scratches, strong cast shadows and thick raised layers. Main motif and broad incised ritual-circuit grooves should be graphic, clean, and readable at 64px. Keep the motif sparse, with muted dark copper fill, charcoal recessed lines, and restrained gold only along the central type block edge. Preserve controlled small patina accents but use a painted flat finish with very low relief. No neon or heavy ornament.
+Production layout: final intended asset 512×512 PNG with alpha, point-up hexagon centered, transparent 40px padding on all four sides at that scale. Main motif within a centered circular safe area diameter352px. Each important groove at least6px wide at512. If possible output exactly512×512. No text labels, no extra badges, no background panel, no shadow outside the hexagon.

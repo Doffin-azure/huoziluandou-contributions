@@ -155,6 +155,9 @@ func _show_tab(mode: String) -> void:
 
 
 func _populate_chars() -> void:
+	if cfg.has("instances"):
+		_populate_instances()
+		return
 	var list: Array = cfg.get("characters", [])
 	if list.is_empty() and not cfg.has("characters"):
 		# 默认展示全部字库（排除污染物）
@@ -172,6 +175,33 @@ func _populate_chars() -> void:
 			wrapped.description = "×%d  " % cnt + ch.description
 			card.setup(wrapped)
 		card.clicked.connect(_on_card_clicked.bind(ch))
+		_grid.add_child(card)
+
+
+func _populate_instances() -> void:
+	var allowed: Array = (cfg.get("characters", []) as Array).map(func(ch): return ch.id)
+	var groups: Dictionary = {}
+	for inst: CharInstance in cfg.instances:
+		if inst == null or inst.data == null: continue
+		if cfg.has("characters") and not allowed.has(inst.id()): continue
+		var display := inst.display_data()
+		var key := display.id + "|" + display.glyph + "|" + display.description
+		if not groups.has(key):
+			var source: CharacterData = inst.data
+			for candidate: CharacterData in cfg.get("characters", []):
+				if candidate.id == inst.id():
+					source = candidate
+					break
+			groups[key] = {"display":display, "source":source, "count":0}
+		groups[key].count += 1
+	for group: Dictionary in groups.values():
+		var display: CharacterData = group.display
+		display.description = "×%d  " % group.count + display.description
+		if not str(cfg.get("modification_preview", "")).is_empty():
+			display.description += "\n修饰后：" + str(cfg.modification_preview)
+		var card := CharCard.new()
+		card.setup(display)
+		card.clicked.connect(_on_card_clicked.bind(group.source))
 		_grid.add_child(card)
 
 

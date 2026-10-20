@@ -9,11 +9,11 @@ const BOSS_HEAL_RATIO := 0.3
 var node: MapNodeData
 var _options: Array = []
 var _room_run := false
-var _expedition := false   ## 墨途远征：选中的字进字匣，回远征地图
+var _expedition := false   ## 墨途远征：选中的字直接入字袋，回远征地图
 var _cards: Array[GlyphOffer] = []
 var _showcase: Control
 var _hud: Control
-var _selected := 0
+var _selected := -1
 var _busy := false
 var _boss_heal := 0
 var _settled := false
@@ -42,6 +42,14 @@ func build(root: Control) -> void:
 	node = params.get("node", null)
 	_expedition = params.get("expedition", false) and GameState.expedition != null
 	var is_boss := node != null and node.type == MapNodeData.Type.BOSS
+	var reward_act: int = GameState.expedition.act if _expedition else GameState.act_index
+	if is_boss and reward_act >= 3:
+		if params.get("room_run", false) and GameState.room_run != null:
+			GameState.room_run._finish_final_boss()
+		elif not _expedition and not GameState.run_complete():
+			GameState.complete_current_node()
+		goto.call_deferred("res://src/screens/run_result_screen.gd", {"victory":true, "location":node.title})
+		return
 	var saved: Dictionary = params.get("_saved_screen", {})
 	_room_run = params.get("room_run", false) and GameState.room_run != null
 	if _room_run:
@@ -79,9 +87,9 @@ func build(root: Control) -> void:
 	_hud = preload("res://src/ui/object_stage/object_hud.gd").new()
 	_hud.heading = "幕末 · 馈赠" if is_boss else "战后 · 馈赠"
 	if _room_run and GameState.room_run.graph.rooms[GameState.room_run.current_room].kind=="treasure": _hud.heading = "荷池 · 藏字"
-	_hud.instruction = "活字与铜钱择一；遗物候选中选一件。" if _relic_pending else ("活字收入字匣；也可不择字换铜钱。" if _expedition else "选择一枚活字收入字袋，或不择字换铜钱。")
+	_hud.instruction = "活字与铜钱择一；遗物候选中选一件。" if _relic_pending else "选择一枚活字收入字袋，或不择字换铜钱。"
 	_hud.status = "气血 %d / %d    铜钱 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
-	_hud.action_text = "收入字匣" if _expedition else "收入字袋"
+	_hud.action_text = "收入字袋"
 	_hud.secondary_text = "收下这幕的馈赠" if is_boss else "跳过 · 获得 %d 铜钱" % Expedition.SKIP_GOLD
 	if _room_run: _hud.secondary_text = "跳过 · 获得 %d 铜钱" % Expedition.SKIP_GOLD
 	_hud.on_action = _accept_selected
@@ -94,13 +102,13 @@ func build(root: Control) -> void:
 		offer.character = ch
 		offer.caption = "%02d   %s" % [i + 1, ch.glyph]
 		offer.clicked.connect(_inspect.bind(i))
-		offer.hovered.connect(_inspect.bind(i))
 		root.add_child(offer)
 		_cards.append(offer)
 	_build_loot(root)
 	_showcase.layout_changed.connect(_layout_cards)
 	_layout_cards.call_deferred()
-	_inspect(0)
+	_hud.set_detail("点击活字选中", "左键点击一枚活字查看效果并选中，再点击领取按钮确认。")
+	_set_busy(false)
 	_showcase.stage.open_case()
 	if _relic_pending:
 		_inspect_relic(0)
@@ -113,7 +121,6 @@ func _build_loot(root: Control) -> void:
 	_gold_offer.name = "GoldReward"
 	_gold_offer.caption = "不择字 · +%d 铜钱" % Expedition.SKIP_GOLD
 	_gold_offer.tooltip_text = "放弃本次活字奖励，换取 %d 铜钱。" % Expedition.SKIP_GOLD
-	_gold_offer.hovered.connect(_inspect_gold)
 	_gold_offer.clicked.connect(_take_gold)
 	root.add_child(_gold_offer)
 	_relic_ids = [_relic_taken] if not _relic_taken.is_empty() else _relic_choices.duplicate()
@@ -124,7 +131,6 @@ func _build_loot(root: Control) -> void:
 		offer.name = "RelicReward_" + id
 		offer.caption = ("已领 · " if not _relic_pending else "") + Relics.name_of(id)
 		offer.tooltip_text = Relics.text(id)
-		offer.hovered.connect(_inspect_relic.bind(i))
 		offer.clicked.connect(_take_relic.bind(i))
 		root.add_child(offer)
 		_relic_offers.append(offer)
@@ -174,12 +180,12 @@ func _inspect_relic(index: int) -> void:
 
 
 func _update_reward_actions() -> void:
-	_hud.action_button.disabled = _busy or (_selected_kind == "relic" and not _relic_pending) or (_relic_pending and _selected_kind != "relic")
+	_hud.action_button.disabled = _busy or (_selected_kind == "glyph" and _selected < 0) or (_selected_kind == "relic" and not _relic_pending) or (_relic_pending and _selected_kind != "relic")
 	_hud.secondary_button.disabled = _busy
 	_hud.secondary_button.text = "比较遗物" if _relic_pending else "不择字 · +%d 铜钱" % Expedition.SKIP_GOLD
 	if _selected_kind == "relic": _hud.action_button.text = "领取遗物" if _relic_pending else "已领取"
 	elif _selected_kind == "gold": _hud.action_button.text = "换取 %d 铜钱" % Expedition.SKIP_GOLD
-	else: _hud.action_button.text = "收入字匣" if _expedition else "收入字袋"
+	else: _hud.action_button.text = "收入字袋"
 
 
 func _selected_object() -> int:
@@ -392,21 +398,12 @@ func _reward_pool(is_boss: bool) -> Array:
 
 func _with_hint(c: CharacterData) -> CharacterData:
 	var copy: CharacterData = c.duplicate()
-	var words := _words_for(c.glyph)
-	var hint := c.description
-	if not words.is_empty():
-		var shown := words.slice(0, 4)
-		hint += "\n可组：" + " / ".join(shown)
-	copy.description = hint
+	copy.description = EffectGlossary.character_hint(c)
 	return copy
 
 
 func _words_for(glyph: String) -> Array:
-	var out: Array = []
-	for w in Database.words.values():
-		if w.glyphs.has(glyph):
-			out.append(w.word)
-	return out
+	return EffectGlossary.words_for_glyph(glyph)
 
 
 func _on_pick(c: CharacterData) -> void:
@@ -465,23 +462,7 @@ func _leave() -> void:
 
 
 func _try_victory() -> void:
-	var overlay := ChoiceOverlay.new()
-	overlay.setup({
-		"title": "通关",
-		"body": "三幕已尽，字阵大成。你的字袋共 %d 枚实体字。" % GameState.deck_size(),
-		"options": [{"text": "再走一遍", "primary": true}, {"text": "返回标题"}],
-	})
-	overlay.chose.connect(_on_victory_choice)
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(overlay)
-
-
-func _on_victory_choice(index: int) -> void:
-	if index == 0:
-		GameState.start_new_run("v03")
-		goto("res://src/screens/map_screen.gd")
-	else:
-		goto("res://src/screens/title_screen.gd")
+	goto("res://src/screens/run_result_screen.gd", {"victory":true})
 
 
 func save_checkpoint() -> Dictionary:

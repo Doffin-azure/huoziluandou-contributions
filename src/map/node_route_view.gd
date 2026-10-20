@@ -9,6 +9,7 @@ var points := {}
 var _offset := 0.0
 var _overview := true
 var _unit := 1.0
+var _node_scale := 1.0
 var _pitch := 100.0
 var _span := 0.0
 var _down := Vector2.ZERO
@@ -90,14 +91,15 @@ func _layout() -> void:
 	var top := (40.0 if compact else 64.0)*_unit
 	# Reserve a clear corner for the floating actions, without a separate footer.
 	var bottom := 104.0*_unit
-	var height := maxf(120 * _unit, size.y - top - bottom)
+	var height := maxf(0, size.y - top - bottom)
 	for id: String in run.graph.rooms:
 		var data: Dictionary = run.layout.rooms[id]
 		var spec: Dictionary = run.graph.rooms[id]
 		var lane: float = clampf(float(data.lane), 0, 3)
 		var jitter: float = float(spec.get("jitter",0)) if id not in [run.graph.start,run.graph.boss] else 0
 		if compact: jitter *= .4
-		points[id] = Vector2(margin + (data.column + 1) * _pitch - _offset, top + (lane + jitter) / 3 * height)
+		points[id] = Vector2(margin + (data.column + 1) * _pitch - _offset, top + clampf(lane + jitter,0,3) / 3 * height)
+	_node_scale = clampf(height/(3*56*_unit),0.5,1.0)
 	queue_redraw()
 
 
@@ -233,7 +235,7 @@ func _draw_planning() -> void:
 	var end := plan_end()
 	for id: String in points:
 		var center: Vector2 = points[id]
-		var radius: float = (27 if run.graph.rooms[id].kind=="boss" else 23) * _unit
+		var radius: float = (27 if run.graph.rooms[id].kind=="boss" else 23) * _unit * _node_scale
 		if not plan_lit(id):
 			# 压暗：不在这一步能走到的格子
 			draw_circle(center, radius + 3 * _unit, Color(0.04, 0.07, 0.08, .68))
@@ -276,7 +278,7 @@ func _draw_node(id: String) -> void:
 	var abandoned: bool = run.sealed.has(id)
 	var planned: bool = run.planned_route.has(id)
 	var marked: bool = selected==id or _hover==id
-	var radius: float = (27 if spec.kind=="boss" else 23)*_unit
+	var radius: float = (27 if spec.kind=="boss" else 23)*_unit*_node_scale
 	var ink := Color("152e35")
 	var line := JourneyStyle.GOLD if current or available or planned else Color("7f8b7e")
 	var text := JourneyStyle.TEXT
@@ -293,7 +295,7 @@ func _draw_node(id: String) -> void:
 	if current or planned or marked:
 		draw_arc(center,radius+5*_unit,PI*.15,PI*.85,12,line,1.2*_unit,true)
 		draw_arc(center,radius+5*_unit,PI*1.15,PI*1.85,12,line,1.2*_unit,true)
-	_text(GLYPHS.get(spec.kind,"？"),center+Vector2(0,9*_unit),26,text)
+	_text(GLYPHS.get(spec.kind,"？"),center+Vector2(0,9*_unit*_node_scale),roundi(26*_node_scale),text)
 	var caption: String = "当前" if current else ("已行" if past else LABELS[spec.kind])
 	if current or marked and _unit<=1.1:
 		_text(caption,center+Vector2(0,43*_unit),14,JourneyStyle.GOLD if current or available else text)

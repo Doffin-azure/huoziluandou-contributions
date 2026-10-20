@@ -18,6 +18,7 @@ func _ready() -> void:
 		_streams[cue] = variants
 	for index in VOICES:
 		var player := AudioStreamPlayer.new()
+		player.bus = Settings.SFX_BUS
 		add_child(player)
 		_voices.append(player)
 	Settings.changed.connect(_on_settings_changed)
@@ -50,7 +51,7 @@ func play_cue(cue: String) -> void:
 	_voice = (_voice + 1) % VOICES
 	player.stream = _streams[cue][_variant % 3]
 	_variant += 1
-	player.volume_db = linear_to_db(Settings.sfx_volume) + (-9.0 if cue == "select" else -3.0)
+	player.volume_db = -9.0 if cue == "select" else -3.0
 	player.play()
 
 

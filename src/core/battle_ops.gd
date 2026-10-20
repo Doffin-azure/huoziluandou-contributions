@@ -151,6 +151,7 @@ static func spawn_scorch_into_bag(b: BattleState, count: int) -> int:
 		ci.add_pollution("scorch")
 		b.bag.insert(b.rng.randi_range(0, b.bag.size()), ci)
 		b.temp_chars.append(ci)
+	if b.achievement != null: b.achievement.emit_metrics([{"metric": "overflow_created", "amount": count}])
 	return count
 
 
@@ -440,6 +441,7 @@ static func cleanse_board(b: BattleState) -> int:
 	var n := 0
 	for c in b.board.cells:
 		if c != null and not c.pollutions.is_empty():
+			if b.achievement != null: b.achievement.emit_metrics([{"metric": "pollution_cleansed", "amount": c.pollutions.size()}])
 			c.clear_pollutions()
 			n += 1
 	return n
@@ -448,6 +450,7 @@ static func cleanse_scorch(b: BattleState) -> int:
 	var n := 0
 	for c in b.board.cells:
 		if c != null and c.has_pollution("scorch"):
+			if b.achievement != null: b.achievement.emit_metrics([{"metric": "pollution_cleansed", "amount": 1}])
 			c.remove_pollution("scorch")
 			n += 1
 	return n

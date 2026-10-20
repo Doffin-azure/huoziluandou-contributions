@@ -4,6 +4,7 @@ class_name ScreenBase
 
 var params: Dictionary = {}
 var content: Control
+var inventory_bar: Control
 
 
 func setup(p: Dictionary) -> void:
@@ -33,6 +34,24 @@ func _ready() -> void:
 	content.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(content)
 	build(content)
+	inventory_bar = preload("res://src/ui/run_inventory.gd").new()
+	inventory_bar.screen = self
+	add_child(inventory_bar)
+	resized.connect(_layout_inventory_bar)
+	_layout_inventory_bar()
+	if has_method("_layout"):
+		content.resized.connect(Callable(self, "_layout"))
+		Callable(self, "_layout").call_deferred()
+
+
+func _layout_inventory_bar() -> void:
+	var height := 64.0 * clampf(JourneyStyle.touch_scale(self), 1.0, 1.85)
+	var safe := ScreenLayout.safe_rect(self)
+	inventory_bar.position = safe.position
+	inventory_bar.size = Vector2(safe.size.x, height)
+	content.offset_top = safe.position.y + height
+	inventory_bar.update_scale()
+
 
 
 ## 子类重写

@@ -23,14 +23,16 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	for index in 2:
 		var player := AudioStreamPlayer.new()
+		player.bus = Settings.MUSIC_BUS
 		player.volume_db = SILENT_DB
 		add_child(player)
 		_players.append(player)
-	Settings.changed.connect(_apply_volume)
 
 
 ## 按屏幕脚本路径选曲；未知屏幕（调试工具等）不换曲。
 func track_for_screen(screen_path: String) -> String:
+	if screen_path.ends_with("/run_result_screen.gd"):
+		return "defeat"
 	if screen_path.ends_with("/title_screen.gd"):
 		return "title"
 	if screen_path.ends_with("/battle_screen.gd"):
@@ -43,6 +45,9 @@ func track_for_screen(screen_path: String) -> String:
 
 
 func for_screen(screen_path: String) -> void:
+	if screen_path.ends_with("/run_result_screen.gd") and bool(GameState.last_run_result.get("victory", false)):
+		play("explore")
+		return
 	var track := track_for_screen(screen_path)
 	if not track.is_empty():
 		play(track)
@@ -86,12 +91,5 @@ func _exit_tree() -> void:
 
 
 func _target_db() -> float:
-	return linear_to_db(maxf(Settings.music_volume, 0.001)) - 6.0
-
-
-func _apply_volume() -> void:
-	var player := _players[_active]
-	if _tween != null and _tween.is_running():
-		_tween.kill()
-		_players[1 - _active].stop()
-	player.volume_db = _target_db() if Settings.music_volume > 0.0 else SILENT_DB
+	# 用户音量由 BGM 总线控制，切曲淡入淡出只改变播放器增益。
+	return -6.0

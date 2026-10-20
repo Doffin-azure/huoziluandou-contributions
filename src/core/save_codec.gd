@@ -39,6 +39,7 @@ func pack(value: Dictionary) -> Dictionary:
 func _fields(object: Object) -> Dictionary:
 	var fields := {}
 	for property in object.get_script().get_script_property_list():
+		if object.get_script() == TYPES.battle and str(property.name) == "achievement": continue
 		if int(property.usage) & PROPERTY_USAGE_SCRIPT_VARIABLE:
 			fields[str(property.name)] = property
 	return fields
@@ -103,6 +104,11 @@ func unpack(data: Dictionary) -> Dictionary:
 		for key in fields:
 			if not node.fields.has(key) and not MONSTER_DEFAULT_FIELDS.get(node.type, []).has(key): return {}
 		for key in node.fields:
+			if node.type == "expedition" and key == "tray":
+				var legacy = _decode(node.fields[key], 0)
+				if not valid or not legacy is Array or not legacy.all(func(g): return g is String and Database.get_character_by_glyph(g) != null): return {}
+				object.set_meta("legacy_tray", legacy)
+				continue
 			if not fields.has(key): return {}
 			var encoded: Variant = node.fields[key]
 			# Crop legacy histories before decoding every old entry. Keep the same

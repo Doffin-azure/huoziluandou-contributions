@@ -26,6 +26,8 @@ static func execute(line: String) -> Array:
 		return _help()
 	if not _cmds.has(name):
 		return ["未知命令：/%s（用 /help 查看）" % name]
+	if name not in ["cls", "refresh", "style", "word", "char", "words-of"]:
+		Achievements.invalidate_run()
 	var args: Array = []
 	for i in range(1, parts.size()):
 		args.append(parts[i])
@@ -377,21 +379,13 @@ static func install() -> void:
 							break
 		_refresh_relics()
 		return [("移除：" if drop else "得到：") + ("、".join(done) if not done.is_empty() else "无变化"), "绑定类自动选未占用的字；/relic-bind 指定绑字，/relic-status 查看。战斗中改动下一场生效。"])
-	register("tray", "远征字匣放字：/tray 火热强", func(a):
-		var ex: Expedition = GameState.expedition
-		if ex == null or a.is_empty(): return ["用法：在远征地图里 /tray 火热强"]
-		for g in "".join(a):
-			if Database.get_character_by_glyph(g) != null: ex.tray.append(g)
-		var s = Router.current
-		if s != null and s.has_method("refresh"): s.call("refresh")
-		return ["字匣：" + "".join(ex.tray)])
 	register("forge", "远征：在当前位置打开熔炉面板（需站在熔炉上使用）", func(_a):
 		var ex: Expedition = GameState.expedition
 		if ex == null: return ["只在远征地图里可用"]
 		ex.push_panel({"kind": "forge", "k": ex.pos})
 		var s = Router.current
 		if s != null and s.has_method("refresh"): s.call("refresh")
-		return ["熔炉已打开：在字匣点两枚字"])
+		return ["熔炉已打开：从字袋点选两枚字"])
 	register("shop", "远征：在当前位置打开商店面板", func(_a):
 		var ex: Expedition = GameState.expedition
 		if ex == null: return ["只在远征地图里可用"]

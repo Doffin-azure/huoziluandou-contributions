@@ -1,6 +1,6 @@
 extends Control
 class_name SpeechBubble
-## 纸面词效按阅读顺序自然排布；长说明滚动，不把目标推到纸张底部。
+## 纸面词效按阅读顺序自然排布；长说明滚动，操作提示按需显示。
 enum State { IDLE, PREVIEW, RESULT, ERROR }
 
 var frame_details: EffectText
@@ -8,6 +8,7 @@ var title: Label
 var body: EffectText
 var _caption: Label
 var _context: EffectText
+var _context_rule: HSeparator
 var _column: VBoxContainer
 var _scroll: ScrollContainer
 var _state: int = State.IDLE
@@ -47,7 +48,8 @@ func _ready() -> void:
 	body = EffectText.new()
 	body.add_theme_constant_override("line_separation", 0)
 	_column.add_child(body)
-	_column.add_child(_rule())
+	_context_rule = _rule()
+	_column.add_child(_context_rule)
 	_context = EffectText.new()
 	_context.add_theme_font_override("normal_font", Ink.serif)
 	_context.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -73,7 +75,9 @@ func _rule() -> HSeparator:
 func set_context(text: String) -> void:
 	_context_text = text
 	if _context != null:
-		_context.set_effect_text(text.replace("\n", " · ").replace("污染代价：", "污染：") if compact or illustrated_scale > 0 else text)
+		_context.set_effect_text(text.strip_edges().replace("\n", " · ") if compact or illustrated_scale > 0 else text.strip_edges())
+		_context.visible = not text.strip_edges().is_empty()
+		_context_rule.visible = _context.visible
 
 
 func set_state(s: int) -> void:

@@ -28,11 +28,14 @@ func pick(screen: Control, title: String, completed: Callable) -> void:
 	for glyph: String in run.pending_glyphs:
 		var character: CharacterData = Database.get_character_by_glyph(glyph)
 		if character!=null: chars.append(character)
+	var instances: Array = GameState.deck
+	if run.phase=="rest_choose" and run.pending_kind=="upgrade":
+		instances = instances.filter(func(inst): return not inst.gilded)
 	var overlay := CollectionOverlay.new()
 	var counts := GameState.glyph_counts()
 	if run.phase == "event_choose": counts = preload("res://src/core/event_effects.gd").remaining_counts(run.pending_event_effect)
 	var subtitle := "还需 %d 枚" % int(run.pending_event_effect.get("remaining",1)) if run.phase == "event_choose" else ""
-	overlay.setup({"title":title,"subtitle":subtitle,"characters":chars,"counts":counts,"pick_on_click":true,"close_text":"取消选择"})
+	overlay.setup({"title":title,"subtitle":subtitle,"characters":chars,"instances":instances,"modification_preview": "镀金：每次有效打出额外获得%d铜钱，组词也生效，永久保留。" % BattleBalance.i("gild_gold", 1) if run.phase=="rest_choose" and run.pending_kind=="upgrade" else "","counts":counts,"pick_on_click":true,"close_text":"取消选择"})
 	overlay.picked.connect(func(character: CharacterData):
 		if generation!=_picker_generation or not _picker_open or not is_instance_valid(screen) or screen.is_queued_for_deletion() or not screen.is_inside_tree(): return
 		_picker_open = false; _picker_generation += 1

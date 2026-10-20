@@ -19,7 +19,7 @@ const WORDS := {
 	"分化": "删除1枚未固定的字，在它上下左右的空格生成可组词的临时字；也会参考被删的字。",
 	"分心": "补{a0}字，造成{a1}伤害，获得{a2}持久盾，回复{a3}生命。",
 	"分流": "移除至多{c_divert_limit}枚未固定的敌方字、临时字或自生污染字。不清除其他字上的污染。",
-	"利息": "获得{a0}铜钱。",
+	"利息": "对目标造成当前总金币的{a0}%基础伤害，向下取整。不消耗金币。",
 	"加强": "本场第N次打出【加强】，获得N层力量。重演不增加打出次数。",
 	"加急": "立即补{c_next_bonus_draw}字。",
 	"加收": "本回合敌人每成功塞入1字，获得{c_inject_bounty}铜钱。",
@@ -225,6 +225,8 @@ static func word(word_data: WordData, concise := false) -> String:
 	params.fee = "支付%d铜钱。" % cost if cost > 0 else ""
 	var template: String = SHORT.get(word_data.word, WORDS[word_data.word]) if concise else WORDS[word_data.word]
 	var result := template.format(params)
+	if word_data.word in ["火热", "电流过载", "电能", "能力", "流转", "蓄能", "连载"]:
+		result += "重复施放可叠加持续收益。"
 	var bonuses: Array[String] = []
 	var labels := {"damage": "伤害", "damage_multi": "每段伤害", "heal": "回复生命", "block_temp": "临时格挡", "block_persist": "持久盾", "energy": "储能", "gold": "铜钱", "heat": "热度", "draw_random": "补字数"}
 	for effect in word_data.effects:
@@ -313,6 +315,7 @@ static func character(data: CharacterData) -> String:
 
 static func clean(text: String) -> String:
 	var replacements := {
+		"金币": "铜钱",
 		"己方原实体": "己方原字", "己方实体字": "己方原字", "原实体": "原字", "实体字": "字块", "实体": "字块",
 		"施词以外": "本词之外", "非固定": "未固定", "临挡": "临时格挡", "待兑现": "待生效", "兑现": "生效", "预算": "次数", "超强翻倍": "超强增幅",
 		"正价支付": "付费", "本阶段储能净消费": "本回合已消耗储能（扣除退款）", "落地": "放入空格", "成词": "组词"

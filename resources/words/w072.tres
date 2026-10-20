@@ -5,23 +5,23 @@
 
 [sub_resource type="Resource" id="Economy_0"]
 script = ExtResource("1_dhn60")
-kind = 29
-handler = "gold"
-amount = 2
+kind = 0
+handler = "gold_percent_damage"
+amount = 10
 args = {}
-note = "立即获得2铜钱。"
+note = "对目标造成当前总金币的10%基础伤害，向下取整。不消耗金币。"
 
 [resource]
 script = ExtResource("2_itrjk")
 id = "w072"
 word = "利息"
 glyphs = Array[String](["利", "息"])
-description = "立即获得2铜钱。"
+description = "对目标造成当前总金币的10%基础伤害，向下取整。不消耗金币。"
 effects = Array[ExtResource("1_dhn60")]([SubResource("Economy_0")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "立即获得2铜钱。"
-effect_handler_id = "gold"
-implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
+effect_summary = "对目标造成当前总金币的10%基础伤害，向下取整。不消耗金币。"
+effect_handler_id = "gold_percent_damage"
+implementation_delta = "2026-10-20：改为当前总金币的10%基础伤害，向下取整，不消耗金币。"
 priority = "P3·补全词效"
 implemented = true

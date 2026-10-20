@@ -5,6 +5,9 @@ extends Node
 signal changed
 signal board_font_changed(font_id: String)
 
+const MUSIC_BUS := &"BGM"
+const SFX_BUS := &"SFX"
+
 const PATH := "user://settings.cfg"
 var storage_path := PATH
 
@@ -19,7 +22,7 @@ var board_font_id := BoardTypography.DEFAULT_ID
 var reduced_motion: bool = false
 var sfx_volume := 0.65
 var music_volume := 0.6
-var bgm_volume := 0.35
+var bgm_volume := 0.6
 var first_run_tutorial_completed := false
 var route_hint_seen := false
 
@@ -35,12 +38,30 @@ func _ready() -> void:
 		board_font_id = BoardTypography.normalize_id(stored_font)
 		reduced_motion = bool(_cfg.get_value("visual", "reduced_motion", false))
 		sfx_volume = clampf(float(_cfg.get_value("audio", "sfx_volume", 0.65)), 0.0, 1.0)
-		music_volume = clampf(float(_cfg.get_value("audio", "music_volume", 0.6)), 0.0, 1.0)
-		bgm_volume = clampf(float(_cfg.get_value("audio", "bgm_volume", 0.35)), 0.0, 1.0)
+		music_volume = clampf(float(_cfg.get_value("audio", "music_volume", _cfg.get_value("audio", "bgm_volume", 0.6))), 0.0, 1.0)
+		bgm_volume = music_volume
 		first_run_tutorial_completed = bool(_cfg.get_value("onboarding", "first_run_tutorial_completed", false))
 		route_hint_seen = bool(_cfg.get_value("guides", "route_hint_seen", false))
 		if stored_style != visual_style or _cfg.has_section_key("visual", "style") or stored_font != board_font_id or _cfg.has_section_key("visual", "board_font"):
 			_save()
+
+	_apply_audio_volumes()
+
+
+func _apply_audio_volumes() -> void:
+	_set_bus_volume(MUSIC_BUS, music_volume)
+	_set_bus_volume(SFX_BUS, sfx_volume)
+
+
+func _set_bus_volume(bus_name: StringName, volume: float) -> void:
+	var index := AudioServer.get_bus_index(bus_name)
+	if index < 0:
+		AudioServer.add_bus()
+		index = AudioServer.bus_count - 1
+		AudioServer.set_bus_name(index, bus_name)
+		AudioServer.set_bus_send(index, &"Master")
+	AudioServer.set_bus_mute(index, volume <= 0.0)
+	AudioServer.set_bus_volume_db(index, linear_to_db(maxf(volume, 0.001)))
 
 
 func set_drag_release_play(value: bool) -> void:
@@ -92,12 +113,15 @@ func set_reduced_motion(value: bool) -> void:
 
 func set_sfx_volume(value: float) -> void:
 	sfx_volume = clampf(value, 0.0, 1.0)
+	_set_bus_volume(SFX_BUS, sfx_volume)
 	_save()
 	changed.emit()
 
 
-func set_bgm_volume(value: float) -> void:
-	bgm_volume = clampf(value, 0.0, 1.0)
+func set_music_volume(value: float) -> void:
+	music_volume = clampf(value, 0.0, 1.0)
+	bgm_volume = music_volume
+	_set_bus_volume(MUSIC_BUS, music_volume)
 	_save()
 	changed.emit()
 
@@ -115,7 +139,5 @@ func set_board_font_id(font_id: String) -> void:
 	board_font_changed.emit(font_id)
 
 
-func set_music_volume(value: float) -> void:
-	music_volume = clampf(value, 0.0, 1.0)
-	_save()
-	changed.emit()
+func set_bgm_volume(value: float) -> void:
+	set_music_volume(value)

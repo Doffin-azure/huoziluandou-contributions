@@ -1,0 +1,88 @@
+Tool: built-in image_gen.
+Output: 48-seal atlas, 8 columns by 6 rows, Traditional Chinese names.
+Primary reference: user-supplied dark teal stone mechanism with five illuminated circular runes.
+Secondary reference: previous achievement atlas, used for layout and subject identity only.
+Production note: visual review atlas; not individual exported game icons. Original v1 remains intact.
+
++Use case: style-transfer.
+Image 1 is the NEW PRIMARY STYLE reference. Image 2 is the existing 48-badge atlas to redesign, used ONLY for the count, names, subjects, and 8-column × 6-row organization.
+Create ONE complete redesigned atlas containing all 48 achievement seals and their Traditional Chinese names. Match image 1's actual visual language closely.
+
+STYLE:
+Flat 2D hand-painted Taoist science-fiction stone machinery. Deep petrol teal and ink blue stone, dark angular incised outlines, broad flat shaded areas, subtle worn surface, very little ornamental detail. Each achievement should feel like one of the small glowing circular rune tokens inset into the large mechanical stone dial in image 1.
+Keep the requested six-sided POINT-UP HEXAGON outer silhouette for every badge, but make it a thin DARK TEAL STONE SOCKET, not a bright gold jewelry frame. Inside that hexagon place a round inset seal / simple mechanical dial with one bold minimal GEOMETRIC pictogram or rune. Use a few short straight radial connection lines, small circular nodes, and broken concentric grooves; emulate the restrained circular diagram and angular seal-script symbols in image 1.
+The central icon is a flat carved symbolic SIGN, not a rendered inventory object. Reduce the old atlas's books, shields, cubes, tools, bags and masks into distinctive simple geometric etched emblems. Readability and shape matter more than texture. Circle, rune and connection points can have a restrained colored inner light with a soft small halo as in image 1. Glow must never wash out the shape.
+Palette anchored in image 1: dominant dark turquoise #123D43 and #092931, stone teal #24545A. Limited accent lights: jade mint #76D2AB, ice cyan #71C7DF, coral vermilion #DD7D7D, aged ochre #B89A58, amber #DEA66F. Mix these five accents across badges in a controlled manner. No saturated electric neon, rainbow gradients, purple, pink fantasy enamel, beige paper faces or gold filigree.
+Do NOT carry over the previous atlas's ornate curling cloud borders, thick gold frames, bright cream parchment background, landscape borders, hanging plaques, ribbons, chunky 3D objects, highly detailed gold decoration, or cast-metal photography. This should be much quieter, simpler, darker, and closer to image 1.
+Do NOT copy the small rabbit character or reproduce the reference's whole circular room. This is an original achievement atlas.
+
+SHEET:
+One high-resolution landscape sheet, aim 4096×3584 if supported.
+Exactly 8 columns and 6 rows, 48 equal-size hexagonal seals, no missing or duplicate badges. Dark ink-teal stone background with subtle panel seams. Clean spacing. Thin subtle divider between category rows.
+Title exact text “蝕刻章總覽”, small and restrained, top center, pale stone gray.
+One understated Traditional Chinese category heading on the left of each row, no ornamental hanging plaques.
+Every seal's full Traditional Chinese name is written directly beneath it in clean legible pale ivory-gray Chinese typography, horizontal and consistently sized.
+All visible Chinese including any carved center glyphs MUST use correct TRADITIONAL forms. No English, no fake microtext, no watermark. Central glyphs may be angular seal-script inspired but remain recognizable. No Simplified 笔、词、识、热、础、净、红、蓝、铜、铅.
+
+EXACT ORDER, TITLES AND REDUCED GEOMETRIC MOTIFS:
+ROW 1 “組詞入門”
+落下第一筆 — single type tile with “筆”
+百詞成篇 — three linked tiles and “詞”
+千詞成卷 — minimal double-ended scroll rune
+識得十詞 — open-book rune and “識”
+詞庫漸豐 — book with four squared corner markers
+腹有詞章 — three stacked drawer bars like a stepped hill
+初戰告捷 — short straight sword across folded paper outline
+印成一卷 — closed-scroll rune and a small square stamp
+
+ROW 2 “戰鬥技巧”
+鋒芒初現 — one diagonal cut rune through a square
+一擊破陣 — angular three-part broken shield
+刻石成痕 — two split upright stone bars
+接字如流 — five linked flowing strokes
+連篇不絕 — repeated folding-page zigzag
+餘盾未散 — nested double-shield outline
+銅牆留印 — shield and three simplified brick courses
+毫髮無損 — intact shield and one feather stroke
+
+ROW 3 “儲能熱度”
+電光初蓄 — half-filled squared battery rune and lightning
+滿匣雷聲 — full squared battery rune with two lightning branches
+一放驚雷 — open battery base and broad upward lightning
+爐心漸赤 — bowl furnace rune with one coral flame
+熱字出爐 — square “熱” above furnace arc
+驟冷成霜 — ice rune pressing a tiny flame
+餘燼落字 — notched page rune and three ember points
+十響連擊 — central strike and three broken concentric rings
+
+ROW 4 “字塊養成”
+字上生金 — square “字” with restrained amber edge light
+三字鑲金 — three flat squares arranged as triangle
+字字有價 — “字” tile above three square-holed coin circles
+精工一字 — diagonal chisel mark against tile corner
+立字為礎 — square “礎” on wide anchored base
+二字合印 — two flat squares linked by mortise joint
+反覆打磨 — tile inside two open circular strokes
+借字成章 — solid tile linked to a dotted-outline tile
+
+ROW 5 “污染解籤”
+拂去墨污 — sweeping brush stroke clearing dark spot
+淨字成行 — three clean tiles and the single glyph “淨”
+污字亦成詞 — dark-spotted tile and connecting phrase line
+止於一字 — branched glyph cut by transverse stroke
+折頁解籤 — folded-page angle and severed tag string
+紅藍對校 — crossed tags bearing “紅” and “藍”, coral and ice-cyan accents
+移字出軌 — tile outside two straight rails
+一紙無塵 — clean empty page with sparse corner marks
+
+ROW 6 “首領旅途”
+破開鉛版 — rectangular printing plate split vertically
+字魔伏誅 — angular glyph-mask under two crossing seal strips
+平定混鉛 — three calm geometric ripple bands
+沿途留印 — three small footprints along an angular path
+百程入卷 — route line within scroll outline
+奇聞十錄 — little journal and three page markers
+行囊漸滿 — simple pouch rune, tile and coin
+舊物成藏 — shallow display frame with three simplified relic symbols
+
+Final priority: really match image 1's austere teal stone, circular dial etching, minimal geometric seal-runes and controlled soft colored light. Keep all 48 distinct icons and exact Traditional Chinese names.

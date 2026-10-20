@@ -1,5 +1,5 @@
 extends Node
-## 墨途远征 v0.3：地图生成对照原型 / 伏兵领地约束 / 无版面构筑 / 迷雾与首领追逐 / 拾字与字匣 / 赏 / 休息 / 商店 /
+## 墨途远征：地图、伏兵、无版面构筑、追逐、直接入字袋、赏、休息和商店。
 ## 战斗开场效果 / 战后与幕间 / 界面往返
 
 var _pass := 0
@@ -20,6 +20,14 @@ func _ok(condition: bool, description: String) -> void:
 
 
 func _run() -> void:
+	if OS.get_cmdline_user_args().has("--inventory"):
+		_test_no_layout()
+		_test_glyphs_and_tray()
+		_test_loot_rest_shop()
+		_test_finish_and_acts()
+		print("[expedition_inventory_test] PASS=%d FAIL=%d" % [_pass, _fail])
+		get_tree().quit(1 if _fail else 0)
+		return
 	_test_parity()
 	_test_generate()
 	_test_movers()
@@ -211,7 +219,7 @@ func _test_start_and_move() -> void:
 	var main_deck := GameState.glyph_counts()
 	ex = _fresh()
 	_ok(ex_deck == main_deck, "远征的战斗字袋 = 标准主线默认起始字袋（v03）")
-	_ok(GameState.expedition == ex and GameState.deck_size() == 12 and ex.tray.is_empty() and ex.ink == Expedition.START_INK, "开局：字袋 12、字匣空、墨4")
+	_ok(GameState.expedition == ex and GameState.deck_size() == 12 and not ex.get_property_list().any(func(p):return p.name == "tray") and ex.ink == Expedition.START_INK, "开局：仅字袋12枚，没有字匣库存")
 	_ok(ex.themes.size() == 4 and ex.m.tn == ex.themes[0] and ex.explored.has(ex.m.start), "三幕主题不重复；起点可见")
 	_ok(not ex.explored.has(ex.m.lair), "首领巢穴藏在迷雾里")
 	_ok(not ex.boss_revealed(), "开局看不见首领棋子")
@@ -387,7 +395,7 @@ func _test_glyphs_and_tray() -> void:
 	var ex := _fresh(21)
 	var g := _find(ex, func(k): return ex.m.glyph.has(k) and not ex.sealed(k) and ex.guard_of(k).is_empty())
 	ex.pos = g
-	_ok(ex.pickup() and ex.tray.size() == 1 and ex.taken.has(g), "散字：走过去就拾进字匣")
+	_ok(ex.pickup() and GameState.deck_size() == 13 and ex.taken.has(g), "散字：走过去直接拾进字袋")
 	var guarded := _find(ex, func(k): return ex.m.glyph.has(k) and not ex.guard_of(k).is_empty())
 	if guarded >= 0:
 		ex.pos = guarded
@@ -396,24 +404,19 @@ func _test_glyphs_and_tray() -> void:
 	if sealed >= 0:
 		ex.pos = sealed
 		_ok(not ex.pickup(), "被封的散字拾不走")
-	ex.tray = ["火", "火", "火", "火", "火", "火"]
 	var free := _find(ex, func(k): return ex.m.glyph.has(k) and not ex.taken.has(k) and not ex.sealed(k) and ex.guard_of(k).is_empty())
 	ex.pos = free
-	_ok(not ex.pickup() and ex.tray.size() == 6, "字匣 6 格，满了不能再拾字")
-	_ok(ex.tray_cap() == 6, "基础字匣6格")
-	ex.seals = ["活字盒"]
-	_ok(ex.tray_cap() == 8, "活字盒：字匣 +2")
-	ex.seals = []
+	_ok(ex.pickup() and GameState.deck_size() == 14, "拾字不需要腾出字匣容量")
+	_ok(not ex.has_method("tray_cap") and not ex.has_method("tray_to_deck") and not ex.has_method("discard"), "字匣容量、调配与丢弃接口移除")
+	_ok(not Expedition.SEALS.has("活字盒"), "字匣容量印章不再进入奖励池")
 	ex.gain_glyph("电")
-	_ok(GameState.deck_size() == 13, "字匣满了，发的字直接进字袋")
-	_ok(ex.tray_to_deck(0) and GameState.deck_size() == 14 and ex.tray.size() == 5, "字匣 → 字袋")
-	ex.discard(0)
-	_ok(ex.buyback == ["火"] and ex.tray.size() == 4, "丢字进回购清单")
-	ex.tray.clear()
+	_ok(GameState.deck_size() == 15 and GameState.deck[-1].glyph() == "电", "发字直接进入字袋")
+	for i in 10: ex.gain_glyph("火")
+	_ok(GameState.deck_size() == 25, "超过旧20枚限制仍直接获得活字")
 	var g2 := _find(ex, func(k): return ex.m.glyph.has(k) and not ex.taken.has(k) and not ex.sealed(k) and ex.guard_of(k).is_empty())
 	ex.pos = g2
 	ex.pickup()
-	_ok(ex.tray.size() == 1, "散字只拾一枚，没有词谱复制")
+	_ok(GameState.deck_size() == 26, "散字只拾一枚，没有词谱复制")
 
 
 func _test_loot_rest_shop() -> void:
@@ -441,7 +444,7 @@ func _test_loot_rest_shop() -> void:
 			if not base.has(p):
 				in_lib = false
 	_ok(in_lib and Database.get_word_by_glyphs(ex.roll_pair()) != null, "奖励字取自原游戏字库（同战后奖励 / 商店筛选与稀有度），成对的字是游戏词库里的词")
-	_ok(ex.shop_offers().filter(func(o): return o.kind == "glyph").size() == 3, "商店同原版：三枚字")
+	_ok(ex.shop_offers().filter(func(o): return o.kind == "glyph").size() == Expedition.SHOP_CARD_COUNT, "商店每批提供五枚字")
 	var big := _find(ex, func(k): return ex.m.node.has(k) and ex.m.node[k].t == "大")
 	ex.pos = big
 	ex.enter_cell()
@@ -488,13 +491,14 @@ func _test_loot_rest_shop() -> void:
 	_ok(ex.buyback_offers().size() == 1 and ex.price(ex.buyback_offers()[0]) == 7, "回购：丢掉的字半价买回")
 	# 熔炉
 	# 地图熔炉：两枚字换一枚稀有字
-	ex.tray = ["冷", "冷"]
+	GameState.deck.clear()
+	GameState.add_character(Database.get_character_by_glyph("冷"), 2)
 	ex.m = MapGen.generate(17, "熔铸坊")
 	for k in ex.m.mech:
 		if ex.m.mech[k].g == "炉": ex.pos = k; break
 	ex.push_panel({"kind": "forge", "k": ex.pos})
 	gold = GameState.gold
-	_ok(ex.forge(0, 1) and ex.tray.size() == 1 and Database.get_character_by_glyph(ex.tray[0]).rarity >= 2 and GameState.gold == gold, "熔炉：两字熔成一枚稀有字，无额外铜钱")
+	_ok(ex.forge(0, 1) and GameState.deck_size() == 1 and GameState.deck[0].data.rarity >= 2 and GameState.gold == gold, "熔炉：字袋两字熔成一枚稀有字，无额外铜钱")
 
 
 func _battle(ex: Expedition, f: Dictionary) -> BattleState:
@@ -598,12 +602,13 @@ func _test_finish_and_acts() -> void:
 	_ok(not ex.finish_act(), "幕间结算面板开着时不能重复结束")
 	_ok(not ex.has_method("act_settlement"), "幕间不再计算版面利息与投资")
 	ex.act = 1
-	ex.tray = ["火"]
+	GameState.add_character(Database.get_character_by_glyph("火"))
+	var carried := GameState.deck.duplicate()
 	while ex.top_panel().get("kind", "") != "act_end":
 		ex.pop_panel()
 	var th1: String = ex.m.tn
 	ex.next_act()
-	_ok(ex.act == 2 and ex.m.tn != th1 and ex.tray == ["火"] and ex.t == 0 and ex.stir == null, "进入第二幕：换主题、新地图，字匣 / 字袋 / 印章带过去")
+	_ok(ex.act == 2 and ex.m.tn != th1 and GameState.deck == carried and ex.t == 0 and ex.stir == null, "进入第二幕：换主题、新地图，字袋实体与印章保留")
 	ex.act = 3
 	ex.push_panel({"kind": "act_end"})
 	ex.next_act()
@@ -732,7 +737,7 @@ func _test_autoplay() -> void:
 					ex.buy(0)
 					ex.leave_panel()
 				"forge":
-					if ex.tray.size() >= 2:
+					if GameState.deck_size() >= 2:
 						ex.forge(0, 1)
 					else:
 						ex.leave_panel()
@@ -741,9 +746,6 @@ func _test_autoplay() -> void:
 				"relic_bind": ex.bind_relic(GameState.deck[0].id())
 				"act_end": ex.next_act()
 				_:
-					if not ex.tray.is_empty() and rng.randf() < 0.3:
-						if not ex.tray_to_deck(0): ex.discard(0)
-						continue
 					# 一半时间朝首领走（让每幕都能结束），一半随机探索
 					var opts: Array = MapGen.nbrs(ex.pos).filter(func(k): return ex.can_step(k))
 					if opts.is_empty():

@@ -1,0 +1,79 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 68 / 词 165 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS shop has an independent deck entry
+PASS shop deck entry fits and retains 48px touch height
+PASS shop browser contains the complete owned counts without duplicate overlays
+PASS shop browser does not select a destructive action
+PASS shop browsing spends no gold, glyph, RNG, node or rest action
+PASS rest has an independent deck entry
+PASS rest deck entry fits and retains 48px touch height
+PASS rest browser contains the complete owned counts without duplicate overlays
+PASS rest browser does not select a destructive action
+PASS rest browsing spends no gold, glyph, RNG, node or rest action
+PASS reverse exposes board inspection
+PASS peeking reveals the board while retaining the modal input lock
+PASS peeking cannot play, advance time or lose the pending path
+PASS ESC returns to the retained choice instead of closing or unlocking it
+PASS row and column choices scroll within the viewport
+PASS last column choice is reachable by scrolling
+PASS board inspection preserves choice scroll position
+PASS action releases input
+PASS reverse still executes after viewing the board
+PASS shop has an independent deck entry
+PASS shop deck entry fits and retains 48px touch height
+PASS shop browser contains the complete owned counts without duplicate overlays
+PASS shop browser does not select a destructive action
+PASS shop browsing spends no gold, glyph, RNG, node or rest action
+PASS rest has an independent deck entry
+PASS rest deck entry fits and retains 48px touch height
+PASS rest browser contains the complete owned counts without duplicate overlays
+PASS rest browser does not select a destructive action
+PASS rest browsing spends no gold, glyph, RNG, node or rest action
+PASS reverse exposes board inspection
+PASS peeking reveals the board while retaining the modal input lock
+PASS peeking cannot play, advance time or lose the pending path
+PASS ESC returns to the retained choice instead of closing or unlocking it
+PASS row and column choices scroll within the viewport
+PASS last column choice is reachable by scrolling
+PASS board inspection preserves choice scroll position
+PASS action releases input
+PASS reverse still executes after viewing the board
+ERROR: pollution preview states timing, each base damage and draw penalty
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/frontend_feedback_test.gd:22)
+       [1] run (res://tests/frontend_feedback_test.gd:150)
+       [2] open_page (res://tests/frontend_feedback_test.gd:37)
+       [3] frames (res://tests/frontend_feedback_test.gd:18)
+PASS pollution preview never damages, spends shields, applies penalties or consumes RNG
+ERROR: word preview retains pollution details
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/frontend_feedback_test.gd:22)
+       [1] run (res://tests/frontend_feedback_test.gd:158)
+       [2] open_page (res://tests/frontend_feedback_test.gd:37)
+       [3] frames (res://tests/frontend_feedback_test.gd:18)
+ERROR: fireproof preview matches the existing exemption
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/frontend_feedback_test.gd:22)
+       [1] run (res://tests/frontend_feedback_test.gd:163)
+       [2] open_page (res://tests/frontend_feedback_test.gd:37)
+       [3] frames (res://tests/frontend_feedback_test.gd:18)
+ERROR: empty pools warn before playing hui without changing its rule
+   at: push_error (core/variant/variant_utility.cpp:1023)
+PASS empty hints do not create a blank tooltip
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/frontend_feedback_test.gd:22)
+       [1] run (res://tests/frontend_feedback_test.gd:167)
+       [2] open_page (res://tests/frontend_feedback_test.gd:37)
+       [3] frames (res://tests/frontend_feedback_test.gd:18)
+PASS commit hover contains an explicit readable operation hint
+SCRIPT ERROR: Invalid assignment of property or key 'temp_funds' with value of type 'int' on a base object of type 'RefCounted (Combatant)'.
+   at: run (res://tests/frontend_feedback_test.gd:172)
+   GDScript backtrace (most recent call first):
+       [0] run (res://tests/frontend_feedback_test.gd:172)
+       [1] open_page (res://tests/frontend_feedback_test.gd:37)
+       [2] frames (res://tests/frontend_feedback_test.gd:18)

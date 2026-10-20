@@ -36,6 +36,7 @@ func _resume() -> void:
 
 
 func _run() -> void:
+	GameState.set_meta("courtyard_preview", true)
 	Settings.reduced_motion = true
 	if OS.get_cmdline_user_args().has("--restart-write") or OS.get_cmdline_user_args().has("--restart-read"):
 		await _restart_phase()
@@ -52,7 +53,7 @@ func _run() -> void:
 	GameState.player_hp = 39
 	GameState.node_index = 3
 	GameState.visited = {"1:1": true, "1:2": true}
-	GameState._reinvestments = [{"amount": 12, "due_battle": 4}]
+	GameState.permanent_damage_reduction = 3
 	var upgraded: CharacterData = GameState.deck[0].data.duplicate(true)
 	if not upgraded.solo_effects.is_empty(): upgraded.solo_effects[0].amount += 2
 	GameState.deck[0].data = upgraded
@@ -72,7 +73,7 @@ func _run() -> void:
 		await _capture_title(Vector2i(960, 432), "title-phone-landscape")
 		_ok(SaveManager.resume_run(), "Continue returns after screenshots")
 		await _frames()
-	_ok(GameState.reinvest_gold == 12 and GameState._reinvestments[0].due_battle == 4, "investment due battle preserved")
+	_ok(GameState.permanent_damage_reduction == 3, "permanent damage reduction preserved")
 	_ok(GameState.deck[0].gilded and GameState.deck[0].data.solo_effects[0].amount == upgraded.solo_effects[0].amount, "permanent glyph upgrades survive")
 	_ok(GameState.relic_binds.test_bind == GameState.deck[0].uid and CharInstance.new().uid > GameState.deck[0].uid, "UIDs and relic bindings survive")
 	_ok(GameState.rng.state == rng_state, "64-bit RNG state unchanged by resume")

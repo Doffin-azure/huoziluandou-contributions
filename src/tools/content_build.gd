@@ -370,7 +370,7 @@ static func word_effects(word: String) -> Array:
 		"电流": return [e("flow_energy_or_draw", 2, -1, "", "本回合已补字则储能 +2，否则补 2 字", {})]
 		# ---- 普通铜钱 / 镀金 ----
 		"投资": return [e("gild_glyph", 3, -1, "", WordDescriptionsS.TEXT[word], {"cost": 3})]
-		"利息": return [e("gold", 2)]
+		"利息": return [e("gold_percent_damage", 10, T.ENEMY, "", WordDescriptionsS.TEXT["利息"])]
 		"炼金": return [e("gold", 3), e("draw_random", 1)]
 		"纯金": return [e("gold", 3)]
 		"合金": return [e("alloy", 6, -1, "", "获得 6 持久盾与 2 铜钱", {"gold": 2})]

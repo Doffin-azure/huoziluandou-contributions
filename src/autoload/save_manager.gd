@@ -5,8 +5,8 @@ const VERSION := 1
 const MAX_BYTES := 8 * 1024 * 1024
 const ROUTES := ["map", "expedition_map", "battle", "reward", "shop", "rest", "event"]
 const STATE_FIELDS := ["deck", "player_max_hp", "player_hp", "gold", "act_index", "node_index",
-	"fork_choice", "visited", "permanent_damage_reduction", "gold_growth_percent", "battle_sequence",
-	"_reinvestments", "rng", "custom_deck", "expedition", "relics", "relic_binds", "relic_counters", "first_run_tutorial"]
+	"fork_choice", "visited", "permanent_damage_reduction", "battle_sequence",
+	"rng", "custom_deck", "expedition", "relics", "relic_binds", "relic_counters", "first_run_tutorial"]
 var enabled := false
 var save_path := "user://adventure.save"
 var last_error := ""
@@ -82,7 +82,7 @@ func checkpoint() -> bool:
 	var state := {}
 	for field in STATE_FIELDS: state[field] = GameState.get(field)
 	var codec := SaveCodec.new()
-	var graph := codec.pack({"state": state, "route": route, "params": local.get("params", {}), "screen": local.get("screen", {}), "revive_charges": GameState.revive_charges})
+	var graph := codec.pack({"state": state, "route": route, "params": local.get("params", {}), "screen": local.get("screen", {}), "revive_charges": GameState.revive_charges, "achievements":Achievements.export_run()})
 	if graph.is_empty():
 		_fail("无法编码当前冒险")
 		return false
@@ -158,10 +158,14 @@ func resume_run() -> bool:
 		return false
 	for field in STATE_FIELDS: GameState.set(field, saved.state[field])
 	GameState.room_run = null
+	GameState.last_run_result.clear()
+	GameState._run_end_emitted = false
+	Achievements.resume_run(saved.get("achievements", {}))
 	GameState.revive_charges = int(saved.get("revive_charges", 0))
 	# New generated entities must never collide with relic-bound or battle-only UIDs.
 	CharInstance._next_uid = maxi(CharInstance._next_uid, int(saved.get("next_uid", 1)))
 	GameState.rules = Database.rules
+	if GameState.expedition != null: GameState.expedition.migrate_legacy_inventory()
 	_active = true
 	_last_payload.clear()
 	EventBus.deck_changed.emit()
@@ -203,7 +207,8 @@ func _read_latest() -> Dictionary:
 
 func _valid_snapshot(saved: Dictionary) -> bool:
 	if not ROUTES.has(saved.get("route")) or not saved.get("state") is Dictionary or not saved.get("params") is Dictionary or not saved.get("screen") is Dictionary: return false
-	if saved.state.size() != STATE_FIELDS.size(): return false
+	for key in saved.state:
+		if key not in STATE_FIELDS and key not in ["gold_growth_percent", "_reinvestments"]: return false
 	for field in STATE_FIELDS:
 		if not saved.state.has(field): return false
 		var expected = GameState.get(field)

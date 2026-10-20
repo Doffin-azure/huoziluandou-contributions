@@ -1,0 +1,95 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 68 / 词 165 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS battle model construction never repeats combat gold settlement
+PASS battle glyphs, coins and relics share the actual counter
+PASS coin pile has batched 3D meshes and the real gold amount
+PASS (1280, 720)battle all loot targets fit and keep 48px touch areas
+PASS the counter remains visible without an automatic selection popup
+PASS (1280, 720)battle reward captions stay outside every displayed model
+PASS real coin click settles skip gold exactly once and leaves the reward
+PASS repeated or stale gold claim is rejected
+PASS elite model construction never repeats combat gold settlement
+PASS elite glyphs, coins and relics share the actual counter
+PASS coin pile has batched 3D meshes and the real gold amount
+PASS (1280, 720)elite all loot targets fit and keep 48px touch areas
+PASS the counter remains visible without an automatic selection popup
+PASS (1280, 720)elite reward captions stay outside every displayed model
+PASS pending relic blocks glyph and gold settlement
+PASS binding relic keeps the reward locked until its glyph is chosen
+PASS real model click grants the displayed relic and completes its continuation
+PASS unselected relics leave the counter and the saved candidate list clears
+PASS relic pickup never grants gold or a glyph twice
+PASS claimed relic receipt saves
+PASS resume keeps the received 3D relic without rerolling or regranting
+PASS real coin click settles skip gold exactly once and leaves the reward
+PASS repeated or stale gold claim is rejected
+PASS boss model construction never repeats combat gold settlement
+PASS boss glyphs, coins and relics share the actual counter
+PASS coin pile has batched 3D meshes and the real gold amount
+PASS (1280, 720)boss all loot targets fit and keep 48px touch areas
+PASS the counter remains visible without an automatic selection popup
+PASS (1280, 720)boss reward captions stay outside every displayed model
+PASS pending relic blocks glyph and gold settlement
+PASS real model click grants the displayed relic and completes its continuation
+PASS unselected relics leave the counter and the saved candidate list clears
+PASS relic pickup never grants gold or a glyph twice
+PASS claimed relic receipt saves
+PASS resume keeps the received 3D relic without rerolling or regranting
+PASS real coin click settles skip gold exactly once and leaves the reward
+PASS repeated or stale gold claim is rejected
+PASS battle model construction never repeats combat gold settlement
+PASS battle glyphs, coins and relics share the actual counter
+PASS coin pile has batched 3D meshes and the real gold amount
+PASS (640, 360)battle all loot targets fit and keep 48px touch areas
+PASS the counter remains visible without an automatic selection popup
+PASS (640, 360)battle reward captions stay outside every displayed model
+PASS glyph choice remains an alternative to the 3D gold pile
+PASS elite model construction never repeats combat gold settlement
+PASS elite glyphs, coins and relics share the actual counter
+PASS coin pile has batched 3D meshes and the real gold amount
+PASS (640, 360)elite all loot targets fit and keep 48px touch areas
+PASS the counter remains visible without an automatic selection popup
+PASS (640, 360)elite reward captions stay outside every displayed model
+PASS pending relic blocks glyph and gold settlement
+PASS binding relic keeps the reward locked until its glyph is chosen
+PASS real model click grants the displayed relic and completes its continuation
+PASS unselected relics leave the counter and the saved candidate list clears
+PASS relic pickup never grants gold or a glyph twice
+PASS claimed relic receipt saves
+PASS resume keeps the received 3D relic without rerolling or regranting
+PASS real coin click settles skip gold exactly once and leaves the reward
+PASS repeated or stale gold claim is rejected
+PASS boss model construction never repeats combat gold settlement
+PASS boss glyphs, coins and relics share the actual counter
+PASS coin pile has batched 3D meshes and the real gold amount
+PASS (640, 360)boss all loot targets fit and keep 48px touch areas
+PASS the counter remains visible without an automatic selection popup
+PASS (640, 360)boss reward captions stay outside every displayed model
+PASS pending relic blocks glyph and gold settlement
+PASS real model click grants the displayed relic and completes its continuation
+PASS unselected relics leave the counter and the saved candidate list clears
+PASS relic pickup never grants gold or a glyph twice
+PASS claimed relic receipt saves
+PASS resume keeps the received 3D relic without rerolling or regranting
+PASS real coin click settles skip gold exactly once and leaves the reward
+PASS repeated or stale gold claim is rejected
+PASS (1280, 720) three relic captions remain separate from models, HUD and each other
+PASS (1280, 720) all hovered reward poses keep captions readable
+PASS (1280, 720) received relic caption stays separate after pickup
+PASS (640, 360) three relic captions remain separate from models, HUD and each other
+PASS (640, 360) all hovered reward poses keep captions readable
+PASS (640, 360) received relic caption stays separate after pickup
+PASS animated relic pickup blocks other relics and gold before settlement
+PASS animated relic pickup grants only the selected candidate
+PASS received relic restores its full model scale after the take animation
+PASS coin animation locks repeated clicks before granting gold
+PASS animated coin pickup grants exactly one gold alternative
+PASS stale coin claim restores the model and releases controls without granting gold
+PASS retrying a rejected coin claim still settles once
+[reward_loot_3d_test] PASS=86 FAIL=0 TOTAL=86
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 1 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

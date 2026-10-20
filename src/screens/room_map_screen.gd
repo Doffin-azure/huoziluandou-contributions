@@ -102,11 +102,10 @@ func _sync_ui_scale() -> void:
 	if not is_instance_valid(_tools): return
 	JourneyStyle.apply(self)
 	var unit := JourneyStyle.touch_scale(self)
-	var compact := unit>1.1
+	var compact := ScreenLayout.safe_rect(self).size.y / unit < 600
 	_page.add_theme_constant_override("separation",roundi((8 if compact else 20)*unit))
 	_header.add_theme_constant_override("separation",roundi((8 if compact else 18)*unit))
-	for side in ["margin_left","margin_top","margin_right","margin_bottom"]:
-		_page.get_parent().add_theme_constant_override(side,roundi((12 if compact else 28)*unit))
+	ScreenLayout.margins(_page.get_parent(),self,(12 if compact else 28)*unit)
 	_act_title.add_theme_font_size_override("font_size",roundi((22 if compact else 30)*unit))
 	_stats.add_theme_font_size_override("font_size",roundi((17 if compact else 23)*unit))
 	for button in find_children("*","Button",true,false):
@@ -131,6 +130,10 @@ func resume_session() -> void:
 
 func refresh() -> void:
 	if _routing: return
+	if run.phase in ["defeat", "victory"]:
+		_routing = true
+		goto.call_deferred("res://src/screens/run_result_screen.gd")
+		return
 	_update_stats()
 	if run.phase=="battle": return
 	var node_screen: String = {"reward":"reward_screen.gd", "event":"event_screen.gd", "event_choose":"event_screen.gd",
@@ -275,5 +278,5 @@ func _open_deck() -> void:
 		var character := Database.get_character_by_glyph(glyph)
 		if character!=null: chars.append(character)
 	var overlay := CollectionOverlay.new()
-	overlay.setup({"title":"字袋", "subtitle":"%d 枚实体字" % GameState.deck_size(), "characters":chars, "counts":counts})
+	overlay.setup({"title":"字袋", "instances":GameState.deck, "subtitle":"%d 枚实体字" % GameState.deck_size(), "characters":chars, "counts":counts})
 	add_child(overlay)

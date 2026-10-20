@@ -1,0 +1,37 @@
+Tool: built-in image_gen edit.
+Source: achievement_atlas_jade_v3.png.
+Revised subjects: 落下第一筆 / 紅藍對校 / 止於一字 / 沿途留印.
+Direction: retain the approved celadon/ivory jade style; reduce foreground vermilion; preserve all48 labels and layout; update corresponding small UI samples.
+Status: visual review atlas, not individually exported runtime icons.
+
++Use case: precise-object-edit.
+Edit the attached jade achievement atlas. The user APPROVES its jade material, 48-icon family, painterly game background, restrained celadon/ivory/antique-gold aesthetic, and compact icon sizing. Preserve those. Make only the requested icon design revisions and reduce intrusive RED on foreground icons.
+
+INVARIANTS:
+Keep exactly the same atlas, title “玉符成就總覽”, 8 columns × 6 category rows with all48 achievements and their labels. Keep all Traditional Chinese names and category text unchanged, exact placement and consistent type. Preserve the background scenery, red maple foliage, moon, cream paper header, gold dividers, jade palette, material quality, light direction, and all other icon subjects. No added frames around icons, no large medals, no bright neon. Do not change unrelated designs.
+These are tiny hand-painted carved-jade objects, slim and elegant, with visible nephrite grain and soft edge translucency, not realistic jewelry photography or blocky inventory models.
+
+REPLACE THESE FOUR SPECIFIC DESIGNS:
+1) “落下第一筆”, row1 column1:
+Replace the generic rectangular hanging tile with an elegant SMALL JADE CALLIGRAPHY BRUSH making its first ink stroke. A slim pale-celadon jade handle, tiny old-gold ferrule, dark-ink brush tip, alongside a small thin ivory-jade writing slip carrying the single freshly written Traditional-compatible stroke “一”. Use graceful diagonal composition. The brush and first ink stroke communicate beginning word-writing; a large written “筆” on a pendant is no longer the main motif. No red cord. Clear silhouette at small UI size.
+
+2) “紅藍對校”, row5 column6:
+Replace the large red/blue hanging-tag effect with a PAIR OF MATCHING PROOFREADING JADE SLIPS, one ivory jade and one deep blue-green jade. Thin narrow carved pieces, slightly angled toward each other, their complementary small notches visually align to show checking and matching. Each carries one clean Traditional Chinese glyph: ivory slip “紅”, blue-green slip “藍”. Both glyphs predominantly dark ink. One tiny faded cinnabar proof mark on the ivory slip and one subtle ink-teal proof mark on the green slip, rather than saturated colored labels. No long red cords, red bows, or broad red fill. Tasteful, scholarly, harmonious.
+
+3) “止於一字”, row5 column4:
+Replace the current branch with its large bright RED crossbar. New motif: ONE small celadon movable-type jade block cleanly engraved with Traditional “連”; a delicate incised budding vine near one edge is visibly interrupted by a tiny clean cut, with two small jade bud fragments resting immediately beside it. Symbolize stopping replication before it branches. Keep the jade carving poetic and compact, clear central single-letter block, sparse cut-vine detail. No big horizontal barrier, no prohibition symbol, no traffic-sign look, no red bar, no branch floating by itself.
+
+4) “沿途留印”, row6 column4:
+Remove the LITERAL HUMAN FOOTPRINTS entirely. New motif: a slender gently winding JADE PATH SLIP, pale celadon and ivory, with THREE small SQUARE SEAL IMPRESSIONS inset along the path and a few fine trail grooves. The little square impressions are glyph-print marks, NOT footprints. Evokes a wordsmith leaving printing-seal traces across a journey. Quiet, elegant compact silhouette, no miniature landscape or plaque.
+
+RED RESTRAINT across FOREGROUND ICONS ONLY:
+Reduce bright vermilion/cinnabar accents by roughly two-thirds. The dominant material must be jade. Wherever a cord exists, shorten it and use subdued dark oxblood / muted tea-brown / old gold where appropriate; not bright crimson.
+- “爐心漸赤”, “熱字出爐”, “餘燼落字”, “十響連擊”: keep heat legible through JADE-CARVED flame shapes, warm muted amber or tiny dim cinnabar insets; avoid big saturated red flames and fiery red splashes. Fire accents should be secondary, elegant and sculptural.
+- “字魔伏誅”: keep its angular jade mask but make red facial/strap details small, dark desaturated cinnabar, no bright red striped cheeks dominating the pale jade.
+- Other foreground jade icons remain as close as possible to the original.
+
+BOTTOM “介面尺寸示意” strip:
+Keep this strip. Update the first tiny sample to the new jade brush design and the red/blue pair sample to the new matching jade-slip design; reflect the subdued heat coloring in small samples. Other samples stay unchanged.
+
+IMPORTANT:
+All visible Chinese text stays Traditional. Do not add English labels, design annotations, edit arrows or explanations. Return one complete edited final image, same composition and readability, high resolution.

@@ -1,0 +1,92 @@
+Tool: built-in image_gen, generation followed by a style edit.
+Purpose: 48-achievement art overview, 8 columns by 6 rows, Traditional Chinese lettering.
+Source definitions: data/achievements/catalog.json (48 achievements in configured order).
+Reference roles: user image 1 = hexagonal ornamental pattern language; user image 2 = ink teal / jade / antique gold / vermilion / parchment palette.
+This is an atlas for art review; individual production asset paths remain unchanged.
+
+INITIAL GENERATION
++Use case: stylized-concept.
+Create ONE very high resolution, polished game achievement badge atlas / art direction sheet containing ALL 48 unique hexagonal etched seals listed below, with their exact Traditional Chinese names. This is a single finished image for the game designer to review, not individual files.
+Input image 1 is the ORNAMENT AND SHAPE reference ONLY: fine hexagonal frames, symmetrical ritual ornaments, lively illustrated pictograms, carved talisman/lotus/scroll motifs, flat East Asian fantasy game icon language. Input image 2 is the COLOR AND MATERIAL reference ONLY: deep ink teal, dark jade, antique brass gold, vermilion red, warm ivory rice paper. Match image 2's muted game palette closely. Do NOT use the pink, purple, magenta or pastel cyan palette from image 1. Do NOT reproduce the game screenshot or any interface from image 2.
+Art direction: original Nine Sols / 九日 inspired Taoist science-fiction achievement seals. Refined 2D illustrated etched/enamel seals, slim antique-gold point-up regular HEXAGON frames, ink-teal recessed faces, ivory and desaturated jade motifs, limited vermilion accents. Crisp clean ornamental strokes and balanced bilateral or radial symmetry like reference 1; glyph printing motifs combined with ritual mechanical ornament. Flat graphic shading and delicate engraved linework, not photographed metal or massive beveled 3D coins. Each badge must have a clear distinctive central pictogram specified below, with a modest ceremonial decorative border. Readable silhouettes, no identical repeated center icons.
+Palette: deep teal #103F46, near-black green #142523, aged gold #AB813F, parchment #E7D8AE, dark jade #41685E, vermilion #A6332D. Gold is restrained, not bright lemon. No neon.
+Layout: wide high-resolution landscape sheet, aim 4096×3584 or larger if supported. Exactly EIGHT columns and SIX rows = 48 seals. Equal seal size, generous gutters. One category heading above each row. Each seal has its full exact Traditional Chinese name centered BELOW it, on the parchment background, clean legible dark-ink Traditional Chinese Song-style typography. Do not put full names inside small badges. Overall warm ivory parchment background with subtle paper grain, thin muted-gold outside border. Header exact text: “蝕刻章總覽”. No extra subtitles, UI, logos, English, watermark or number captions.
+Important text rule: ALL visible Chinese must be TRADITIONAL, including any characters carved inside the badge. For motifs involving a letter tile, use the specified Traditional Chinese center glyph where given, carved as part of the tile. Do not let decorative glyphs turn into fake unreadable script. Prefer pure pictograms where no glyph is specified. Print all 48 names exactly once. Do not omit seals, merge cells, create extra rows or substitute names.
+
+ROW 1 category “組詞入門”, left to right:
+1 “落下第一筆” — one movable-type tile engraved “筆”, short inscription strokes.
+2 “百詞成篇” — three connected movable-type tiles and fine phrase-lines, central glyph “詞”.
+3 “千詞成卷” — an open scroll with orderly engraved lines.
+4 “識得十詞” — open little vocabulary book, center glyph “識”.
+5 “詞庫漸豐” — an open book with four small corner page markers.
+6 “腹有詞章” — stacked type drawers, symmetrical stepped mountain silhouette.
+7 “初戰告捷” — short ritual sword holding down a folded paper corner.
+8 “印成一卷” — closed scroll with a square print seal.
+
+ROW 2 category “戰鬥技巧”:
+9 “鋒芒初現” — one broad diagonal engraved slash through a square tile.
+10 “一擊破陣” — a shield cracked into three pieces.
+11 “刻石成痕” — a stone stele cleaved into two symmetrical halves.
+12 “接字如流” — five connected short ritual strokes flowing in an arc.
+13 “連篇不絕” — a continuously unfolding accordion book.
+14 “餘盾未散” — two nested ceremonial shields.
+15 “銅牆留印” — central shield protected by three tiers of bricks.
+16 “毫髮無損” — unbroken paper shield and a single delicate feather.
+
+ROW 3 category “儲能熱度”:
+17 “電光初蓄” — half-filled ancient battery case with central lightning.
+18 “滿匣雷聲” — full battery case and two branching lightning bolts.
+19 “一放驚雷” — open thunder case releasing a broad upward lightning bolt.
+20 “爐心漸赤” — small furnace mouth surrounding one vermilion fire seed.
+21 “熱字出爐” — a square tile engraved “熱” rising from a furnace mouth.
+22 “驟冷成霜” — a six-point frost pattern pressing down on a small flame.
+23 “餘燼落字” — curled paper corner with three vermilion ember specks.
+24 “十響連擊” — central strike mark surrounded by three broken concentric shock rings.
+
+ROW 4 category “字塊養成”:
+25 “字上生金” — one square movable-type tile engraved “字”, narrow bright antique-gold edge.
+26 “三字鑲金” — three gold-edged movable-type blocks arranged as a triangle.
+27 “字字有價” — a letter tile above three square-holed coins.
+28 “精工一字” — fine chisel touching a tile corner, two tiny metal chips.
+29 “立字為礎” — tile engraved “礎” fixed to a wide base by corner rivets.
+30 “二字合印” — two type blocks joining with a visible mortise-and-tenon joint.
+31 “反覆打磨” — one type block surrounded by two open looping engraved lines.
+32 “借字成章” — solid type block connected to a ghost / dotted-outline block.
+
+ROW 5 category “污染解籤”:
+33 “拂去墨污” — soft brush wiping a dark ink spot from a metal face.
+34 “淨字成行” — three clean type tiles and a single continuous wiping stroke, center glyph “淨”.
+35 “污字亦成詞” — ink-spotted type block connected into a phrase by a clean ritual line.
+36 “止於一字” — central type block with a branching stem cut off by a horizontal stroke.
+37 “折頁解籤” — folded paper corner with a visibly severed tag string.
+38 “紅藍對校” — two crossed tags, one vermilion and one muted blue-jade, distinguished also by horizontal versus diagonal hatching.
+39 “移字出軌” — one square tile outside two straight rails, clearly empty rail slot.
+40 “一紙無塵” — pale clean paper sheet with sparse delicate etched corner strokes.
+
+ROW 6 category “首領旅途”:
+41 “破開鉛版” — a printing plate separated along a deep vertical crack.
+42 “字魔伏誅” — stylized hostile glyph-mask held under two crossing sealing strips; no copied character design.
+43 “平定混鉛” — three calm molten-metal ripple bands contracting inward.
+44 “沿途留印” — three small footprints along a short angular trail.
+45 “百程入卷” — a winding angular route carved into an open scroll.
+46 “奇聞十錄” — small travel journal with three differently shaped page tabs.
+47 “行囊漸滿” — open travel pouch with one type block and one coin emerging.
+48 “舊物成藏” — shallow display case holding a small seal, old bottle and a fragment, symmetrically balanced.
+
+Quality priority: exact 48-item completeness and order, beautiful unified reference-1 ornamental language with reference-2 colors, legible exact Traditional Chinese names, distinct readable icon centers. Avoid overcrowding each badge with text or extra objects.
+
+FINAL STYLE EDIT
++Use case: style-transfer and text-localization.
+Edit image 1, the completed 48-achievement atlas. Image 2 is the required PATTERN LANGUAGE reference. Image 3 is the required COLOR reference.
+Preserve image 1's exact 8-column by 6-row layout, all 48 badges, all name label positions and the parchment/ink-teal/antique-gold/vermilion palette. Do not drop or duplicate any badges. Keep the whole sheet in one image, high resolution.
+Main change: make the badge faces visually closer to the ornamental etched-seal designs in image 2: elegant bilateral and radial symmetry, stylized talismanic linework, scrolling cloud/lotus-like fine ornaments, dark recessed enamel fields and flat engraved silhouettes. Each center motif must still be recognizable, but represent it as a symbolic etched emblem rather than a chunky 3D inventory item. Reduce boxy extruded cubes and block thickness. Give every icon the fine decorative visual rhythm of image 2 while keeping its own subject. Preserve readability and negative space. Keep frame and motif lines crisp and refined. No pink/purple/pastel palette; use image 3's muted deep teal, jade, ivory, aged gold, vermilion.
+ALL Chinese in the entire image, especially inside icons, must be correctly written TRADITIONAL Chinese. Center type tiles use 筆、詞、識、熱、字、礎、淨 where applicable. Crossed red/blue tags use just one large clear glyph each, respectively “紅” and “藍”; remove all other microlettering or fake writing within badges. Keep no simplified 字形 such as 笔、词、识、热、础、净、红、蓝.
+Render these exact names underneath the badges with legible, consistent Chinese Song typography:
+Title: 蝕刻章總覽
+Row 1 heading 組詞入門: 落下第一筆 | 百詞成篇 | 千詞成卷 | 識得十詞 | 詞庫漸豐 | 腹有詞章 | 初戰告捷 | 印成一卷
+Row 2 heading 戰鬥技巧: 鋒芒初現 | 一擊破陣 | 刻石成痕 | 接字如流 | 連篇不絕 | 餘盾未散 | 銅牆留印 | 毫髮無損
+Row 3 heading 儲能熱度: 電光初蓄 | 滿匣雷聲 | 一放驚雷 | 爐心漸赤 | 熱字出爐 | 驟冷成霜 | 餘燼落字 | 十響連擊
+Row 4 heading 字塊養成: 字上生金 | 三字鑲金 | 字字有價 | 精工一字 | 立字為礎 | 二字合印 | 反覆打磨 | 借字成章
+Row 5 heading 污染解籤: 拂去墨污 | 淨字成行 | 污字亦成詞 | 止於一字 | 折頁解籤 | 紅藍對校 | 移字出軌 | 一紙無塵
+Row 6 heading 首領旅途: 破開鉛版 | 字魔伏誅 | 平定混鉛 | 沿途留印 | 百程入卷 | 奇聞十錄 | 行囊漸滿 | 舊物成藏
+Do not print the | separators. Exact counts and complete names matter. No English, watermark, extra UI or unrelated text.

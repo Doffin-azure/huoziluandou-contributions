@@ -1586,6 +1586,7 @@ func _new_screen():
 	add_child(screen)
 	for i in 4:
 		await get_tree().process_frame
+	await _wait_for_screen_idle(screen)
 	screen.battle.board.cells.fill(null)
 	screen.battle.bag.clear()
 	screen.battle.discard.clear()

@@ -1,0 +1,85 @@
+Tool: built-in image_gen.
+Output: jade achievement art direction atlas; 48 designs with Traditional Chinese names and one compact UI-size demonstration strip.
+Reference: user-supplied game's teal, parchment, vermilion and aged-brass battle background.
+Art direction: small jade talismans and charms replace large framed etched medals. No mandatory hexagonal frame.
+Status: art review image; individual runtime icons and spreadsheet contracts have not been replaced by this preview.
+
++Use case: stylized-concept.
+Create ONE beautiful, restrained, production-minded art-direction atlas of 48 SMALL JADE achievement icons for the Chinese word roguelike shown in the reference image. The user has REJECTED the previous large etched medals. Entirely redesign the art as small, elegant carved jade charms and jade talismans that belong naturally in this specific game's background and UI.
+Reference image: use its actual art style and colors—inky deep teal mountain temples, aged brass mechanisms, warm parchment panels, vermilion maple leaves, hand-illustrated Taoist science-fiction / Nine Sols aesthetic. Do not reproduce the screenshot as the whole composition.
+
+ESSENTIAL DESIGN CHANGE:
+The jade objects themselves ARE the icons. No hexagonal medal frame, no universal stone socket, no large round dial, no plaques around each icon, no decorative outer medallions, no coin-like discs around every subject. Small thin carved jade objects with distinctive silhouettes: modest jade slips, pierced jade rings, openwork charms, narrow tablets, tiny scroll-shaped jade pieces, cloud-shaped pendants, shield-shaped jade carvings. Less bulk, more breathing room. The original subjects become elegant carved jade silhouettes and sparse shallow relief, not 3D inventory miniatures mounted on bases.
+Visually sophisticated 2D hand-painted game icons, disciplined dark-ink contours, smooth softly polished edges, subtle mineral translucency only at the rim, a few delicate natural inclusions, very restrained soft highlight. Mostly celadon nephrite, pale blue-green jade, warm ivory white jade; occasional deep moss-jade accents. Tiny antique-gold inlay or one short vermilion cord can appear on selected items only. Do not add large tassels or hanging ornaments to every icon. No bright colored emissions, neon glow, shiny glass, plastic, faceted emeralds, jewelry catalog photography, glossy 3D renders, rainbow color coding, or heavy bronze frames.
+Palette of icons: muted celadon #9EBBA4, pale mist jade #BDD0BF, deep jade #416B60, ivory jade #D9D4B9; tiny gold #A9864E and cinnabar #A64236. Background charcoal teal #153735 and #0C292F, labels warm parchment #E4D6AD. Match the reference's subdued painted atmosphere. Achievements can share one family of jade rather than looking like colored magic buttons.
+
+LAYOUT AND SIZE:
+Exactly 8 columns × 6 rows = all 48 icons, one per achievement listed below. Consistent spacing. Each jade icon should occupy only about half the cell width, looking much smaller and lighter than a medal, with ample unfilled space around it. Name beneath every icon in legible Traditional Chinese Song-style text. Thin subtle separator lines between six category rows. Category labels on left margin, small and understated, no framed hanging plaques.
+Title exact Traditional Chinese: “玉符成就總覽”.
+The main sheet background is an elegant dark ink-teal UI board with a very faint painted mountain silhouette along the bottom, a little warm parchment only for a restrained top title strip, and minimal aged-gold structural corner lines, matching the provided game's interface without overwhelming the jade.
+Add a narrow bottom strip labeled exactly “介面尺寸示意”, showing eight of the same jade icons MUCH SMALLER in a quiet horizontal UI row, approximating 32–40px icons at game screen scale, to demonstrate actual compact interface use. This strip repeats sample icons only; main atlas must still contain all48 distinct achievements. No dramatic large hero object. No central oversized medal.
+High resolution landscape sheet, aim4096×3584 if supported, and keep all labels readable. No English, watermark, invented paragraphs, or gameplay statistics.
+All Chinese names and characters on the jade MUST be TRADITIONAL. Any jade tile with a glyph uses the single clean glyph specified, otherwise keep carvings pictorial rather than adding fake text.
+
+EXACT 48 ACHIEVEMENTS AND SUBJECTS:
+Row 1 category “組詞入門”
+落下第一筆 — thin celadon type slip engraved “筆”, one elegant brush stroke.
+百詞成篇 — three tiny joined flat jade tiles, middle engraved “詞”.
+千詞成卷 — a delicate open scroll silhouette carved in ivory jade.
+識得十詞 — small open-book jade charm engraved “識”.
+詞庫漸豐 — flat book-shaped jade with four tiny page notches.
+腹有詞章 — stacked geometric jade bars forming a compact stepped silhouette.
+初戰告捷 — narrow sword-shaped jade crossed with one folded-paper jade plane.
+印成一卷 — small jade scroll tied by a single short cinnabar line.
+
+Row 2 category “戰鬥技巧”
+鋒芒初現 — narrow angular jade blade with one incision.
+一擊破陣 — small split shield-shaped jade carving.
+刻石成痕 — thin upright jade tablet with a sharp cleft.
+接字如流 — five connected curved jade strokes forming a flowing openwork charm.
+連篇不絕 — delicate accordion-page jade silhouette.
+餘盾未散 — two nested shield contours carved as jade openwork.
+銅牆留印 — flat shield charm with three shallow brick-line engravings.
+毫髮無損 — graceful intact shield-shaped white jade and one feather relief.
+
+Row 3 category “儲能熱度”
+電光初蓄 — slim square jade energy talisman with a lightning groove.
+滿匣雷聲 — compact jade energy talisman with two branching lightning grooves.
+一放驚雷 — sharp lightning-shaped jade openwork.
+爐心漸赤 — small bowl-shaped jade furnace charm with one cinnabar flame engraving.
+熱字出爐 — flat jade tile engraved “熱”, lower edge subtly like a furnace arc.
+驟冷成霜 — delicate frosted jade snow-crystal charm.
+餘燼落字 — irregular curled-page jade with three tiny cinnabar inclusions.
+十響連擊 — three thin offset jade arcs around a short central strike.
+
+Row 4 category “字塊養成”
+字上生金 — small thin jade type slip engraved “字”, fine gold edge only.
+三字鑲金 — three flat tiny jade squares joined as a triangle, hairline gold inlay.
+字字有價 — jade type slip above three small pierced jade rings.
+精工一字 — small chisel-shaped jade paired with a thin flat type fragment.
+立字為礎 — upright thin jade talisman engraved “礎”, short wider foot, not a bulky pedestal.
+二字合印 — two flat interlocking jade pieces with a clean mortise joint.
+反覆打磨 — pierced jade loop embracing a small square.
+借字成章 — solid jade square paired with a delicate openwork square.
+
+Row 5 category “污染解籤”
+拂去墨污 — small soft brush-shaped jade charm with dark mineral inclusion being swept aside.
+淨字成行 — three thin ivory-jade slips, center engraved “淨”.
+污字亦成詞 — jade type slip with visible dark inclusion and a clean connecting line.
+止於一字 — openwork jade branch cleanly interrupted by one transverse stroke.
+折頁解籤 — folded-page jade charm with short severed cinnabar tag cord.
+紅藍對校 — two narrow jade tags crossed, engraved “紅” and “藍”, tiny red cord and blue-green jade variation.
+移字出軌 — two parallel thin jade rail bars and one tiny tile displaced to the side.
+一紙無塵 — quiet ivory-jade paper-shaped charm with sparse corner relief.
+
+Row 6 category “首領旅途”
+破開鉛版 — flat rectangular jade printing plate split down the center.
+字魔伏誅 — compact angular jade glyph-mask with crossed cinnabar sealing lines.
+平定混鉛 — three smooth flowing wave-shaped jade bands, very quiet silhouette.
+沿途留印 — three tiny footprint shapes linked in one jade openwork trail.
+百程入卷 — thin jade scroll outline with a simple route groove.
+奇聞十錄 — miniature book-shaped jade with three subtle page tabs.
+行囊漸滿 — small rounded jade pouch silhouette with one simple type-square and coin-hole relief.
+舊物成藏 — elegant jade display-outline charm containing three simplified relic shapes.
+
+Quality target: precious, subtle, tactile, poetic, integrated with the user's existing painterly teal-and-parchment game world; SMALL collectible jade talismans rather than big badges. Consistent 48-item set with exact Traditional Chinese labels.

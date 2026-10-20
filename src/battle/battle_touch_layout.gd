@@ -7,14 +7,9 @@ class_name BattleTouchLayout
 static var test_dpi := 0.0
 
 static func unit_for(view_size: Vector2, window_size: Vector2i) -> float:
-	var density := 1.0
 	if OS.is_debug_build() and test_dpi > 0:
-		density = maxf(1.0, test_dpi / 160.0)
-	elif OS.has_feature("android"):
-		density = maxf(1.0, DisplayServer.screen_get_dpi() / 160.0)
-	elif OS.has_feature("ios"):
-		density = maxf(1.0, DisplayServer.screen_get_scale())
-	return maxf(1.0, view_size.y / maxf(1, window_size.y) * density)
+		return maxf(1.0, view_size.y / maxf(1, window_size.y) * maxf(1, test_dpi / 160.0))
+	return ScreenLayout.unit_for(view_size, window_size)
 
 
 static func measure(view_size: Vector2, unit: float, _has_status: bool) -> Dictionary:

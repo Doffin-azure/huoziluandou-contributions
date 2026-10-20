@@ -4,6 +4,14 @@ extends ScreenBase
 var node: MapNodeData
 var _done := false
 var _room_session: RefCounted
+var _page: VBoxContainer
+var _row: HBoxContainer
+var _heading: Label
+var _stats: Label
+var _panels: Array[Control] = []
+var _marks: Array[Label] = []
+var _titles: Array[Label] = []
+var _descriptions: Array[Label] = []
 
 
 func save_checkpoint() -> Dictionary:
@@ -15,46 +23,46 @@ func build(root: Control) -> void:
 	if params.get("room_run",false) and GameState.room_run!=null:
 		_room_session = preload("res://src/screens/room_node_session.gd").new(GameState.room_run)
 
-	var main := JourneyStyle.page(root)
-	var stats := JourneyStyle.label("气血 %d / %d" % [GameState.player_hp, GameState.player_max_hp], "Stat", JourneyStyle.GOLD)
-	var tools := Ink.hbox(16)
-	tools.add_child(stats)
-	var deck := JourneyStyle.button("字袋", _open_deck)
-	deck.custom_minimum_size.y = 48 * JourneyStyle.touch_scale(self)
-	tools.add_child(deck)
-	main.add_child(JourneyStyle.heading("休整 · 灯下", "灯火未熄。选择一项整备，然后继续前行。", tools))
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	main.add_child(scroll)
-	var center := CenterContainer.new()
-	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.add_child(center)
-	var row := GridContainer.new()
-	row.columns = 3
-	row.add_theme_constant_override("h_separation", 12)
-	center.add_child(row)
-	row.add_child(_option_card("息", "调息", "回复 %d 点气血。" % _heal_amount(), _do_heal))
-	row.add_child(_option_card("删", "删字", "永久移除一枚字，精炼字袋。", _do_remove))
-	row.add_child(_option_card("镌", "修饰", "强化一枚字的单字效果。", _do_upgrade))
-	if get_viewport_rect().size.x / JourneyStyle.touch_scale(self) >= 1100: main.add_child(JourneyStyle.section("此处可歇脚", "三项整备，只选其一"))
+	_page = JourneyStyle.page(root)
+	var header := Ink.hbox(16)
+	_heading = JourneyStyle.label("休整 · 灯下","Heading",JourneyStyle.GOLD)
+	header.add_child(_heading)
+	header.add_child(Ink.expander())
+	_stats = JourneyStyle.label("气血 %d / %d" % [GameState.player_hp, GameState.player_max_hp], "Stat", JourneyStyle.GOLD)
+	header.add_child(_stats)
+	header.add_child(JourneyStyle.button("字袋", _open_deck))
+	_page.add_child(header)
+	_row = Ink.hbox(20)
+	_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_page.add_child(_row)
+	_row.add_child(_option_card("息", "调息", "回复 %d 点气血。" % _heal_amount(), _do_heal))
+	_row.add_child(_option_card("删", "删字", "永久移除一枚字，精炼字袋。", _do_remove))
+	_row.add_child(_option_card("镌", "修饰", "为未镀金的字镀金，每次打出额外获得%d铜钱，组词也生效。" % BattleBalance.i("gild_gold",1) if _room_session!=null else "所选字形的单字效果数值+2；组词效果不变。", _do_upgrade))
+	if _room_session!=null and _room_session.run.phase=="rest_choose": _resume_room_choice.call_deferred()
+	if _room_session!=null:
+		_page.add_child(JourneyStyle.button("不休整，继续前行",func(): _room_rest_action({"type":"leave_service"})))
+	resized.connect(_layout_rest.call_deferred)
+	_layout_rest.call_deferred()
 
 
 func _option_card(seal: String, title: String, desc: String, cb: Callable) -> Control:
 	var panel := Ink.panel("PanelCard")
-	panel.custom_minimum_size = Vector2((get_viewport_rect().size.x - 100) / 3, 0)
-	var compact := get_viewport_rect().size.x / JourneyStyle.touch_scale(self) < 1100
-	var col := Ink.vbox(6 if compact else 18)
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_panels.append(panel)
+	var col := Ink.vbox(18)
 	panel.add_child(col)
 	var mark := JourneyStyle.label(seal, "Title", JourneyStyle.GOLD)
-	mark.add_theme_font_size_override("font_size", int(36 * JourneyStyle.touch_scale(self)) if compact else 76)
+	mark.add_theme_font_size_override("font_size", 76)
 	mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_marks.append(mark)
 	col.add_child(mark)
 	var t := JourneyStyle.label(title, "Subheading")
+	t.set_meta("rest_title",title)
+	_titles.append(t)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(t)
 	var d := JourneyStyle.label(desc, "Muted")
+	_descriptions.append(d)
 	d.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	d.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -63,6 +71,25 @@ func _option_card(seal: String, title: String, desc: String, cb: Callable) -> Co
 	button.custom_minimum_size.y = 48 * JourneyStyle.touch_scale(self)
 	col.add_child(button)
 	return panel
+
+
+func _layout_rest() -> void:
+	if _page==null: return
+	JourneyStyle.apply(self)
+	var unit := JourneyStyle.touch_scale(self)
+	var compact := ScreenLayout.safe_rect(self).size.y/unit < 600
+	_page.add_theme_constant_override("separation",roundi((8 if compact else 20)*unit))
+	_row.add_theme_constant_override("separation",roundi((8 if compact else 20)*unit))
+	_heading.add_theme_font_size_override("font_size",roundi((24 if compact else 30)*unit))
+	_stats.add_theme_font_size_override("font_size",roundi(20*unit))
+	for i in _panels.size():
+		_panels[i].custom_minimum_size = Vector2.ZERO if compact else Vector2(280,320)
+		_marks[i].visible = not compact
+		_titles[i].text = (_marks[i].text+" · " if compact else "")+str(_titles[i].get_meta("rest_title"))
+		_titles[i].add_theme_font_size_override("font_size",roundi((20 if compact else 24)*unit))
+		_descriptions[i].add_theme_font_size_override("font_size",roundi((15 if compact else 18)*unit))
+		_panels[i].get_child(0).add_theme_constant_override("separation",roundi((6 if compact else 18)*unit))
+	for button in find_children("*","Button",true,false): button.custom_minimum_size.y = 48*unit
 
 
 func _heal_amount() -> int:
@@ -104,6 +131,8 @@ func _choose_char(title: String, kind: String) -> void:
 		"title": title,
 		"characters": chars,
 		"counts": counts,
+		"instances": GameState.deck,
+		"modification_preview": "所选字形的全部实体，单字效果数值 +2；组词效果不变。" if kind == "upgrade" else "",
 		"pick_on_click": true,
 	})
 	overlay.picked.connect(_on_picked.bind(kind))
@@ -119,21 +148,14 @@ func _on_picked(ch: CharacterData, kind: String) -> void:
 	else:
 		_apply_upgrade(ch)
 	_done = true
-	_finish()
+	if kind == "upgrade":
+		_show_modification(GameState.character_type_description(ch.id))
+	else:
+		_finish()
 
 
 func _apply_upgrade(ch: CharacterData) -> void:
-	var copy: CharacterData = ch.duplicate()
-	var new_effects: Array[EffectData] = []
-	for eff in ch.solo_effects:
-		var e2: EffectData = eff.duplicate() as EffectData
-		e2.amount += 2
-		new_effects.append(e2)
-	copy.solo_effects = new_effects
-	# 把字袋中同种字全部替换为强化版
-	for inst in GameState.deck:
-		if inst.id() == ch.id:
-			inst.data = copy
+	GameState.upgrade_character_type(ch.id)
 
 
 func _finish() -> void:
@@ -155,11 +177,24 @@ func _room_rest_result(result: Dictionary) -> void:
 	if not result.ok:
 		if _room_session.current() and _room_session.run.phase == "rest_choose": _room_session.apply({"type":"cancel_pick"})
 		_done = false
+		var notice := ChoiceOverlay.new()
+		notice.z_index = 71
+		notice.setup({"title":"未能修饰", "body":str(result.reason), "options":[{"text":"返回休整"}]})
+		add_child(notice)
 		return
 	if _room_session.run.phase == "rest": _done = false; return
 	_done = true
 	if _room_session.run.phase=="rest_choose": _resume_room_choice()
+	elif not str(result.get("modification", "")).is_empty(): _show_modification(str(result.modification))
 	else: _finish()
+
+
+func _show_modification(body: String) -> void:
+	var notice := ChoiceOverlay.new()
+	notice.z_index = 71
+	notice.setup({"title":"修饰完成", "body":body, "hud_details":true, "scroll_body":true, "options":[{"text":"继续前行", "primary":true}]})
+	notice.chose.connect(func(_index: int): _finish())
+	add_child(notice)
 
 
 func _resume_room_choice() -> void:

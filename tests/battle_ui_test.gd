@@ -20,7 +20,7 @@ func _ready() -> void:
 	_saved_motion = Settings.reduced_motion
 	_saved_release = Settings.drag_release_play
 	_saved_style = Palette.STYLE_ID
-	Ink.apply_style(GameStyle.paper())
+	Ink.apply_style(GameStyle.taopunk())
 	Settings.reduced_motion = false
 	Settings.drag_release_play = false
 	if _capture:
@@ -31,7 +31,7 @@ func _ready() -> void:
 
 func _capture_frame() -> void:
 	if _recording:
-		var image := get_viewport().get_texture().get_image()
+		var image: Image = get_viewport().get_texture().get_image()
 		image.save_png("res://shots/motion-frames/%03d.png" % _recorded)
 		_recorded += 1
 
@@ -88,13 +88,13 @@ func _shot(name: String) -> void:
 	# 隐藏窗口或切换尺寸时，主动提交一帧，避免等待被节流的绘制通知。
 	RenderingServer.force_draw(false)
 	DirAccess.make_dir_recursive_absolute("res://shots")
-	var image := get_viewport().get_texture().get_image()
+	var image: Image = get_viewport().get_texture().get_image()
 	var error := image.save_png("res://shots/" + name + ".png")
 	_ok(error == OK, "保存 " + name + " 实际渲染截图")
 
 
 func _paper_luminance(stage: StudyStage) -> float:
-	var image := stage.viewport.get_texture().get_image()
+	var image: Image = stage.viewport.get_texture().get_image()
 	var rect: Rect2 = _screen._preview_panel.get_global_rect().grow(-32)
 	var total := 0.0
 	for row in 12:
@@ -102,7 +102,7 @@ func _paper_luminance(stage: StudyStage) -> float:
 			var canvas_point := rect.position + rect.size * Vector2((col + 0.5) / 8.0, (row + 0.5) / 12.0)
 			var local := stage.get_global_transform().affine_inverse() * canvas_point
 			var pixel := Vector2i(local * Vector2(image.get_size()) / stage.size)
-			var color := image.get_pixel(clampi(pixel.x, 0, image.get_width() - 1), clampi(pixel.y, 0, image.get_height() - 1))
+			var color: Color = image.get_pixel(clampi(pixel.x, 0, image.get_width() - 1), clampi(pixel.y, 0, image.get_height() - 1))
 			total += color.r * 0.2126 + color.g * 0.7152 + color.b * 0.0722
 	return total / 96.0
 
@@ -119,6 +119,7 @@ func _run() -> void:
 	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7, "node": fixture})
 	await _frames()
 	_screen = Router.current
+	await _idle()
 	_ok(_screen._board_view.tiles.size() == 16, "真实战斗场景有 16 枚固定视图")
 	var presentation: BoardPresentation3D = _screen._board_view._presentation
 	_ok(presentation != null and presentation.actors.size() == 16, "宣纸主题创建 16 个真实 3D 字块")
@@ -164,7 +165,7 @@ func _run() -> void:
 		await _frames(20)
 	await _shot("battle-desktop-live")
 	if _capture:
-		_ok(not _screen._bubble._scroll.get_v_scroll_bar().visible, "桌面击破预览完整显示词效、目标和污染代价，无需滚动")
+		_ok(not _screen._bubble._scroll.get_v_scroll_bar().visible, "桌面击破预览完整显示词效，无需滚动")
 		var stage: StudyStage = Router.study_stage
 		var shadowed := _paper_luminance(stage)
 		stage._sun.shadow_enabled = false
@@ -289,7 +290,7 @@ func _run() -> void:
 		_ok(_screen._end_btn.size.y * factor >= 47.5, "小手机结束回合按钮至少 48 屏幕像素")
 		await _shot("battle-phone-small-live")
 		_ok(get_viewport().get_texture().get_image().get_size() == Vector2i(844, 390), "小手机验证使用真实 844×390 渲染尺寸")
-		_ok(not _screen._bubble._scroll.get_v_scroll_bar().visible, "小手机击破预览完整显示词效、目标和污染，无需滚动")
+		_ok(not _screen._bubble._scroll.get_v_scroll_bar().visible, "小手机击破预览完整显示词效，无需滚动")
 		_ok(_screen._menu_btn.size.y * factor >= 48, "小手机右上菜单入口至少 48 屏幕像素")
 		_screen._open_menu()
 		await _frames()
@@ -430,6 +431,7 @@ func _verify_relic_board() -> void:
 	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7})
 	await _frames(12)
 	_screen = Router.current
+	await _idle()
 	var board: BoardView = _screen._board_view
 	_ok(_screen.battle.board.size == 5 and board.tiles.size() == 25 and board._presentation.actors.size() == 25, "对开版遗物在当前美术下构建 5×5 字盘与全部字块")
 	for i in 25:

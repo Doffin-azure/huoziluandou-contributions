@@ -102,7 +102,7 @@ func captions_clear_of_models(screen: Control) -> bool:
 				var point: Vector2 = view.stage.camera.unproject_position(node.global_transform * bounds.get_endpoint(corner)) * view.size / Vector2(view.viewport.size)
 				low = low.min(point)
 				high = high.max(point)
-			if caption.intersects(Rect2(low, high - low)):
+			if caption.intersects(Rect2(low + view.global_position, high - low)):
 				print("Caption overlaps model: ", offer.caption, " ", caption, " ", node.name, " ", Rect2(low, high - low))
 				return false
 	return true
@@ -154,7 +154,7 @@ func _run() -> void:
 				screen._inspect(1)
 				screen._hud.action_button.pressed.emit()
 				await frames()
-				check(GameState.deck_size() == before + 1 and GameState.gold == gold, "glyph choice remains an alternative to the 3D gold pile")
+				check(GameState.deck_size() == before + 1 and GameState.gold == gold, "glyph goes straight into the deck as an alternative to the 3D gold pile")
 			else:
 				var before := GameState.deck_size()
 				await click(screen._gold_offer, resolution.x == 640)

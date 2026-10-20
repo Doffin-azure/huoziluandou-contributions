@@ -294,6 +294,7 @@ static func _cleanse_adjacent(b: BattleState, ctx: Dictionary, all_tags := false
 	if not neighbors.has(chosen) or inst == null or inst.pollutions.is_empty():
 		return ["%s：四邻没有可净化的污染" % name]
 	var n := inst.pollutions.size() if all_tags else 1
+	if b.achievement != null: b.achievement.emit_metrics([{"metric": "pollution_cleansed", "amount": n}])
 	if all_tags:
 		inst.clear_pollutions()
 	else:
@@ -435,8 +436,8 @@ static func _gild_glyph(b: BattleState, ctx: Dictionary, eff: EffectData) -> Arr
 		return ["镀金：未选择合法实体字"]
 	var cost := int(eff.args.get("cost", 0)) if eff != null else 0
 	if not EffectUtil.pay(b, cost):
-		return ["镀金：铜钱不足"]
-	inst.gilded = true
+		return ["镀金：金币不足"]
+	GameState.gild_character(inst)
 	EventBus.deck_changed.emit()
 	return ["镀金：【%s】#%d 永久镀金，每次有效单字或组词打出+%d铜钱" % [inst.glyph(), inst.uid, BattleBalance.i("gild_gold", 1)]]
 

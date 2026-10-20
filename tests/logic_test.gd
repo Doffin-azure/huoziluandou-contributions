@@ -649,15 +649,17 @@ func _test_immediate_economy() -> void:
 	var b := _battle()
 	var g0 := GameState.gold
 	GameState.gold = 100
+	var enemy := _add_enemy(b)
 	for row in 3:
 		var glyphs: String = ["复利", "利息", "炼金"][row]
 		_place(b, 0, row, glyphs[0])
 		_place(b, 1, row, glyphs[1])
 		var result := b.try_play([Vector2i(0, row), Vector2i(1, row)])
 		_ok(result.ok, "即时经济词生效：" + glyphs)
-	_ok(GameState.gold == 107, "复利、利息、炼金直接获得2+2+3铜钱")
+	_ok(GameState.gold == 105, "复利、炼金获得2+3金币，利息不改变金币")
+	_ok(enemy.hp == 190, "利息按发动时102金币的10%向下取整造成10伤害")
 	GameState.settle_victory_economy()
-	_ok(GameState.gold == 107, "胜利没有额外投资返还")
+	_ok(GameState.gold == 105, "胜利没有额外投资返还")
 	GameState.gold = g0
 
 

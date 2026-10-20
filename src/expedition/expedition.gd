@@ -1,6 +1,6 @@
 extends RefCounted
 class_name Expedition
-## 墨途远征：迷雾探索、分阶段敌人、首领追逐、字匣与战斗构筑。
+## 墨途远征：迷雾探索、分阶段敌人、首领追逐与字袋构筑。
 ## 印章 / 遗物 / 休息 / 商店 / 熔炉保留；首领击败即封层。
 ## 遭遇进入真正的 4×4 战斗（battle_screen），开场效果见 apply_battle_setup。格子用 MapGen 的整数 k。
 
@@ -22,8 +22,6 @@ const ENCOUNTER_STAGES := {
 	3: ["兑现·复合应对", "兑现·循环稳定", "兑现·终局考验"],
 }
 
-const TRAY_CAP := 6
-const DECK_CAP := 20
 const SEAL_CAP := 3
 const START_INK := 4
 const BARRIER_INK := 2
@@ -42,7 +40,7 @@ const SEALS := {
 	"镇纸": ["每场战斗少掉 4 点血", "精英"], "夜灯": ["视野 +1 格", "大赏"], "更漏": ["首领走路概率增长得更慢", "大赏"],
 	"拓本": ["打开任何赏都多一个选项", "大赏"], "印鉴": ["被「封」的奖励会显示伏兵的位置", "精英"],
 	"朱笔": ["首领战开场，新首领生命上限 −6；旧首领少一条词条", "首领"], "蒲团": ["休息点的治疗量翻倍", "精英"],
-	"活字盒": ["字匣 +2 格", "大赏"], "字印": ["每场战斗开场多抽 1 枚字", "首领"],
+	"字印": ["每场战斗开场多抽 1 枚字", "首领"],
 }
 ## 三幕首领使用精选机制资源；地图主题仍保留。
 const BOSS := EnemyRoster.BOSSES
@@ -84,7 +82,6 @@ var alarm := false
 var halt_done := false          ## 起身提示已触发
 var boss_down := false          ## 首领已败，本层封闭，只能处理首领奖励与幕间结算。
 var ink := START_INK
-var tray: Array = []
 var seals: Array = []
 var buyback: Array = []
 var panels: Array = []          ## 待处理的面板，顶上的先显示
@@ -153,8 +150,16 @@ func has_seal(s: String) -> bool:
 	return seals.has(s)
 
 
-func tray_cap() -> int:
-	return TRAY_CAP + (2 if has_seal("活字盒") else 0)
+func migrate_legacy_inventory() -> void:
+	# The codec keeps retired inventory data out of the live model. Consume it
+	# only after the saved deck and UID counter have been restored.
+	var glyphs: Array = get_meta("legacy_tray", [])
+	if has_meta("legacy_tray"): remove_meta("legacy_tray")
+	for glyph in glyphs:
+		GameState.add_character(Database.get_character_by_glyph(str(glyph)))
+	if seals.has("活字盒"):
+		if not seals.has("字印"): seals.append("字印")
+		seals.erase("活字盒")
 
 
 func vision() -> int:
@@ -475,32 +480,21 @@ func pickup() -> bool:
 	if not gd.is_empty():
 		_log("散字【%s】被%s看守着，拾不走" % [m.glyph[pos], gd])
 		return false
-	if tray.size() >= tray_cap():
-		_log("字匣满了（%d 格），拾不了【%s】" % [tray_cap(), m.glyph[pos]])
-		return false
 	taken[pos] = true
 	var g: String = m.glyph[pos]
-	tray.append(g)
-	_log("拾得【%s】" % g)
+	gain_glyph(g, "拾得")
 	return true
 
 
-## 发字：先进字匣；字匣满了进字袋；都满了折 8 铜钱
+## 所有新字直接收入字袋，不再经过独立库存或容量折现。
 func gain_glyph(g: String, why := "") -> void:
 	if Database.get_character_by_glyph(g) == null:
 		return
 	# 许愿笺·千字同文：之后拿到的字都变成许愿的字
 	g = Relics.redirect_glyph(Database.get_character_by_glyph(g)).glyph
 	var note := ("%s：" % why) if not why.is_empty() else ""
-	if tray.size() < tray_cap():
-		tray.append(g)
-		_log("%s【%s】进字匣" % [note, g])
-	elif GameState.deck_size() < DECK_CAP:
-		GameState.add_character(Database.get_character_by_glyph(g))
-		_log("%s字匣满了，【%s】直接进字袋" % [note, g])
-	else:
-		GameState.add_gold(8)
-		_log("%s字匣、字袋都满了，【%s】折成 8 铜钱" % [note, g])
+	GameState.add_character(Database.get_character_by_glyph(g))
+	_log("%s【%s】收入字袋" % [note, g])
 
 
 func push_panel(p: Dictionary) -> void:
@@ -531,8 +525,6 @@ func owned_glyphs() -> Dictionary:
 	var out := {}
 	for c in GameState.deck:
 		out[c.glyph()] = true
-	for g in tray:
-		out[g] = true
 	return out
 
 
@@ -679,6 +671,7 @@ func choose_loot(i: int) -> void:
 		return
 	pop_panel()
 	taken[pos] = true
+	Achievements.node_completed()
 	match o.kind:
 		"glyphs":
 			for g in o.glyphs:
@@ -833,6 +826,7 @@ func rest(choice: String, glyph_id := "") -> bool:
 	pop_panel()
 	taken[pos] = true
 	advance(REST_T)
+	Achievements.node_completed()
 	return true
 
 
@@ -842,7 +836,7 @@ func _gild(glyph_id: String) -> bool:
 	var done := 0
 	for c in GameState.deck:
 		if c.id() == glyph_id and not c.gilded and done < n:
-			c.gilded = true
+			GameState.gild_character(c)
 			done += 1
 	if done == 0:
 		return false
@@ -868,6 +862,7 @@ func shop_offers() -> Array:
 	if not m.has("shops"):
 		m["shops"] = {}
 	m.shops[pos] = offers
+	Achievements.register_offers(offers)
 	return offers
 
 
@@ -892,6 +887,7 @@ func refresh_shop() -> bool:
 	for id in Relics.roll_choices(GameState.relics, relic_rng, 3):
 		offers.append({"kind": "relic", "relic": id, "base": Relics.price(id)})
 	m.shops[pos] = offers
+	Achievements.register_offers(offers)
 	_log("商店：花 %d 铜钱刷新货架，下次 %d 铜钱" % [cost, shop_refresh_cost()])
 	return true
 
@@ -918,9 +914,6 @@ func buy(index: int, glyph_id := "") -> bool:
 		"relic":
 			if GameState.has_relic(o.relic):
 				return false
-		"glyph", "buyback":
-			if tray.size() >= tray_cap() and GameState.deck_size() >= DECK_CAP:
-				return false
 		"remove":
 			if not GameState.remove_character_id(glyph_id):
 				return false
@@ -928,6 +921,7 @@ func buy(index: int, glyph_id := "") -> bool:
 			if not _gild(glyph_id):
 				return false
 	GameState.spend_gold(cost)
+	Achievements.bought_offer(o)
 	match o.kind:
 		"relic":
 			# 先移掉货架，再拿遗物（绑定面板压在商店上面）
@@ -952,11 +946,12 @@ func buy(index: int, glyph_id := "") -> bool:
 func leave_panel() -> void:
 	var p := top_panel()
 	if p.get("kind", "") in ["shop", "forge", "event"]:
+		if p.kind == "shop": Achievements.node_completed()
 		pop_panel()
 
 
 # ---------------------------------------------------------------- 熔炉
-## 每个地图熔炉一次；投两个字匣里的字熔成一个稀有字。
+## 每个地图熔炉一次；从字袋选择两个实体，换一枚稀有字。
 func forge(a: int, b: int) -> bool:
 	var p := top_panel()
 	if p.get("kind", "") != "forge" or boss_down or over:
@@ -964,12 +959,15 @@ func forge(a: int, b: int) -> bool:
 	var cell := int(p.get("k", -1))
 	if cell != pos or mech_at(cell).get("g", "") != "炉" or int(used.get(cell, 0)) >= 1:
 		return false
-	if a == b or a < 0 or b < 0 or a >= tray.size() or b >= tray.size():
+	if a == b or a < 0 or b < 0 or a >= GameState.deck.size() or b >= GameState.deck.size():
 		return false
-	var gs: Array = [tray[a], tray[b]]
-	tray.remove_at(maxi(a, b))
-	tray.remove_at(mini(a, b))
+	if GameState.relic_binds.values().has(GameState.deck[a].uid) or GameState.relic_binds.values().has(GameState.deck[b].uid):
+		return false
+	var gs: Array = [GameState.deck[a].glyph(), GameState.deck[b].glyph()]
+	GameState.deck.remove_at(maxi(a, b))
+	GameState.deck.remove_at(mini(a, b))
 	used[cell] = 1
+	Achievements.node_completed()
 	pop_panel()
 	var out := roll_glyph(1)
 	_log("熔炉：%s熔成【%s】" % ["".join(gs.map(func(g): return "【%s】" % g)), out])
@@ -991,6 +989,8 @@ func choose_event(take: bool) -> void:
 		return
 	pop_panel()
 	taken[pos] = true
+	Achievements.node_completed()
+	Achievements.event_completed("expedition_event_" + str(p.event))
 	if not take:
 		return
 	match int(p.event):
@@ -1007,27 +1007,6 @@ func choose_event(take: bool) -> void:
 					explored[k] = true
 			_log("雾中灯：迷雾散开")
 			advance(2)
-
-
-# ---------------------------------------------------------------- 字匣 / 字袋
-## 字匣 → 字袋（上限 20），探索获得的字用于战斗构筑
-func tray_to_deck(i: int) -> bool:
-	if busy() or i < 0 or i >= tray.size() or GameState.deck_size() >= DECK_CAP:
-		return false
-	var g: String = tray.pop_at(i)
-	GameState.add_character(Database.get_character_by_glyph(g))
-	_log("【%s】放进字袋" % g)
-	return true
-
-
-## 丢字进入回购清单
-func discard(i: int) -> bool:
-	if busy() or i < 0 or i >= tray.size():
-		return false
-	var g: String = tray.pop_at(i)
-	buyback.append(g)
-	_log("丢掉【%s】，可在商店回购" % g)
-	return true
 
 
 # ---------------------------------------------------------------- 首领：主动迎战 / 幕间
@@ -1109,6 +1088,7 @@ func next_act() -> void:
 	if act >= 3:
 		over = true
 		won = true
+		Achievements.finish_run(true)
 		_log("三幕已尽，远征完成")
 		return
 	var supply := act_supply()
@@ -1165,15 +1145,27 @@ func stage_text(kind: String, cell: int) -> String:
 	return ENCOUNTER_STAGES[act][encounter_stage(kind, cell)]
 
 
-func encounter_enemy(kind: String, cell: int) -> EnemyData:
+func encounter_enemy(kind: String, cell: int, commit := false) -> EnemyData:
 	if not m.is_empty() and not m.has("encounter_stages"): _assign_encounter_stages()
 	var stage := encounter_stage(kind, cell)
 	var pool: Array = NORMAL_STAGES[act][stage]
 	if kind == "boss": pool = [EnemyRoster.BOSSES[act]]
 	elif kind == "elite": pool = ELITE_STAGES[act][stage]
-	var pick := RandomNumberGenerator.new()
-	pick.seed = run_seed * 997 + act * 100003 + encounter_anchor(kind, cell) * 31
-	var source: EnemyData = Database.get_enemy(pool[pick.randi_range(0, pool.size() - 1)])
+	var anchor := encounter_anchor(kind, cell)
+	var key := "%s:%d" % ["normal" if kind in ["foe", "ambush"] else kind, anchor]
+	var assignments: Dictionary = m.get("enemy_assignments", {})
+	var history: Array = m.get("enemy_history", [])
+	var available: Array = EnemyRoster.ELITES[act] if kind=="elite" else EnemyRoster.NORMAL[act]
+	if kind=="boss": available = pool
+	var id := str(assignments.get(key, ""))
+	if id.is_empty():
+		id = EnemyRoster.pick_encounter(pool, available, history, run_seed * 997 + act * 100003 + anchor * 31)
+		if commit:
+			assignments[key] = id
+			m["enemy_assignments"] = assignments
+			history.append(id)
+			m["enemy_history"] = history
+	var source: EnemyData = Database.get_enemy(id)
 	# 深区小幅延长机制应对，伤害沿用初稿；第三幕再加12%生命。首领保持88/124/168。
 	var ed: EnemyData = source.duplicate(true)
 	if kind != "boss": ed.max_hp = ceili(source.max_hp * (100 + 4 * stage + (12 if act == 3 else 0)) / 100.0)
@@ -1230,7 +1222,7 @@ func battle_node() -> MapNodeData:
 	var node := MapNodeData.new()
 	var kind: String = fight.kind
 	node.type = MapNodeData.Type.BOSS if kind == "boss" else (MapNodeData.Type.ELITE if kind == "elite" else MapNodeData.Type.BATTLE)
-	var ed := encounter_enemy(kind, int(fight.k))
+	var ed := encounter_enemy(kind, int(fight.k), true)
 	node.title = ("首领 · " if kind == "boss" else ("精英 · " if kind == "elite" else "")) + ed.name
 	node.enemies.append(ed)
 	fight.name = ed.name
@@ -1336,9 +1328,11 @@ func finish_battle(victory: bool) -> Dictionary:
 			_log("镇纸：这场少掉 %d 点血" % mini(BattleBalance.i("seal_recovery", 4), lost))
 	if not victory:
 		over = true
+		Achievements.finish_run(false)
 		_log("败于%s，远征中止" % f.name)
 		return {"reward": false}
 	var payout := encounter_rewards(f)
+	Achievements.node_completed("expedition:%d:%d" % [act, int(f.get("k", pos))])
 	var gold: int = payout.gold
 	if gold > 0:
 		GameState.add_gold(gold)
@@ -1353,8 +1347,14 @@ func finish_battle(victory: bool) -> Dictionary:
 			stun = 0
 			boss_trail.clear()
 			alerts.clear()
-			# 关闭旧层面板。结算压在首领奖励下方，满印章先选替换再进入结算。
+			# 关闭旧层面板；终局直接通关，其余幕保留首领奖励。
 			panels.clear()
+			if act >= 3:
+				over = true
+				won = true
+				Achievements.finish_run(true)
+				_log("三幕首领已败，远征通关。")
+				return {"reward":false, "victory":true}
 			push_panel({"kind": "act_end"})
 			var seal := roll_seal("首领")
 			if not seal.is_empty(): add_seal(seal)

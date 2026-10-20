@@ -8,6 +8,8 @@ signal chose(index)
 var cfg: Dictionary = {}
 var _chosen := false
 var _sheet: Control
+var _options_scroll: ScrollContainer
+var _options_content: VBoxContainer
 var _panel: PanelContainer
 var _padding: MarginContainer
 var _peek_button: Button
@@ -59,6 +61,7 @@ func _build() -> void:
 	_sheet.add_child(_panel)
 	var sheet_scroll := ScrollContainer.new()
 	sheet_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	if cfg.get("scroll_options", false): sheet_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_panel.add_child(sheet_scroll)
 
 	var pad := Ink.margin(12 if cfg.get("compact", false) else 24)
@@ -121,26 +124,30 @@ func _build() -> void:
 	if cfg.get("physical_relics", false):
 		_build_relic_options(col, options, hud_scale)
 		return
+	var scroll_options := bool(cfg.get("scroll_options", false))
+	var cancel_index := int(cfg.get("cancel_index", -1))
+	var option_parent: VBoxContainer = col
+	if scroll_options:
+		z_index = 80
+		_options_scroll = ScrollContainer.new()
+		_options_scroll.name = "OptionsScroll"
+		_options_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		_options_scroll.follow_focus = true
+		_options_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		col.add_child(_options_scroll)
+		_options_content = Ink.vbox(10)
+		_options_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_options_scroll.add_child(_options_content)
+		option_parent = _options_content
 	for i in options.size():
-		var opt: Dictionary = options[i]
-		var btn := Ink.button(BattleText.clean(str(opt.get("text", "选项 %d" % (i + 1)))), bool(opt.get("primary", false)))
-		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		btn.focus_mode = Control.FOCUS_ALL
-		btn.custom_minimum_size.y = 48 * hud_scale
-		btn.add_theme_font_size_override("font_size", int(20 * hud_scale))
-		if opt.has("relic_id"):
-			RelicArt.apply_button(btn, str(opt.relic_id), 48 * hud_scale)
-		if opt.has("disabled"):
-			btn.disabled = bool(opt["disabled"])
-		btn.pressed.connect(_on_choose.bind(i))
-		col.add_child(btn)
-		if not str(opt.get("hint", "")).is_empty():
-			var h := Ink.label(BattleText.clean(str(opt["hint"])), "Muted")
-			h.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			if cfg.get("compact", false):
-				h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-				h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			col.add_child(h)
+		if scroll_options and i == cancel_index: continue
+		_add_option(option_parent, i, hud_scale)
+	if scroll_options and cancel_index >= 0 and cancel_index < options.size():
+		col.add_child(Ink.hline())
+		_add_option(col, cancel_index, hud_scale)
+	if scroll_options:
+		_layout.call_deferred()
+
 	if cfg.get("board_peek", false):
 		_peek_button = JourneyStyle.button("查看棋盘", _toggle_peek)
 		add_child(_peek_button)
@@ -239,6 +246,7 @@ func _layout() -> void:
 		_peek_button.size = Vector2(200, 48) * scale
 		_peek_button.position = Vector2(size.x - _peek_button.size.x - 16 * scale, top)
 		top += _peek_button.size.y + 8 * scale
+	_fit_scroll_options()
 	var skin := _panel.get_theme_stylebox("panel")
 	var width := 520.0
 	if cfg.get("physical_relics", false):
@@ -262,6 +270,41 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif cfg.get("dismissible", false) and event.is_action_pressed("cancel_selection"):
 		get_viewport().set_input_as_handled()
 		_on_choose(int(cfg.get("cancel_index", 0)))
+
+
+func _add_option(parent: VBoxContainer, index: int, hud_scale: float) -> void:
+	var opt: Dictionary = cfg.options[index]
+	var btn := Ink.button(BattleText.clean(str(opt.get("text", "选项 %d" % (index + 1)))), bool(opt.get("primary", false)))
+	btn.name = "Option_%d" % index
+	btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if opt.has("relic_id"): RelicArt.apply_button(btn, str(opt.relic_id), 48 * hud_scale)
+	btn.focus_mode = Control.FOCUS_ALL
+	btn.custom_minimum_size.y = 48 * hud_scale
+	btn.add_theme_font_size_override("font_size", int(20 * hud_scale))
+	btn.disabled = bool(opt.get("disabled", false))
+	btn.pressed.connect(_on_choose.bind(index))
+	parent.add_child(btn)
+	if not str(opt.get("hint", "")).is_empty():
+		var hint := Ink.label(BattleText.clean(str(opt.hint)), "Muted")
+		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		parent.add_child(hint)
+
+
+func _fit_scroll_options() -> void:
+	if _options_scroll == null or not is_inside_tree(): return
+	# 标题、说明与取消固定在列表外；只有候选区按剩余高度滚动。
+	var fixed_height := _padding.get_combined_minimum_size().y - _options_scroll.custom_minimum_size.y + _panel.get_theme_stylebox("panel").get_minimum_size().y
+	var available := maxf(48, size.y - 32 * JourneyStyle.touch_scale(self) - fixed_height)
+	_options_scroll.custom_minimum_size.y = minf(_options_content.get_combined_minimum_size().y, available)
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not cfg.get("scroll_options", false): return
+	var cancel_index := int(cfg.get("cancel_index", -1))
+	if event.is_action_pressed("ui_cancel") and cancel_index >= 0:
+		accept_event()
+		_on_choose(cancel_index)
+
 
 
 func _on_choose(index: int) -> void:

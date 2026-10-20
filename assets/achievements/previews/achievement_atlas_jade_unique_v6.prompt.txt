@@ -1,0 +1,77 @@
+Tool: built-in image_gen.
+Input: achievement_atlas_jade_natural_v5.png.
+Output: complete48-item atlas with unique dominant subjects and distinct silhouettes; natural jade drawing style retained.
+Companion audit: docs/成就玉符差异核对_v6.md.
+Status: visual review atlas; no achievement IDs, conditions, workbook or runtime assets changed.
+
++Use case: precise-object-edit and art-direction redesign.
+Redesign the attached COMPLETE48 jade achievement atlas to remove ALL duplicated or confusingly similar designs, while keeping its APPROVED natural hand-drawn jade carving style, dark teal backdrop, 8×6 grid, clear Traditional Chinese names, and restrained muted green/ivory jade palette.
+The current sheet has exact duplicates: gold-edged leaves, paired fish, mountain arches, curled spirals, cloud scrolls, generic birds. Remove those similarities. This request is not satisfied by changing color, mirror flipping, adding tiny details, or slightly turning the same carving.
+Every icon must have a DIFFERENT DOMINANT SUBJECT AND OUTER SILHOUETTE. All48 subjects below are deliberately unique. Follow them one by one. A subject may appear as dominant motif only once. Do NOT substitute another leaf, fish, bird, spiral, or mountain because it looks attractive.
+Maintain the human-illustrator look: economical dark contours with gently varied weight, matte old celadon and warm ivory nephrite, two or three broad painted shading planes, graceful irregular edges, selected natural inclusions and sparse small tool traces. Most surfaces quiet. No glossy 3D renders, no uniform bevels, neon, bright red, large medal frames, photo textures, noise overload or letters carved on plaques. A few tiny old-gold accents only where specified. These are compact small jade keepsakes; source topics can be represented by a beautiful carved symbol, not literal fully modeled props.
+Names and concepts should be connected intuitively. The subjects below now strengthen that connection.
+
+ONE image, EXACTLY8 columns×6 rows,48 icons, same order. Small title “玉符成就總覽”. All category headings and names TRADITIONAL, each name printed directly below its icon. Give icons enough separation, don’t merge neighbors. Dark muted teal background; no ornate gold border, no landscape, no sample strip, no extra annotation, no numbers.
+
+ROW1 “組詞入門”
+01 落下第一筆 — ONE YOUNG BAMBOO SHOOT with a delicate pointed tip and one small leaf, a single first growing stroke. Slim upright asymmetrical silhouette. This is the only bamboo.
+02 百詞成篇 — OPEN FOLDING PAGE-FAN, five thin ivory-jade page slats radiating from a small hinge, gentle broad fan silhouette; a completed collection of words. No cloud lobes.
+03 千詞成卷 — HORIZONTAL JADE SCROLL with a long central thin sheet and two differently curled end rolls. Clearly broad and horizontal, not one abstract spiral.
+04 識得十詞 — HORIZONTAL EYE-SHAPED pierced jade ornament with a small inset pupil and irregular almond outline, suggesting recognition and knowledge. Not an animal.
+05 詞庫漸豐 — ONE LAYERED LINGZHI jade carving, narrow stalk and three subtly different umbrella-like tiers, growing abundant like a vocabulary store. Must have an obvious stem, not cloud curls.
+06 腹有詞章 — ROUND RIPE POMEGRANATE jade carving, tiny crown at top and one discreet side opening showing two seeds, abundance within. This is the only pomegranate.
+07 初戰告捷 — ONE SWIFT SWALLOW jade carving in upward flight, extended narrow wings and split tail, a returning messenger of victory. This is the only flying bird.
+08 印成一卷 — COMPLETE ANCIENT SQUARE PRINT SEAL with a low arch-shaped seal handle and visible flat square base. No written glyph, no cloud or scroll shape.
+
+ROW2 “戰鬥技巧”
+09 鋒芒初現 — SINGLE CURVED IVORY-JADE FANG, narrow hook with sharp exposed tip and thicker worn root. No leaf veins and no gold.
+10 一擊破陣 — ONE SHORT ARROW piercing an incomplete broken array-ring, arrowhead projects decisively through the gap. Strong diagonal, clearly a broken formation and not a standalone circular ring.
+11 刻石成痕 — UPRIGHT ROUGH STONE-TABLET jade carving with ONE DEEP DIAGONAL CHISEL SCAR. Solid slim monolith, no mountain peak or arch.
+12 接字如流 — ONE LONG SWIMMING FISH jade carving with flowing S-shaped body and relaxed waterlike tail. The ONLY fish-shaped object on the entire sheet.
+13 連篇不絕 — TWO LONG INTERLOCKING OVAL CHAIN LINKS, slim openwork jade with unequal gentle curves, visibly continuous connection. Not a cloud or circular spiral.
+14 餘盾未散 — CLOSED RIVER-CLAM shell jade, low horizontal oval with a protective overlapping lip and one quiet seam. No leaf or shield silhouette.
+15 銅牆留印 — SMALL RESTING TORTOISE jade with broad shell, short head and four little feet, shell has only two engraved courses. Low sturdy form.
+16 毫髮無損 — ONE WHOLE WHITE-JADE FEATHER, slim naturally waved edge and clean intact shaft. Only one feather icon.
+
+ROW3 “儲能熱度”
+17 電光初蓄 — SMALL CLOSED-WING FIREFLY jade charm, rounded oval wing case and a single tiny soft old-gold spot in its abdomen suggesting stored light. No carved lightning plaque.
+18 滿匣雷聲 — SMALL ANCIENT THUNDER DRUM carved in jade, squat barrel body with round upper drumhead, two short restrained side pegs, no dangling strings. Drum implies contained thunder. Not a spiral horn.
+19 一放驚雷 — ANGULAR FORKED LIGHTNING-shaped jade openwork, a decisive long zigzag stem with one short branch, energetic irregular form. No bird or insect wing.
+20 爐心漸赤 — MODEST THREE-LEGGED ROUND INCENSE FURNACE jade charm, shallow open mouth, one very tiny dull ochre inset inside, no red flame. It should feel scholarly and ancient, not generic loot.
+21 熱字出爐 — CLOSED LOTUS-BUD jade carving with an upper seam just beginning to open and a thin warm mineral line. Narrow upright bud, not an open flower.
+22 驟冷成霜 — IRREGULAR CLUSTER OF THREE ICE CRYSTAL SHARDS in pale bluish white jade, sharply angular and unequal. No plum blossom, snowflake or rounded beads.
+23 餘燼落字 — ONE SMALL CURLED MAPLE LEAF jade with pointed lobes and a tiny ochre vein. The only full broad leaf on the sheet. No gold repaired edge.
+24 十響連擊 — THREE TINY ANCIENT L-SHAPED MUSICAL CHIME STONES hanging at staggered lengths from a short unobtrusive jade crossbar. They imply repeated ringing impacts. Clearly angular open chimes, no fish or waves.
+
+ROW4 “字塊養成”
+25 字上生金 — ONE ASYMMETRIC JADE RUYI BELT-HOOK with a tiny OLD-GOLD REPAIR on its broad curved head, thin shaft and small hook tip. The precious gold joins original jade. No leaf.
+26 三字鑲金 — THREE ROUNDED JADE BEADS arranged loosely as a triangle, each different size, linked by hairline old-gold repair seams. Rounded circles, NOT ice shards or seed pods.
+27 字字有價 — ANCIENT SPADE-SHAPED MONEY TOKEN carved from jade, flat wide shoulders and a split forked bottom, one tiny worn gold nick. No writing or round coins. A distinct historical value symbol.
+28 精工一字 — BUDDHA-HAND CITRUS jade carving, several graceful individually carved fingerlike lobes gathered at one root, fine deliberate craftsmanship. Natural intricate carving, no bird, tools, or cube.
+29 立字為礎 — A LOW WIDE SQUARE COLUMN FOOTING with one very short central stone post carved as jade, grounded stable T-like silhouette. No mountain or arch.
+30 二字合印 — TWO COMPLEMENTARY HALF-MOON JADE JUE PIECES interlocking along a clear mortise seam, one ivory and one celadon, asymmetrical joined oval. No fish, animal faces or tags.
+31 反覆打磨 — ONE SMOOTH FLATTENED RIVER PEBBLE jade with a shallow polishing groove and beautifully worn irregular oval contour. No hole, spiral, ring or gold.
+32 借字成章 — SMALL OPENWORK EMPTY NEST with ONE differently colored ivory-jade egg resting in it, borrowing another's resting place. Low woven organic cup silhouette; no adult bird, leaves or scroll.
+
+ROW5 “污染解籤”
+33 拂去墨污 — SMALL TAOIST FLY-WHISK jade carving, a slim stem and a loose curving tassel rendered as two broad ivory sweeps, one tiny dark mineral streak being brushed aside. NOT a bird or feather.
+34 淨字成行 — SIMPLE ANCIENT JADE COMB, slightly arched horizontal spine with a row of six broad short clean teeth. Distinct disciplined row, no plant or letter plaques.
+35 污字亦成詞 — IRREGULAR MOTTLED DARK-JADE MOSAIC FRAGMENT with an expressive dark mineral band becoming part of its composition, three unequal jagged corners. It remains beautiful despite inclusion; no cloud or leaf outline.
+36 止於一字 — SMALL DELICATE PRUNING-SHEARS JADE OPENWORK with two restrained oval handles, short crossed tips and ONE tiny cut bud beside the tips. Implies cutting off multiplication early. No fern spiral or red bar.
+37 折頁解籤 — ONE HALF-OPEN MOTH-WING jade carving, a folded triangular wing beginning to unfold, subtle midfold; unmistakably a moth, not a bird feather or full butterfly.
+38 紅藍對校 — TWO SLENDER COMPLEMENTARY JADE CALIBRATION SLIPS, ivory and dark blue-green, unequal lengths with matching notches aligning at one edge and one short dark proof-mark groove. Small quiet paired straight instruments, NOT fish, tags or colored ribbons.
+39 移字出軌 — COMPACT Y-SHAPED RAIL SWITCH carved in jade, two parallel lower bars becoming a short fork where one little square part moves to the outer branch. Clearly track switching, no reed plant.
+40 一紙無塵 — SINGLE THIN IVORY-JADE WATER DROP, calm unmarked surface and one slightly curved tip, pure and light. No leaf veins or feather.
+
+ROW6 “首領旅途”
+41 破開鉛版 — TWO UNEQUAL FLAT RECTANGULAR PRINTING-PLATE PIECES with one torn vertical separation and a few shallow printing-grid traces. Broad flat pair; no mountains, arches or upright monolith.
+42 字魔伏誅 — SMALL FRONTAL ANCIENT JADE BEAST MASK, broad angular face, closed mouth and quiet brow ridges. One archaic face only, no cartoon glowing eyes or red markings.
+43 平定混鉛 — THREE HORIZONTAL CALM WATER-RIPPLE BANDS carved as a low wide jade openwork, different lengths, one slack central crest. No fish, cloud curling heads or spiral.
+44 沿途留印 — ONE WORN ELONGATED CLOUD-SHAPED JADE HUANG FRAGMENT, three discreet shallow notch traces along lower edge. Only this icon uses a cloud-shaped outer silhouette. Low and irregular, no map or footsteps.
+45 百程入卷 — LONG FLAT IRREGULAR ANCIENT MAP-SCREEN jade carving with a single winding route and two tiny route-point depressions. No scroll rollers, cloud or mountain silhouette; wide panel with gently curved ends.
+46 奇聞十錄 — SMALL ATTENTIVE SEATED FOX jade carving, one tilted tall ear, big quiet tail, side-facing. Different silhouette from all birds, masks and tortoise.
+47 行囊漸滿 — LITTLE TWO-LOBED TRAVEL GOURD jade with narrow neck and rounded lower belly, one tiny old-gold neck band. No pomegranate crown, bags or cube stacks.
+48 舊物成藏 — TIME-WORN SHORT JADE CONG fragment, softly squared cylinder, round central opening and a single incised band. Quiet low two-plane drawing, no photorealistic 3D cube.
+
+FINAL REVIEW RULE:
+Check each cell against this list before rendering the final sheet. Do not repeat any dominant subject or simply mirror a neighbor. In particular there must NOT be a second fish, full leaf, flying bird, bamboo, cloud outline, gold-edged leaf, mountain arch, generic spiral, or paired-fish design. ALL48 labels are exact Traditional Chinese and appear once. One beautiful cohesive jade-carving family,48 unmistakably different readable silhouettes.

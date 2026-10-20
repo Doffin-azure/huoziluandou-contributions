@@ -598,14 +598,14 @@ func _test_out_of_battle() -> void:
 	_ok(GameState.deck_size() == n + 4 and GameState.glyph_counts().get("火", 0) >= 4, "火种（主线）：字袋 +4 枚【火】")
 	_reset()
 	ex = Expedition.start(4)
+	var fire_before: int = GameState.glyph_counts().get("火", 0)
 	GameState.add_relic("fireman")
-	_ok(ex.tray.count("火") == 4, "火种（远征）：4 枚【火】先进字匣")
-	ex.tray = ["一", "二", "三", "四", "五"]
+	_ok(GameState.glyph_counts().get("火", 0) == fire_before + 4, "火种（远征）：4 枚火直接入字袋")
 	GameState.relics.clear()
 	GameState.relic_counters.clear()
 	var deck_n := GameState.deck_size()
 	GameState.add_relic("fireman")
-	_ok(ex.tray.size() == 6 and GameState.deck_size() == deck_n + 3, "火种（远征）：字匣满了按原规则进字袋")
+	_ok(GameState.deck_size() == deck_n + 4, "火种（远征）：没有容量中转，四枚火全部入字袋")
 	GameState.expedition = null
 	_reset(["egg"])
 	n = GameState.deck_size()
@@ -636,11 +636,12 @@ func _test_expedition() -> void:
 	ex.m = MapGen.generate(17, "熔铸坊")
 	for k in ex.m.mech:
 		if ex.m.mech[k].g == "炉": ex.pos = k; break
-	ex.tray = ["击","强","力"]
+	GameState.deck.clear()
+	for glyph in ["击","强","力"]: GameState.add_character(Database.get_character_by_glyph(glyph))
 	ex.panels = [{"kind":"forge","k":ex.pos}]
 	var before: Array = GameState.relics.duplicate()
-	_ok(not ex.forge(0,0) and ex.tray.size() == 3, "熔炉重复选同一字不吞字")
-	_ok(ex.forge(0,1) and GameState.relics == before and ex.tray.size() == 2, "原相关字现在仅换字，不合成遗物")
+	_ok(not ex.forge(0,0) and GameState.deck_size() == 3, "熔炉重复选同一字不吞字")
+	_ok(ex.forge(0,1) and GameState.relics == before and GameState.deck_size() == 2, "字袋材料仅换字，不合成遗物")
 	ex.panels = [{"kind":"forge","k":ex.pos}]
 	_ok(not ex.forge(0,1), "同一熔炉不能反复使用")
 	GameState.expedition = null

@@ -1,5 +1,5 @@
 extends ScreenBase
-## 墨途远征地图（v0.3）：左边迷雾地图 + 日志，中间构筑说明 / 字匣，右边事件面板。
+## 墨途远征地图：左边迷雾地图 + 日志，中间构筑说明，右边事件面板。
 ## 状态全在 GameState.expedition（Expedition），本界面只负责显示与转发操作。
 
 const MAP_CELL := 40
@@ -11,8 +11,6 @@ const NODE_TIP := {"起": "起点", "大": "大赏：打开会立刻惊动首领
 
 var ex: Expedition
 var _map_grid: GridContainer
-var _tray_row: HFlowContainer
-var _tray_actions: HBoxContainer
 var _build_box: VBoxContainer
 var _build_scroll: ScrollContainer
 var _event_box: VBoxContainer
@@ -24,7 +22,6 @@ var _stat_label: Label
 var _seal_label: Label
 var _relic_label: Label
 var _confront_btn: Button
-var _sel := -1
 var _forge_sel: Array = []
 var _boss_bar: PanelContainer
 var _boss_bar_label: Label
@@ -49,6 +46,7 @@ func build(root: Control) -> void:
 	ex = GameState.expedition
 	if ex == null:
 		ex = Expedition.start()
+		Achievements.start_run("expedition")
 	_mobile = JourneyStyle.touch_scale(self) > 1.1
 	if _mobile:
 		_map_cell_size = int(ceil(48 * JourneyStyle.touch_scale(self)))
@@ -221,13 +219,6 @@ func _build_middle() -> Control:
 	col.add_child(Ink.h2("战斗构筑"))
 	_build_box = Ink.vbox(6)
 	col.add_child(_build_box)
-	col.add_child(Ink.caption("字匣 · 选字后加入字袋"))
-	_tray_row = HFlowContainer.new()
-	_tray_row.add_theme_constant_override("h_separation", 4)
-	_tray_row.add_theme_constant_override("v_separation", 4)
-	col.add_child(_tray_row)
-	_tray_actions = Ink.hbox(6)
-	col.add_child(_tray_actions)
 	return panel
 
 
@@ -254,7 +245,7 @@ func _open_deck() -> void:
 		var cd: CharacterData = Database.get_character_by_glyph(id)
 		if cd != null:
 			chars.append(cd)
-	viewer.setup({"title": "字袋", "subtitle": "%d / %d 枚 · 战斗时从这里抽字" % [GameState.deck_size(), Expedition.DECK_CAP], "characters": chars, "counts": counts})
+	viewer.setup({"title": "字袋", "instances": GameState.deck, "subtitle": "%d 枚 · 战斗时从这里抽字" % GameState.deck_size(), "characters": chars, "counts": counts})
 	viewer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(viewer)
 
@@ -319,7 +310,7 @@ func _on_stats_changed() -> void:
 	_title_label.text = "墨途远征" if _mobile else "墨途远征 · 第 %d 幕 · %s" % [ex.act, ex.m.tn]
 	_boss_label.text = "第 %d 幕 · %s · %d 步" % [ex.act, ex.m.tn, ex.t] if _mobile else "%s　·　第 %d 步" % [ex.boss_status(), ex.t]
 	_hp_bar.setup_bar(GameState.player_hp, GameState.player_max_hp, JourneyStyle.RED)
-	_stat_label.text = "墨 %d　❖ %d　字袋 %d/%d" % [ex.ink, GameState.gold, GameState.deck_size(), Expedition.DECK_CAP]
+	_stat_label.text = "墨 %d　❖ %d　字袋 %d" % [ex.ink, GameState.gold, GameState.deck_size()]
 	_seal_label.text = "印章：" + ("、".join(ex.seals) if not ex.seals.is_empty() else "无")
 	_seal_label.tooltip_text = "\n".join(ex.seals.map(func(s): return "%s：%s" % [s, Expedition.SEALS[s][0]]))
 	_relic_label.text = "遗物：" + ("、".join(GameState.relics.slice(0, 2).map(func(r): return Relics.name_of(r))) + (" 等%d件" % GameState.relics.size() if GameState.relics.size() > 2 else "") if not GameState.relics.is_empty() else "无")
@@ -472,7 +463,7 @@ func _refresh_build() -> void:
 		"第%d幕 · %s" % [ex.act, ["起步", "成型", "兑现"][ex.act - 1]],
 		["基础应对 → 盘面练习 → 污染管理", "资源运转 → 费用调度 → 组合考验", "复合应对 → 循环稳定 → 终局考验"][ex.act - 1],
 		"越深入，怪物机制越复杂。精英守着高价值奖励；前往深区前先补强字袋。",
-		"字匣里的字可加入字袋，或在地图熔炉换字。中赏、大赏可选择遗物。",
+		"新字直接收入字袋；地图熔炉可用字袋里的两枚字换字。中赏、大赏可选择遗物。",
 		"组词在战斗的4×4字盘内完成，印章与遗物提供跨战成长。",
 	]
 	for text in texts:
@@ -480,42 +471,6 @@ func _refresh_build() -> void:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.custom_minimum_size.x = 210
 		_build_box.add_child(label)
-	_refresh_tray()
-
-
-func _refresh_tray() -> void:
-	for child in _tray_row.get_children():
-		child.queue_free()
-	for child in _tray_actions.get_children():
-		child.queue_free()
-	if _sel >= ex.tray.size():
-		_sel = -1
-	var forging: bool = ex.top_panel().get("kind", "") == "forge"
-	for i in ex.tray.size():
-		var on: bool = (_sel == i) if not forging else _forge_sel.has(i)
-		var b := _cell(ex.tray[i], _map_cell_size if _mobile else 38, Palette.VERMILION if on else Palette.SURFACE_RAISED, Palette.PAPER if on else Palette.INK, Palette.BORDER_SOFT)
-		b.pressed.connect(_on_tray.bind(i))
-		_tray_row.add_child(b)
-	for i in range(ex.tray.size(), ex.tray_cap()):
-		var empty := _cell("", _map_cell_size if _mobile else 38, Palette.PAPER_DARK, Palette.INK, Palette.BORDER_SOFT)
-		empty.disabled = true
-		_tray_row.add_child(empty)
-	if _sel >= 0 and not ex.busy():
-		var to_deck := _ghost("进字袋", func(): ex.tray_to_deck(_sel); _sel = -1)
-		to_deck.disabled = GameState.deck_size() >= Expedition.DECK_CAP
-		_tray_actions.add_child(to_deck)
-		_tray_actions.add_child(_ghost("丢掉", func(): ex.discard(_sel); _sel = -1))
-
-
-func _on_tray(i: int) -> void:
-	if ex.top_panel().get("kind", "") == "forge":
-		if _forge_sel.has(i):
-			_forge_sel.erase(i)
-		elif _forge_sel.size() < 2:
-			_forge_sel.append(i)
-	else:
-		_sel = -1 if _sel == i else i
-	refresh()
 
 
 func _refresh_log() -> void:
@@ -560,8 +515,6 @@ func _event_idle() -> void:
 	_add(Ink.body("点脚边的金框格前进。迷雾里只看得见身边 %d 步；★ 是隔着迷雾发光的引导点（大赏、休息点、商店）。" % ex.vision()))
 	_add(Ink.caption("首领被惊动后会沿最短路追来。战斗、休息都要花时间。被追上的位置会给首领战一个减益；主动迎战不吃减益。"))
 	_add(Ink.caption("「封」：被伏兵控制的奖励，伏兵就在附近。走进它的领地就必须开战。"))
-	if ex.tray.size() >= ex.tray_cap():
-		_add(Ink.label("字匣满了：把字放进字袋、在熔炉换字，或丢掉。", "", Palette.VERMILION))
 
 
 func _event_fight() -> void:
@@ -596,7 +549,7 @@ func _start_battle() -> void:
 
 func _event_loot(p: Dictionary) -> void:
 	_add(Ink.h2({"大": "大赏", "中": "中赏", "小": "小赏"}[p.tier]))
-	_add(Ink.caption("挑一样。字先进字匣（%d/%d），满了进字袋。" % [ex.tray.size(), ex.tray_cap()]))
+	_add(Ink.caption("挑一样。获得的字直接收入字袋。"))
 	for i in p.options.size():
 		var o: Dictionary = p.options[i]
 		var title := ex.loot_text(o)
@@ -636,6 +589,13 @@ func _event_shop() -> void:
 				b = _ghost("%s　❖ %d" % [label, cost], func(): ex.buy(i))
 		b.disabled = GameState.gold < cost or (o.kind == "relic" and GameState.has_relic(o.relic))
 		_add(b)
+		if o.has("glyph"):
+			var character := Database.get_character_by_glyph(str(o.glyph))
+			if character != null:
+				var description := EffectText.new()
+				description.add_theme_font_size_override("normal_font_size", 17)
+				description.set_effect_text(EffectGlossary.character_hint(character))
+				_add(description)
 		if o.kind == "relic":
 			RelicArt.apply_button(b, str(o.relic))
 			var cap := Ink.caption(Relics.desc_of(o.relic))
@@ -646,7 +606,7 @@ func _event_shop() -> void:
 		sell.tooltip_text = Relics.text(id)
 		RelicArt.apply_button(sell, str(id))
 		_add(sell)
-	_add(Ink.caption("丢弃过的字可按半价回购。"))
+	if not ex.buyback.is_empty(): _add(Ink.caption("旧存档的回购字仍可按半价买回。"))
 	var refresh := _ghost("刷新货架　❖ %d" % ex.shop_refresh_cost(), func(): ex.refresh_shop())
 	refresh.disabled = GameState.gold < ex.shop_refresh_cost()
 	_add(refresh)
@@ -656,12 +616,32 @@ func _event_shop() -> void:
 
 func _event_forge() -> void:
 	_add(Ink.h2("熔炉"))
-	_add(Ink.body("在字匣里选两枚字，换一枚稀有字。每处熔炉只能用一次。"))
-	var gs: Array = _forge_sel.map(func(i): return ex.tray[i])
-	var b := _ghost("熔成稀有字" + "".join(gs.map(func(g): return "【%s】" % g)), func(): ex.forge(_forge_sel[0], _forge_sel[1]); _forge_sel.clear(), true)
+	_add(Ink.body("从字袋选两枚字，换一枚稀有字。每处熔炉只能用一次；已绑定遗物的字不能作为材料。"))
+	_forge_sel = _forge_sel.filter(func(uid): return GameState.deck.any(func(inst): return inst.uid == uid))
+	var grid := HFlowContainer.new()
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 6)
+	_add(grid)
+	for inst in GameState.deck:
+		var button := _cell(inst.glyph(), _map_cell_size if _mobile else 48, Palette.VERMILION if _forge_sel.has(inst.uid) else Palette.SURFACE_RAISED, Palette.PAPER if _forge_sel.has(inst.uid) else Palette.INK, Palette.BORDER_SOFT)
+		button.tooltip_text = inst.data.description
+		button.disabled = GameState.relic_binds.values().has(inst.uid)
+		button.pressed.connect(func():
+			if _forge_sel.has(inst.uid): _forge_sel.erase(inst.uid)
+			elif _forge_sel.size() < 2: _forge_sel.append(inst.uid)
+			refresh())
+		grid.add_child(button)
+	var b := _ghost("熔成稀有字", _forge_from_deck, true)
 	b.disabled = _forge_sel.size() != 2
 	_add(b)
 	_add(_ghost("不熔，走开", func(): ex.leave_panel(); _forge_sel.clear()))
+
+
+func _forge_from_deck() -> void:
+	if _forge_sel.size() != 2: return
+	var a := GameState.deck.find_custom(func(inst): return inst.uid == _forge_sel[0])
+	var b := GameState.deck.find_custom(func(inst): return inst.uid == _forge_sel[1])
+	if ex.forge(a, b): _forge_sel.clear()
 
 
 func _event_mystery(p: Dictionary) -> void:
@@ -726,30 +706,11 @@ func _event_act_end() -> void:
 	if ex.act < 3:
 		var supply := ex.act_supply()
 		_add(Ink.body("进入下一幕后补给：铜钱 +%d，气血最多 +%d，墨 +%d。" % [supply.gold, supply.heal, supply.ink]))
-		_add(Ink.caption("补给仅发放一次。剩余的墨、字匣、字袋、印章和遗物带入下一幕。"))
+		_add(Ink.caption("补给仅发放一次。剩余的墨、字袋、印章和遗物带入下一幕。"))
 
 
 func _event_over() -> void:
-	_add(Ink.h2("远征完成" if ex.won else "远征中止"))
-	_add(Ink.body("三幕已尽，字阵大成。" if ex.won else "字散墨枯，这一程到此为止。"))
-	_add(Ink.caption("字袋 %d 枚 · 印章 %d 个" % [GameState.deck_size(), ex.seals.size()]))
-	_add(_ghost("再走一程", func(): ex = Expedition.start(), true))
-	_add(_ghost("返回标题", func(): goto("res://src/screens/title_screen.gd")))
-
-
-## 从字袋里挑一枚（删字 / 修饰）
-func _pick_deck(title: String, done: Callable) -> void:
-	var counts := GameState.glyph_counts()
-	var chars: Array = []
-	for id in counts:
-		var cd: CharacterData = Database.get_character_by_glyph(id)
-		if cd != null:
-			chars.append(cd)
-	var overlay := CollectionOverlay.new()
-	overlay.setup({"title": title, "subtitle": "点一枚字", "characters": chars, "counts": counts, "pick_on_click": true})
-	overlay.picked.connect(func(cd: CharacterData): done.call(cd.id); refresh())
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(overlay)
+	goto.call_deferred("res://src/screens/run_result_screen.gd", {"victory":ex.won})
 
 
 # ---------------------------------------------------------------- 首领棋子
@@ -922,4 +883,13 @@ func _legend_row(glyph: String, bg: Color, fg: Color, desc: String) -> Control:
 func _open_loadout() -> void:
 	var overlay := ChoiceOverlay.new()
 	overlay.setup({"title":"印章与遗物", "body":_seal_label.text + "\n" + _seal_label.tooltip_text + "\n\n" + "\n".join(GameState.relics.map(func(id): return Relics.text(id))), "relics":GameState.relics.duplicate(), "hud_details":true,"scroll_body":true,"dismissible":true,"options":[{"text":"返回整备","primary":true}]})
+	add_child(overlay)
+
+
+func _pick_deck(title: String, callback: Callable) -> void:
+	var overlay := CollectionOverlay.new()
+	overlay.setup({"title":title,"instances":GameState.deck,"counts":GameState.glyph_counts(),"pick_on_click":true})
+	overlay.picked.connect(func(character: CharacterData):
+		callback.call(character.id)
+		refresh())
 	add_child(overlay)

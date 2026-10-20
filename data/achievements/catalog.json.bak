@@ -1,0 +1,3572 @@
+{
+  "version": 2,
+  "contract": "huozi.achievements.v2",
+  "runtime_status": "tracking_enabled",
+  "source_sha256": "743ef47a35a73e48deb4518fbbe736e8ef55e1bdfe1f5067fe63d47a762eeafc",
+  "tables": {
+    "成就配置": [
+      [
+        "first_word",
+        "落下第一笔",
+        "组词入门",
+        "素玉",
+        "累计成功打出{target}个词。",
+        1,
+        "累计",
+        "word_plays",
+        "",
+        "",
+        0,
+        1,
+        "seal_first_word",
+        1
+      ],
+      [
+        "words_100",
+        "百词成篇",
+        "组词入门",
+        "青玉",
+        "累计成功打出{target}个词。",
+        100,
+        "累计",
+        "word_plays",
+        "",
+        "first_word",
+        0,
+        1,
+        "seal_words_100",
+        2
+      ],
+      [
+        "words_1000",
+        "千词成卷",
+        "组词入门",
+        "金縫",
+        "累计成功打出{target}个词。",
+        1000,
+        "累计",
+        "word_plays",
+        "",
+        "words_100",
+        0,
+        1,
+        "seal_words_1000",
+        3
+      ],
+      [
+        "vocab_10",
+        "识得十词",
+        "组词入门",
+        "素玉",
+        "累计打出{target}种不同的词。",
+        10,
+        "累计",
+        "unique_words",
+        "",
+        "",
+        0,
+        1,
+        "seal_vocab_10",
+        4
+      ],
+      [
+        "vocab_40",
+        "词库渐丰",
+        "组词入门",
+        "青玉",
+        "累计打出{target}种不同的词。",
+        40,
+        "累计",
+        "unique_words",
+        "",
+        "vocab_10",
+        0,
+        1,
+        "seal_vocab_40",
+        5
+      ],
+      [
+        "vocab_80",
+        "腹有词章",
+        "组词入门",
+        "金縫",
+        "累计打出{target}种不同的词。",
+        80,
+        "累计",
+        "unique_words",
+        "",
+        "vocab_40",
+        0,
+        1,
+        "seal_vocab_80",
+        6
+      ],
+      [
+        "first_battle",
+        "初战告捷",
+        "组词入门",
+        "素玉",
+        "累计赢得{target}场战斗。",
+        1,
+        "累计",
+        "battle_wins",
+        "",
+        "",
+        0,
+        1,
+        "seal_first_battle",
+        7
+      ],
+      [
+        "first_clear",
+        "印成一卷",
+        "组词入门",
+        "金縫",
+        "完成{target}次冒险通关。",
+        1,
+        "累计",
+        "run_wins",
+        "",
+        "",
+        0,
+        1,
+        "seal_first_clear",
+        8
+      ],
+      [
+        "damage_20",
+        "锋芒初现",
+        "战斗技巧",
+        "素玉",
+        "一次攻击累计造成至少{target}伤害。",
+        20,
+        "单次",
+        "attack_damage",
+        "",
+        "",
+        0,
+        1,
+        "seal_damage_20",
+        9
+      ],
+      [
+        "damage_50",
+        "一击破阵",
+        "战斗技巧",
+        "青玉",
+        "一次攻击累计造成至少{target}伤害。",
+        50,
+        "单次",
+        "attack_damage",
+        "",
+        "damage_20",
+        0,
+        1,
+        "seal_damage_50",
+        10
+      ],
+      [
+        "damage_100",
+        "刻石成痕",
+        "战斗技巧",
+        "金縫",
+        "一次攻击累计造成至少{target}伤害。",
+        100,
+        "单次",
+        "attack_damage",
+        "",
+        "damage_50",
+        1,
+        1,
+        "seal_damage_100",
+        11
+      ],
+      [
+        "turn_words_5",
+        "接字如流",
+        "战斗技巧",
+        "素玉",
+        "一个回合内成功打出{target}个词。",
+        5,
+        "单回合",
+        "word_plays",
+        "",
+        "",
+        0,
+        1,
+        "seal_turn_words_5",
+        12
+      ],
+      [
+        "turn_words_8",
+        "连篇不绝",
+        "战斗技巧",
+        "青玉",
+        "一个回合内成功打出{target}个词。",
+        8,
+        "单回合",
+        "word_plays",
+        "",
+        "turn_words_5",
+        0,
+        1,
+        "seal_turn_words_8",
+        13
+      ],
+      [
+        "shield_20",
+        "余盾未散",
+        "战斗技巧",
+        "素玉",
+        "一场战斗中持久盾达到{target}点。",
+        20,
+        "单战",
+        "persistent_shield",
+        "",
+        "",
+        0,
+        1,
+        "seal_shield_20",
+        14
+      ],
+      [
+        "shield_50",
+        "铜墙留印",
+        "战斗技巧",
+        "青玉",
+        "一场战斗中持久盾达到{target}点。",
+        50,
+        "单战",
+        "persistent_shield",
+        "",
+        "shield_20",
+        0,
+        1,
+        "seal_shield_50",
+        15
+      ],
+      [
+        "flawless_win",
+        "毫发无损",
+        "战斗技巧",
+        "金縫",
+        "累计{target}场战斗未失去生命并获胜。",
+        1,
+        "累计",
+        "flawless_wins",
+        "",
+        "",
+        0,
+        1,
+        "seal_flawless_win",
+        16
+      ],
+      [
+        "energy_10",
+        "电光初蓄",
+        "储能热度",
+        "素玉",
+        "一场战斗中储能达到{target}点。",
+        10,
+        "单战",
+        "energy_peak",
+        "",
+        "",
+        0,
+        1,
+        "seal_energy_10",
+        17
+      ],
+      [
+        "energy_25",
+        "满匣雷声",
+        "储能热度",
+        "青玉",
+        "一场战斗中储能达到{target}点。",
+        25,
+        "单战",
+        "energy_peak",
+        "",
+        "energy_10",
+        0,
+        1,
+        "seal_energy_25",
+        18
+      ],
+      [
+        "spend_energy_10",
+        "一放惊雷",
+        "储能热度",
+        "青玉",
+        "一次出字实际消耗至少{target}点储能。",
+        10,
+        "单次",
+        "energy_spent",
+        "",
+        "",
+        0,
+        1,
+        "seal_spend_energy_10",
+        19
+      ],
+      [
+        "heat_10",
+        "炉心渐赤",
+        "储能热度",
+        "素玉",
+        "一场战斗中热度达到{target}点。",
+        10,
+        "单战",
+        "heat_peak",
+        "",
+        "",
+        0,
+        1,
+        "seal_heat_10",
+        20
+      ],
+      [
+        "overflow_3",
+        "热字出炉",
+        "储能热度",
+        "素玉",
+        "一场战斗中由溢热生成{target}枚灼热【热】。",
+        3,
+        "单战",
+        "overflow_created",
+        "",
+        "",
+        0,
+        1,
+        "seal_overflow_3",
+        21
+      ],
+      [
+        "cool_10",
+        "骤冷成霜",
+        "储能热度",
+        "青玉",
+        "一次出字实际降低至少{target}点热度。",
+        10,
+        "单次",
+        "heat_cooled",
+        "",
+        "",
+        0,
+        1,
+        "seal_cool_10",
+        22
+      ],
+      [
+        "burn_kill",
+        "余烬落字",
+        "储能热度",
+        "素玉",
+        "累计让灼烧击败{target}名敌人。",
+        1,
+        "累计",
+        "burn_kills",
+        "",
+        "",
+        0,
+        1,
+        "seal_burn_kill",
+        23
+      ],
+      [
+        "hits_10",
+        "十响连击",
+        "储能热度",
+        "金縫",
+        "一次攻击实际命中至少{target}段。",
+        10,
+        "单次",
+        "attack_hits",
+        "",
+        "",
+        0,
+        1,
+        "seal_hits_10",
+        24
+      ],
+      [
+        "first_gild",
+        "字上生金",
+        "字块养成",
+        "素玉",
+        "累计为{target}枚原字永久镀金。",
+        1,
+        "累计",
+        "gilded_tiles",
+        "",
+        "",
+        0,
+        1,
+        "seal_first_gild",
+        25
+      ],
+      [
+        "gild_3",
+        "三字镶金",
+        "字块养成",
+        "青玉",
+        "一局冒险中为{target}枚原字永久镀金。",
+        3,
+        "单局",
+        "gilded_tiles",
+        "",
+        "first_gild",
+        0,
+        1,
+        "seal_gild_3",
+        26
+      ],
+      [
+        "gild_gold_10",
+        "字字有价",
+        "字块养成",
+        "金縫",
+        "一场战斗中由镀金获得{target}金币。",
+        10,
+        "单战",
+        "gild_gold",
+        "",
+        "",
+        0,
+        1,
+        "seal_gild_gold_10",
+        27
+      ],
+      [
+        "first_refine",
+        "精工一字",
+        "字块养成",
+        "素玉",
+        "累计成功精炼{target}次。",
+        1,
+        "累计",
+        "refine_uses",
+        "",
+        "",
+        0,
+        1,
+        "seal_first_refine",
+        28
+      ],
+      [
+        "pin_used",
+        "立字为础",
+        "字块养成",
+        "素玉",
+        "一场战斗中有效使用固定字{target}次。",
+        1,
+        "单战",
+        "pinned_used",
+        "",
+        "",
+        0,
+        1,
+        "seal_pin_used",
+        29
+      ],
+      [
+        "first_fusion",
+        "二字合印",
+        "字块养成",
+        "青玉",
+        "累计成功融合{target}次。",
+        1,
+        "累计",
+        "fusion_success",
+        "",
+        "",
+        0,
+        1,
+        "seal_first_fusion",
+        30
+      ],
+      [
+        "extra_use_5",
+        "反复打磨",
+        "字块养成",
+        "青玉",
+        "一场战斗中消耗{target}次额外使用。",
+        5,
+        "单战",
+        "extra_use_spent",
+        "",
+        "",
+        0,
+        1,
+        "seal_extra_use_5",
+        31
+      ],
+      [
+        "temp_words_10",
+        "借字成章",
+        "字块养成",
+        "金縫",
+        "一场战斗中使用{target}枚临时字组词。",
+        10,
+        "单战",
+        "temporary_word_tiles",
+        "",
+        "",
+        0,
+        1,
+        "seal_temp_words_10",
+        32
+      ],
+      [
+        "first_cleanse",
+        "拂去墨污",
+        "污染解签",
+        "素玉",
+        "累计净化{target}个污染标签。",
+        1,
+        "累计",
+        "pollution_cleansed",
+        "",
+        "",
+        0,
+        1,
+        "seal_first_cleanse",
+        33
+      ],
+      [
+        "cleanse_5",
+        "净字成行",
+        "污染解签",
+        "青玉",
+        "一场战斗中净化{target}个污染标签。",
+        5,
+        "单战",
+        "pollution_cleansed",
+        "",
+        "first_cleanse",
+        0,
+        1,
+        "seal_cleanse_5",
+        34
+      ],
+      [
+        "polluted_words_20",
+        "污字亦成词",
+        "污染解签",
+        "青玉",
+        "累计使用{target}枚污染字组词。",
+        20,
+        "累计",
+        "polluted_word_tiles",
+        "",
+        "",
+        0,
+        1,
+        "seal_polluted_words_20",
+        35
+      ],
+      [
+        "replicate_stop_3",
+        "止于一字",
+        "污染解签",
+        "金縫",
+        "一场战斗中，在首次复制前移除或净化{target}枚敌方蔓生字。",
+        3,
+        "单战",
+        "replicate_removed",
+        "",
+        "",
+        0,
+        1,
+        "seal_replicate_stop_3",
+        36
+      ],
+      [
+        "fold_unseal",
+        "折页解签",
+        "污染解签",
+        "素玉",
+        "累计完成折页蛾解签{target}次。",
+        1,
+        "累计",
+        "fold_tasks",
+        "",
+        "",
+        0,
+        1,
+        "seal_fold_unseal",
+        37
+      ],
+      [
+        "proof_3",
+        "红蓝对校",
+        "污染解签",
+        "金縫",
+        "一场战斗中完整完成{target}组红蓝签任务。",
+        3,
+        "单战",
+        "proof_tasks",
+        "",
+        "",
+        0,
+        1,
+        "seal_proof_3",
+        38
+      ],
+      [
+        "rail_clear",
+        "移字出轨",
+        "污染解签",
+        "青玉",
+        "累计完成铅轨机清轨任务{target}次。",
+        1,
+        "累计",
+        "rail_tasks",
+        "",
+        "",
+        0,
+        1,
+        "seal_rail_clear",
+        39
+      ],
+      [
+        "cleanse_50",
+        "一纸无尘",
+        "污染解签",
+        "金縫",
+        "累计净化{target}个污染标签。",
+        50,
+        "累计",
+        "pollution_cleansed",
+        "",
+        "first_cleanse",
+        0,
+        1,
+        "seal_cleanse_50",
+        40
+      ],
+      [
+        "boss_plate",
+        "破开铅版",
+        "首领旅途",
+        "青玉",
+        "累计击败【铅版】{target}次。",
+        1,
+        "累计",
+        "enemy_kills",
+        "boss_lead_plate",
+        "",
+        0,
+        1,
+        "seal_boss_plate",
+        41
+      ],
+      [
+        "boss_demon",
+        "字魔伏诛",
+        "首领旅途",
+        "青玉",
+        "累计击败【字魔】{target}次。",
+        1,
+        "累计",
+        "enemy_kills",
+        "boss_word_demon",
+        "",
+        0,
+        1,
+        "seal_boss_demon",
+        42
+      ],
+      [
+        "boss_chaos",
+        "平定混铅",
+        "首领旅途",
+        "墨玉",
+        "累计击败【混铅海】{target}次。",
+        1,
+        "累计",
+        "enemy_kills",
+        "boss_chaos_press",
+        "",
+        1,
+        1,
+        "seal_boss_chaos",
+        43
+      ],
+      [
+        "nodes_20",
+        "沿途留印",
+        "首领旅途",
+        "素玉",
+        "累计完成{target}个旅途节点。",
+        20,
+        "累计",
+        "nodes_completed",
+        "",
+        "",
+        0,
+        1,
+        "seal_nodes_20",
+        44
+      ],
+      [
+        "nodes_100",
+        "百程入卷",
+        "首领旅途",
+        "金縫",
+        "累计完成{target}个旅途节点。",
+        100,
+        "累计",
+        "nodes_completed",
+        "",
+        "nodes_20",
+        0,
+        1,
+        "seal_nodes_100",
+        45
+      ],
+      [
+        "events_10",
+        "奇闻十录",
+        "首领旅途",
+        "青玉",
+        "累计完成{target}种不同事件。",
+        10,
+        "累计",
+        "unique_events",
+        "",
+        "",
+        0,
+        1,
+        "seal_events_10",
+        46
+      ],
+      [
+        "shop_5",
+        "行囊渐满",
+        "首领旅途",
+        "素玉",
+        "一局冒险中在商店买入{target}件商品。",
+        5,
+        "单局",
+        "shop_purchases",
+        "",
+        "",
+        0,
+        1,
+        "seal_shop_5",
+        47
+      ],
+      [
+        "relics_5",
+        "旧物成藏",
+        "首领旅途",
+        "青玉",
+        "一局冒险中同时持有{target}件不同遗物。",
+        5,
+        "单局",
+        "relics_held",
+        "",
+        "",
+        0,
+        1,
+        "seal_relics_5",
+        48
+      ]
+    ],
+    "徽章美术": [
+      [
+        "seal_first_word",
+        "一枚活字与短刻线",
+        "中心刻一枚凸起活字，底部留一道印痕",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_words_100",
+        "三枚相连活字",
+        "三枚方字沿斜线排布，细线连成短句",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_words_1000",
+        "展开的金属书卷",
+        "卷轴上刻三排短线，用留白组成书脊",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_vocab_10",
+        "打开的小词册",
+        "两页薄册中心刻十字形分隔",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_vocab_40",
+        "书册与四角标记",
+        "四枚页签围绕打开的书册",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_vocab_80",
+        "层叠字匣",
+        "三层字匣组成紧凑的山形",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_first_battle",
+        "短剑压住纸角",
+        "剑尖与折纸只保留两组轮廓",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_first_clear",
+        "合拢书卷与印章",
+        "卷轴中央刻一枚圆印，外缘不增加装饰",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_damage_20",
+        "一道破开的刻痕",
+        "一道宽斜刻痕穿过中心方块",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_damage_50",
+        "裂开的盾牌",
+        "中心盾形分为三片，裂缝清晰",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_damage_100",
+        "被劈开的石碑",
+        "石碑裂成两半，刻痕深且少",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_turn_words_5",
+        "五段相接的刻线",
+        "五道短线沿弧形依次排布",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_turn_words_8",
+        "连续展开的折页",
+        "折页连续八段，以粗细刻线分层",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_shield_20",
+        "双层盾",
+        "内盾实面，外盾用断续蚀刻线表示",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_shield_50",
+        "盾与砖墙",
+        "简化三层砖纹护住中央盾牌",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_flawless_win",
+        "完整无缺的纸盾",
+        "无缺口的盾面上刻一片轻羽",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_energy_10",
+        "半满蓄电匣",
+        "方匣内刻一道闪电与两格电量",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_energy_25",
+        "蓄电匣与分叉闪电",
+        "中央匣体向两边伸出短闪电",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_spend_energy_10",
+        "打开的雷匣",
+        "闪电从匣口向上释放，底部刻线收束",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_heat_10",
+        "小型炉口",
+        "炉口以三条弧线包围一枚火种",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_overflow_3",
+        "炉口吐出活字",
+        "一枚方字从炉口升起，三条热纹",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_cool_10",
+        "冰纹压住火种",
+        "简化六角冰纹与下方小火苗交叠",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_burn_kill",
+        "残页与火星",
+        "纸角蚀刻成卷边，留三点火星",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_hits_10",
+        "同心冲击纹",
+        "三圈断开的冲击线围住中心活字",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_first_gild",
+        "金边活字",
+        "方字外沿留一圈亮金切边",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_gild_3",
+        "三枚金边活字",
+        "三枚活字作三角布局，金边清晰",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_gild_gold_10",
+        "活字落下铜钱",
+        "一枚活字下接三枚错开的钱片",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_first_refine",
+        "细凿修整活字",
+        "凿尖接触方字边角，飞出两点金属屑",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_pin_used",
+        "铆钉固定活字",
+        "方字下有宽底座，四角短铆钉",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_first_fusion",
+        "两枚活字合为一块",
+        "左右两方块在中心用榫卯相接",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_extra_use_5",
+        "活字与回环刻线",
+        "活字外有两道不闭合回环，避免箭头过细",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_temp_words_10",
+        "虚线活字与实线词组",
+        "前方实线字与后方虚线字以粗刻线相连",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_first_cleanse",
+        "拭去墨点的软刷",
+        "斜刷头下露出干净金属面",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_cleanse_5",
+        "一排洁净活字",
+        "三枚方字上有统一的擦拭刻线",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_polluted_words_20",
+        "墨点活字与词线",
+        "活字角落保留墨点，连线越过墨迹",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_replicate_stop_3",
+        "被截断的分枝",
+        "中心活字上方两条分枝被横刻线切断",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_fold_unseal",
+        "折页与断开的签绳",
+        "纸页折角上有一条已断开的细签绳",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_proof_3",
+        "交错双签",
+        "两枚短签交叠，分别用横纹与斜纹区分",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_rail_clear",
+        "移出轨道的活字",
+        "双横轨外侧放一枚活字，留明显空槽",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_cleanse_50",
+        "白页与细密擦痕",
+        "整页留白，边角以稀疏细刻线收边",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_boss_plate",
+        "断开的铅印版",
+        "中央印版沿一条竖缝分开",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_boss_demon",
+        "封住异形字面的印条",
+        "怪面压在两道交叉封条下",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_boss_chaos",
+        "归于平静的金属波纹",
+        "黑金面上三层波纹向中心收束",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_nodes_20",
+        "三处脚印与路径",
+        "三枚脚印沿短折线路径排布",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_nodes_100",
+        "卷轴中的路径",
+        "简洁折线路径刻入展开书卷",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_events_10",
+        "带页签的见闻册",
+        "小册旁伸出三枚不同形状页签",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_shop_5",
+        "张开的行囊",
+        "袋口上方露出活字、钱片两种轮廓",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ],
+      [
+        "seal_relics_5",
+        "陈列三件旧物的匣子",
+        "浅匣中摆小印、旧瓶与残片",
+        "玉符自然轮廓",
+        "",
+        512,
+        "中心图形在64像素仍可辨认"
+      ]
+    ],
+    "指标字典": [
+      [
+        "word_plays",
+        "成功组词",
+        "累加",
+        "累计、单战、单回合",
+        "每个成功结算的多字词计1次。单打、无效连线、效果重演不计；结阵在实际发动时计。",
+        "AchievementBattle.finish_play：成功多字词快照",
+        "次",
+        "已接入"
+      ],
+      [
+        "unique_words",
+        "不同词语",
+        "去重计数",
+        "累计、单局、单战",
+        "按词语ID去重。效果重演不新增；失败连线不计。",
+        "AchievementBattle.finish_play：WordData.id 去重",
+        "种",
+        "已接入"
+      ],
+      [
+        "battle_wins",
+        "战斗胜利",
+        "累加",
+        "累计、单局",
+        "战斗胜利结算成功计1次；同一 battle_id 只计一次。",
+        "BattleScreen._check_outcome → AchievementBattle.finish",
+        "次",
+        "已接入"
+      ],
+      [
+        "run_wins",
+        "冒险通关",
+        "累加",
+        "累计",
+        "正式冒险完成最终胜利结算计1次；同一 run_id 只计一次。",
+        "RoomRun / Expedition 最终通关；EventBus.run_ended",
+        "次",
+        "已接入"
+      ],
+      [
+        "attack_damage",
+        "一次攻击伤害",
+        "取最大",
+        "单次",
+        "同一次攻击所有实际命中段的扣血与吸盾之和。排除溢出伤害、污染伤害、灼烧等非攻击伤害。",
+        "BattleState.deal_damage / begin、end_attack_sequence：实际扣血与吸盾",
+        "伤害",
+        "已接入"
+      ],
+      [
+        "persistent_shield",
+        "持久盾峰值",
+        "取最大",
+        "单战",
+        "玩家持久盾变化后记录当前值。临时格挡不计。",
+        "Combatant.feedback + AchievementBattle.sample：玩家持久盾",
+        "点",
+        "已接入"
+      ],
+      [
+        "flawless_wins",
+        "无损获胜",
+        "累加",
+        "累计",
+        "战斗胜利且本战实际失去生命为0。自伤与污染伤害也计入失血，先受伤再治疗不算无损。",
+        "玩家 Combatant.feedback 累计实际失血 + 战斗胜利",
+        "次",
+        "已接入"
+      ],
+      [
+        "energy_peak",
+        "储能峰值",
+        "取最大",
+        "单战",
+        "玩家储能变化后记录当前值。只记实际获得，不记预览。",
+        "BattleState.add_energy / spend_energy；出字前后采样",
+        "点",
+        "已接入"
+      ],
+      [
+        "energy_spent",
+        "单次出字耗能",
+        "取最大",
+        "单次",
+        "同一 play_id 内实际支付的储能合计，含效果重演的再次支付。金币抵扣消耗的储能也计；退款不倒扣。",
+        "BattleState.spend_energy → 当前 play_id 汇总",
+        "点",
+        "已接入"
+      ],
+      [
+        "heat_peak",
+        "热度峰值",
+        "取最大",
+        "单战",
+        "热度变化后记录实际当前值；提高热容不算热度增加。",
+        "BattleState.add_heat；出字与回合边界采样",
+        "点",
+        "已接入"
+      ],
+      [
+        "overflow_created",
+        "溢热生成",
+        "累加",
+        "单战",
+        "仅计溢热实际生成的自生灼热【热】。满盘未生成、抽回旧字、怪物塞字不计。",
+        "BattleOps.overflow：成功放入自生热后",
+        "字",
+        "已接入"
+      ],
+      [
+        "heat_cooled",
+        "单次出字降温",
+        "取最大",
+        "单次",
+        "同一 play_id 内实际减少的热度合计；不能把不足的热度算进去。",
+        "BattleState.add_heat：同次出字实际减少值",
+        "点",
+        "已接入"
+      ],
+      [
+        "burn_kills",
+        "灼烧击败",
+        "累加",
+        "累计",
+        "敌人因既有灼烧结算死亡计1次。灼热字造成玩家伤害不计。",
+        "BattleState._enemy_act：灼烧扣血死亡",
+        "名",
+        "已接入"
+      ],
+      [
+        "attack_hits",
+        "一次攻击段数",
+        "取最大",
+        "单次",
+        "一次攻击实际结算的命中段数。被盾全挡仍计1段；目标死亡后未结算的剩余段不计。",
+        "BattleState.deal_damage：每段实际结算后",
+        "段",
+        "已接入"
+      ],
+      [
+        "gilded_tiles",
+        "永久镀金",
+        "累加",
+        "累计、单局",
+        "己方原字首次获得永久镀金时计1枚；同一字块重复镀金不计。",
+        "GameState.gild_character：己方原字 false → true",
+        "字",
+        "已接入"
+      ],
+      [
+        "gild_gold",
+        "镀金收益",
+        "累加",
+        "单战",
+        "仅计镀金实际发放金币。单打与组词均计；融合字块按实际发放数计。其他金币来源不计。",
+        "BattleState 出字镀金收益：earn_gold 实际返回值",
+        "金币",
+        "已接入"
+      ],
+      [
+        "refine_uses",
+        "精炼成功",
+        "累加",
+        "累计",
+        "【精炼】成功作用于目标字块计1次。无目标、取消、不满足条件不计。",
+        "BattleState.refine_pair：成功返回前",
+        "次",
+        "已接入"
+      ],
+      [
+        "pinned_used",
+        "固定字使用",
+        "累加",
+        "单战",
+        "有效单打或组词使用固定字，每枚字块每个 play_id 计1次。只固定但未使用不计。",
+        "AchievementBattle.begin、finish_play：固定字参与快照",
+        "次",
+        "已接入"
+      ],
+      [
+        "fusion_success",
+        "融合成功",
+        "累加",
+        "累计",
+        "实际把两枚字合为一个字块计1次，取消或条件失败不计。",
+        "BattleState.fuse_cards：成功返回前",
+        "次",
+        "已接入"
+      ],
+      [
+        "extra_use_spent",
+        "额外使用消耗",
+        "累加",
+        "单战",
+        "额外使用次数实际扣除1时计1次。固定字每回合使用机会不计。",
+        "BattleState 出字消耗：temporary_uses 实际扣除",
+        "次",
+        "已接入"
+      ],
+      [
+        "temporary_word_tiles",
+        "临时字组词",
+        "累加",
+        "单战",
+        "成功多字词中的临时字，每个 play_id 每枚字块计1次。普通临时字单打不计。",
+        "AchievementBattle.finish_play：成功多字词临时字快照",
+        "字",
+        "已接入"
+      ],
+      [
+        "pollution_cleansed",
+        "净化污染",
+        "累加",
+        "累计、单战",
+        "实际移除的污染标签数。1字清除2种污染计2；普通签、区域标记与销毁字块不算净化。",
+        "BattleOps.cleanse_board / 邻字净化：实际移除标签数",
+        "种污染",
+        "已接入"
+      ],
+      [
+        "polluted_word_tiles",
+        "污染字组词",
+        "累加",
+        "累计",
+        "成功多字词中的带污染字块数。1字多污染只计1，同一 play_id 去重；普通签单独不算污染。",
+        "AchievementBattle.finish_play：出字前污染快照",
+        "字",
+        "已接入"
+      ],
+      [
+        "replicate_removed",
+        "蔓生未复制即移除",
+        "累加",
+        "单战",
+        "敌方蔓生字首次复制前，被玩家使用、净化或清除时计1枚。怪物死亡自动移除不计。",
+        "复制成功标记母字；出字后检查使用、净化与移除",
+        "字",
+        "已接入"
+      ],
+      [
+        "fold_tasks",
+        "折页解签",
+        "累加",
+        "累计",
+        "折页蛾签字按任务要求完成有效使用并触发解签奖励计1次；单纯移动、怪物死亡不计。",
+        "EnemyMechanics.update_targets：折页任务成功发奖",
+        "次",
+        "已接入"
+      ],
+      [
+        "proof_tasks",
+        "红蓝签完成",
+        "累加",
+        "单战",
+        "对校官的一组红蓝签任务全部达成时计1次；单独清掉一签不计。",
+        "EnemyMechanics.update_targets：红蓝签全部完成",
+        "次",
+        "已接入"
+      ],
+      [
+        "rail_tasks",
+        "压轨解签",
+        "累加",
+        "累计",
+        "铅轨机压轨任务全部完成并触发清轨奖励计1次；死亡自动清标不计。",
+        "EnemyMechanics.after_action：压轨清轨奖励",
+        "次",
+        "已接入"
+      ],
+      [
+        "enemy_kills",
+        "击败指定敌人",
+        "累加",
+        "累计",
+        "指定资源ID的敌人实际死亡计1名。召唤物按各自ID；同一敌人实例只计一次。",
+        "敌人 Combatant.feedback：实际死亡，每实例只记一次",
+        "名",
+        "已接入"
+      ],
+      [
+        "nodes_completed",
+        "完成旅途节点",
+        "累加",
+        "累计",
+        "完成一次可结算节点计1次。移动、重访、打开面板不计；同一 run_id/node_id 只计一次。",
+        "RoomRun / Expedition / GameState 节点结算",
+        "个",
+        "已接入"
+      ],
+      [
+        "unique_events",
+        "不同事件",
+        "去重计数",
+        "累计",
+        "完成选择并结算的事件按事件ID去重。打开后退出、同事件重复出现不新增。",
+        "RunHarness / RoomRun / Expedition / EventScreen 事件提交",
+        "种",
+        "已接入"
+      ],
+      [
+        "shop_purchases",
+        "商店购买",
+        "累加",
+        "单局",
+        "成功付费购买1件商品计1次。刷新、出售、回购同一交易重放不计。",
+        "商店提交成功：稳定 achievement_offer 交易ID",
+        "件",
+        "已接入"
+      ],
+      [
+        "relics_held",
+        "持有遗物",
+        "取最大",
+        "单局",
+        "以当前持有的不同遗物ID数量记录峰值。重复遗物与失去后重得不叠加。",
+        "GameState.add_relic / remove_relic：当前不同ID数量",
+        "件",
+        "已接入"
+      ]
+    ]
+  },
+  "metrics": [
+    {
+      "id": "word_plays",
+      "name": "成功组词",
+      "method": "累加",
+      "scopes": [
+        "累计",
+        "单战",
+        "单回合"
+      ],
+      "rule": "每个成功结算的多字词计1次。单打、无效连线、效果重演不计；结阵在实际发动时计。",
+      "hook": "AchievementBattle.finish_play：成功多字词快照",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "unique_words",
+      "name": "不同词语",
+      "method": "去重计数",
+      "scopes": [
+        "累计",
+        "单局",
+        "单战"
+      ],
+      "rule": "按词语ID去重。效果重演不新增；失败连线不计。",
+      "hook": "AchievementBattle.finish_play：WordData.id 去重",
+      "unit": "种",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "battle_wins",
+      "name": "战斗胜利",
+      "method": "累加",
+      "scopes": [
+        "累计",
+        "单局"
+      ],
+      "rule": "战斗胜利结算成功计1次；同一 battle_id 只计一次。",
+      "hook": "BattleScreen._check_outcome → AchievementBattle.finish",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "run_wins",
+      "name": "冒险通关",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "正式冒险完成最终胜利结算计1次；同一 run_id 只计一次。",
+      "hook": "RoomRun / Expedition 最终通关；EventBus.run_ended",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "attack_damage",
+      "name": "一次攻击伤害",
+      "method": "取最大",
+      "scopes": [
+        "单次"
+      ],
+      "rule": "同一次攻击所有实际命中段的扣血与吸盾之和。排除溢出伤害、污染伤害、灼烧等非攻击伤害。",
+      "hook": "BattleState.deal_damage / begin、end_attack_sequence：实际扣血与吸盾",
+      "unit": "伤害",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "persistent_shield",
+      "name": "持久盾峰值",
+      "method": "取最大",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "玩家持久盾变化后记录当前值。临时格挡不计。",
+      "hook": "Combatant.feedback + AchievementBattle.sample：玩家持久盾",
+      "unit": "点",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "flawless_wins",
+      "name": "无损获胜",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "战斗胜利且本战实际失去生命为0。自伤与污染伤害也计入失血，先受伤再治疗不算无损。",
+      "hook": "玩家 Combatant.feedback 累计实际失血 + 战斗胜利",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "energy_peak",
+      "name": "储能峰值",
+      "method": "取最大",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "玩家储能变化后记录当前值。只记实际获得，不记预览。",
+      "hook": "BattleState.add_energy / spend_energy；出字前后采样",
+      "unit": "点",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "energy_spent",
+      "name": "单次出字耗能",
+      "method": "取最大",
+      "scopes": [
+        "单次"
+      ],
+      "rule": "同一 play_id 内实际支付的储能合计，含效果重演的再次支付。金币抵扣消耗的储能也计；退款不倒扣。",
+      "hook": "BattleState.spend_energy → 当前 play_id 汇总",
+      "unit": "点",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "heat_peak",
+      "name": "热度峰值",
+      "method": "取最大",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "热度变化后记录实际当前值；提高热容不算热度增加。",
+      "hook": "BattleState.add_heat；出字与回合边界采样",
+      "unit": "点",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "overflow_created",
+      "name": "溢热生成",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "仅计溢热实际生成的自生灼热【热】。满盘未生成、抽回旧字、怪物塞字不计。",
+      "hook": "BattleOps.overflow：成功放入自生热后",
+      "unit": "字",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "heat_cooled",
+      "name": "单次出字降温",
+      "method": "取最大",
+      "scopes": [
+        "单次"
+      ],
+      "rule": "同一 play_id 内实际减少的热度合计；不能把不足的热度算进去。",
+      "hook": "BattleState.add_heat：同次出字实际减少值",
+      "unit": "点",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "burn_kills",
+      "name": "灼烧击败",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "敌人因既有灼烧结算死亡计1次。灼热字造成玩家伤害不计。",
+      "hook": "BattleState._enemy_act：灼烧扣血死亡",
+      "unit": "名",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "attack_hits",
+      "name": "一次攻击段数",
+      "method": "取最大",
+      "scopes": [
+        "单次"
+      ],
+      "rule": "一次攻击实际结算的命中段数。被盾全挡仍计1段；目标死亡后未结算的剩余段不计。",
+      "hook": "BattleState.deal_damage：每段实际结算后",
+      "unit": "段",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "gilded_tiles",
+      "name": "永久镀金",
+      "method": "累加",
+      "scopes": [
+        "累计",
+        "单局"
+      ],
+      "rule": "己方原字首次获得永久镀金时计1枚；同一字块重复镀金不计。",
+      "hook": "GameState.gild_character：己方原字 false → true",
+      "unit": "字",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "gild_gold",
+      "name": "镀金收益",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "仅计镀金实际发放金币。单打与组词均计；融合字块按实际发放数计。其他金币来源不计。",
+      "hook": "BattleState 出字镀金收益：earn_gold 实际返回值",
+      "unit": "金币",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "refine_uses",
+      "name": "精炼成功",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "【精炼】成功作用于目标字块计1次。无目标、取消、不满足条件不计。",
+      "hook": "BattleState.refine_pair：成功返回前",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "pinned_used",
+      "name": "固定字使用",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "有效单打或组词使用固定字，每枚字块每个 play_id 计1次。只固定但未使用不计。",
+      "hook": "AchievementBattle.begin、finish_play：固定字参与快照",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "fusion_success",
+      "name": "融合成功",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "实际把两枚字合为一个字块计1次，取消或条件失败不计。",
+      "hook": "BattleState.fuse_cards：成功返回前",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "extra_use_spent",
+      "name": "额外使用消耗",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "额外使用次数实际扣除1时计1次。固定字每回合使用机会不计。",
+      "hook": "BattleState 出字消耗：temporary_uses 实际扣除",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "temporary_word_tiles",
+      "name": "临时字组词",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "成功多字词中的临时字，每个 play_id 每枚字块计1次。普通临时字单打不计。",
+      "hook": "AchievementBattle.finish_play：成功多字词临时字快照",
+      "unit": "字",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "pollution_cleansed",
+      "name": "净化污染",
+      "method": "累加",
+      "scopes": [
+        "累计",
+        "单战"
+      ],
+      "rule": "实际移除的污染标签数。1字清除2种污染计2；普通签、区域标记与销毁字块不算净化。",
+      "hook": "BattleOps.cleanse_board / 邻字净化：实际移除标签数",
+      "unit": "种污染",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "polluted_word_tiles",
+      "name": "污染字组词",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "成功多字词中的带污染字块数。1字多污染只计1，同一 play_id 去重；普通签单独不算污染。",
+      "hook": "AchievementBattle.finish_play：出字前污染快照",
+      "unit": "字",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "replicate_removed",
+      "name": "蔓生未复制即移除",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "敌方蔓生字首次复制前，被玩家使用、净化或清除时计1枚。怪物死亡自动移除不计。",
+      "hook": "复制成功标记母字；出字后检查使用、净化与移除",
+      "unit": "字",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "fold_tasks",
+      "name": "折页解签",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "折页蛾签字按任务要求完成有效使用并触发解签奖励计1次；单纯移动、怪物死亡不计。",
+      "hook": "EnemyMechanics.update_targets：折页任务成功发奖",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "proof_tasks",
+      "name": "红蓝签完成",
+      "method": "累加",
+      "scopes": [
+        "单战"
+      ],
+      "rule": "对校官的一组红蓝签任务全部达成时计1次；单独清掉一签不计。",
+      "hook": "EnemyMechanics.update_targets：红蓝签全部完成",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "rail_tasks",
+      "name": "压轨解签",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "铅轨机压轨任务全部完成并触发清轨奖励计1次；死亡自动清标不计。",
+      "hook": "EnemyMechanics.after_action：压轨清轨奖励",
+      "unit": "次",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "enemy_kills",
+      "name": "击败指定敌人",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "指定资源ID的敌人实际死亡计1名。召唤物按各自ID；同一敌人实例只计一次。",
+      "hook": "敌人 Combatant.feedback：实际死亡，每实例只记一次",
+      "unit": "名",
+      "filters": "boss_lead_plate,boss_word_demon,boss_chaos_press",
+      "status": "已接入"
+    },
+    {
+      "id": "nodes_completed",
+      "name": "完成旅途节点",
+      "method": "累加",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "完成一次可结算节点计1次。移动、重访、打开面板不计；同一 run_id/node_id 只计一次。",
+      "hook": "RoomRun / Expedition / GameState 节点结算",
+      "unit": "个",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "unique_events",
+      "name": "不同事件",
+      "method": "去重计数",
+      "scopes": [
+        "累计"
+      ],
+      "rule": "完成选择并结算的事件按事件ID去重。打开后退出、同事件重复出现不新增。",
+      "hook": "RunHarness / RoomRun / Expedition / EventScreen 事件提交",
+      "unit": "种",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "shop_purchases",
+      "name": "商店购买",
+      "method": "累加",
+      "scopes": [
+        "单局"
+      ],
+      "rule": "成功付费购买1件商品计1次。刷新、出售、回购同一交易重放不计。",
+      "hook": "商店提交成功：稳定 achievement_offer 交易ID",
+      "unit": "件",
+      "filters": "",
+      "status": "已接入"
+    },
+    {
+      "id": "relics_held",
+      "name": "持有遗物",
+      "method": "取最大",
+      "scopes": [
+        "单局"
+      ],
+      "rule": "以当前持有的不同遗物ID数量记录峰值。重复遗物与失去后重得不叠加。",
+      "hook": "GameState.add_relic / remove_relic：当前不同ID数量",
+      "unit": "件",
+      "filters": "",
+      "status": "已接入"
+    }
+  ],
+  "art": {
+    "shape": "natural_jade",
+    "shape_label": "玉符自然轮廓",
+    "style": "hand_drawn_nephrite",
+    "size": 512,
+    "padding": 40,
+    "background": "transparent",
+    "palette": [
+      "#0C3540",
+      "#5F8F82",
+      "#C4CDB1",
+      "#B99B61"
+    ],
+    "states": {
+      "locked": "同一玉符压暗，仍展示名称与条件",
+      "unlocked": "恢复玉材原色，显示已解锁",
+      "new": "解锁提示排队显示，查看总览后标记已读"
+    },
+    "files": "独立资源为512×512透明PNG或SVG；图标路径留空时使用已确认v6玉符图集；64像素检查辨识度。",
+    "forbidden": "不使用六边金属框、厚重徽章、鲜红高亮或重复主体；名称用繁体，图形不靠换色区分。"
+  },
+  "tiers": {
+    "素玉": {
+      "base": "#C7CDB1",
+      "edge": "#E2DDC4",
+      "etch": "#6A8D78",
+      "finish": "温润白玉，少量天然沁色"
+    },
+    "青玉": {
+      "base": "#71988C",
+      "edge": "#C0CDB1",
+      "etch": "#345F5B",
+      "finish": "青玉细纹，保留自然磨痕"
+    },
+    "金縫": {
+      "base": "#89A394",
+      "edge": "#B59A60",
+      "etch": "#375E56",
+      "finish": "青白玉，局部细金补缝"
+    },
+    "墨玉": {
+      "base": "#315F5A",
+      "edge": "#94B09C",
+      "etch": "#C3CEB0",
+      "finish": "深青玉，收敛金线与旧刻痕"
+    }
+  },
+  "achievements": [
+    {
+      "id": "first_word",
+      "name": "落下第一笔",
+      "category": "组词入门",
+      "tier": "素玉",
+      "description_template": "累计成功打出{target}个词。",
+      "description": "累计成功打出1个词。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "word_plays",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_first_word",
+      "order": 1,
+      "reward": {
+        "type": "badge",
+        "id": "seal_first_word"
+      }
+    },
+    {
+      "id": "words_100",
+      "name": "百词成篇",
+      "category": "组词入门",
+      "tier": "青玉",
+      "description_template": "累计成功打出{target}个词。",
+      "description": "累计成功打出100个词。",
+      "target": 100,
+      "scope": "lifetime",
+      "metric": "word_plays",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [
+        "first_word"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_words_100",
+      "order": 2,
+      "reward": {
+        "type": "badge",
+        "id": "seal_words_100"
+      }
+    },
+    {
+      "id": "words_1000",
+      "name": "千词成卷",
+      "category": "组词入门",
+      "tier": "金縫",
+      "description_template": "累计成功打出{target}个词。",
+      "description": "累计成功打出1000个词。",
+      "target": 1000,
+      "scope": "lifetime",
+      "metric": "word_plays",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [
+        "words_100"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_words_1000",
+      "order": 3,
+      "reward": {
+        "type": "badge",
+        "id": "seal_words_1000"
+      }
+    },
+    {
+      "id": "vocab_10",
+      "name": "识得十词",
+      "category": "组词入门",
+      "tier": "素玉",
+      "description_template": "累计打出{target}种不同的词。",
+      "description": "累计打出10种不同的词。",
+      "target": 10,
+      "scope": "lifetime",
+      "metric": "unique_words",
+      "aggregation": "unique_count",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_vocab_10",
+      "order": 4,
+      "reward": {
+        "type": "badge",
+        "id": "seal_vocab_10"
+      }
+    },
+    {
+      "id": "vocab_40",
+      "name": "词库渐丰",
+      "category": "组词入门",
+      "tier": "青玉",
+      "description_template": "累计打出{target}种不同的词。",
+      "description": "累计打出40种不同的词。",
+      "target": 40,
+      "scope": "lifetime",
+      "metric": "unique_words",
+      "aggregation": "unique_count",
+      "filter": "",
+      "prerequisites": [
+        "vocab_10"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_vocab_40",
+      "order": 5,
+      "reward": {
+        "type": "badge",
+        "id": "seal_vocab_40"
+      }
+    },
+    {
+      "id": "vocab_80",
+      "name": "腹有词章",
+      "category": "组词入门",
+      "tier": "金縫",
+      "description_template": "累计打出{target}种不同的词。",
+      "description": "累计打出80种不同的词。",
+      "target": 80,
+      "scope": "lifetime",
+      "metric": "unique_words",
+      "aggregation": "unique_count",
+      "filter": "",
+      "prerequisites": [
+        "vocab_40"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_vocab_80",
+      "order": 6,
+      "reward": {
+        "type": "badge",
+        "id": "seal_vocab_80"
+      }
+    },
+    {
+      "id": "first_battle",
+      "name": "初战告捷",
+      "category": "组词入门",
+      "tier": "素玉",
+      "description_template": "累计赢得{target}场战斗。",
+      "description": "累计赢得1场战斗。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "battle_wins",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_first_battle",
+      "order": 7,
+      "reward": {
+        "type": "badge",
+        "id": "seal_first_battle"
+      }
+    },
+    {
+      "id": "first_clear",
+      "name": "印成一卷",
+      "category": "组词入门",
+      "tier": "金縫",
+      "description_template": "完成{target}次冒险通关。",
+      "description": "完成1次冒险通关。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "run_wins",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_first_clear",
+      "order": 8,
+      "reward": {
+        "type": "badge",
+        "id": "seal_first_clear"
+      }
+    },
+    {
+      "id": "damage_20",
+      "name": "锋芒初现",
+      "category": "战斗技巧",
+      "tier": "素玉",
+      "description_template": "一次攻击累计造成至少{target}伤害。",
+      "description": "一次攻击累计造成至少20伤害。",
+      "target": 20,
+      "scope": "action",
+      "metric": "attack_damage",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_damage_20",
+      "order": 9,
+      "reward": {
+        "type": "badge",
+        "id": "seal_damage_20"
+      }
+    },
+    {
+      "id": "damage_50",
+      "name": "一击破阵",
+      "category": "战斗技巧",
+      "tier": "青玉",
+      "description_template": "一次攻击累计造成至少{target}伤害。",
+      "description": "一次攻击累计造成至少50伤害。",
+      "target": 50,
+      "scope": "action",
+      "metric": "attack_damage",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [
+        "damage_20"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_damage_50",
+      "order": 10,
+      "reward": {
+        "type": "badge",
+        "id": "seal_damage_50"
+      }
+    },
+    {
+      "id": "damage_100",
+      "name": "刻石成痕",
+      "category": "战斗技巧",
+      "tier": "金縫",
+      "description_template": "一次攻击累计造成至少{target}伤害。",
+      "description": "一次攻击累计造成至少100伤害。",
+      "target": 100,
+      "scope": "action",
+      "metric": "attack_damage",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [
+        "damage_50"
+      ],
+      "hidden": true,
+      "enabled": true,
+      "badge_id": "seal_damage_100",
+      "order": 11,
+      "reward": {
+        "type": "badge",
+        "id": "seal_damage_100"
+      }
+    },
+    {
+      "id": "turn_words_5",
+      "name": "接字如流",
+      "category": "战斗技巧",
+      "tier": "素玉",
+      "description_template": "一个回合内成功打出{target}个词。",
+      "description": "一个回合内成功打出5个词。",
+      "target": 5,
+      "scope": "turn",
+      "metric": "word_plays",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_turn_words_5",
+      "order": 12,
+      "reward": {
+        "type": "badge",
+        "id": "seal_turn_words_5"
+      }
+    },
+    {
+      "id": "turn_words_8",
+      "name": "连篇不绝",
+      "category": "战斗技巧",
+      "tier": "青玉",
+      "description_template": "一个回合内成功打出{target}个词。",
+      "description": "一个回合内成功打出8个词。",
+      "target": 8,
+      "scope": "turn",
+      "metric": "word_plays",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [
+        "turn_words_5"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_turn_words_8",
+      "order": 13,
+      "reward": {
+        "type": "badge",
+        "id": "seal_turn_words_8"
+      }
+    },
+    {
+      "id": "shield_20",
+      "name": "余盾未散",
+      "category": "战斗技巧",
+      "tier": "素玉",
+      "description_template": "一场战斗中持久盾达到{target}点。",
+      "description": "一场战斗中持久盾达到20点。",
+      "target": 20,
+      "scope": "battle",
+      "metric": "persistent_shield",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_shield_20",
+      "order": 14,
+      "reward": {
+        "type": "badge",
+        "id": "seal_shield_20"
+      }
+    },
+    {
+      "id": "shield_50",
+      "name": "铜墙留印",
+      "category": "战斗技巧",
+      "tier": "青玉",
+      "description_template": "一场战斗中持久盾达到{target}点。",
+      "description": "一场战斗中持久盾达到50点。",
+      "target": 50,
+      "scope": "battle",
+      "metric": "persistent_shield",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [
+        "shield_20"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_shield_50",
+      "order": 15,
+      "reward": {
+        "type": "badge",
+        "id": "seal_shield_50"
+      }
+    },
+    {
+      "id": "flawless_win",
+      "name": "毫发无损",
+      "category": "战斗技巧",
+      "tier": "金縫",
+      "description_template": "累计{target}场战斗未失去生命并获胜。",
+      "description": "累计1场战斗未失去生命并获胜。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "flawless_wins",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_flawless_win",
+      "order": 16,
+      "reward": {
+        "type": "badge",
+        "id": "seal_flawless_win"
+      }
+    },
+    {
+      "id": "energy_10",
+      "name": "电光初蓄",
+      "category": "储能热度",
+      "tier": "素玉",
+      "description_template": "一场战斗中储能达到{target}点。",
+      "description": "一场战斗中储能达到10点。",
+      "target": 10,
+      "scope": "battle",
+      "metric": "energy_peak",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_energy_10",
+      "order": 17,
+      "reward": {
+        "type": "badge",
+        "id": "seal_energy_10"
+      }
+    },
+    {
+      "id": "energy_25",
+      "name": "满匣雷声",
+      "category": "储能热度",
+      "tier": "青玉",
+      "description_template": "一场战斗中储能达到{target}点。",
+      "description": "一场战斗中储能达到25点。",
+      "target": 25,
+      "scope": "battle",
+      "metric": "energy_peak",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [
+        "energy_10"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_energy_25",
+      "order": 18,
+      "reward": {
+        "type": "badge",
+        "id": "seal_energy_25"
+      }
+    },
+    {
+      "id": "spend_energy_10",
+      "name": "一放惊雷",
+      "category": "储能热度",
+      "tier": "青玉",
+      "description_template": "一次出字实际消耗至少{target}点储能。",
+      "description": "一次出字实际消耗至少10点储能。",
+      "target": 10,
+      "scope": "action",
+      "metric": "energy_spent",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_spend_energy_10",
+      "order": 19,
+      "reward": {
+        "type": "badge",
+        "id": "seal_spend_energy_10"
+      }
+    },
+    {
+      "id": "heat_10",
+      "name": "炉心渐赤",
+      "category": "储能热度",
+      "tier": "素玉",
+      "description_template": "一场战斗中热度达到{target}点。",
+      "description": "一场战斗中热度达到10点。",
+      "target": 10,
+      "scope": "battle",
+      "metric": "heat_peak",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_heat_10",
+      "order": 20,
+      "reward": {
+        "type": "badge",
+        "id": "seal_heat_10"
+      }
+    },
+    {
+      "id": "overflow_3",
+      "name": "热字出炉",
+      "category": "储能热度",
+      "tier": "素玉",
+      "description_template": "一场战斗中由溢热生成{target}枚灼热【热】。",
+      "description": "一场战斗中由溢热生成3枚灼热【热】。",
+      "target": 3,
+      "scope": "battle",
+      "metric": "overflow_created",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_overflow_3",
+      "order": 21,
+      "reward": {
+        "type": "badge",
+        "id": "seal_overflow_3"
+      }
+    },
+    {
+      "id": "cool_10",
+      "name": "骤冷成霜",
+      "category": "储能热度",
+      "tier": "青玉",
+      "description_template": "一次出字实际降低至少{target}点热度。",
+      "description": "一次出字实际降低至少10点热度。",
+      "target": 10,
+      "scope": "action",
+      "metric": "heat_cooled",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_cool_10",
+      "order": 22,
+      "reward": {
+        "type": "badge",
+        "id": "seal_cool_10"
+      }
+    },
+    {
+      "id": "burn_kill",
+      "name": "余烬落字",
+      "category": "储能热度",
+      "tier": "素玉",
+      "description_template": "累计让灼烧击败{target}名敌人。",
+      "description": "累计让灼烧击败1名敌人。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "burn_kills",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_burn_kill",
+      "order": 23,
+      "reward": {
+        "type": "badge",
+        "id": "seal_burn_kill"
+      }
+    },
+    {
+      "id": "hits_10",
+      "name": "十响连击",
+      "category": "储能热度",
+      "tier": "金縫",
+      "description_template": "一次攻击实际命中至少{target}段。",
+      "description": "一次攻击实际命中至少10段。",
+      "target": 10,
+      "scope": "action",
+      "metric": "attack_hits",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_hits_10",
+      "order": 24,
+      "reward": {
+        "type": "badge",
+        "id": "seal_hits_10"
+      }
+    },
+    {
+      "id": "first_gild",
+      "name": "字上生金",
+      "category": "字块养成",
+      "tier": "素玉",
+      "description_template": "累计为{target}枚原字永久镀金。",
+      "description": "累计为1枚原字永久镀金。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "gilded_tiles",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_first_gild",
+      "order": 25,
+      "reward": {
+        "type": "badge",
+        "id": "seal_first_gild"
+      }
+    },
+    {
+      "id": "gild_3",
+      "name": "三字镶金",
+      "category": "字块养成",
+      "tier": "青玉",
+      "description_template": "一局冒险中为{target}枚原字永久镀金。",
+      "description": "一局冒险中为3枚原字永久镀金。",
+      "target": 3,
+      "scope": "run",
+      "metric": "gilded_tiles",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [
+        "first_gild"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_gild_3",
+      "order": 26,
+      "reward": {
+        "type": "badge",
+        "id": "seal_gild_3"
+      }
+    },
+    {
+      "id": "gild_gold_10",
+      "name": "字字有价",
+      "category": "字块养成",
+      "tier": "金縫",
+      "description_template": "一场战斗中由镀金获得{target}金币。",
+      "description": "一场战斗中由镀金获得10金币。",
+      "target": 10,
+      "scope": "battle",
+      "metric": "gild_gold",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_gild_gold_10",
+      "order": 27,
+      "reward": {
+        "type": "badge",
+        "id": "seal_gild_gold_10"
+      }
+    },
+    {
+      "id": "first_refine",
+      "name": "精工一字",
+      "category": "字块养成",
+      "tier": "素玉",
+      "description_template": "累计成功精炼{target}次。",
+      "description": "累计成功精炼1次。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "refine_uses",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_first_refine",
+      "order": 28,
+      "reward": {
+        "type": "badge",
+        "id": "seal_first_refine"
+      }
+    },
+    {
+      "id": "pin_used",
+      "name": "立字为础",
+      "category": "字块养成",
+      "tier": "素玉",
+      "description_template": "一场战斗中有效使用固定字{target}次。",
+      "description": "一场战斗中有效使用固定字1次。",
+      "target": 1,
+      "scope": "battle",
+      "metric": "pinned_used",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_pin_used",
+      "order": 29,
+      "reward": {
+        "type": "badge",
+        "id": "seal_pin_used"
+      }
+    },
+    {
+      "id": "first_fusion",
+      "name": "二字合印",
+      "category": "字块养成",
+      "tier": "青玉",
+      "description_template": "累计成功融合{target}次。",
+      "description": "累计成功融合1次。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "fusion_success",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_first_fusion",
+      "order": 30,
+      "reward": {
+        "type": "badge",
+        "id": "seal_first_fusion"
+      }
+    },
+    {
+      "id": "extra_use_5",
+      "name": "反复打磨",
+      "category": "字块养成",
+      "tier": "青玉",
+      "description_template": "一场战斗中消耗{target}次额外使用。",
+      "description": "一场战斗中消耗5次额外使用。",
+      "target": 5,
+      "scope": "battle",
+      "metric": "extra_use_spent",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_extra_use_5",
+      "order": 31,
+      "reward": {
+        "type": "badge",
+        "id": "seal_extra_use_5"
+      }
+    },
+    {
+      "id": "temp_words_10",
+      "name": "借字成章",
+      "category": "字块养成",
+      "tier": "金縫",
+      "description_template": "一场战斗中使用{target}枚临时字组词。",
+      "description": "一场战斗中使用10枚临时字组词。",
+      "target": 10,
+      "scope": "battle",
+      "metric": "temporary_word_tiles",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_temp_words_10",
+      "order": 32,
+      "reward": {
+        "type": "badge",
+        "id": "seal_temp_words_10"
+      }
+    },
+    {
+      "id": "first_cleanse",
+      "name": "拂去墨污",
+      "category": "污染解签",
+      "tier": "素玉",
+      "description_template": "累计净化{target}个污染标签。",
+      "description": "累计净化1个污染标签。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "pollution_cleansed",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_first_cleanse",
+      "order": 33,
+      "reward": {
+        "type": "badge",
+        "id": "seal_first_cleanse"
+      }
+    },
+    {
+      "id": "cleanse_5",
+      "name": "净字成行",
+      "category": "污染解签",
+      "tier": "青玉",
+      "description_template": "一场战斗中净化{target}个污染标签。",
+      "description": "一场战斗中净化5个污染标签。",
+      "target": 5,
+      "scope": "battle",
+      "metric": "pollution_cleansed",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [
+        "first_cleanse"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_cleanse_5",
+      "order": 34,
+      "reward": {
+        "type": "badge",
+        "id": "seal_cleanse_5"
+      }
+    },
+    {
+      "id": "polluted_words_20",
+      "name": "污字亦成词",
+      "category": "污染解签",
+      "tier": "青玉",
+      "description_template": "累计使用{target}枚污染字组词。",
+      "description": "累计使用20枚污染字组词。",
+      "target": 20,
+      "scope": "lifetime",
+      "metric": "polluted_word_tiles",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_polluted_words_20",
+      "order": 35,
+      "reward": {
+        "type": "badge",
+        "id": "seal_polluted_words_20"
+      }
+    },
+    {
+      "id": "replicate_stop_3",
+      "name": "止于一字",
+      "category": "污染解签",
+      "tier": "金縫",
+      "description_template": "一场战斗中，在首次复制前移除或净化{target}枚敌方蔓生字。",
+      "description": "一场战斗中，在首次复制前移除或净化3枚敌方蔓生字。",
+      "target": 3,
+      "scope": "battle",
+      "metric": "replicate_removed",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_replicate_stop_3",
+      "order": 36,
+      "reward": {
+        "type": "badge",
+        "id": "seal_replicate_stop_3"
+      }
+    },
+    {
+      "id": "fold_unseal",
+      "name": "折页解签",
+      "category": "污染解签",
+      "tier": "素玉",
+      "description_template": "累计完成折页蛾解签{target}次。",
+      "description": "累计完成折页蛾解签1次。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "fold_tasks",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_fold_unseal",
+      "order": 37,
+      "reward": {
+        "type": "badge",
+        "id": "seal_fold_unseal"
+      }
+    },
+    {
+      "id": "proof_3",
+      "name": "红蓝对校",
+      "category": "污染解签",
+      "tier": "金縫",
+      "description_template": "一场战斗中完整完成{target}组红蓝签任务。",
+      "description": "一场战斗中完整完成3组红蓝签任务。",
+      "target": 3,
+      "scope": "battle",
+      "metric": "proof_tasks",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_proof_3",
+      "order": 38,
+      "reward": {
+        "type": "badge",
+        "id": "seal_proof_3"
+      }
+    },
+    {
+      "id": "rail_clear",
+      "name": "移字出轨",
+      "category": "污染解签",
+      "tier": "青玉",
+      "description_template": "累计完成铅轨机清轨任务{target}次。",
+      "description": "累计完成铅轨机清轨任务1次。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "rail_tasks",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_rail_clear",
+      "order": 39,
+      "reward": {
+        "type": "badge",
+        "id": "seal_rail_clear"
+      }
+    },
+    {
+      "id": "cleanse_50",
+      "name": "一纸无尘",
+      "category": "污染解签",
+      "tier": "金縫",
+      "description_template": "累计净化{target}个污染标签。",
+      "description": "累计净化50个污染标签。",
+      "target": 50,
+      "scope": "lifetime",
+      "metric": "pollution_cleansed",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [
+        "first_cleanse"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_cleanse_50",
+      "order": 40,
+      "reward": {
+        "type": "badge",
+        "id": "seal_cleanse_50"
+      }
+    },
+    {
+      "id": "boss_plate",
+      "name": "破开铅版",
+      "category": "首领旅途",
+      "tier": "青玉",
+      "description_template": "累计击败【铅版】{target}次。",
+      "description": "累计击败【铅版】1次。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "enemy_kills",
+      "aggregation": "sum",
+      "filter": "boss_lead_plate",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_boss_plate",
+      "order": 41,
+      "reward": {
+        "type": "badge",
+        "id": "seal_boss_plate"
+      }
+    },
+    {
+      "id": "boss_demon",
+      "name": "字魔伏诛",
+      "category": "首领旅途",
+      "tier": "青玉",
+      "description_template": "累计击败【字魔】{target}次。",
+      "description": "累计击败【字魔】1次。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "enemy_kills",
+      "aggregation": "sum",
+      "filter": "boss_word_demon",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_boss_demon",
+      "order": 42,
+      "reward": {
+        "type": "badge",
+        "id": "seal_boss_demon"
+      }
+    },
+    {
+      "id": "boss_chaos",
+      "name": "平定混铅",
+      "category": "首领旅途",
+      "tier": "墨玉",
+      "description_template": "累计击败【混铅海】{target}次。",
+      "description": "累计击败【混铅海】1次。",
+      "target": 1,
+      "scope": "lifetime",
+      "metric": "enemy_kills",
+      "aggregation": "sum",
+      "filter": "boss_chaos_press",
+      "prerequisites": [],
+      "hidden": true,
+      "enabled": true,
+      "badge_id": "seal_boss_chaos",
+      "order": 43,
+      "reward": {
+        "type": "badge",
+        "id": "seal_boss_chaos"
+      }
+    },
+    {
+      "id": "nodes_20",
+      "name": "沿途留印",
+      "category": "首领旅途",
+      "tier": "素玉",
+      "description_template": "累计完成{target}个旅途节点。",
+      "description": "累计完成20个旅途节点。",
+      "target": 20,
+      "scope": "lifetime",
+      "metric": "nodes_completed",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_nodes_20",
+      "order": 44,
+      "reward": {
+        "type": "badge",
+        "id": "seal_nodes_20"
+      }
+    },
+    {
+      "id": "nodes_100",
+      "name": "百程入卷",
+      "category": "首领旅途",
+      "tier": "金縫",
+      "description_template": "累计完成{target}个旅途节点。",
+      "description": "累计完成100个旅途节点。",
+      "target": 100,
+      "scope": "lifetime",
+      "metric": "nodes_completed",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [
+        "nodes_20"
+      ],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_nodes_100",
+      "order": 45,
+      "reward": {
+        "type": "badge",
+        "id": "seal_nodes_100"
+      }
+    },
+    {
+      "id": "events_10",
+      "name": "奇闻十录",
+      "category": "首领旅途",
+      "tier": "青玉",
+      "description_template": "累计完成{target}种不同事件。",
+      "description": "累计完成10种不同事件。",
+      "target": 10,
+      "scope": "lifetime",
+      "metric": "unique_events",
+      "aggregation": "unique_count",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_events_10",
+      "order": 46,
+      "reward": {
+        "type": "badge",
+        "id": "seal_events_10"
+      }
+    },
+    {
+      "id": "shop_5",
+      "name": "行囊渐满",
+      "category": "首领旅途",
+      "tier": "素玉",
+      "description_template": "一局冒险中在商店买入{target}件商品。",
+      "description": "一局冒险中在商店买入5件商品。",
+      "target": 5,
+      "scope": "run",
+      "metric": "shop_purchases",
+      "aggregation": "sum",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_shop_5",
+      "order": 47,
+      "reward": {
+        "type": "badge",
+        "id": "seal_shop_5"
+      }
+    },
+    {
+      "id": "relics_5",
+      "name": "旧物成藏",
+      "category": "首领旅途",
+      "tier": "青玉",
+      "description_template": "一局冒险中同时持有{target}件不同遗物。",
+      "description": "一局冒险中同时持有5件不同遗物。",
+      "target": 5,
+      "scope": "run",
+      "metric": "relics_held",
+      "aggregation": "max",
+      "filter": "",
+      "prerequisites": [],
+      "hidden": false,
+      "enabled": true,
+      "badge_id": "seal_relics_5",
+      "order": 48,
+      "reward": {
+        "type": "badge",
+        "id": "seal_relics_5"
+      }
+    }
+  ],
+  "badges": [
+    {
+      "id": "seal_boss_chaos",
+      "motif": "归于平静的金属波纹",
+      "engraving": "黑金面上三层波纹向中心收束",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_boss_demon",
+      "motif": "封住异形字面的印条",
+      "engraving": "怪面压在两道交叉封条下",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_boss_plate",
+      "motif": "断开的铅印版",
+      "engraving": "中央印版沿一条竖缝分开",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_burn_kill",
+      "motif": "残页与火星",
+      "engraving": "纸角蚀刻成卷边，留三点火星",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_cleanse_5",
+      "motif": "一排洁净活字",
+      "engraving": "三枚方字上有统一的擦拭刻线",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_cleanse_50",
+      "motif": "白页与细密擦痕",
+      "engraving": "整页留白，边角以稀疏细刻线收边",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_cool_10",
+      "motif": "冰纹压住火种",
+      "engraving": "简化六角冰纹与下方小火苗交叠",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_damage_100",
+      "motif": "被劈开的石碑",
+      "engraving": "石碑裂成两半，刻痕深且少",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_damage_20",
+      "motif": "一道破开的刻痕",
+      "engraving": "一道宽斜刻痕穿过中心方块",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_damage_50",
+      "motif": "裂开的盾牌",
+      "engraving": "中心盾形分为三片，裂缝清晰",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_energy_10",
+      "motif": "半满蓄电匣",
+      "engraving": "方匣内刻一道闪电与两格电量",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_energy_25",
+      "motif": "蓄电匣与分叉闪电",
+      "engraving": "中央匣体向两边伸出短闪电",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_events_10",
+      "motif": "带页签的见闻册",
+      "engraving": "小册旁伸出三枚不同形状页签",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_extra_use_5",
+      "motif": "活字与回环刻线",
+      "engraving": "活字外有两道不闭合回环，避免箭头过细",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_first_battle",
+      "motif": "短剑压住纸角",
+      "engraving": "剑尖与折纸只保留两组轮廓",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_first_cleanse",
+      "motif": "拭去墨点的软刷",
+      "engraving": "斜刷头下露出干净金属面",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_first_clear",
+      "motif": "合拢书卷与印章",
+      "engraving": "卷轴中央刻一枚圆印，外缘不增加装饰",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_first_fusion",
+      "motif": "两枚活字合为一块",
+      "engraving": "左右两方块在中心用榫卯相接",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_first_gild",
+      "motif": "金边活字",
+      "engraving": "方字外沿留一圈亮金切边",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_first_refine",
+      "motif": "细凿修整活字",
+      "engraving": "凿尖接触方字边角，飞出两点金属屑",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_first_word",
+      "motif": "一枚活字与短刻线",
+      "engraving": "中心刻一枚凸起活字，底部留一道印痕",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_flawless_win",
+      "motif": "完整无缺的纸盾",
+      "engraving": "无缺口的盾面上刻一片轻羽",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_fold_unseal",
+      "motif": "折页与断开的签绳",
+      "engraving": "纸页折角上有一条已断开的细签绳",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_gild_3",
+      "motif": "三枚金边活字",
+      "engraving": "三枚活字作三角布局，金边清晰",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_gild_gold_10",
+      "motif": "活字落下铜钱",
+      "engraving": "一枚活字下接三枚错开的钱片",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_heat_10",
+      "motif": "小型炉口",
+      "engraving": "炉口以三条弧线包围一枚火种",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_hits_10",
+      "motif": "同心冲击纹",
+      "engraving": "三圈断开的冲击线围住中心活字",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_nodes_100",
+      "motif": "卷轴中的路径",
+      "engraving": "简洁折线路径刻入展开书卷",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_nodes_20",
+      "motif": "三处脚印与路径",
+      "engraving": "三枚脚印沿短折线路径排布",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_overflow_3",
+      "motif": "炉口吐出活字",
+      "engraving": "一枚方字从炉口升起，三条热纹",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_pin_used",
+      "motif": "铆钉固定活字",
+      "engraving": "方字下有宽底座，四角短铆钉",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_polluted_words_20",
+      "motif": "墨点活字与词线",
+      "engraving": "活字角落保留墨点，连线越过墨迹",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_proof_3",
+      "motif": "交错双签",
+      "engraving": "两枚短签交叠，分别用横纹与斜纹区分",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_rail_clear",
+      "motif": "移出轨道的活字",
+      "engraving": "双横轨外侧放一枚活字，留明显空槽",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_relics_5",
+      "motif": "陈列三件旧物的匣子",
+      "engraving": "浅匣中摆小印、旧瓶与残片",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_replicate_stop_3",
+      "motif": "被截断的分枝",
+      "engraving": "中心活字上方两条分枝被横刻线切断",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_shield_20",
+      "motif": "双层盾",
+      "engraving": "内盾实面，外盾用断续蚀刻线表示",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_shield_50",
+      "motif": "盾与砖墙",
+      "engraving": "简化三层砖纹护住中央盾牌",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_shop_5",
+      "motif": "张开的行囊",
+      "engraving": "袋口上方露出活字、钱片两种轮廓",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_spend_energy_10",
+      "motif": "打开的雷匣",
+      "engraving": "闪电从匣口向上释放，底部刻线收束",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_temp_words_10",
+      "motif": "虚线活字与实线词组",
+      "engraving": "前方实线字与后方虚线字以粗刻线相连",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_turn_words_5",
+      "motif": "五段相接的刻线",
+      "engraving": "五道短线沿弧形依次排布",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_turn_words_8",
+      "motif": "连续展开的折页",
+      "engraving": "折页连续八段，以粗细刻线分层",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_vocab_10",
+      "motif": "打开的小词册",
+      "engraving": "两页薄册中心刻十字形分隔",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_vocab_40",
+      "motif": "书册与四角标记",
+      "engraving": "四枚页签围绕打开的书册",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_vocab_80",
+      "motif": "层叠字匣",
+      "engraving": "三层字匣组成紧凑的山形",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_words_100",
+      "motif": "三枚相连活字",
+      "engraving": "三枚方字沿斜线排布，细线连成短句",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    },
+    {
+      "id": "seal_words_1000",
+      "motif": "展开的金属书卷",
+      "engraving": "卷轴上刻三排短线，用留白组成书脊",
+      "shape": "natural_jade",
+      "asset_path": "",
+      "size": 512,
+      "small_size_requirement": "中心图形在64像素仍可辨认",
+      "asset_status": "pending"
+    }
+  ]
+}
