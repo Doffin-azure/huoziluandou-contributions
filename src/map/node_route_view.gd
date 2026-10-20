@@ -88,18 +88,25 @@ func _layout() -> void:
 	_clamp_offset()
 	points.clear()
 	var compact := _unit>1.1
-	var top := (40.0 if compact else 64.0)*_unit
+	var top := (24.0 if compact else 64.0)*_unit
 	# Reserve a clear corner for the floating actions, without a separate footer.
-	var bottom := 104.0*_unit
+	var bottom := (88.0 if compact else 104.0)*_unit
 	var height := maxf(0, size.y - top - bottom)
+	var lane_min := INF
+	var lane_max := -INF
+	for data: Dictionary in run.layout.rooms.values():
+		lane_min = minf(lane_min, float(data.lane))
+		lane_max = maxf(lane_max, float(data.lane))
+	var lane_span := maxf(1, lane_max - lane_min)
 	for id: String in run.graph.rooms:
 		var data: Dictionary = run.layout.rooms[id]
 		var spec: Dictionary = run.graph.rooms[id]
-		var lane: float = clampf(float(data.lane), 0, 3)
+		var lane := float(data.lane)
 		var jitter: float = float(spec.get("jitter",0)) if id not in [run.graph.start,run.graph.boss] else 0
 		if compact: jitter *= .4
-		points[id] = Vector2(margin + (data.column + 1) * _pitch - _offset, top + clampf(lane + jitter,0,3) / 3 * height)
-	_node_scale = clampf(height/(3*56*_unit),0.5,1.0)
+		var offset_x: float = float(spec.get("offset_x", 0))
+		points[id] = Vector2(margin + (data.column + 1 + offset_x) * _pitch - _offset, top + clampf((lane + jitter - lane_min) / lane_span, 0, 1) * height)
+	_node_scale = clampf(height/(maxf(3, lane_span)*56*_unit),0.3 if compact else 0.5,1.0)
 	queue_redraw()
 
 
@@ -187,8 +194,8 @@ func _draw() -> void:
 		var data: Dictionary = run.layout.rooms[id]
 		if data.column==last_column or id==run.graph.start: continue
 		last_column = data.column
-		var x: float = points[id].x
-		_text("首领" if id==run.graph.boss else "%02d" % (data.column+1),Vector2(x,(14 if _unit>1.1 else 32)*_unit),13,Color(JourneyStyle.GOLD,.5))
+		var x: float = 54 * _unit + (data.column + 1) * _pitch - _offset
+		_text("首领" if id==run.graph.boss else "%02d" % (data.column+1),Vector2(x,(9 if _unit>1.1 else 32)*_unit),11 if _unit>1.1 else 13,Color(JourneyStyle.GOLD,.5))
 	for edge: Dictionary in run.graph.edges:
 		var a: Vector2 = points[edge.from]
 		var b: Vector2 = points[edge.to]

@@ -102,8 +102,17 @@ func _run() -> void:
 			grid_fits = grid_fits and at.y-radius>=0 and at.y+radius<=screen.map_view.size.y
 			var rect := Rect2(screen.map_view.global_position+at-Vector2.ONE*radius,Vector2.ONE*radius*2)
 			controls_clear = controls_clear and not rect.intersects(screen._tools.get_global_rect())
-		check(grid_fits,"all four map lanes remain inside the map")
+		check(grid_fits,"all active map lanes remain inside the map")
 		check(controls_clear,"map nodes do not overlap travel controls")
+		var distinct := true
+		var ids: Array = screen.map_view.points.keys()
+		for i in ids.size():
+			for j in range(i + 1, ids.size()):
+				var left: String = ids[i]
+				var right: String = ids[j]
+				var radii: float = ((27 if run.graph.rooms[left].kind=="boss" else 23) + (27 if run.graph.rooms[right].kind=="boss" else 23)) * JourneyStyle.touch_scale(screen) * screen.map_view._node_scale
+				distinct = distinct and screen.map_view.points[left].distance_to(screen.map_view.points[right])>=radii+JourneyStyle.touch_scale(screen)*.5
+		check(distinct,"variable-width route nodes remain visually separate")
 		await capture(screen,"map")
 		for event_id in ["old_bookshop","delete_poems"]:
 			run = fresh("event"); run.event_data = EVENTS.get_event(event_id).duplicate(true); run.event_node = "start"; run._sync_content()

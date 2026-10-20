@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-20",
+  "baseline": "7a74563cb58a2f6b29259ef5c5a0b6782367718f",
+  "layout_version": 2,
+  "seed_act_samples": 180,
+  "observed_candidate_range": [
+    47,
+    63
+  ],
+  "observed_column_widths": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "mean_mixed_columns": 9.57,
+  "content_fallback_count": 0,
+  "minimum_route_choices_including_entry": 4,
+  "event_budget": [
+    3,
+    5
+  ],
+  "combat_budget_excluding_boss": [
+    6,
+    10
+  ],
+  "tests": [
+    {
+      "suite": "generation",
+      "checks": 1627,
+      "failures": 0,
+      "log": "generation.log"
+    },
+    {
+      "suite": "routes",
+      "checks": 196,
+      "failures": 0,
+      "log": "routes.log"
+    },
+    {
+      "suite": "runtime",
+      "checks": 29,
+      "failures": 0,
+      "log": "runtime.log"
+    },
+    {
+      "suite": "mobile-layout",
+      "checks": 308,
+      "failures": 0,
+      "log": "mobile-layout.log"
+    },
+    {
+      "suite": "event-reward",
+      "checks": 61,
+      "failures": 0,
+      "log": "event-reward.log"
+    },
+    {
+      "suite": "native",
+      "checks": 1627,
+      "failures": 0,
+      "log": "native.log"
+    },
+    {
+      "suite": "mobile-vivo-y33",
+      "checks": 28,
+      "failures": 0,
+      "log": "mobile-vivo-y33.log"
+    },
+    {
+      "suite": "mobile-reference-2664",
+      "checks": 28,
+      "failures": 0,
+      "log": "mobile-reference-2664.log"
+    }
+  ],
+  "legacy_v1": {
+    "note": "Old generator extracted with git show 7a74563:src/expedition/node_route_plan.gd into validation tests/_node_route_v1.gd; temporary probe uses isolated user saves.",
+    "probe": "legacy-v1-probe.gd.txt",
+    "nodes": 55,
+    "log": "legacy-v1.log",
+    "baseline": "7a74563",
+    "phase": "reward"
+  },
+  "mobile_profiles": 11,
+  "android_device_tested": false,
+  "notes": [
+    "Desktop Forward+ native captures plus simulated phone density and safe areas. No Android hardware or performance claim.",
+    "The event reward suite retains existing standalone ObjectDB/resource cleanup warnings.",
+    "Other concurrent battle/relic/balance-table working-tree changes are outside this patch."
+  ]
+}

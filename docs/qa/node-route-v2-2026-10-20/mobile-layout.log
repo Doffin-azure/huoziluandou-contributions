@@ -1,0 +1,20 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 68 / 词 165 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+[mobile_layout] vivo-y33 failures=0
+[mobile_layout] redmi-7a failures=0
+[mobile_layout] vivo-y3 failures=0
+[mobile_layout] iqoo-u1x failures=0
+[mobile_layout] huawei-70s failures=0
+[mobile_layout] redmi-9a failures=0
+[mobile_layout] iqoo-10 failures=0
+[mobile_layout] reference-2664 failures=0
+[mobile_layout] reference-large-ui failures=0
+[mobile_layout] low-854 failures=0
+[mobile_layout] desktop-720 failures=0
+[mobile_layout_matrix] CHECKS=308 FAIL=0
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 1 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

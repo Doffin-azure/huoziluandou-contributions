@@ -10,6 +10,7 @@ var error := ""
 
 func build(graph: Dictionary) -> bool:
 	rooms.clear()
+	site.generation.version = int(graph.get("layout_version", 1))
 	var depths := {str(graph.start):-1}
 	var queue: Array = [graph.start]
 	var cursor := 0

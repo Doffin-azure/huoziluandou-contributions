@@ -10,7 +10,7 @@ func _ready() -> void:
 	Settings.reduced_motion = true
 	for seed_value in 40:
 		var graph: Dictionary = PLAN.generate(seed_value,1)
-		_ok(graph.rooms.size()==55,"55 candidates, seed %d" % seed_value)
+		_ok(graph.rooms.size()>=PLAN.MIN_NODES and graph.rooms.size()<=PLAN.MAX_NODES,"variable candidate count, seed %d" % seed_value)
 		var reached := {"start":true}
 		var event_bounds := {"start":[0,0]}
 		var all_forward := true
@@ -31,7 +31,7 @@ func _ready() -> void:
 					if event_bounds.has(target):
 						event_bounds[target] = [mini(event_bounds[target][0],lower),maxi(event_bounds[target][1],upper)]
 					else: event_bounds[target] = [lower,upper]
-		_ok(all_forward and incoming and reached.size()==55,"every candidate lies on a forward route")
+		_ok(all_forward and incoming and reached.size()==graph.rooms.size(),"every candidate lies on a forward route")
 		_ok(event_bounds.boss[0]>=3 and event_bounds.boss[1]<=5,"3–5 events on every route")
 		var crosses := false
 		for edge: Dictionary in graph.edges:
@@ -103,7 +103,7 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var screen: Control = Router.current
-	_ok(screen!=null and screen.map_view.points.size()==55,"live map displays all candidates")
+	_ok(screen!=null and screen.map_view.points.size()==GameState.room_run.graph.rooms.size(),"live map displays all candidates")
 	_ok(screen.find_children("*","SubViewport",true,false).is_empty(),"map has no 3D render targets")
 	var state: int = GameState.rng.state
 	screen._toggle_planning(); screen._select_node(GameState.room_run.next_rooms()[0]); screen._toggle_planning()

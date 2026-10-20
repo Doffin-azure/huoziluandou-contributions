@@ -1,0 +1,24 @@
+extends Node
+const RUN = preload("res://src/expedition/room_run_state.gd")
+const OLD = preload("res://tests/_node_route_v1.gd")
+func _ready() -> void:
+	GameState.set_meta("courtyard_preview", true)
+	SaveManager.enabled = false
+	var run = RUN.start(29)
+	run.graph = OLD.generate(29, 1)
+	run.layout.build(run.graph)
+	run.position = run.layout.rooms[run.current_room].stand_cell
+	var first: String = run.next_rooms()[0]
+	run.enter_room(first)
+	run.begin_live_battle()
+	run.finish_live_battle(true)
+	var edges: Array = run.graph.edges.duplicate(true)
+	var offers: Array = run.reward_options.map(func(cd): return cd.id)
+	var rng: int = GameState.rng.state
+	var path := "user://node-v1-compat-probe.tres"
+	var saved: bool = run.save_run(path)==OK
+	var restored = RUN.restore(path, true)
+	var ok: bool = saved and restored!=null and restored.graph.rooms.size()==55 and restored.graph.layout_version==1 and restored.graph.edges==edges and restored.phase=="reward" and restored.current_room==first and restored.reward_options.map(func(cd): return cd.id)==offers and GameState.rng.state==rng
+	print("[node_route_v1_compat] PASS=", ok, " NODES=", restored.graph.rooms.size(), " VERSION=", restored.graph.layout_version, " PHASE=", restored.phase)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	get_tree().quit(0 if ok else 1)
