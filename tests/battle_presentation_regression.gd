@@ -116,7 +116,7 @@ func _run() -> void:
 	_screen._refresh_all()
 	_ok(_screen._player_status.entries.any(func(item): return item.id == "heat" and item.stacks == 4) and _screen._player_status.entries.any(func(item): return item.id == "energy" and item.stacks == 3), "资源并入状态栏，读取真实热度与储能数值")
 	_ok(_screen._player_status._buttons.all(func(button): return button.get_node("Glyph") is Label and not button.get_node("Glyph").text.is_empty()), "能力按钮显示汉字方牌，不使用图形符号")
-	var descriptions_available := _screen._player_status.entries.all(func(entry): return str(entry.glyph).length() == 1 and not str(entry.description).is_empty())
+	var descriptions_available: bool = _screen._player_status.entries.all(func(entry): return str(entry.glyph).length() == 1 and not str(entry.description).is_empty())
 	_ok(descriptions_available, "每个活动状态都有单字标签和完整说明")
 	_screen._player_status.item_for("heat").pressed.emit()
 	await _frames()
@@ -333,17 +333,18 @@ func _run() -> void:
 	_ok(not _screen._player_status.entries.any(func(entry): return entry.id == "ability:counter"), "能力耗尽后图标立即移除")
 
 	_fresh("重")
+	var hud_origin: Vector2 = _screen.content.position
 	var stage_origin: Vector2 = Router.study_stage.position if _capture else Vector2.ZERO
 	_screen._on_primary()
 	await _idle()
 	_ok(_screen._effects._impact_strength > 0.0, "单字重在真实重力结算后触发震动")
 	var effects: BattleEffects = _screen._effects
 	effects._process(0.025)
-	_ok(_screen.content.position.length() > 0.01, "震动实际位移 HUD，与 3D 桌面一起移动")
+	_ok(_screen.content.position.distance_to(hud_origin) > 0.01, "震动实际位移 HUD，与背景一起移动")
 	if _capture:
 		_ok(Router.study_stage.position.distance_to(stage_origin) > 0.01, "真实 3D 场景参与同一次震动")
 	effects._process(0.5)
-	_ok(_screen.content.position == Vector2.ZERO and effects._impact_strength == 0.0, "短震动结束回到原位，不修改全局时间流速")
+	_ok(_screen.content.position.is_equal_approx(hud_origin) and effects._impact_strength == 0.0, "短震动结束回到当前布局的原位，不修改全局时间流速")
 	Settings.reduced_motion = true
 	effects.table_impact(7.0)
 	_ok(effects._impact_strength == 0.0, "减少动效关闭整桌震动")

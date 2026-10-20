@@ -213,7 +213,7 @@ func _update_controls() -> void:
 	else:
 		var target := _next_target()
 		_action.visible = not target.is_empty()
-		_action.text = "前往"
+		_action.text = "前往 · "+LABELS[run.graph.rooms[target].kind] if not target.is_empty() else "前往"
 		_action.tooltip_text = "下一站 · "+LABELS[run.graph.rooms[target].kind] if not target.is_empty() else ""
 	_place_tools.call_deferred()
 

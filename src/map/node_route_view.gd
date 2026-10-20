@@ -123,6 +123,28 @@ func _hit(at: Vector2) -> String:
 	return best
 
 
+func _node_radius(id: String) -> float:
+	return (27 if run.graph.rooms[id].kind=="boss" else 23) * _unit * _node_scale
+
+
+func _connection_points(from: String, to: String) -> PackedVector2Array:
+	var a: Vector2 = points[from]
+	var b: Vector2 = points[to]
+	var direction := a.direction_to(b)
+	# Match the drawn faces, including compact phone nodes and the larger boss.
+	return PackedVector2Array([a + direction * (_node_radius(from) + 3 * _unit), b - direction * (_node_radius(to) + 3 * _unit)])
+
+
+func _focus_source() -> String:
+	if planning: return plan_end()
+	return _hover if not _hover.is_empty() else selected
+
+
+func _preview_target(id: String) -> bool:
+	var source := _focus_source()
+	return run.graph.rooms.has(source) and not run.sealed.has(source) and not run.sealed.has(id) and run.graph.rooms[source].next.has(id)
+
+
 func _get_tooltip(at_position: Vector2) -> String:
 	var id := _hit(at_position)
 	if id.is_empty(): return ""
@@ -204,21 +226,21 @@ func _draw() -> void:
 		if planning: reachable = edge.from==plan_end() and run.plan_choices().has(edge.to)
 		var planned: bool = _planned_edge(edge.from,edge.to)
 		var abandoned: bool = run.sealed.has(edge.from) or run.sealed.has(edge.to)
-		var color := Color(JourneyStyle.GOLD,.46)
-		if planning and not (walked or planned or reachable): color = Color(JourneyStyle.GOLD,.14)
+		var inspected: bool = edge.from==_focus_source() and not abandoned
+		var color := Color(JourneyStyle.GOLD,.62)
+		if planning and not (walked or planned or reachable): color = Color(JourneyStyle.GOLD,.4)
 		if abandoned: color = Color(JourneyStyle.EDGE,.2)
 		elif walked: color = JourneyStyle.RED
 		elif planned: color = JourneyStyle.RED if planning else JourneyStyle.GOLD
-		elif reachable: color = Color(JourneyStyle.GOLD,.9)
-		var delta := b-a
-		var trimmed_a := a+delta.normalized()*29*_unit
-		var trimmed_b := b-delta.normalized()*29*_unit
-		if walked or reachable or planned: draw_line(trimmed_a,trimmed_b,color,(2 if reachable or walked else 1.5)*_unit,true)
-		else: draw_dashed_line(trimmed_a,trimmed_b,color,1.2*_unit,6*_unit,true)
-		if reachable or planned:
-			var middle := a.lerp(b,.55)
-			var axis := delta.normalized()
-			draw_polyline(PackedVector2Array([middle-axis.rotated(-.48)*7*_unit,middle,middle-axis.rotated(.48)*7*_unit]),color,1.5*_unit,true)
+		elif reachable or inspected: color = Color(JourneyStyle.GOLD,.95)
+		var segment := _connection_points(edge.from,edge.to)
+		var width := (2.2 if reachable or inspected or walked else (1.8 if planned else 1.2)) * _unit
+		if abandoned: draw_dashed_line(segment[0],segment[1],color,width,4*_unit,true)
+		else: draw_line(segment[0],segment[1],color,width,true)
+		if reachable or planned or inspected:
+			var middle := segment[0].lerp(segment[1],.7)
+			var axis := a.direction_to(b)
+			draw_polyline(PackedVector2Array([middle-axis.rotated(-.48)*6*_unit,middle,middle-axis.rotated(.48)*6*_unit]),color,1.6*_unit,true)
 	for id: String in points: _draw_node(id)
 	if planning: _draw_planning()
 	if _span>size.x+2:
@@ -242,10 +264,10 @@ func _draw_planning() -> void:
 	var end := plan_end()
 	for id: String in points:
 		var center: Vector2 = points[id]
-		var radius: float = (27 if run.graph.rooms[id].kind=="boss" else 23) * _unit * _node_scale
+		var radius := _node_radius(id)
 		if not plan_lit(id):
 			# 压暗：不在这一步能走到的格子
-			draw_circle(center, radius + 3 * _unit, Color(0.04, 0.07, 0.08, .68))
+			draw_circle(center, radius + 3 * _unit, Color(0.04, 0.07, 0.08, .28))
 			continue
 		if run.plan_choices().has(id):
 			draw_arc(center, radius + 7 * _unit, 0, TAU, 40, Color(JourneyStyle.GOLD, .35 + .5 * pulse), 2 * _unit, true)
@@ -285,9 +307,10 @@ func _draw_node(id: String) -> void:
 	var abandoned: bool = run.sealed.has(id)
 	var planned: bool = run.planned_route.has(id)
 	var marked: bool = selected==id or _hover==id
-	var radius: float = (27 if spec.kind=="boss" else 23)*_unit*_node_scale
+	var preview := _preview_target(id)
+	var radius := _node_radius(id)
 	var ink := Color("152e35")
-	var line := JourneyStyle.GOLD if current or available or planned else Color("7f8b7e")
+	var line := JourneyStyle.GOLD if current or available or planned or preview else Color("7f8b7e")
 	var text := JourneyStyle.TEXT
 	if current: ink = Color("84382f"); line = JourneyStyle.GOLD
 	elif past: ink = Color("3d3330"); line = JourneyStyle.RED
@@ -298,11 +321,12 @@ func _draw_node(id: String) -> void:
 	var sides := 4 if spec.kind in ["elite","treasure"] else 8
 	for i in sides: polygon.append(center+Vector2.from_angle(-PI*.5+TAU*i/sides)*radius)
 	draw_colored_polygon(polygon,ink)
-	polygon.append(polygon[0]); draw_polyline(polygon,line,(2 if current or marked else 1.3)*_unit,true)
+	polygon.append(polygon[0]); draw_polyline(polygon,line,(2 if current or marked or preview else 1.3)*_unit,true)
 	if current or planned or marked:
 		draw_arc(center,radius+5*_unit,PI*.15,PI*.85,12,line,1.2*_unit,true)
 		draw_arc(center,radius+5*_unit,PI*1.15,PI*1.85,12,line,1.2*_unit,true)
-	_text(GLYPHS.get(spec.kind,"？"),center+Vector2(0,9*_unit*_node_scale),roundi(26*_node_scale),text)
+	var glyph_size := maxi(11, roundi(26 * _node_scale))
+	_text(GLYPHS.get(spec.kind,"？"),center+Vector2(0,glyph_size*.35*_unit),glyph_size,text)
 	var caption: String = "当前" if current else ("已行" if past else LABELS[spec.kind])
 	if current or marked and _unit<=1.1:
 		_text(caption,center+Vector2(0,43*_unit),14,JourneyStyle.GOLD if current or available else text)

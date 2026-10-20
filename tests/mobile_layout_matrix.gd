@@ -113,7 +113,25 @@ func _run() -> void:
 				var radii: float = ((27 if run.graph.rooms[left].kind=="boss" else 23) + (27 if run.graph.rooms[right].kind=="boss" else 23)) * JourneyStyle.touch_scale(screen) * screen.map_view._node_scale
 				distinct = distinct and screen.map_view.points[left].distance_to(screen.map_view.points[right])>=radii+JourneyStyle.touch_scale(screen)*.5
 		check(distinct,"variable-width route nodes remain visually separate")
+		var joined := true
+		for edge: Dictionary in run.graph.edges:
+			var segment: PackedVector2Array = screen.map_view._connection_points(edge.from, edge.to)
+			for side in 2:
+				var id: String = edge.from if side==0 else edge.to
+				var radius: float = (27 if run.graph.rooms[id].kind=="boss" else 23) * JourneyStyle.touch_scale(screen) * screen.map_view._node_scale
+				var gap: float = screen.map_view.points[id].distance_to(segment[side])-radius
+				joined = joined and gap>=JourneyStyle.touch_scale(screen) and gap<=JourneyStyle.touch_scale(screen)*5
+			joined = joined and (segment[1]-segment[0]).dot(screen.map_view.points[edge.to]-screen.map_view.points[edge.from])>0
+		check(joined,"route lines reach the actual node faces after phone scaling")
+		var chosen: String = run.next_rooms()[0]
+		check(screen._action.text.ends_with(screen.LABELS[run.graph.rooms[chosen].kind]) and run.current_room==run.graph.start,"touch travel confirmation names its target without entering it")
 		await capture(screen,"map")
+		screen._toggle_planning()
+		for step in 3: screen._select_node(run.plan_choices()[0])
+		await frames()
+		check(screen.map_view._focus_source()==run.planned_route[-1] and run.plan_choices().all(func(id): return screen.map_view._preview_target(id)),"planning highlights the next connected targets")
+		await capture(screen,"map-planning")
+		screen._toggle_planning()
 		for event_id in ["old_bookshop","delete_poems"]:
 			run = fresh("event"); run.event_data = EVENTS.get_event(event_id).duplicate(true); run.event_node = "start"; run._sync_content()
 			screen = await open_screen("event_screen",{"room_run":true})

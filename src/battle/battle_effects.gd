@@ -63,9 +63,12 @@ func _spawn_glyph(profile: Dictionary, from: Vector2, to: Vector2, phase: String
 
 
 func setup_impact(hud: Control, stage: Control) -> void:
+	_apply_impact_offset(Vector2.ZERO)
+	_impact_targets.clear()
+	_impact_strength = 0.0
 	for target in [hud, stage]:
 		if is_instance_valid(target):
-			_impact_targets.append({"target": weakref(target), "origin": target.position})
+			_impact_targets.append({"target": weakref(target), "origin": target.position, "last_position": target.position})
 
 
 func table_impact(strength := 6.0) -> void:
@@ -84,17 +87,23 @@ func _process(delta: float) -> void:
 	if Settings.reduced_motion or envelope <= 0.0:
 		_impact_strength = 0.0
 		offset = Vector2.ZERO
+	_apply_impact_offset(offset)
+
+
+func _apply_impact_offset(offset: Vector2) -> void:
 	for entry in _impact_targets:
 		var target: Control = entry.target.get_ref()
 		if is_instance_valid(target):
+			# Layout may finish after setup, or change while shaking (resize/safe area).
+			# A position we did not write is the new rest pose, never another offset.
+			if not target.position.is_equal_approx(entry.last_position):
+				entry.origin = target.position
 			target.position = entry.origin + offset
+			entry.last_position = target.position
 
 
 func _exit_tree() -> void:
-	for entry in _impact_targets:
-		var target: Control = entry.target.get_ref()
-		if is_instance_valid(target):
-			target.position = entry.origin
+	_apply_impact_offset(Vector2.ZERO)
 
 
 func _ready() -> void:

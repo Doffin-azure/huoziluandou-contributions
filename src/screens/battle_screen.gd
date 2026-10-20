@@ -94,6 +94,10 @@ var _tutorial_step := 0
 var _entrance: BattleEntrance
 
 
+func has_run_inventory() -> bool:
+	return false
+
+
 func save_checkpoint() -> Dictionary:
 	# Multi-stage interactions own temporary model changes; keep the last completed
 	# action until the entire picker/placement/animation has resolved.

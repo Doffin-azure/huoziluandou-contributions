@@ -38,6 +38,10 @@ func has_scene_background() -> bool:
 	return true
 
 
+func has_run_inventory() -> bool:
+	return false
+
+
 func build(root: Control) -> void:
 	_courtyard = CourtyardView.new()
 	root.add_child(_courtyard)

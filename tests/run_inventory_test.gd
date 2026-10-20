@@ -36,6 +36,10 @@ func _run() -> void:
 		if page == "room_map_3d":
 			while screen.map_view._building: await frames()
 		var bar: Control = screen.inventory_bar
+		if page in ["title", "battle"]:
+			check(bar==null, page + " does not display the shared run inventory")
+			check(screen.content.position.is_equal_approx(Vector2.ZERO) and screen.content.size.is_equal_approx(screen.size), page + " keeps the full content area without an empty inventory strip")
+			continue
 		check(bar.is_visible_in_tree() and bar.buttons.size() == 3 and not bar.buttons.has("tray"), page + " exposes deck, relics and coins without a tray entry")
 		check(screen.content.position.y >= bar.size.y - 1, page + " reserves space for inventory bar")
 		check(bar._relics.get_child_count() == 1 and bar._relics.get_child(0).text == Relics.name_of("strike"), page + " displays owned relics")
@@ -45,11 +49,9 @@ func _run() -> void:
 			await frames(2)
 			var overlay: Control = bar._overlay
 			check(is_instance_valid(overlay) and overlay._tab == tab and get_tree().paused, page + " opens " + tab + " and pauses underlying actions")
-			if page == "battle": check(screen._modal_count == 1, "battle inventory locks board input")
 			overlay._close()
 			await frames(2)
 			check(not get_tree().paused, page + " restores processing on close")
-			if page == "battle": check(screen._modal_count == 0, "battle inventory releases input lock")
 		check(before == [GameState.gold, GameState.deck, GameState.rng.state, CharInstance._next_uid], page + " inventory is read only")
 		GameState.add_gold(7)
 		await frames()
