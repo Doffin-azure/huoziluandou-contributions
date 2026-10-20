@@ -22,9 +22,9 @@ func run_checks() -> void:
 	var map: Control = Router.current
 	check(map.find_children("*","SubViewport",true,false).is_empty(),"2D map has no 3D viewport")
 	var before: int = GameState.rng.state
-	map._select_node(run.plan_choices()[0]); map._plan_selected()
-	map._select_node(run.plan_choices()[0]); map._plan_selected()
-	map._select_node(run.plan_choices()[0]); map._plan_selected()
+	map._toggle_planning()
+	for i in 3: map._select_node(run.plan_choices()[0])
+	map._toggle_planning()
 	check(GameState.rng.state==before and run.current_room=="start","planning three stops never enters a node or consumes RNG")
 	await frames(4); await snap("node-map-1920.png")
 	get_window().size = Vector2i(1280,720); await frames(10)

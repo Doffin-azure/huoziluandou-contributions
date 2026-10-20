@@ -118,8 +118,8 @@ func _get_tooltip(at_position: Vector2) -> String:
 
 
 func _status(id: String) -> String:
-	if planning and run.planned_route.has(id): return "已规划第 %d 站 · 再点最后一站可撤回" % (run.planned_route.find(id) + 1)
-	if planning and run.plan_choices().has(id): return "规划候选 · 点击加入路线"
+	if planning and run.planned_route.has(id): return "已预选第 %d 站 · 再点最后一站可撤回" % (run.planned_route.find(id) + 1)
+	if planning and run.plan_choices().has(id): return "预选候选 · 点击加入路线"
 	if id==run.current_room: return "当前所在"
 	if run.visited_rooms.has(id): return "已走过 · 不能返回"
 	if run.sealed.has(id): return "已放弃"
