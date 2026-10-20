@@ -50,7 +50,7 @@ func _card(id: String) -> Control:
 	tier.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	inner.add_child(tier)
 	var description := EffectText.new()
-	description.add_theme_font_size_override("normal_font_size", 17)
+	description.add_theme_font_size_override("normal_font_size", int(17 * JourneyStyle.touch_scale(self)))
 	description.set_effect_text(Relics.desc_of(id))
 	inner.add_child(description)
 	var tags: Array[String] = []
