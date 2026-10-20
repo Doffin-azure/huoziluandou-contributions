@@ -135,3 +135,18 @@ func finish(victory: bool) -> void:
 		emit_metrics(rows)
 	ended = true
 	service.save_progress()
+
+
+func export_snapshot() -> Dictionary:
+	return {"key":key,"serial":serial,"play_index":play_index,"hp_lost":hp_lost,"ended":ended,"attack_index":attack_index}
+
+
+func restore_snapshot(data: Dictionary) -> void:
+	serial = int(data.get("serial", 0))
+	play_index = int(data.get("play_index", 0))
+	hp_lost = int(data.get("hp_lost", 0))
+	ended = bool(data.get("ended", false))
+	attack_index = int(data.get("attack_index", 0))
+	var battle = b.get_ref()
+	for enemy in battle.enemies:
+		if not enemy.is_alive(): killed[enemy.get_instance_id()] = true

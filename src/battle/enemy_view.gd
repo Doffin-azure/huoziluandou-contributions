@@ -20,6 +20,7 @@ var _status_rule: ColorRect
 var _portrait: Control
 var _visual: InkSpirit
 var _motion: Tween
+var _tap := TouchTap.new()
 
 
 func setup(p_index: int, p_combatant: Combatant) -> void:
@@ -62,7 +63,7 @@ func _ready() -> void:
 
 
 func _on_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and combatant.is_alive():
+	if _tap.matches(event, self) and combatant.is_alive():
 		clicked.emit(index)
 		accept_event()
 
@@ -87,15 +88,20 @@ func _layout() -> void:
 	_name.size = Vector2(w, 34 * factor if compact else 54)
 	_name.add_theme_font_size_override("font_size", int(24 * factor) if compact else 42)
 	_hp.position = Vector2(0, 52 * factor if compact else 82)
-	var number_width := minf(w * 0.38, 94 * factor)
+	var number_font := int(18 * factor) if compact else 22
+	_hp_number.clip_text = true
+	var number_face := _hp_number.get_theme_font("font")
+	while number_font > int(12 * factor) and number_face.get_string_size(_hp_number.text, HORIZONTAL_ALIGNMENT_LEFT, -1, number_font).x > w * 0.62:
+		number_font -= 1
+	_hp_number.add_theme_font_size_override("font_size", number_font)
+	var number_width := minf(w * 0.62, maxf(w * 0.38, number_face.get_string_size(_hp_number.text, HORIZONTAL_ALIGNMENT_LEFT, -1, number_font).x + 2 * factor))
 	_hp.custom_minimum_size.y = 12
 	_hp.size = Vector2(w - number_width - 10, 14 * factor)
 	_hp_number.position = Vector2(w - number_width, _hp.position.y - 8 * factor)
 	_hp_number.size = Vector2(number_width, 32 * factor)
-	_hp_number.add_theme_font_size_override("font_size", int(18 * factor) if compact else 22)
 	_name.clip_text = true
 	var art_top := 196.0
-	var art_side := minf(w + 18, maxf(64, size.y - art_top - (44 if not _status.entries.is_empty() else 18)))
+	var art_side := minf(w + 18, maxf(64, size.y - art_top - 44))
 	_portrait.visible = not compact
 	_portrait.position = Vector2((w - art_side) * 0.5, art_top)
 	_portrait.size = Vector2(art_side, art_side)
@@ -120,7 +126,7 @@ func _layout() -> void:
 		_intent.size.y = EnemyIntent.ROW_HEIGHT * factor
 		_status.position.y = 116 * factor
 		if show_compact_portrait:
-			art_top = (156 if _status.visible else 116) * factor
+			art_top = 156 * factor
 			art_side = minf(w, maxf(0, size.y - art_top - 4 * factor))
 			_portrait.visible = art_side >= 48 * factor
 			_portrait.position = Vector2((w - art_side) * 0.5, art_top)
@@ -129,7 +135,7 @@ func _layout() -> void:
 	if Palette.STYLE_ID == "taopunk" and (not compact or show_compact_portrait):
 		_portrait.clip_contents = true
 		_portrait.position = Vector2(0, art_top)
-		var bottom := 44.0 * factor if not compact and _status.visible else 4.0 * factor
+		var bottom := (44.0 if not compact else 4.0) * factor
 		_portrait.size = Vector2(w, maxf(0, size.y - art_top - bottom))
 	var defense_width := _defense.display_width()
 	_defense.position = Vector2(0, _hp.position.y + (_hp.size.y - _defense.cell_size) * 0.5)
@@ -149,12 +155,16 @@ func _layout_illustrated(unit: float) -> void:
 	_name.position = Vector2.ZERO
 	_name.size = Vector2(w, 48 * unit)
 	_name.add_theme_font_size_override("font_size", int(40 * unit))
-	var number_width := 120 * unit
+	var number_font := int(28 * unit)
+	var number_face := _hp_number.get_theme_font("font")
+	while number_font > int(12 * unit) and number_face.get_string_size(_hp_number.text, HORIZONTAL_ALIGNMENT_LEFT, -1, number_font).x > w * 0.62:
+		number_font -= 1
+	_hp_number.add_theme_font_size_override("font_size", number_font)
+	var number_width := minf(w * 0.62, maxf(120 * unit, number_face.get_string_size(_hp_number.text, HORIZONTAL_ALIGNMENT_LEFT, -1, number_font).x + 2 * unit))
 	_hp.position = Vector2(0, 54 * unit)
 	_hp.size = Vector2(w - number_width - 12 * unit, 21 * unit)
 	_hp_number.position = Vector2(w - number_width, 44 * unit)
 	_hp_number.size = Vector2(number_width, 40 * unit)
-	_hp_number.add_theme_font_size_override("font_size", int(28 * unit))
 	_intent.position = Vector2(0, 88 * unit)
 	_intent.size = Vector2(w, 88 * unit)
 	_intent.set_ui_scale(1.5 * unit)
@@ -162,7 +172,8 @@ func _layout_illustrated(unit: float) -> void:
 	_status.size = Vector2(w, 42 * unit)
 	_status.set_ui_scale(unit)
 	_status_rule.position.y = _status.position.y - 2 * unit
-	var art_y := (220 if _status.visible else 174) * unit
+	# 状态出现或耗尽只更新图标，立绘始终使用同一占位。
+	var art_y := 220 * unit
 	_portrait.show()
 	_portrait.position = Vector2(-20 * unit, art_y)
 	_portrait.size = Vector2(w + 40 * unit, maxf(0, size.y - art_y))
@@ -182,6 +193,7 @@ func refresh(animate := true) -> void:
 	_visual.glyph = ed.glyph if ed != null else "敌"
 	_visual.enemy_id = ed.id if ed != null else ""
 	_visual.set_defeated(not combatant.is_alive())
+	if ed != null and ed.is_boss: _visual.set_combat_phase(EnemyMechanics.phase(combatant))
 	_visual.queue_redraw()
 	_name.text = combatant.display_name
 	_hp.setup_bar(combatant.hp, combatant.max_hp, Palette.HP, "", animate)

@@ -27,11 +27,11 @@ static func offer(host: Node, title: String, body: String, ids: Array, on_done: 
 		return
 	var options: Array = []
 	for i in ids.size():
-		options.append({"text": "遗物「%s」" % Relics.name_of(ids[i]), "hint": Relics.desc_of(ids[i]), "primary": i == 0})
+		options.append({"text": "遗物「%s」" % Relics.name_of(ids[i]), "hint": Relics.desc_of(ids[i]), "relic_id": ids[i], "primary": i == 0})
 	if allow_skip:
 		options.append({"text": "不要"})
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": title, "body": body, "options": options})
+	overlay.setup({"title": title, "body": body, "options": options, "compact": true, "physical_relics": true})
 	overlay.chose.connect(func(index: int):
 		if index >= ids.size():
 			on_done.call("")
@@ -49,8 +49,17 @@ static func grant(host: Node, id: String, on_done: Callable) -> void:
 	bind_owned(host, id, on_done)
 
 
+## 拾取后的选择：绑定类挑一枚绑定；泥金笔 / 复字拓片挑字；许愿笺许愿
+
+
 ## Also used after a saved route controller has granted the relic exactly once.
 static func bind_owned(host: Node, id: String, on_done: Callable) -> void:
+	if not Relics.pick_spec(id).is_empty():
+		_pick_loop(host, id, int(Relics.pick_spec(id)[1]), on_done)
+		return
+	if id == "monkey" and not GameState.relic_counters.has("monkey"):
+		_wish(host, on_done)
+		return
 	if not Relics.needs_bind(id):
 		on_done.call(id)
 		return
@@ -91,5 +100,66 @@ static func bind_owned(host: Node, id: String, on_done: Callable) -> void:
 		GameState.relic_binds.erase(id)
 		GameState.bind_relic(id, str(keys[GameState.rng.randi_range(0, keys.size() - 1)]))
 		on_done.call(id))
+	picker.set_anchors_preset(Control.PRESET_FULL_RECT)
+	host.add_child(picker)
+
+
+## 泥金笔 / 复字拓片：挑 left 枚字；关掉窗口就随机挑剩下的
+static func _pick_loop(host: Node, id: String, left: int, on_done: Callable) -> void:
+	var counts := Relics.pick_candidates(id)
+	if left <= 0 or counts.is_empty():
+		on_done.call(id)
+		return
+	var verb := "镀金" if Relics.pick_spec(id)[0] == "gild" else "复制"
+	_pick_glyph(host, "「%s」%s哪一枚？（还剩 %d 枚）" % [Relics.name_of(id), verb, left], Relics.desc_of(id) + "　关闭则随机挑选", counts, func(glyph_id: String):
+		Relics.apply_pick(id, glyph_id)
+		_pick_loop(host, id, left - 1, on_done))
+
+
+## 许愿笺：从 3 个愿望里选 1 个
+static func _wish(host: Node, on_done: Callable) -> void:
+	var wishes := Relics.wish_options(GameState.rng)
+	var options: Array = []
+	for w in wishes:
+		options.append({"text": "「%s」" % Relics.WISHES[w][0], "hint": Relics.WISHES[w][1]})
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": "许愿笺 · 许一个愿", "body": "每个愿望都有代价，只能许一次。", "options": options, "compact": true})
+	overlay.chose.connect(func(index: int):
+		var wish: String = wishes[index]
+		if wish != "endless_glyph":
+			Relics.grant_wish(wish)
+			on_done.call("monkey")
+			return
+		var counts := GameState.glyph_counts()
+		_pick_glyph(host, "千字同文：字袋全部变成哪个字？", "之后拿到的字也都变成它　关闭则随机挑选", counts, func(glyph_id: String):
+			Relics.grant_wish(wish, glyph_id)
+			on_done.call("monkey")))
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	host.add_child(overlay)
+
+
+## 从 counts（字形 id -> 枚数）里挑一枚；关窗随机挑
+static func _pick_glyph(host: Node, title: String, subtitle: String, counts: Dictionary, done: Callable) -> void:
+	var chars: Array = []
+	for glyph_id in counts.keys():
+		var cd: CharacterData = Database.get_character(glyph_id)
+		if cd == null:
+			cd = Database.get_character_by_glyph(str(glyph_id))
+		if cd != null:
+			chars.append(cd)
+	if chars.is_empty():
+		done.call("")
+		return
+	var picker := CollectionOverlay.new()
+	var state := {"done": false}
+	picker.setup({"title": title, "subtitle": subtitle, "characters": chars, "counts": counts, "pick_on_click": true})
+	picker.picked.connect(func(cd: CharacterData):
+		if state.done: return
+		state.done = true
+		done.call(cd.id))
+	picker.closed.connect(func():
+		if state.done: return
+		state.done = true
+		done.call(chars[GameState.rng.randi_range(0, chars.size() - 1)].id))
 	picker.set_anchors_preset(Control.PRESET_FULL_RECT)
 	host.add_child(picker)

@@ -273,10 +273,13 @@ static func injected_count(b: BattleState, source_id: int, glyph: String) -> int
 static func inject_move(b: BattleState, e: Combatant, mv: EnemyMoveData) -> int:
 	var count := mv.inject_count
 	var cap := parameter(e, "inject_cap")
-	if cap > 0: count = mini(count, maxi(0, cap - injected_count(b, e.get_instance_id(), mv.inject_glyph)))
+	# The enemy array is saved in battle order; runtime ObjectIDs change on load.
+	var source_id := b.enemies.find(e)
+	if source_id < 0: return 0
+	if cap > 0: count = mini(count, maxi(0, cap - injected_count(b, source_id, mv.inject_glyph)))
 	if count <= 0 or b.board.free_count() <= 0: return 0
 	var before := b.temp_chars.size()
-	var added := b.inject_enemy_glyphs(count, mv.pollution_id, mv.inject_glyph, e.get_instance_id())
+	var added := b.inject_enemy_glyphs(count, mv.pollution_id, mv.inject_glyph, source_id)
 	for c in b.temp_chars.slice(before):
 		c.statuses.inject_cap = cap
 		c.statuses.replicate_count = parameter(e, "replicate_count")

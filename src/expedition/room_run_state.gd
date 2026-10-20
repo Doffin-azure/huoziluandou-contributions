@@ -19,19 +19,19 @@ var resolved := {}
 var visited_rooms := {}
 var choices := {}
 var sealed := {}
-var contents := {} # Per-room cached event, inventory and reward resources.
+var contents := {} # Per-room cached event, shop stock and reward resources.
 var seen_events: Array = [] # Event IDs already drawn in this run; avoids repeats until the act pool is exhausted.
 var event_bags := {}
 var last_event_id := ""
 var position := Vector2i.ZERO
 var autosave := false
 var generation_error := ""
-var plate := [["", ""], ["", ""]]
-var tray: Array = []
-var active := {}
 var layout_kind := "procedural"
 var generation_ms := 0.0
 var travel: RefCounted
+var plate := [["", ""], ["", ""]]
+var tray: Array = []
+var active := {}
 var planned_route: Array[String] = [] # Preview only; confirmation still advances one encounter.
 
 
@@ -50,9 +50,9 @@ func reset(cfg: Dictionary = {}) -> void:
 	layout_kind = str(cfg.get("layout","procedural"))
 	GameState.room_run = self
 	GameState.expedition = null
+	tray.clear(); plate = [["",""],["",""]]; active.clear()
 	resolved.clear(); visited_rooms.clear(); choices.clear(); sealed.clear(); contents.clear()
 	seen_events.clear(); event_bags.clear(); last_event_id = ""
-	tray.clear(); plate = [["",""],["",""]]; active.clear()
 	_load_act(1)
 
 
@@ -161,6 +161,15 @@ func _advance_event() -> void:
 	super._advance_event()
 
 
+func _cancel_pick() -> Dictionary:
+	var was_event := phase == "event_choose"
+	var result := super._cancel_pick()
+	if result.get("ok", false) and was_event:
+		pending_spawn = ""
+		pending_spawn_relic = ""
+	return result
+
+
 ## 璇玑字盘：进入后只做一次选词，选中的词给其中不重复的字。
 func _start_event_board() -> void:
 	var board_seed := GameState.rng.randi()
@@ -230,7 +239,7 @@ func _spawn_after_event(kind: String) -> void:
 		"treasure":
 			if _grant_treasure_relic().is_empty():
 				GameState.add_gold(30)
-				_log("宝箱：普通遗物已收集完，改为金币 +30")
+				_log("宝箱：普通遗物已收集完，改为铜钱 +30")
 			_complete_node()
 		"battle":
 			spawned_battle = true
@@ -368,7 +377,7 @@ func _arrive(id: String) -> void:
 			var found := _grant_treasure_relic()
 			if found.is_empty():
 				GameState.add_gold(30)
-				_log("宝箱：普通遗物已收集完，改为金币 +30")
+				_log("宝箱：普通遗物已收集完，改为铜钱 +30")
 			if layout_kind=="node_graph":
 				if not contents.has(current_room): contents[current_room] = {}
 				contents[current_room]["treasure"] = {"relic":found}
@@ -507,11 +516,11 @@ func _grant_battle_relic(mode: String) -> void:
 		id = str(choices[0]) if not choices.is_empty() else ""
 	if id.is_empty():
 		GameState.add_gold(35)
-		_log("奇遇：遗物已取尽，改为金币 +35")
+		_log("奇遇：遗物已取尽，改为铜钱 +35")
 		return
 	if not GameState.add_relic(id):
 		GameState.add_gold(35)
-		_log("奇遇：遗物未能取得，改为金币 +35")
+		_log("奇遇：遗物未能取得，改为铜钱 +35")
 		return
 	if Relics.needs_bind(id):
 		for inst: CharInstance in GameState.deck:
@@ -600,6 +609,7 @@ func apply_battle_setup(b: BattleState) -> void:
 	if active.has("防御力"): b.player.permanent_damage_reduction += 1
 
 
+
 func _apply_reward(t: String, action: Dictionary) -> Dictionary:
 	if not contents.get(current_room,{}).get("battle_relics",[]).is_empty(): return _fail("请先选择遗物奖励")
 	if t=="skip": GameState.add_gold(Expedition.SKIP_GOLD)
@@ -647,7 +657,7 @@ func legal_actions() -> Array:
 			return range(ids.size()).map(func(i):return {"type":"reward_relic","index":i,"relic":ids[i]})
 	if phase=="shop":
 		var stock: Array = super.legal_actions()
-		if GameState.gold>=Expedition.SHOP_REFRESH_COST: stock.append({"type":"shop_refresh","price":Expedition.SHOP_REFRESH_COST})
+		if GameState.gold>=shop_refresh_cost(): stock.append({"type":"shop_refresh","price":shop_refresh_cost()})
 		return stock
 	if phase=="encounter": return [{"type":"interact","label":"开战"}]
 	if phase=="act_end": return [{"type":"next_act","label":"完成远征" if GameState.act_index==3 else "进入下一幕"}]
@@ -687,9 +697,6 @@ func apply(action: Dictionary) -> Dictionary:
 		_grant_battle_relic(str(ids[index]))
 		contents[current_room]["battle_relics"] = []
 		result = {"ok":true,"relic":ids[index]}
-	elif type=="tray_to_deck": result = _manage(action,false)
-	elif type=="plate": result = _manage(action,true)
-	elif type=="take_plate": result = {"ok":take_plate(int(action.get("row",-1)),int(action.get("col",-1)))}
 	else:
 		var valid := legal_actions().any(func(a):
 			if a.type!=type: return false
@@ -752,7 +759,7 @@ func _apply_upgrade(ch: CharacterData) -> void:
 func observe() -> Dictionary:
 	var result := super.observe()
 	var kind: String = graph.rooms.get(current_room,{}).get("kind","")
-	result.merge({"mode":"courtyard","schema":1,"layout":layout_kind,"generation":layout.site.get("generation",{}).duplicate(true),"seed":seed,"current_room":current_room,"room_kind":kind,"next_rooms":next_rooms(),"resolved":resolved.keys(),"branch_choices":choices.duplicate(),"sealed_rooms":sealed.keys(),"position":[position.x,position.y],"tray":tray.duplicate(),"plate":plate.duplicate(true),"generation_error":generation_error,"grid_step":layout.walk_step,"grid_origin":[layout.grid_origin.x,layout.grid_origin.y],"seen_events":seen_events.duplicate()},true)
+	result.merge({"mode":"courtyard","schema":2,"layout":layout_kind,"generation":layout.site.get("generation",{}).duplicate(true),"seed":seed,"current_room":current_room,"room_kind":kind,"next_rooms":next_rooms(),"resolved":resolved.keys(),"branch_choices":choices.duplicate(),"sealed_rooms":sealed.keys(),"position":[position.x,position.y],"generation_error":generation_error,"grid_step":layout.walk_step,"grid_origin":[layout.grid_origin.x,layout.grid_origin.y],"seen_events":seen_events.duplicate()},true)
 	result["pending_reward"] = phase=="reward"
 	result["candidate_nodes"] = graph.rooms.size()
 	result["forward_only"] = travel!=null or layout_kind=="node_graph"
@@ -778,22 +785,7 @@ func observe() -> Dictionary:
 				"remaining": int(pending_event_effect.get("remaining", 0)),
 				"glyphs": pending_event_effect.get("glyphs", []).duplicate(),
 			}
-	result["inventory_actions"] = inventory_actions()
 	return result
-
-
-func inventory_actions() -> Array:
-	var actions: Array = []
-	if phase not in ["map","rest","shop"]: return actions
-	for i in tray.size():
-		actions.append({"type":"tray_to_deck","index":i,"glyph":tray[i]})
-		for row in 2:
-			for col in 2:
-				if str(plate[row][col]).is_empty(): actions.append({"type":"plate","index":i,"row":row,"col":col})
-	for row in 2:
-		for col in 2:
-			if not str(plate[row][col]).is_empty(): actions.append({"type":"take_plate","row":row,"col":col})
-	return actions
 
 
 func summary() -> Dictionary:
@@ -811,6 +803,7 @@ func save_run(path := SAVE_PATH) -> Error:
 	if travel!=null: data.run["forward"] = {"history":travel.history.duplicate(),"departed":travel.departed}
 	data.run["planned_route"] = planned_route.duplicate()
 	data.player = {"hp":GameState.player_hp,"max_hp":GameState.player_max_hp,"gold":GameState.gold,"sequence":GameState.battle_sequence,"relics":GameState.relics,"binds":GameState.relic_binds,"counters":GameState.relic_counters,"reduction":GameState.permanent_damage_reduction,"deck":[]}
+	data.player["revive_charges"] = GameState.revive_charges
 	for inst in GameState.deck:
 		data.player.deck.append({"uid":inst.uid,"data":inst.data,"gilded":inst.gilded,"upgrade":inst.upgrade_level,"modifiers":inst.modifiers.duplicate(),"pollutions":inst.pollutions.duplicate(),"fusion":inst.fusion.duplicate()})
 	return ResourceSaver.save(data,path)
@@ -854,7 +847,7 @@ static func restore(path := SAVE_PATH, as_nodes := false):
 	run.event_bags = state.get("event_bags",{}); run.last_event_id = str(state.get("last_event_id",""))
 	run.event_node = state.get("event_node", "start"); run.pending_event_next = state.get("pending_event_next", "")
 	GameState.event_temp_hp = int(state.get("event_temp_hp", 0))
-	run.position = state.position; run.phase = state.phase; run.plate = state.plate; run.tray = state.tray; run.active = state.active
+	run.position = state.position; run.phase = state.phase
 	run._restore_travel(state.get("forward",{}))
 	# Bridge routing may be refined between development builds. Preserve all room
 	# progress; only an invalid walking position returns to that room's safe stand.
@@ -874,8 +867,10 @@ static func restore(path := SAVE_PATH, as_nodes := false):
 		GameState.deck.append(inst)
 	GameState.player_hp = player.hp; GameState.player_max_hp = player.max_hp; GameState.gold = player.gold
 	GameState.battle_sequence = player.sequence; GameState.relics = player.relics; GameState.relic_binds = player.binds; GameState.relic_counters = player.counters
+	GameState.revive_charges = int(player.get("revive_charges", 0))
 	GameState.permanent_damage_reduction = player.reduction
 	GameState.rng.state = state.rng
+	run.plate = state.get("plate", [["",""],["",""]]); run.tray = state.get("tray", []); run._refresh_active()
 	Achievements.resume_run(state.get("achievements", {}))
 	# 旧版本没有成就快照；从恢复后的实际操作开始记录，不补算历史。
 	var migrated_achievements: bool = state.get("achievements", {}).is_empty() and run.phase not in ["victory", "defeat"]
@@ -888,6 +883,19 @@ static func restore(path := SAVE_PATH, as_nodes := false):
 		run._finish_final_boss()
 	if migrated_achievements and run.autosave and not Achievements.run_id.is_empty(): run.save_run(path)
 	return run
+
+
+static func _restore_legacy_inventory(state: Dictionary) -> void:
+	# Old trays and plates stored extra glyphs outside the deck. Import them once;
+	# new saves omit these fields, so saving and loading cannot duplicate them.
+	var glyphs: Array = []
+	if state.get("tray") is Array: glyphs.append_array(state.tray)
+	if state.get("plate") is Array:
+		for row in state.plate:
+			if row is Array: glyphs.append_array(row)
+	for glyph in glyphs:
+		var character := Database.get_character_by_glyph(str(glyph))
+		if character != null: GameState.add_character(character)
 
 
 func use_node_map() -> void:
@@ -905,14 +913,21 @@ func use_node_map() -> void:
 
 func _start_shop() -> void:
 	super._start_shop()
-	var ids: Array = RelicRewardFlow.roll(1,RelicRewardFlow.side_rng("shop"))
-	if not ids.is_empty(): shop_offers.append({"kind":"relic","character":null,"relic":ids[0],"price":RelicRewardFlow.SHOP_PRICE})
+	var ids: Array = RelicRewardFlow.roll(3,RelicRewardFlow.side_rng("shop"))
+	for id in ids: shop_offers.append({"kind":"relic","character":null,"relic":id,"price":Relics.price(id)})
 	Achievements.register_offers(shop_offers)
+
+
+func shop_refresh_cost() -> int:
+	return Expedition.SHOP_REFRESH_COST * (int(contents.get(current_room, {}).get("shop_refreshes", 0)) + 1)
+
 
 
 func _apply_shop(type: String, action: Dictionary) -> Dictionary:
 	if type=="shop_refresh":
-		if phase!="shop" or not GameState.spend_gold(Expedition.SHOP_REFRESH_COST): return _fail("金币不足或正在处理服务")
+		if phase!="shop" or not GameState.spend_gold(shop_refresh_cost()): return _fail("铜钱不足或正在处理服务")
+		if not contents.has(current_room): contents[current_room] = {}
+		contents[current_room]["shop_refreshes"] = int(contents[current_room].get("shop_refreshes", 0)) + 1
 		var services: Array = shop_offers.filter(func(item):return item.kind not in ["buy_char","relic"])
 		_start_shop()
 		shop_offers = shop_offers.filter(func(item):return item.kind in ["buy_char","relic"])+services
@@ -920,7 +935,7 @@ func _apply_shop(type: String, action: Dictionary) -> Dictionary:
 	var index := int(action.get("index",-1))
 	if type=="shop_buy" and index>=0 and index<shop_offers.size() and shop_offers[index].kind=="relic":
 		var item: Dictionary = shop_offers[index]
-		if not GameState.spend_gold(int(item.price)): return _fail("金币不足")
+		if not GameState.spend_gold(int(item.price)): return _fail("铜钱不足")
 		_grant_battle_relic(str(item.relic))
 		Achievements.bought_offer(item)
 		shop_offers.remove_at(index)

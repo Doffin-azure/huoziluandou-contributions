@@ -12,6 +12,23 @@ var _mode := "chars"
 var _word_grid: GridContainer
 var _scroll: ScrollContainer
 var _counts: Dictionary = {}
+var _dim_tap := TouchTap.new()
+var _relic_page: RelicCompendiumOverlay
+var _closing := false
+var _picked := false
+
+
+static func open_deck(owner: Control) -> void:
+	for child in owner.get_children():
+		if child is CollectionOverlay: return
+	var counts := GameState.glyph_counts()
+	var characters: Array = []
+	for glyph in counts:
+		var character: CharacterData = Database.get_character_by_glyph(glyph)
+		if character != null: characters.append(character)
+	var overlay := CollectionOverlay.new()
+	overlay.setup({"title": "字袋", "subtitle": "共 %d 枚 · 仅查看，不消耗金币或整备机会" % GameState.deck_size(), "characters": characters, "counts": counts})
+	owner.add_child(overlay)
 
 
 func setup(p_cfg: Dictionary) -> void:
@@ -36,10 +53,10 @@ func _build() -> void:
 
 	var frame := MarginContainer.new()
 	frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	frame.add_theme_constant_override("margin_left", 60)
-	frame.add_theme_constant_override("margin_right", 60)
-	frame.add_theme_constant_override("margin_top", 40)
-	frame.add_theme_constant_override("margin_bottom", 40)
+	frame.add_theme_constant_override("margin_left", 16)
+	frame.add_theme_constant_override("margin_right", 16)
+	frame.add_theme_constant_override("margin_top", 16)
+	frame.add_theme_constant_override("margin_bottom", 16)
 	add_child(frame)
 
 	var panel := Ink.panel("PanelCard")
@@ -52,16 +69,22 @@ func _build() -> void:
 
 	var head := Ink.hbox(12)
 	col.add_child(head)
+	var headings := JourneyStyle.flow(12)
+	headings.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(headings)
 	var title := Ink.h2(cfg.get("title", "字库图鉴"))
-	head.add_child(title)
+	headings.add_child(title)
 	if not str(cfg.get("subtitle", "")).is_empty():
 		var st := Ink.label(str(cfg["subtitle"]), "Muted")
 		st.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		head.add_child(st)
-	head.add_child(Ink.expander())
-	var close := Ink.button("关闭")
+		st.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		st.custom_minimum_size.x = minf(400, size.x * 0.22)
+		headings.add_child(st)
+
+	var close := Ink.button(str(cfg.get("close_text", "关闭")))
 	close.theme_type_variation = "GhostButton"
-	close.custom_minimum_size = Vector2(90, 48 * JourneyStyle.touch_scale(self))
+	close.custom_minimum_size = Vector2(90, ceilf(48 * JourneyStyle.touch_scale(self)))
+	close.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	close.pressed.connect(_close)
 	head.add_child(close)
 
@@ -70,6 +93,9 @@ func _build() -> void:
 	_add_tab("实体字", "chars")
 	if not (cfg.get("words", []) as Array).is_empty():
 		_add_tab("词", "words")
+
+	if cfg.get("show_relics", false) and not cfg.get("pick_on_click", false):
+		_add_tab("遗物", "relics")
 
 	col.add_child(Ink.hline())
 
@@ -95,6 +121,11 @@ func _build() -> void:
 	_word_grid.visible = false
 	wrap.add_child(_word_grid)
 
+	if cfg.get("show_relics", false) and not cfg.get("pick_on_click", false):
+		_relic_page = RelicCompendiumOverlay.new()
+		_relic_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		col.add_child(_relic_page)
+
 	_populate_chars()
 	_populate_words()
 	_scroll.resized.connect(_layout_columns)
@@ -111,8 +142,14 @@ func _add_tab(text: String, mode: String) -> void:
 
 func _show_tab(mode: String) -> void:
 	_mode = mode
+	_scroll.visible = mode != "relics"
+	if is_instance_valid(_relic_page):
+		_relic_page.visible = mode == "relics"
 	_grid.visible = mode == "chars"
 	_word_grid.visible = mode == "words"
+	_scroll.scroll_vertical = 0
+	for effect in find_children("*", "RichTextLabel", true, false):
+		if effect is EffectText: effect.close_help()
 	for button in _tab_bar.get_children():
 		button.theme_type_variation = "PrimaryButton" if button.get_meta("tab") == mode else "GhostButton"
 
@@ -169,11 +206,14 @@ func _populate_instances() -> void:
 
 
 func _on_dim_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
+	if _dim_tap.matches(event, get_child(0)):
+		accept_event()
 		_close()
 
 
 func _on_card_clicked(ch: CharacterData) -> void:
+	if _closing or _picked: return
+	if cfg.get("pick_on_click", false): _picked = true
 	picked.emit(ch)
 	if cfg.get("pick_on_click", false):
 		_close()
@@ -197,21 +237,23 @@ func _populate_words() -> void:
 		var meta := JourneyStyle.label(w.group, "Muted")
 		inner.add_child(meta)
 		var d := EffectText.new()
-		d.add_theme_font_size_override("normal_font_size", 17)
+		d.add_theme_font_size_override("normal_font_size", int(17 * JourneyStyle.touch_scale(self)))
 		d.set_effect_text(EffectGlossary.brief(w), 0, w)
 		inner.add_child(d)
 		_word_grid.add_child(holder)
 
 
 func _close() -> void:
+	if _closing: return
+	_closing = true
 	closed.emit()
 	queue_free()
 
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("cancel_selection"):
-		_close()
 		get_viewport().set_input_as_handled()
+		_close()
 
 
 func _layout_columns() -> void:

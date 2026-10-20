@@ -3,14 +3,26 @@ class_name InkGuardianActor
 ## 原图蒙皮样板：骨骼只驱动画面，不参与战斗状态或随机数。
 const SOURCE_SIZE := Vector2(1402, 1122)
 const EYE := Vector2(720, 437)
-const RELEASE := {"attack": 0.24, "inject": 0.40}
-const LENGTH := {"attack": 0.72, "inject": 1.04}
+const RELEASE := {"attack": 0.24, "inject": 0.40, "guard":0.34}
+const LENGTH := {"attack": 0.72, "inject": 1.04, "guard":0.90}
 var skeleton: Skeleton2D
 var mesh: Polygon2D
 var player: AnimationPlayer
 var bones: Dictionary = {}
 var _resting := false
-var defeated := false
+var defeated := false:
+	set(value):
+		if defeated == value: return
+		defeated = value
+		if not is_node_ready(): return
+		player.stop()
+		for bone in bones.values(): bone.apply_rest()
+		if value:
+			if Settings.reduced_motion: modulate.a = 0.18
+			else: player.play("death")
+		elif not Settings.reduced_motion:
+			modulate.a = 1.0
+			player.play("idle")
 
 
 func _ready() -> void:
@@ -112,6 +124,32 @@ func _build_animations() -> void:
 	_track(inject, "ClothLeft", "rotation", times, [0.0, 0.035, 0.06, 0.04, 0.015, 0.0])
 	_track(inject, "ClothRight", "rotation", times, [0.0, -0.035, -0.06, -0.04, -0.015, 0.0])
 	library.add_animation("inject", inject)
+	var guard := Animation.new()
+	guard.length = LENGTH.guard
+	times = [0.0,0.20,0.34,0.56,0.90]
+	_track(guard,"Head","rotation",times,[0.0,0.025,0.05,0.035,0.0])
+	_track(guard,"ClothLeft","rotation",times,[0.0,-0.055,-0.11,-0.08,0.0])
+	_track(guard,"ClothRight","rotation",times,[0.0,0.055,0.11,0.08,0.0])
+	library.add_animation("guard",guard)
+	var hit := Animation.new()
+	hit.length = 0.42
+	times = [0.0,0.06,0.15,0.28,0.42]
+	_track(hit,"Head","rotation",times,[0.0,0.10,-0.04,0.01,0.0])
+	_track(hit,"ClothLeft","rotation",times,[0.0,-0.10,0.03,-0.01,0.0])
+	_track(hit,"ClothRight","rotation",times,[0.0,0.10,-0.03,0.01,0.0])
+	library.add_animation("hit",hit)
+	var death := Animation.new()
+	death.length = 1.15
+	times = [0.0,0.18,0.48,0.80,1.15]
+	_track(death,"Body","position",times,[Vector2(700,1040),Vector2(700,1027),Vector2(710,1085),Vector2(718,1135),Vector2(720,1155)])
+	_track(death,"Head","rotation",times,[0.0,-0.03,0.13,0.20,0.22])
+	_track(death,"Halo","rotation",times,[0.0,0.02,-0.08,-0.14,-0.16])
+	_track(death,"ClothLeft","rotation",times,[0.0,0.025,-0.14,-0.20,-0.22])
+	_track(death,"ClothRight","rotation",times,[0.0,-0.025,0.14,0.20,0.22])
+	var fade := death.add_track(Animation.TYPE_VALUE)
+	death.track_set_path(fade,NodePath(":modulate:a"))
+	for i in times.size(): death.track_insert_key(fade,times[i],[1.0,1.0,0.8,0.4,0.18][i])
+	library.add_animation("death",death)
 	player.add_animation_library("", library)
 
 
@@ -125,8 +163,8 @@ func _track(clip: Animation, bone: String, property: String, times: Array, value
 func play_action(move: EnemyMoveData) -> Dictionary:
 	if Settings.reduced_motion or defeated: return {"release": 0.04, "duration": 0.04}
 	var action := "inject" if move.kind == EnemyMoveData.Kind.INJECT else "attack"
-	if move.kind not in [EnemyMoveData.Kind.ATTACK, EnemyMoveData.Kind.ATTACK_BLOCK, EnemyMoveData.Kind.MULTI, EnemyMoveData.Kind.INJECT]:
-		return {}
+	if move.kind == EnemyMoveData.Kind.BLOCK: action = "guard"
+	elif move.kind in [EnemyMoveData.Kind.SPECIAL,EnemyMoveData.Kind.BUFF,EnemyMoveData.Kind.DEBUFF]: action = "inject"
 	player.play(action, 0.055)
 	return {"release": RELEASE[action], "duration": LENGTH[action], "action": action}
 
@@ -145,9 +183,18 @@ func _set_resting(value: bool) -> void:
 	if value:
 		player.stop()
 		for bone in bones.values(): bone.apply_rest()
-	else:
+		modulate.a = 0.18 if defeated else 1.0
+	elif not defeated:
 		player.play("idle")
 
 
 func _process(_delta: float) -> void:
-	if _resting != (Settings.reduced_motion or defeated): _set_resting(Settings.reduced_motion or defeated)
+	if _resting != Settings.reduced_motion: _set_resting(Settings.reduced_motion)
+
+
+func apply_feedback(event: Dictionary) -> void:
+	if event.has("hp") and int(event.hp) <= 0: defeated = true
+	elif not defeated and not Settings.reduced_motion and (int(event.get("hp_loss",0)) > 0 or int(event.get("blocked",0)) > 0):
+		player.stop()
+		for bone in bones.values(): bone.apply_rest()
+		player.play("hit")

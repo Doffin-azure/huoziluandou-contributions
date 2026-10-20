@@ -4,6 +4,7 @@ class_name DebugCommands
 ## 只在调试构建由 DebugConsole 安装。
 
 static var _cmds: Dictionary = {}
+const RelicTools = preload("res://src/debug/relic_tools.gd")
 
 
 static func is_empty() -> bool:
@@ -56,6 +57,14 @@ static func _refresh() -> void:
 		s.call("_refresh_all")
 
 
+static func _refresh_relics() -> void:
+	var s = Router.current
+	if s != null and s.has_method("refresh"):
+		s.call("refresh")
+	_refresh()
+	SaveManager.request_save()
+
+
 static func _ck() -> Array:
 	return ["（当前不在战斗中）"]
 
@@ -106,13 +115,6 @@ static func install() -> void:
 		if Debug != null: Debug.clear_log()
 		return [])
 	register("refresh", "刷新战斗界面", func(_a): _refresh(); return ["已刷新"])
-	register("style", "切换风格 paper|neon", func(a):
-		var id: String = _glyph(a, 0)
-		if id != "paper" and id != "neon":
-			return ["用法：/style paper|neon"]
-		Ink.apply_style(GameStyle.get_style(id))
-		Router.goto(Router.current_path)
-		return ["风格已切到 " + id])
 	register("seed", "固定本场随机种子", func(a):
 		var b := _battle()
 		if b == null: return _ck()
@@ -143,11 +145,11 @@ static func install() -> void:
 		GameState.player_max_hp = b.player.max_hp
 		_refresh()
 		return ["MaxHP = %d" % b.player.max_hp])
-	register("gold", "设置金币", func(a):
+	register("gold", "设置铜钱", func(a):
 		GameState.gold = maxi(0, _int(a, 0, GameState.gold))
 		EventBus.gold_changed.emit(GameState.gold)
 		_refresh()
-		return ["金币 = %d" % GameState.gold])
+		return ["铜钱 = %d" % GameState.gold])
 	register("heat", "设置热度", func(a):
 		var b := _battle()
 		if b == null: return _ck()
@@ -185,11 +187,11 @@ static func install() -> void:
 		if b != null: b.rules.plays_per_turn = Database.rules.plays_per_turn
 		_refresh()
 		return ["每回合出字 = %d" % Database.rules.plays_per_turn])
-	register("goldcap", "设置每战金币收入上限（0 = 不限）", func(a):
+	register("goldcap", "设置每战铜钱收入上限（0 = 不限）", func(a):
 		Database.rules.gold_cap_per_battle = maxi(0, _int(a, 0, Database.rules.gold_cap_per_battle))
 		var b := _battle()
 		if b != null: b.rules.gold_cap_per_battle = Database.rules.gold_cap_per_battle
-		return ["金币上限 = %s" % ("不限" if Database.rules.gold_cap_per_battle <= 0 else str(Database.rules.gold_cap_per_battle))])
+		return ["铜钱上限 = %s" % ("不限" if Database.rules.gold_cap_per_battle <= 0 else str(Database.rules.gold_cap_per_battle))])
 
 	# ---- B. 盘面 ----
 	register("board", "打印字盘（0 基坐标）", func(_a): return _print_board())
@@ -342,6 +344,12 @@ static func install() -> void:
 		return out)
 
 	# ---- D. 字袋 / 构筑 ----
+	register("relic-test", "遗物效果自检（保留对局）：/relic-test [all|名字或id]", func(a): return RelicTools.run_checks(a))
+	register("relic-status", "查看持有/本场遗物、绑字与触发计数", func(_a): return RelicTools.status(_battle()))
+	register("relic-bind", "指定绑字：/relic-bind 名字或id 字形或#实体uid", func(a):
+		var out := RelicTools.bind(a)
+		_refresh_relics()
+		return out)
 	register("deck", "打印永久字袋", func(_a):
 		var counts := GameState.glyph_counts()
 		var out: Array = ["字袋 %d 枚：" % GameState.deck_size()]
@@ -365,12 +373,12 @@ static func install() -> void:
 				if GameState.remove_relic(id): done.append(Relics.name_of(id))
 			elif GameState.add_relic(id):
 				done.append(Relics.name_of(id))
-				if Relics.needs_bind(id) and not GameState.deck.is_empty() and not GameState.relic_binds.has(id):
-					GameState.bind_relic(id, GameState.deck[0].id())
-		var s = Router.current
-		if s != null and s.has_method("refresh"): s.call("refresh")
-		_refresh()
-		return [("移除：" if drop else "得到：") + ("、".join(done) if not done.is_empty() else "无变化（绑定类自动绑字袋第一枚；战斗中改动下一场生效）")])
+				if Relics.needs_bind(id) and not GameState.relic_binds.has(id):
+					for c in GameState.deck:
+						if GameState.bind_relic(id, c.id()):
+							break
+		_refresh_relics()
+		return [("移除：" if drop else "得到：") + ("、".join(done) if not done.is_empty() else "无变化"), "绑定类自动选未占用的字；/relic-bind 指定绑字，/relic-status 查看。战斗中改动下一场生效。"])
 	register("tray", "远征字匣放字：/tray 火热强", func(a):
 		var ex: Expedition = GameState.expedition
 		if ex == null or a.is_empty(): return ["用法：在远征地图里 /tray 火热强"]

@@ -25,7 +25,7 @@ func _ready() -> void:
 	var uid := CharInstance._next_uid
 	var rng := GameState.rng.state
 	var text: String = GameState.deck[0].describe()
-	check(text.contains("镀金：") and text.contains("%d金币" % BattleBalance.i("gild_gold", 1)) and text.contains("组词"), "gilded description explains exact reward and word use")
+	check(text.contains("镀金：") and text.contains("%d铜钱" % BattleBalance.i("gild_gold", 1)) and text.contains("组词"), "gilded description explains exact reward and word use")
 	check(CharInstance._next_uid == uid and GameState.rng.state == rng and not original.description.contains("镀金"), "description is read only and does not mutate original data")
 	var overlay := CollectionOverlay.new()
 	overlay.setup({"title":"字袋", "instances":GameState.deck})
@@ -61,7 +61,7 @@ func _ready() -> void:
 	if picker == null:
 		for child in screen.get_children():
 			if child is CollectionOverlay: picker = child
-	check(picker != null and picker.cfg.modification_preview.contains("金币"), "rest picker previews the real gilding effect")
+	check(picker != null and picker.cfg.modification_preview.contains("铜钱"), "rest picker previews the real gilding effect")
 	if picker != null:
 		picker._grid.get_child(0).clicked.emit()
 		await frames()
@@ -69,7 +69,7 @@ func _ready() -> void:
 	var notice: ChoiceOverlay
 	for child in screen.get_children():
 		if child is ChoiceOverlay: notice = child
-	check(notice != null and notice.cfg.body.contains("镀金") and notice.cfg.body.contains("金币") and not screen.finished, "completion shows actual modifier effect before leaving")
+	check(notice != null and notice.cfg.body.contains("镀金") and notice.cfg.body.contains("铜钱") and not screen.finished, "completion shows actual modifier effect before leaving")
 	if OS.get_cmdline_user_args().has("--capture"):
 		await frames()
 		RenderingServer.force_draw(false)

@@ -16,7 +16,7 @@ var _water: ShaderMaterial
 var _supports_fog := false
 
 
-func setup(landscape: Node3D, environment: Environment, water: ShaderMaterial) -> void:
+func setup(landscape: Node3D, environment: Environment, water: ShaderMaterial, mobile_quality := false) -> void:
 	_environment = environment
 	_water = water
 	for instance in landscape.get_children():
@@ -25,8 +25,9 @@ func setup(landscape: Node3D, environment: Environment, water: ShaderMaterial) -
 		while material is ShaderMaterial:
 			if not _wind_materials.has(material): _wind_materials.append(material)
 			material = material.next_pass
-	_build_fog()
+	if not mobile_quality: _build_fog()
 	_build_petals()
+	if mobile_quality: petals.multimesh.visible_instance_count = 28
 	seek(0.0)
 
 
@@ -113,7 +114,8 @@ func _process(delta: float) -> void:
 func seek(at_time: float) -> void:
 	elapsed = maxf(0.0, at_time)
 	if petals == null: return
-	for i in PETAL_COUNT:
+	var count := petals.multimesh.visible_instance_count
+	for i in (PETAL_COUNT if count < 0 else count):
 		petals.multimesh.set_instance_transform(i, petal_transform(i, elapsed))
 	for material in _wind_materials: material.set_shader_parameter("ambient_time", elapsed)
 	for material in _fog_materials: material.set_shader_parameter("ambient_time", elapsed)

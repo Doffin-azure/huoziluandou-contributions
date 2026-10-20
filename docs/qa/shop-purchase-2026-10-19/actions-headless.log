@@ -1,0 +1,40 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS refresh disabled below five gold
+PASS buy relic button is visible and disabled below price
+PASS insufficient gold cannot open or purchase relic
+PASS buy button shows stocked relic, effect and 45 gold price
+PASS confirmation blocks underlying refresh and purchase
+PASS cancel changes no ownership, gold or RNG
+PASS confirmed purchase grants one relic and debits 45 once
+PASS bought stock disables relic button until refresh
+PASS purchase checkpoint accepted
+PASS purchase checkpoint resumes
+PASS purchase ownership, balance and sold stock survive resume
+PASS refresh button spends five gold and preserves services
+PASS refresh restocks unowned relic and enables purchase
+PASS bound relic purchase opens glyph picker and locks trading
+PASS binding blocks refresh charges
+PASS closing bound relic picker completes binding and unlocks shop
+PASS (1920, 1080) shop button fits with 48px touch height: 买遗物 · 45金
+PASS (1920, 1080) shop button fits with 48px touch height: 刷新货架 · 5 金币
+PASS (1920, 1080) shop button fits with 48px touch height: 离开市集
+PASS (1920, 1080) shop button fits with 48px touch height: 购入 · 15 金币
+PASS buy button does not cover balance
+PASS purchase confirmation fits (1920, 1080)
+PASS (960, 432) shop button fits with 48px touch height: 买遗物 · 45金
+PASS (960, 432) shop button fits with 48px touch height: 刷新货架 · 5 金币
+PASS (960, 432) shop button fits with 48px touch height: 离开市集
+PASS (960, 432) shop button fits with 48px touch height: 购入 · 13 金币
+PASS buy button does not cover balance
+PASS purchase confirmation fits (960, 432)
+PASS (640, 360) shop button fits with 48px touch height: 买遗物 · 45金
+PASS (640, 360) shop button fits with 48px touch height: 刷新货架 · 5 金币
+PASS (640, 360) shop button fits with 48px touch height: 离开市集
+PASS (640, 360) shop button fits with 48px touch height: 购入 · 12 金币
+PASS buy button does not cover balance
+PASS purchase confirmation fits (640, 360)
+PASS complete relic collection disables purchase without fake stock
+[shop_actions_test] PASS=35 FAIL=0 TOTAL=35

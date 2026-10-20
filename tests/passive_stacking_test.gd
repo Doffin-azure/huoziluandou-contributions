@@ -105,7 +105,7 @@ func _ready() -> void:
 	play(b,"火热")
 	strip.set_entries(StatusDisplay.collect(b.player,b))
 	var button: Button = strip.item_for("ability:heat_pollution_damage")
-	check(button.tooltip_text.contains("2 层") and button.get_child_count() == 2 and button.get_child(1).get_child(0).text == "2", "实际HUD角标和悬浮详情一致显示2层")
+	check(button.tooltip_text.contains("2 层") and button.find_child("Stacks", true, false).text == "2", "实际HUD角标和悬浮详情一致显示2层")
 	check(b.ability_value("heat_pollution_damage") == 2, "HUD刷新不改动叠层")
 	strip.queue_free()
 	check(not battle().has_ability("heat_pollution_damage"), "下一场战斗不继承本场持续能力")

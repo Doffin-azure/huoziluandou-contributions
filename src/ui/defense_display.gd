@@ -11,6 +11,7 @@ var _badges: Dictionary = {}
 
 func _ready() -> void:
 	add_theme_constant_override("separation", 0)
+	alignment = BoxContainer.ALIGNMENT_END
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	for id in ["block", "persistent_block"]:
 		var badge := ShieldBadge.new()
@@ -33,7 +34,8 @@ func set_cell_size(value: float) -> void:
 
 
 func display_width() -> float:
-	return (int(block > 0) + int(persistent_block > 0)) * cell_size
+	# 固定预留两种盾的位置；出现、耗尽或数值变化都不再推挤血条。
+	return 2.0 * cell_size
 
 
 func badge_for(id: String) -> ShieldBadge:

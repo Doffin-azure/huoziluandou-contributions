@@ -33,6 +33,7 @@ func _ready() -> void:
 			add_child(screen)
 			screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 			await frames()
+			await idle()
 			var b: BattleState = screen.battle
 			b.enemies[0].hp = 999
 			b.enemies[0].max_hp = 999

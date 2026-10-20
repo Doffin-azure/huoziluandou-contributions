@@ -36,7 +36,7 @@ func _run() -> void:
 	legacy.set_value("visual", "art_style", "paper")
 	legacy.save(temporary)
 	preferences._ready()
-	_ok(preferences.visual_style == "paper", "an explicit new art preference remains respected")
+	_ok(preferences.visual_style == "taopunk", "retired paper art preference migrates to the approved theme")
 	preferences.queue_free()
 	DirAccess.remove_absolute(temporary)
 	Settings.reduced_motion = true

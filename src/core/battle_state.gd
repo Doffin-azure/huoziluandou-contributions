@@ -38,7 +38,7 @@ var damage_taken_last_turn: int = 0
 var damage_taken_this_turn: int = 0
 var damage_dealt_this_turn: int = 0
 var gold_earned: int = 0
-var gold_earned_this_turn: int = 0 ## 利：本回合实际获得过金币，不受随后支出影响
+var gold_earned_this_turn: int = 0 ## 利：本回合实际获得过铜钱，不受随后支出影响
 var zero_effect_count: int = 0
 var pending_place: CharInstance = null
 var pending_choice: Dictionary = {} ## 多阶段选字的施词身份快照
@@ -51,13 +51,17 @@ var enemy_skip_turns := 0               ## 墨途远征「停火」：敌方跳�
 ## 遗物（src/core/relics.gd）：开战时从 GameState 复制，按获得顺序
 var relics: Array = []
 var relic_binds: Dictionary = {}        ## 遗物 id -> 永久实体 uid
-var wheel_step := 0                     ## 四方轮：已转过几次
-var blitz_turn := 0                     ## 借时香：这一回合结束时敌人跳过行动（0 = 不跳）
-var slab_uid := -1                      ## 坠字石绑定的实体
-var slab_uses := 0                      ## 坠字石本场剩余额外次数
+var wheel_step := 0                     ## 转轮架：已转过几次
+var blitz_turn := 0                     ## 急就章：这一回合结束时敌人跳过行动（0 = 不跳）
+var slab_uid := -1                      ## 压字石绑定的实体
+var slab_uses := 0                      ## 压字石本场剩余额外次数
 var magic_hand_left := 3                ## 补字鬼手：本场还能补位的字数
-var fruit_uid := -1                      ## 将腐供果：本场被替换为临时副本的永久实体
-var breeders: Dictionary = {}           ## 寄字菌：有繁殖资格的临时字 uid
+var fruit_uid := -1                      ## 褪墨：本场被替换为临时副本的永久实体
+var moon_uid := -1                      ## 月字模：本场那枚【月】
+var moon_turn := 0                      ## 月字模：放下它的回合，下回合消失
+var cleansed_count := 0                 ## 校勘尺：攒着的净化数
+var question_choices: Array = []        ## 问字签：开局待选的三枚字（选完清空）
+var breeders: Dictionary = {}           ## 蔓生墨：有繁殖资格的临时字 uid
 var strike_active := false              ## 打击增强：当前出字带【击】
 var bounty_paid: bool = false
 var bounty_reward: int = 0
@@ -164,6 +168,10 @@ func start(deck: Array, enemy_datas: Array, seed_value: int = -1, track_achievem
 	slab_uses = 0
 	magic_hand_left = 3
 	fruit_uid = -1
+	moon_uid = -1
+	moon_turn = 0
+	cleansed_count = 0
+	question_choices.clear()
 	breeders.clear()
 	strike_active = false
 	board = BoardState.new(Relics.board_size(rules, relics))
@@ -211,9 +219,19 @@ func first_alive_enemy() -> Combatant:
 	return null
 
 func is_over() -> bool:
+	_check_revive()
 	return not player.is_alive() or first_alive_enemy() == null
 
+## 反死亡：本局存着的复活机会，倒下时满血站起来（也能抵消死亡、金像这类特殊死亡）
+func _check_revive() -> void:
+	if player == null or player.is_alive() or GameState.revive_charges <= 0:
+		return
+	GameState.revive_charges -= 1
+	player.hp = player.max_hp
+	_log("反死亡：满血复活")
+
 func is_victory() -> bool:
+	_check_revive()
 	return player.is_alive() and first_alive_enemy() == null
 
 
@@ -350,12 +368,12 @@ func add_energy(amount: int) -> void:
 		_log("能：本次额外获得 %d 储能" % bonus)
 	if amount > 0 and relics.has("cracked_bottle"):
 		amount *= 2
-		_log("裂雷瓶：本次储能翻倍（+%d）" % amount)
+		_log("裂墨瓶：本次储能翻倍（+%d）" % amount)
 	player.add_energy(amount)
 	if achievement != null: achievement.sample()
 
 
-## 玩家治疗；血珀把溢出部分转成持久盾。
+## 玩家治疗；朱砂印泥把溢出部分转成持久盾。
 func heal_player(amount: int) -> int:
 	var value := maxi(0, amount)
 	var before := player.hp
@@ -364,7 +382,7 @@ func heal_player(amount: int) -> int:
 	if relics.has("amber") and value > healed:
 		var overflow := value - healed
 		player.add_persistent_block(overflow)
-		_log("血珀：溢出治疗 %d 转为持久盾" % overflow)
+		_log("朱砂印泥：溢出治疗 %d 转为持久盾" % overflow)
 	return healed
 
 
@@ -443,11 +461,11 @@ func _spawn_temp_dian() -> void:
 		_log("电能：消耗储能，随机空格生成临时【电】")
 
 
-## 战内获得金币（受安全阀限制）。返回实际获得。
+## 战内获得铜钱（受安全阀限制）。返回实际获得。
 
 func earn_gold(amount: int) -> int:
 	var allowed: int = amount
-	# gold_cap_per_battle <= 0 表示本场金币收入不限
+	# gold_cap_per_battle <= 0 表示本场铜钱收入不限
 	if rules.gold_cap_per_battle > 0 and gold_earned + amount > rules.gold_cap_per_battle:
 		allowed = max(0, rules.gold_cap_per_battle - gold_earned)
 	gold_earned += allowed
@@ -456,7 +474,8 @@ func earn_gold(amount: int) -> int:
 	if allowed > 0 and has_ability("profit_share"):
 		var energy_gain := BattleBalance.i("profit_energy", 1) * allowed * passive_multiplier("分利")
 		add_energy(energy_gain)
-		_log("分利：获得 %d 金币，同时储能 +%d" % [allowed, energy_gain])
+		_log("分利：获得 %d 铜钱，同时储能 +%d" % [allowed, energy_gain])
+	Relics.on_gold_earned(self)
 	return allowed
 
 
@@ -568,10 +587,10 @@ func deal_damage(target: Combatant, amount: int, is_attack: bool = true) -> int:
 	if is_attack and achievement != null: achievement.attack_hit(target, before_hp, before_shield, _attack_sequence_depth > 0)
 	if not target.is_player:
 		damage_dealt_this_turn += real
-		# 爆金：敌方每受到一次「攻击」获得 1 金币（被格挡/护甲吸收也算，故不看 real）
+		# 爆金：敌方每受到一次「攻击」获得 1 铜钱（被格挡/护甲吸收也算，故不看 real）
 		if is_attack and target.status_stacks("gold_burst") > 0:
 			earn_gold(BattleBalance.i("bounty_on_hit", 1))
-			_log("爆金：%s 受击，获得 1 金币" % target.display_name)
+			_log("爆金：%s 受击，获得 1 铜钱" % target.display_name)
 		_check_bounty()
 	return real
 
@@ -580,7 +599,7 @@ func _check_bounty() -> void:
 		bounty_paid = false
 		GameState.add_gold(bounty_reward)
 		gold_earned_this_turn += maxi(0, bounty_reward)
-		_log("重金：悬赏达成，获得 %d 金币" % bounty_reward)
+		_log("重金：悬赏达成，获得 %d 铜钱" % bounty_reward)
 
 
 # ---------------------------------------------------------------- 出字
@@ -623,7 +642,7 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 	return executed
 
 
-## 遗物包一层：打击增强按本次出字是否带【击】；出字后坠字石下落
+## 遗物包一层：打击增强按本次出字是否带【击】；出字后压字石下落
 func _execute_prepared_play(play: Dictionary, shared: Dictionary) -> Dictionary:
 	if achievement != null: achievement.begin_play(play)
 	var prev := strike_active
@@ -631,10 +650,8 @@ func _execute_prepared_play(play: Dictionary, shared: Dictionary) -> Dictionary:
 	var result := _execute_prepared_play_core(play, shared)
 	strike_active = prev
 	if achievement != null: achievement.finish_play(bool(result.get("ok", false)))
-	if result.get("ok", false) and relics.has("slab"):
-		Relics.slab_fall(self)
-		for e in alive_enemies():
-			EnemyMechanics.update_targets(self, e)
+	if result.get("ok", false):
+		Relics.after_play(self)
 	return result
 
 
@@ -938,7 +955,11 @@ func _execute_play_inner(play: Dictionary, shared: Dictionary) -> Dictionary:
 			for wid in words_played_this_turn:
 				distinct[wid] = true
 			abilities["vigor_next"] = distinct.size()
-		if _is_attack_word(word):
+		if _replays_attack(word):
+			# 连击重演了一个攻击词（可能是上回合的）：本回合算打出过攻击词，【回防】等条件能接上；
+			# 但不改写「上一个攻击词」，免得下一次连击重演的是连击自己
+			attack_words_this_turn += 1
+		elif _is_attack_word(word):
 			attack_words_this_turn += 1
 			last_attack_word = word
 			last_attack_glyphs = glyphs.duplicate()
@@ -1176,6 +1197,16 @@ func _is_attack_word(word: WordData) -> bool:
 	return false
 
 
+## 这个词是否带【连击】式重演，且确实有攻击词可重演
+func _replays_attack(word: WordData) -> bool:
+	if word == null or last_attack_word == null or last_attack_effects.is_empty():
+		return false
+	for e in word.effects:
+		if e.handler == "replay_last_attack":
+			return true
+	return false
+
+
 ## 消耗一个路径；返回 [{inst, kind}]，kind = real / layer / pinned / retained。
 
 func _consume_path(path: Array, expected: Array, shared: Dictionary) -> Array:
@@ -1213,7 +1244,7 @@ func _consume_path(path: Array, expected: Array, shared: Dictionary) -> Array:
 		if slab_kind == "layer":
 			item.kind = "layer"
 		elif slab_kind == "exhausted":
-			# 坠字石：次数用尽，本场移出循环（回收、回放都拿不回来），下场恢复
+			# 压字石：次数用尽，本场移出循环（回收、回放都拿不回来），下场恢复
 			removed_this_battle.append(inst)
 			board.cells[physical_index] = null
 		elif item.kind in ["pinned", "layer"]:
@@ -1402,6 +1433,7 @@ func begin_player_turn(draw: bool = true, open_monster_tasks: bool = true) -> vo
 		if str(k).begins_with("next_") and k not in ["next_energy_bonus", "next_serial_bonus"]:
 			abilities.erase(k)
 	restore_reconnect_tiles()
+	Relics.on_turn_start(self)
 	if draw:
 		var vigor := ability_value("vigor_next")
 		abilities.erase("vigor_next")
@@ -1415,13 +1447,8 @@ func begin_player_turn(draw: bool = true, open_monster_tasks: bool = true) -> vo
 			_log("精心：本回合补 %d 枚，改为从字袋定向选字（随机落地）" % amount)
 		else:
 			draw_to_board(amount)
-		# 重力（持续能力）：回合开局抽完牌后也全盘下落
-		if has_ability("gravity_always"):
-			apply_gravity()
-			_log("重力：回合开局下落")
-		# 遗物：无垢拓纸检查后补字，再按获得顺序发动重力类遗物
-		Relics.after_turn_draw(self)
-		Relics.apply_gravity_relics(self)
+		if manual_draw_pending <= 0:
+			_after_turn_draw()
 	abilities.erase("split_mind")
 	abilities.erase("profit_share")
 	abilities.erase("inject_bounty")
@@ -1439,6 +1466,15 @@ func begin_player_turn(draw: bool = true, open_monster_tasks: bool = true) -> vo
 		_decay_turn_statuses(enemy, ["vulnerable"])
 	_log("—— 第 %d 回合 ——" % turn)
 	EventBus.turn_ended.emit(turn)
+
+## 基础补字真正落盘后统一结算；精心等待玩家选字时不能提前判污染或移动字盘。
+func _after_turn_draw() -> void:
+	if has_ability("gravity_always"):
+		apply_gravity()
+		_log("重力：回合开局下落")
+	Relics.after_turn_draw(self)
+	Relics.apply_gravity_relics(self)
+
 
 func _tick_player_statuses() -> void:
 	var poison := player.status_stacks("poison")
@@ -1487,26 +1523,27 @@ func end_player_turn() -> void:
 
 	# 空铅盒：回合结束、敌人行动前，按空行给持久盾
 	Relics.on_player_turn_end(self)
-	# 寄字菌：回合结束、敌人行动前繁殖
+	# 蔓生墨：回合结束、敌人行动前繁殖
 	Relics.breed(self)
 	EnemyMechanics.replicate_glyphs(self)
 	if relics.has("cracked_bottle") and player.energy > 0:
 		var cleared := player.energy
 		player.energy = 0
-		_log("裂雷瓶：回合结束清空 %d 储能" % cleared)
+		_log("裂墨瓶：回合结束清空 %d 储能" % cleared)
 	_log("玩家结束回合")
 	var blitz := blitz_turn > 0 and turn == blitz_turn
 	for e in enemies:
 		if not e.is_alive():
 			continue
 		if blitz:
-			# 借时香：所有敌人跳过这一次行动（意图顺延，和停火一样推进招式）
+			# 急就章：所有敌人跳过这一次行动（意图顺延，和停火一样推进招式）
 			e.move_index += 1
-			_log("借时香：%s 这一回合不行动" % e.display_name)
+			_log("急就章：%s 这一回合不行动" % e.display_name)
 			continue
 		_enemy_act(e)
 		if not player.is_alive():
 			break
+	EnemyMechanics.replicate_glyphs(self)
 	EnemyMechanics.release_dead(self)
 	if blitz:
 		blitz_turn = 0
@@ -1649,10 +1686,10 @@ func current_intent(e: Combatant) -> EnemyMoveData:
 	return EnemyMechanics.preview(self, e)
 
 func _log(text: String) -> void:
-	log.append(text)
-	if log.size() > 120:
-		log.pop_front()
-	EventBus.log_message.emit(text)
+	var clean := RecentLog.line(text)
+	if clean.is_empty(): return
+	RecentLog.append(log, clean)
+	EventBus.log_message.emit(clean)
 
 
 ## 战斗结束，把盘面/弃字堆中的己方与自我污染字归还永久字袋；敌方字清除。
@@ -1774,6 +1811,7 @@ func place_manual_draw(glyphs: Array) -> int:
 		placed += 1
 	var total := record_draw(placed, quota)
 	_log("精心：定向放入 %d 枚字，随机补 %d 枚（随机落地）" % [chosen, total - chosen])
+	_after_turn_draw()
 	return total
 
 func _draw_one() -> bool:
@@ -1814,7 +1852,7 @@ func inject_enemy_glyphs(count: int, pollution_id: String, fixed_glyph := "", so
 	var n: int = BattleOps.inject_enemy_glyphs(self, count, pollution_id, fixed_glyph, source_id)
 	if n > 0 and has_ability("inject_bounty"):
 		var g := earn_gold(n * BattleBalance.i("inject_bounty", 2))
-		_log("加收：敌人注入 %d 枚，获得 %d 金币" % [n, g])
+		_log("加收：敌人注入 %d 枚，获得 %d 铜钱" % [n, g])
 	return n
 
 func spawn_scorch_into_bag(count: int) -> int:
@@ -1891,10 +1929,18 @@ func converge_to(anchor: Vector2i) -> int:
 	return BattleOps.converge_to(self, anchor)
 
 func cleanse_board() -> int:
-	return BattleOps.cleanse_board(self)
+	var n := BattleOps.cleanse_board(self)
+	Relics.on_cleansed(self, n)
+	return n
 
 func cleanse_scorch() -> int:
-	return BattleOps.cleanse_scorch(self)
+	var n := BattleOps.cleanse_scorch(self)
+	Relics.on_cleansed(self, n)
+	return n
+
+## 问字签：玩家从三枚里挑一枚
+func take_question(glyph: String) -> bool:
+	return Relics.take_question(self, glyph)
 
 func spawn_word_neighbors(center: Vector2i, max_count: int = 4, center_glyph: String = "") -> Array:
 	return BattleOps.spawn_word_neighbors(self, center, max_count, center_glyph)

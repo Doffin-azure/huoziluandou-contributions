@@ -1,0 +1,92 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 68 / 词 164 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS original fifteen PNGs remain byte-identical
+PASS all thirty-eight relics have registered art
+PASS three event-only relics keep their original acquisition rules
+PASS elite controller creates the expected candidate count
+PASS unclaimed candidates resume without rerolling or repeating boss healing
+PASS elite mounts the physical reward overlay
+PASS elite displays matching real meshes
+PASS (1280, 720)elite keeps every take button visible
+PASS (1280, 720)elite keeps every specimen visible
+PASS idle previews retain their frame without continuous rendering
+PASS interaction rotates the actual specimen
+PASS glyph claim stays blocked until relic pickup finishes
+PASS pending relic cannot be bypassed through glyph claim or skip
+PASS capture elite-1280
+PASS button grants exactly its displayed relic once
+PASS pickup restores glyph reward controls
+PASS reward candidates clear and reject a second settlement
+PASS settled relic reward saves
+PASS resume keeps the chosen relic without reopening candidates
+PASS boss controller creates the expected candidate count
+PASS unclaimed candidates resume without rerolling or repeating boss healing
+PASS boss mounts the physical reward overlay
+PASS boss displays matching real meshes
+PASS (1280, 720)boss keeps every take button visible
+PASS (1280, 720)boss keeps every specimen visible
+PASS idle previews retain their frame without continuous rendering
+PASS interaction rotates the actual specimen
+PASS glyph claim stays blocked until relic pickup finishes
+PASS pending relic cannot be bypassed through glyph claim or skip
+PASS capture boss-1280
+PASS button grants exactly its displayed relic once
+PASS pickup restores glyph reward controls
+PASS reward candidates clear and reject a second settlement
+PASS settled relic reward saves
+PASS resume keeps the chosen relic without reopening candidates
+PASS elite controller creates the expected candidate count
+PASS unclaimed candidates resume without rerolling or repeating boss healing
+PASS elite mounts the physical reward overlay
+PASS elite displays matching real meshes
+PASS (640, 360)elite keeps every take button visible
+PASS (640, 360)elite keeps every specimen visible
+PASS idle previews retain their frame without continuous rendering
+PASS interaction rotates the actual specimen
+PASS glyph claim stays blocked until relic pickup finishes
+PASS pending relic cannot be bypassed through glyph claim or skip
+PASS capture elite-640
+PASS button grants exactly its displayed relic once
+PASS pickup restores glyph reward controls
+PASS reward candidates clear and reject a second settlement
+PASS settled relic reward saves
+PASS resume keeps the chosen relic without reopening candidates
+PASS boss controller creates the expected candidate count
+PASS unclaimed candidates resume without rerolling or repeating boss healing
+PASS boss mounts the physical reward overlay
+PASS boss displays matching real meshes
+PASS (640, 360)boss keeps every take button visible
+PASS (640, 360)boss keeps every specimen visible
+PASS idle previews retain their frame without continuous rendering
+PASS interaction rotates the actual specimen
+PASS glyph claim stays blocked until relic pickup finishes
+PASS pending relic cannot be bypassed through glyph claim or skip
+PASS capture boss-640
+PASS button grants exactly its displayed relic once
+PASS pickup restores glyph reward controls
+PASS reward candidates clear and reject a second settlement
+PASS settled relic reward saves
+PASS resume keeps the chosen relic without reopening candidates
+PASS goldleaf holds reward controls during its extra pickup step
+PASS goldleaf opens the original glyph picker
+PASS goldleaf opens the original glyph picker
+PASS goldleaf releases glyph rewards only after completing pickup
+PASS gold leaf still gilds exactly two cards
+PASS monkey holds reward controls during its extra pickup step
+PASS wish petition offers three wishes after the physical pickup
+PASS monkey releases glyph rewards only after completing pickup
+PASS wish result is recorded
+PASS slab holds reward controls during its extra pickup step
+PASS slab opens the original glyph picker
+PASS slab releases glyph rewards only after completing pickup
+PASS bound relic records its chosen glyph
+PASS mounted three-way offer resizes with visible 48px take targets
+PASS long nine-ring description scrolls within its own column
+PASS capture classic-choice-640
+PASS mounted three-way offer resizes with visible 48px take targets
+PASS keyboard confirms the focused physical relic choice once
+PASS final-act boss keeps the existing ending reward rule
+[relic_expansion_test] PASS=86 FAIL=0 TOTAL=86

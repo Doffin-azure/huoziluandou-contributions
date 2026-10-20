@@ -1,153 +1,47 @@
 extends RefCounted
 class_name GameStyle
-## 视觉风格令牌。切换风格 = 换一套令牌 + 背景/字块材质 + 主题。
-## 风格：
-##   taopunk —— 青铜绘卷：手绘青绿 / 青铜机关 / 朱红（当前定稿）
-##   paper —— 宣纸 / 木活字 / 朱印（旧版可选）
-##   neon  —— 墨芯：深蓝科技 / 玻璃面板 / 发光字块（大模型概念）
-## 新增风格：照抄一个 static func，再在 Palette.apply 与 Ink 里接线即可。
+## 青铜绘卷配色令牌。旧配置 ID 仅用于迁移，不再保留旧主题实现。
 
-var id := "paper"
-var name := "宣纸活字"
-var bg_kind := "paper"      ## paper | neon
-var tile_kind := "wood"     ## wood | glass
-var panel_alpha := 1.0
-var glow := false
-var corner_bonus := 0
-
-# 背景渐变（neon 用）
-var BG_TOP := Color("efe6d2")
-var BG_BOTTOM := Color("d8c8a2")
+var id := "taopunk"
+var name := "青铜绘卷"
+var corner_bonus := -4
 
 # 基础色（名字沿用原 Palette，避免大改调用点）
-var PAPER := Color("efe6d2")
-var PAPER_WARM := Color("e7d9b8")
-var PAPER_DARK := Color("d8c8a2")
-var PAPER_SHADE := Color("c8b68d")
-var INK := Color("221f1a")
-var INK_SOFT := Color("4a4438")
-var INK_FAINT := Color("7c7360")
-var VERMILION := Color("b83a2e")      ## 主强调色（宣纸=朱印；墨芯=青）
-var VERMILION_DK := Color("8c2a20")
-var GOLD := Color("c9a35a")
-var GOLD_DK := Color("9a7838")
-var WOOD := Color("a9773f")
-var WOOD_LIGHT := Color("c99c60")
-var WOOD_DARK := Color("6f4a24")
+var PAPER := Color("e8d9b7")
+var PAPER_WARM := Color("dfcd9f")
+var PAPER_DARK := Color("cbb98f")
+var PAPER_SHADE := Color("af9a70")
+var INK := Color("171f1d")
+var INK_SOFT := Color("343d33")
+var INK_FAINT := Color("73654b")
+var VERMILION := Color("a93630")      ## 朱砂强调色
+var VERMILION_DK := Color("802822")
+var GOLD := Color("b98c3e")
+var GOLD_DK := Color("785925")
+var WOOD := Color("1f4946")
+var WOOD_LIGHT := Color("49716a")
+var WOOD_DARK := Color("102e30")
 var JADE := Color("5f7d6a")
 var INDIGO := Color("3c4a6b")
 var PLUM := Color("7a4a63")
-var HP := Color("a63c34")
+var HP := Color("a93630")
 var BLOCK := Color("5f7f9a")
-var BORDER := Color("4a4438")
-var BORDER_SOFT := Color("c8b68d")
-var PANEL_DARK := Color("2b2620")   ## 深色托盘（字盘底）
-var STAGE := Color("251f1a")
-var STAGE_EDGE := Color("5d4430")
+var BORDER := Color("171f1d")
+var BORDER_SOFT := Color("785925")
+var PANEL_DARK := Color("132527")   ## 深色托盘（字盘底）
+var STAGE := Color("10353b")
+var STAGE_EDGE := Color("785925")
 var SURFACE_RAISED := Color("f7eedc")
 var SHADOW := Color(0.08, 0.06, 0.04, 0.45)
 
 
-static func get_style(style_id: String) -> GameStyle:
-	match style_id:
-		"taopunk": return taopunk()
-		"neon": return neon()
-		_: return paper()
+static func get_style(_style_id: String) -> GameStyle:
+	return taopunk()
+
+
+static func normalize_id(_style_id: String) -> String:
+	return "taopunk"
 
 
 static func taopunk() -> GameStyle:
-	var s := paper()
-	s.id = "taopunk"
-	s.name = "青铜绘卷"
-	s.bg_kind = "taopunk"
-	s.tile_kind = "bronze"
-	s.PAPER = Color("e8d9b7")
-	s.PAPER_WARM = Color("dfcd9f")
-	s.PAPER_DARK = Color("cbb98f")
-	s.PAPER_SHADE = Color("af9a70")
-	s.INK = Color("171f1d")
-	s.INK_SOFT = Color("343d33")
-	s.INK_FAINT = Color("73654b")
-	s.VERMILION = Color("a93630")
-	s.VERMILION_DK = Color("802822")
-	s.GOLD = Color("b98c3e")
-	s.GOLD_DK = Color("785925")
-	s.WOOD = Color("1f4946")
-	s.WOOD_LIGHT = Color("49716a")
-	s.WOOD_DARK = Color("102e30")
-	s.PANEL_DARK = Color("132527")
-	s.STAGE = Color("10353b")
-	s.STAGE_EDGE = s.GOLD_DK
-	s.BG_TOP = Color("103f49")
-	s.BG_BOTTOM = Color("0c2028")
-	s.HP = s.VERMILION
-	s.BORDER = s.INK
-	s.BORDER_SOFT = s.GOLD_DK
-	s.corner_bonus = -4
-	return s
-
-
-static func paper() -> GameStyle:
-	var s := GameStyle.new()
-	s.id = "paper"
-	s.name = "宣纸活字"
-	s.bg_kind = "paper"
-	s.tile_kind = "wood"
-	s.panel_alpha = 1.0
-	s.glow = false
-	s.corner_bonus = 0
-	s.BG_TOP = Color("efe6d2")
-	s.BG_BOTTOM = Color("d8c8a2")
-	s.BORDER = s.INK_SOFT
-	s.BORDER_SOFT = s.PAPER_SHADE
-	s.PAPER = Color("efe8d8")
-	s.PAPER_WARM = Color("e8deca")
-	s.INK = Color("28241f")
-	s.VERMILION = Color("aa392d")
-	s.WOOD_DARK = Color("b39368")
-	s.WOOD_LIGHT = Color("dcc8a3")
-	s.PANEL_DARK = Color("30251d")
-	return s
-
-
-static func neon() -> GameStyle:
-	var s := GameStyle.new()
-	s.id = "neon"
-	s.name = "墨芯（大模型）"
-	s.bg_kind = "neon"
-	s.tile_kind = "glass"
-	s.panel_alpha = 0.82
-	s.glow = true
-	s.corner_bonus = 6
-	# 背景
-	s.BG_TOP = Color("070d1c")
-	s.BG_BOTTOM = Color("12203c")
-	# 表面 / 文字
-	s.PAPER = Color("16233c")
-	s.PAPER_WARM = Color("1b2c4b")
-	s.PAPER_DARK = Color("0d1729")
-	s.PAPER_SHADE = Color("2a4a70")
-	s.INK = Color("e9f3ff")
-	s.INK_SOFT = Color("b6cbe6")
-	s.INK_FAINT = Color("7d95b6")
-	# 强调（青）/ 金 / 字块玻璃
-	s.VERMILION = Color("3ee0ff")
-	s.VERMILION_DK = Color("14a6d6")
-	s.GOLD = Color("ffd166")
-	s.GOLD_DK = Color("d9a521")
-	s.WOOD = Color("1d2e4c")
-	s.WOOD_LIGHT = Color("3f7fb8")
-	s.WOOD_DARK = Color("0c1526")
-	s.JADE = Color("45d99b")
-	s.INDIGO = Color("6aa8ff")
-	s.PLUM = Color("c07bff")
-	s.HP = Color("ff5c7a")
-	s.BLOCK = Color("5aa9ff")
-	s.BORDER = Color("2f5f8f")
-	s.BORDER_SOFT = Color("1f3c5e")
-	s.PANEL_DARK = Color("0a1222")
-	s.STAGE = Color("07101c")
-	s.STAGE_EDGE = Color("24527a")
-	s.SURFACE_RAISED = Color("1d3150")
-	s.SHADOW = Color(0, 0, 0, 0.55)
-	return s
+	return GameStyle.new()

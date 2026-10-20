@@ -29,12 +29,6 @@ func _ready() -> void:
 		add_child(backdrop)
 	elif not has_scene_background() and (not world_backed or (not path.contains("title_screen") and not path.contains("battle_screen"))):
 		var paper := Ink.paper_layer()
-		if world_backed:
-			var material := ShaderMaterial.new()
-			material.shader = load("res://src/shaders/study_sheet.gdshader")
-			material.set_shader_parameter("paper_color", Palette.PAPER)
-			material.set_shader_parameter("margin", Vector2(0.045, 0.075) if path.contains("map_screen") else Vector2(0.010, 0.008))
-			paper.material = material
 		add_child(paper)
 	content = Control.new()
 	content.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -70,3 +64,10 @@ func build(_root: Control) -> void:
 
 func goto(path: String, p: Dictionary = {}) -> void:
 	Router.goto(path, p)
+
+
+func save_checkpoint() -> Dictionary:
+	# Persist only route parameters; derived controls/layout are rebuilt on resume.
+	var clean := params.duplicate()
+	clean.erase("_saved_screen")
+	return {"params": clean, "screen": {}}

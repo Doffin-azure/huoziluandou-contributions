@@ -212,7 +212,7 @@ static func apply_gravity(b: BattleState) -> void:
 				b.board.set_cell(x, y, null)
 
 
-## 向上重力：每列向上压缩（四方轮用）；固定的字不动。
+## 向上重力：每列向上压缩（转轮架用）；固定的字不动。
 static func apply_gravity_up(b: BattleState) -> void:
 	for x in b.board.size:
 		var column: Array = []

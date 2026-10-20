@@ -40,6 +40,8 @@ static func inspect(b: BattleState, path: Array, target: Dictionary = {}) -> Dic
 					word = bridged
 					result.glyphs = filtered
 		if word == null:
+			word = Relics.fallback_word(b, glyphs)
+		if word == null:
 			result.reason = "“%s”不成词" % b._join(glyphs)
 			return result
 		result.word = word

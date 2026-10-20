@@ -22,6 +22,10 @@ var _clear_btn: Button
 var _end_btn: Button
 var _log_box: VBoxContainer
 var _log_scroll: ScrollContainer
+var _log_lines: Array[String] = []
+var _log_text: Label
+var _log_dirty := false
+var _log_refresh_queued := false
 var _log_overlay: Control
 var _topbar: Control
 var _player_panel: Control
@@ -85,6 +89,23 @@ var _step_timer: Timer
 var _exiting := false
 var _room_run := false
 var _expedition := false   ## 墨途远征的遭遇：战后回远征地图，不走奖励页
+var _first_run_tutorial := false
+var _tutorial_step := 0
+var _entrance: BattleEntrance
+
+
+func save_checkpoint() -> Dictionary:
+	# Multi-stage interactions own temporary model changes; keep the last completed
+	# action until the entire picker/placement/animation has resolved.
+	if battle == null or _busy or _finished or battle.is_over() or _modal_count > 0: return {}
+	if _board_view == null or _board_view.pick_mode != "" or not _ready_action.is_empty() or not _pending_path.is_empty(): return {}
+	if _recast_three_active or _collect_own_active or _compound_picker_active or _solo_release_picker_active or _solo_bag_picker_active or _solo_throw_active or _manual_draw_active or _merge_active: return {}
+	if battle.pending_place != null or not battle.pending_reveal.is_empty() or battle.manual_draw_pending > 0 or battle.end_turn_requested or battle.blackout_requested: return {}
+	var snapshot := super.save_checkpoint()
+	snapshot.params["node"] = node
+	snapshot.screen = {"battle": battle, "first_run_tutorial": _first_run_tutorial, "tutorial_step": _tutorial_step}
+	if battle.achievement != null: snapshot.screen["achievement_battle"] = battle.achievement.export_snapshot()
+	return snapshot
 
 
 func build(root: Control) -> void:
@@ -99,16 +120,25 @@ func build(root: Control) -> void:
 			node = act.nodes[GameState.node_index - 1]
 	if node == null:
 		node = MapNodeData.new()
-	battle = BattleState.new(Database.rules)
-	var enemy_datas: Array = node.select_enemies(int(params.get("seed", GameState.battle_sequence * 997 + GameState.node_index)))
-	if enemy_datas.is_empty():
-		enemy_datas = [Database.get_enemy("ink_spirit")]
-	battle.start(GameState.make_battle_deck(), enemy_datas, int(params.get("seed", -1)), true)
-	_expedition = params.get("expedition", false) and GameState.expedition != null
 	_room_run = params.get("room_run", false) and GameState.room_run != null
-	if _room_run: GameState.room_run.apply_battle_setup(battle)
-	if _expedition:
-		GameState.expedition.apply_battle_setup(battle)
+	_expedition = params.get("expedition", false) and GameState.expedition != null
+	var saved: Dictionary = params.get("_saved_screen", {})
+	_first_run_tutorial = bool(saved.get("first_run_tutorial", GameState.first_run_tutorial or params.get("first_run_tutorial", false)))
+	_tutorial_step = clampi(int(saved.get("tutorial_step", 0)), 0, 1)
+	if saved.get("battle") is BattleState:
+		battle = saved.battle
+		if saved.has("achievement_battle") and Achievements.eligible():
+			battle.achievement = preload("res://src/core/achievement_battle.gd").new(Achievements, battle, str(saved.achievement_battle.key))
+			battle.achievement.restore_snapshot(saved.achievement_battle)
+	else:
+		battle = BattleState.new(Database.rules)
+		var enemy_datas: Array = node.select_enemies(int(params.get("seed", GameState.battle_sequence * 997 + GameState.node_index)))
+		if enemy_datas.is_empty():
+			enemy_datas = [Database.get_enemy("ink_spirit")]
+		battle.start(GameState.make_battle_deck(), enemy_datas, int(params.get("seed", -1)), true)
+		if _room_run: GameState.room_run.apply_battle_setup(battle)
+		if _expedition:
+			GameState.expedition.apply_battle_setup(battle)
 	if battle.achievement != null: battle.achievement.sample()
 	_topbar = _build_topbar()
 	root.add_child(_topbar)
@@ -125,9 +155,10 @@ func build(root: Control) -> void:
 	_enemy_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_enemy_panel.add_child(_enemy_row)
 	_enemy_paper = ArtPaper.new()
-	_enemy_paper.tilt = 1.2
 	_enemy_paper.open_scene = true
 	root.add_child(_enemy_paper)
+	# 两侧底板都位于字盘后方，避免右侧底板盖住外沿、左侧却在外沿下。
+	root.move_child(_enemy_paper, _board_view.get_index())
 	root.add_child(_enemy_panel)
 	root.move_child(_player_panel, _enemy_panel.get_index())
 	_footer = _build_bottombar()
@@ -162,12 +193,47 @@ func build(root: Control) -> void:
 	_refresh_all()
 	for line in battle.log:
 		_on_log(line)
-	_bubble.set_idle(_preview_hint())
+	_bubble.set_idle(_tutorial_hint() if _first_run_tutorial else _preview_hint())
 	resized.connect(_layout)
 	_layout()
-	_bind_table_print.call_deferred()
-	_board_view.call_deferred("play_opening")
+	# A resumed fight should immediately restore the exact saved interaction state.
+	if not Settings.reduced_motion and not saved.get("battle") is BattleState:
+		_play_entrance()
+	else:
+		_board_view.call_deferred("play_opening")
 	_on_log("战斗开始：%s" % node.title)
+	_offer_question.call_deferred()
+
+
+## 问字签：开局从三枚字里挑一枚，作为本场临时字落盘
+func _offer_question() -> void:
+	var choices: Array = battle.question_choices.duplicate()
+	if choices.is_empty() or not is_inside_tree():
+		return
+	var options: Array = []
+	for g in choices:
+		var cd: CharacterData = Database.get_character_by_glyph(g)
+		options.append({"text": "【%s】" % g, "hint": cd.description if cd != null else ""})
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title": Relics.name_of("question"), "body": "挑一枚字，作为本场临时字落到盘上。", "options": options})
+	overlay.chose.connect(func(index: int):
+		battle.take_question(choices[index])
+		_refresh_all(true))
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_mount_overlay(overlay)
+
+
+func _play_entrance() -> void:
+	_set_busy(true)
+	_entrance = BattleEntrance.new()
+	_entrance.setup(node, bool(params.get("elite", false)))
+	_entrance.stamp_hit.connect(func(): _audio.play_cue("play"))
+	_entrance.reveal_started.connect(_board_view.play_opening)
+	_entrance.finished.connect(func():
+		if not _exiting:
+			_entrance = null
+			_set_busy(false))
+	add_child(_entrance)
 
 
 func _exit_tree() -> void:
@@ -183,23 +249,6 @@ func _exit_tree() -> void:
 	_events.clear()
 	if battle != null and battle.play_resolving.is_connected(_on_play_resolving):
 		battle.play_resolving.disconnect(_on_play_resolving)
-
-
-func _bind_table_print() -> void:
-	if not is_instance_valid(Router.study_stage) or not Router.study_stage.shared_table_active():
-		return
-	var lighting := ShaderMaterial.new()
-	lighting.shader = load("res://src/shaders/table_print.gdshader")
-	lighting.set_shader_parameter("table_scene", Router.study_stage.viewport.get_texture())
-	for panel in [_preview_panel, _enemy_panel]:
-		_shade_print_nodes(panel, lighting)
-
-
-func _shade_print_nodes(parent: Node, lighting: ShaderMaterial) -> void:
-	if parent is Label or parent is RichTextLabel or parent is InkSpirit or parent is StatBar:
-		parent.material = lighting
-	for child in parent.get_children():
-		_shade_print_nodes(child, lighting)
 
 
 func _build_topbar() -> Control:
@@ -233,6 +282,7 @@ func _build_topbar() -> Control:
 	_hp_icon.ink = Palette.VERMILION_DK
 	_player_panel.add_child(_hp_icon)
 	_player_hp_value = Ink.label("", "", Palette.VERMILION_DK)
+	_player_hp_value.clip_text = true
 	_player_hp_value.add_theme_font_override("font", Ink.serif)
 	_player_hp_value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_player_panel.add_child(_player_hp_value)
@@ -261,7 +311,6 @@ func _make_enemy_card(i: int, e: Combatant) -> EnemyView:
 func _build_left() -> Control:
 	var col := Control.new()
 	var surface := ArtPaper.new()
-	surface.tilt = -1.6
 	surface.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	col.add_child(surface)
 	_bubble = SpeechBubble.new()
@@ -289,6 +338,7 @@ func _build_left() -> Control:
 	stamp.material = _confirm_ink
 	_confirm_btn.add_child(stamp)
 	_confirm_btn.mouse_entered.connect(func(): _confirm_ink.set_shader_parameter("hovered", true))
+	_confirm_btn.tooltip_text = "拖动连字后点击出字，或按回车。\n需要目标的词请按提示选择，再点「发动」。"
 	_confirm_btn.mouse_exited.connect(func(): _confirm_ink.set_shader_parameter("hovered", false))
 	_confirm_btn.button_down.connect(func(): _confirm_ink.set_shader_parameter("pressed", true))
 	_confirm_btn.button_up.connect(func(): _confirm_ink.set_shader_parameter("pressed", false))
@@ -321,32 +371,40 @@ func _build_center() -> BoardView:
 
 func _build_log_panel() -> Control:
 	var overlay := Control.new()
+	overlay.z_index = 100
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var dim := ColorRect.new()
 	dim.color = Color(Palette.INK, 0.45)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var dim_tap := TouchTap.new()
 	dim.gui_input.connect(func(event: InputEvent):
-		if event is InputEventMouseButton and event.pressed:
+		if dim_tap.matches(event, dim):
 			_toggle_log())
 	overlay.add_child(dim)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.add_child(center)
 	var panel := Ink.panel()
-	panel.custom_minimum_size = Vector2(600, 420)
+	var factor := JourneyStyle.touch_scale(self)
+	panel.custom_minimum_size = Vector2(minf(600 * factor, size.x - 32 * factor), minf(420 * factor, size.y - 32 * factor))
 	center.add_child(panel)
 	var col := Ink.vbox(12)
 	panel.add_child(col)
 	var head := Ink.hbox(10)
-	head.add_child(Ink.h2("战报"))
+	var heading := Ink.h2("战报 · 近 %d 条" % RecentLog.MAX_ENTRIES)
+	heading.add_theme_font_size_override("font_size", int(28 * factor))
+	head.add_child(heading)
 	head.add_child(Ink.expander())
 	var close := Ink.button("关闭")
+	close.custom_minimum_size.y = 48 * factor
+	close.add_theme_font_size_override("font_size", int(20 * factor))
 	close.pressed.connect(_toggle_log)
 	head.add_child(close)
 	col.add_child(head)
 	_log_scroll = ScrollContainer.new()
 	_log_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_log_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_log_scroll.get_v_scroll_bar().changed.connect(_scroll_log_to_end)
 	col.add_child(_log_scroll)
 	_log_box = Ink.vbox(6)
 	_log_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -371,6 +429,7 @@ func _build_bottombar() -> Control:
 
 
 func _refresh_all(animate_board := false) -> void:
+	SaveManager.request_save()
 	_refresh_enemies()
 	_refresh_player()
 	_refresh_piles()
@@ -415,7 +474,7 @@ func _refresh_player() -> void:
 	_show_player_hp(battle.player.hp, battle.player.max_hp)
 	_player_status.set_entries(StatusDisplay.collect(battle.player, battle))
 	_show_defense(battle.player.block, battle.player.persistent_block)
-	var wallet: Array = [{"id": "gold", "title": "金币", "value": GameState.gold, "color": Palette.GOLD_DK, "description": "可用金币 %d，本战获得 %d。" % [GameState.gold, battle.gold_earned]}]
+	var wallet: Array = [{"id": "gold", "title": "铜钱", "value": GameState.gold, "color": Palette.GOLD_DK, "description": "可用铜钱 %d，本战获得 %d。" % [GameState.gold, battle.gold_earned]}]
 
 	_gold_strip.set_entries(wallet)
 
@@ -440,18 +499,31 @@ func _refresh_piles() -> void:
 
 func _on_log(text: String) -> void:
 	text = BattleText.clean(text)
-	if _log_box == null:
-		return
-	var l := Ink.label(text, "Muted")
-	l.add_theme_font_size_override("font_size", 13)
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_log_box.add_child(l)
-	if _log_box.get_child_count() > 80:
-		var first := _log_box.get_child(0)
-		_log_box.remove_child(first)
-		first.queue_free()
-	await get_tree().process_frame
-	if is_inside_tree() and is_instance_valid(_log_scroll):
+	RecentLog.append(_log_lines, text)
+	_log_dirty = true
+	_queue_log_refresh()
+
+
+func _queue_log_refresh() -> void:
+	if not is_instance_valid(_log_overlay) or not _log_overlay.is_visible_in_tree() or _log_refresh_queued: return
+	_log_refresh_queued = true
+	_render_log.call_deferred()
+
+
+func _render_log() -> void:
+	_log_refresh_queued = false
+	if not _log_dirty or not _log_overlay.is_visible_in_tree(): return
+	if not is_instance_valid(_log_text):
+		_log_text = Ink.caption("")
+		_log_text.add_theme_font_size_override("font_size", int(16 * JourneyStyle.touch_scale(self)))
+		_log_box.add_child(_log_text)
+	_log_text.text = RecentLog.display_text(_log_lines)
+	_log_dirty = false
+	_scroll_log_to_end.call_deferred()
+
+
+func _scroll_log_to_end() -> void:
+	if is_inside_tree() and is_instance_valid(_log_scroll) and is_instance_valid(_log_overlay) and _log_overlay.is_visible_in_tree():
 		_log_scroll.scroll_vertical = int(_log_scroll.get_v_scroll_bar().max_value)
 
 
@@ -703,7 +775,7 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 			_request_target(int(result.need_target))
 			return
 		_board_view.flash_invalid()
-		_on_log("✗ " + str(result.reason))
+		_on_log("× " + str(result.reason))
 		_bubble.set_error(str(result.reason))
 		return
 	# 合击·结阵：本词只登记，不结算（点「发动」后一起结算）
@@ -744,7 +816,11 @@ func _on_commit(path: Array, target: Dictionary = {}) -> void:
 		_audio.play_cue("gravity")
 	_hint.text = "拖动连词 · 回车出字 · ESC 取消"
 	_bubble.set_result(result.word, result.glyphs, result.messages)
-	_bubble.set_context(_selection_context([]))
+	if _first_run_tutorial and _tutorial_step == 0:
+		_tutorial_step = 1
+		_bubble.set_context("新手引导：留意敌人头像旁的意图；结束回合后，防御会抵挡攻击。")
+	else:
+		_bubble.set_context(_selection_context([]))
 	_resource_feedback(old_resources)
 	if result.word != null:
 		_on_log("成词：%s" % result.word.word)
@@ -905,12 +981,15 @@ func _on_tile_picked(pos: Vector2i) -> void:
 	if _merge_active:
 		if _merge_cell1 == Vector2i(-1, -1):
 			_merge_cell1 = pos
-			_board_view.begin_pick("empty")
-			_on_log("合流：选择第二个相邻空格")
+			var excluded: Array = []
+			for i in battle.board.cells.size():
+				var cell := battle.board.to_xy(i)
+				if not battle.board.is_adjacent(pos, cell): excluded.append(cell)
+			_board_view.begin_pick("empty", false, excluded)
+			_pick_prompt(_pending_path, "合流 · 3/3：点金框中的相邻空格作为第二个落点，再点「发动」。")
 			return
 		if not battle.board.is_adjacent(_merge_cell1, pos):
-			_board_view.begin_pick("empty")
-			_on_log("合流：第二个空格必须与第一个相邻")
+			_bubble.set_error("合流：第二个空格必须与第一个四邻相接，请选择金框内的空格。")
 			return
 		var mp := _pending_path
 		_pending_path = []
@@ -1020,7 +1099,7 @@ func _run_pair(path: Array, mode: String) -> void:
 func _pick_prompt(path: Array, instruction: String) -> void:
 	var glyphs := battle.board.glyphs_of(path)
 	var word := Database.get_word_by_glyphs(glyphs)
-	_bubble.set_text("".join(glyphs), (word.effect_summary + "\n" if word != null else "") + instruction, SpeechBubble.State.PREVIEW)
+	_bubble.set_text("".join(glyphs), (EffectPreview.word_text(word, battle, path, {"picking": true}, true) + "\n" if word != null else "") + instruction, SpeechBubble.State.PREVIEW)
 	_bubble.set_context(_selection_context(path))
 	_update_input()
 
@@ -1174,7 +1253,7 @@ func _run_line_pick(path: Array, rows_only := false) -> void:
 			options.append({"text": "第 %d 列" % (i + 1)})
 	var word_name := _current_word.word if _current_word != null else "目标选择"
 	var ov := ChoiceOverlay.new()
-	ov.setup({"title": "%s：选择%s" % [word_name, "一行" if rows_only else "一行或一列"], "options": options})
+	ov.setup({"title": "%s：选择%s" % [word_name, "一行" if rows_only else "一行或一列"], "options": options, "board_peek": true})
 	ov.chose.connect(_on_line_chosen.bind(rows_only))
 	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_mount_overlay(ov)
@@ -1213,7 +1292,7 @@ func _choose_solo_throw(path: Array, target: Dictionary) -> bool:
 		return false
 	var due := EffectUtil.discounted_cost(battle, BattleBalance.i("throw_cost", 1))
 	if EffectUtil.available(battle) < due or battle.solo_throw_destinations(inst, path[0]).is_empty():
-		_bubble.set_error("投：需要可用空格与 %d 金币支付额" % due)
+		_bubble.set_error("投：需要可用空格与 %d 铜钱支付额" % due)
 		return true
 	_pending_path = path
 	_solo_throw_active = true
@@ -1238,7 +1317,7 @@ func _choose_word_transfer(path: Array, target: Dictionary) -> bool:
 		_on_commit(path, {"skip_transfer": true})
 		return true
 	if EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, BattleBalance.i("buy_cost", 2)):
-		_bubble.set_error("%s：需要 2 金币支付额" % word.word)
+		_bubble.set_error("%s：需要 2 铜钱支付额" % word.word)
 		return true
 	var spaces: Array = request.cells
 	if spaces.is_empty():
@@ -1274,7 +1353,7 @@ func _choose_solo_bag(path: Array, target: Dictionary) -> bool:
 	var buying := source.data.solo_handler == "buy_bag_solo"
 	var due := EffectUtil.discounted_cost(battle, BattleBalance.i("buy_cost", 2)) if buying else 0
 	if buying and EffectUtil.available(battle) < due:
-		_bubble.set_error("购：支付额不足（需要 %d 金币支付额）" % due)
+		_bubble.set_error("购：支付额不足（需要 %d 铜钱支付额）" % due)
 		return true
 	if not buying and cards.size() == 1:
 		var chosen := target.duplicate()
@@ -1399,7 +1478,7 @@ func _run_collect_own(path: Array, junk := false) -> void:
 
 func _run_merge_flow(path: Array) -> void:
 	if not battle.has_adjacent_empty_pair():
-		_on_log("合流：没有两个相邻空格，跳过")
+		_bubble.set_error("合流需要盘面已有两个相邻空格。请先腾出位置；本次未消耗所选字。")
 		return
 	var preparation := battle.prepare_interaction(path)
 	var revealed: Array = preparation.get("cards", [])
@@ -1413,14 +1492,15 @@ func _run_merge_flow(path: Array) -> void:
 	_merge_cell1 = Vector2i(-1, -1)
 	var list := battle.discard_instances()
 	if list.is_empty():
-		_on_log("合流：弃字堆为空")
 		_abort_merge()
+		_bubble.set_error("合流：揭示后弃字堆没有可选字。请先积累弃字，再尝试；所选字未消耗。")
 		return
 	var options: Array = []
 	for d in list:
 		options.append({"text": "【%s】" % d["glyph"]})
+	options.append({"text": "取消（不消耗字）"})
 	var ov := ChoiceOverlay.new()
-	ov.setup({"title": "合流：从弃字堆指定 1 枚", "options": options})
+	ov.setup({"title": "合流 · 1/3 选择弃字", "body": "已揭示【%s】。再选1枚弃字，依次点两个相邻空格，最后点「发动」。" % revealed[0].glyph(), "options": options, "board_peek": true})
 	ov.chose.connect(_on_merge_discard_chosen.bind(list))
 	ov.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_mount_overlay(ov)
@@ -1429,9 +1509,11 @@ func _run_merge_flow(path: Array) -> void:
 func _on_merge_discard_chosen(index: int, list: Array) -> void:
 	if index < 0 or index >= list.size():
 		_abort_merge()
+		_bubble.set_text("合流", "已取消，所选字未消耗，揭示字已放回。", SpeechBubble.State.PREVIEW)
 		return
 	_merge_discard_uid = int(list[index]["uid"])
 	_board_view.begin_pick("empty")
+	_pick_prompt(_pending_path, "合流 · 2/3：点第一个空格，再点与它四邻相接的第二个空格。选好后点「发动」。")
 	_on_log("合流：选择第一个空格")
 
 
@@ -1545,8 +1627,10 @@ func _on_end_turn(from_effect: bool = false) -> void:
 	_refresh_all(true)
 	if not battle.is_over():
 		_bubble.set_text("你的回合", "新字已落盘，继续连词。", SpeechBubble.State.IDLE)
-		_bubble.set_context(_selection_context([]))
+		_bubble.set_context(_tutorial_hint() if _first_run_tutorial and _tutorial_step == 1 else _selection_context([]))
 		_effects.number("回合 %d" % battle.turn, _effects.point_of(_board_view), Palette.INK_SOFT)
+	if _first_run_tutorial and _tutorial_step == 1:
+		_complete_first_run_tutorial()
 	# 精心：本回合补字改由玩家从字袋定向选择（随机落地）
 	if battle.manual_draw_pending > 0:
 		_start_manual_draw()
@@ -1627,6 +1711,8 @@ func _check_battle_over() -> void:
 	if _finished:
 		return
 	if battle.is_over():
+		if _first_run_tutorial:
+			_complete_first_run_tutorial()
 		_finished = true
 		_update_input()
 		var victory := battle.is_victory()
@@ -1639,6 +1725,9 @@ func _check_battle_over() -> void:
 
 			GameState.settle_victory_economy()
 			Relics.on_battle_won()
+		var settlement := {}
+		if not victory:
+			settlement = RunSettlement.from_run(battle, node, GameState.expedition if _expedition else null, bool(params.get("elite", false)))
 		if _room_run: GameState.room_run.finish_live_battle(victory)
 		var ex_result := {}
 		if _expedition:
@@ -1679,6 +1768,32 @@ func _preview_hint() -> String:
 	return "拖动选择后松手保留；按「出字」或回车 / 空格确认，ESC 取消。"
 
 
+func _tutorial_hint() -> String:
+	if _tutorial_step == 0:
+		return "第一局引导 · 沿相邻字块连线组成词语，选好后点「出字」。"
+	return "观察敌人头像旁的意图，再结束回合；防御可以抵挡攻击。"
+
+
+func can_skip_first_run_tutorial() -> bool:
+	return _first_run_tutorial and not _finished
+
+
+func skip_first_run_tutorial() -> void:
+	if not can_skip_first_run_tutorial():
+		return
+	_complete_first_run_tutorial()
+	_bubble.set_idle(_preview_hint())
+	SaveManager.request_save()
+
+
+func _complete_first_run_tutorial() -> void:
+	_first_run_tutorial = false
+	_tutorial_step = 0
+	GameState.first_run_tutorial = false
+	Settings.complete_first_run_tutorial()
+	SaveManager.request_save()
+
+
 func _pop_confirm() -> void:
 	if _confirm_btn == null or _confirm_btn.disabled or Settings.reduced_motion:
 		return
@@ -1700,7 +1815,7 @@ func _open_gild_picker(path: Array) -> void:
 		options.append({"text": "【%s】 · 第%d枚" % [card.glyph(), options.size() + 1]})
 	options.append({"text": "取消"})
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "选择1字永久镀金", "body": "此字每次打出获得%d金币，组词也算；不影响同字的其他字块。" % BattleBalance.i("gild_gold", 1), "options": options})
+	overlay.setup({"title": "选择1字永久镀金", "body": "此字每次打出获得%d铜钱，组词也算；不影响同字的其他字块。" % BattleBalance.i("gild_gold", 1), "options": options})
 	overlay.chose.connect(func(index):
 		if index >= cards.size(): return
 		_on_commit(path, {"gild_uid": cards[index].uid}))
@@ -1730,10 +1845,12 @@ func _layout() -> void:
 		return
 	var w := content.size.x
 	var h := content.size.y
+	# A touchscreen Windows laptop still has desktop space and mouse/keyboard.
+	# Choose the mobile composition by platform/explicit preview and size budget.
+	var touch_device := OS.has_feature("android") or OS.has_feature("ios") or bool(params.get("touch_layout", false))
 	var illustrated_desktop := (Palette.STYLE_ID == "taopunk" and w >= 1100
-		and get_window().size.y > 540 and not DisplayServer.is_touchscreen_available()
-		and not bool(params.get("touch_layout", false)))
-	_compact = (bool(params.get("touch_layout", false)) or DisplayServer.is_touchscreen_available()
+		and get_window().size.y > 540 and not touch_device)
+	_compact = (touch_device
 		or w / maxf(1.0, h) >= 1.95 or w < 1100 or get_window().size.y <= 540
 		or Palette.STYLE_ID == "taopunk")
 	var ui_scale := BattleTouchLayout.unit_for(size, get_window().size) if _compact else 1.0
@@ -1767,11 +1884,13 @@ func _layout() -> void:
 	_turn_label.size = Vector2(120, 24 * ui_scale)
 	_turn_label.show()
 	_turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_turn_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_turn_label.clip_text = true
 	_turn_label.add_theme_font_size_override("font_size", int(15 * ui_scale))
 	var menu_width := 80 * ui_scale
 	_menu_btn.position = Vector2(_topbar.size.x - menu_width, 0)
-	_menu_btn.size = Vector2(menu_width, 48 * ui_scale)
-	_menu_btn.custom_minimum_size = _menu_btn.size
+	_menu_btn.custom_minimum_size = Vector2(menu_width, 48 * ui_scale)
+	_menu_btn.size = _menu_btn.custom_minimum_size
 	_menu_btn.add_theme_font_size_override("font_size", int(minf(34, 20 * ui_scale)))
 	_gold_strip.set_ui_scale(ui_scale, _compact and _gold_strip.entries.size() > 1)
 	var gold_width := _gold_strip.get_combined_minimum_size().x
@@ -1779,8 +1898,8 @@ func _layout() -> void:
 	_gold_strip.size = Vector2(gold_width, 48 * ui_scale)
 	if _compact:
 		var turn_x := maxf(board_x, touch.player.end.x + 6 * ui_scale) - _topbar.position.x
-		_turn_label.position = Vector2(turn_x, 12 * ui_scale)
-		_turn_label.size = Vector2(maxf(0, minf(80 * ui_scale, _gold_strip.position.x - turn_x - 6 * ui_scale)), 24 * ui_scale)
+		_turn_label.position = Vector2(turn_x, 0)
+		_turn_label.size = Vector2(maxf(0, minf(80 * ui_scale, _gold_strip.position.x - turn_x - 6 * ui_scale)), 48 * ui_scale)
 		_turn_label.visible = _turn_label.size.x >= 48 * ui_scale
 	_topbar.get_node("Rule").position = Vector2(0, _topbar.size.y - 1)
 	_topbar.get_node("Rule").size = Vector2(_topbar.size.x, 1)
@@ -1827,9 +1946,11 @@ func _layout() -> void:
 		hp_font -= 1
 		_player_hp_value.add_theme_font_size_override("font_size", hp_font)
 	var status_x := _player_hp.position.x + _player_hp.size.x + 24
-	_player_status.position = Vector2(0, 54 * ui_scale) if _compact else Vector2(status_x, 6)
-	_player_status.size = Vector2(column if _compact else maxf(36, _topbar.position.x + _gold_strip.position.x - _player_panel.position.x - status_x - 24), (48 if _compact else 36) * ui_scale)
-	_player_status.set_ui_scale(ui_scale * (4.0 / 3.0 if _compact else 1.0))
+	# 桌面绘卷的状态行只有 48 * unit 高，不能沿用手机组件的放大比例。
+	var status_scale: float = touch.scale * 4.0 / 3.0 if illustrated_desktop else ui_scale * (4.0 / 3.0 if _compact else 1.0)
+	_player_status.set_ui_scale(status_scale)
+	_player_status.position = touch.status.position - _player_panel.position if _compact else Vector2(status_x, 6)
+	_player_status.size = touch.status.size if _compact else Vector2(maxf(36, _topbar.position.x + _gold_strip.position.x - _player_panel.position.x - status_x - 24), 36 * ui_scale)
 	_player_status.visible = not _player_status.entries.is_empty()
 	_bubble.illustrated_scale = touch.scale if illustrated_desktop else 0.0
 	_bubble.set_ui_scale(ui_scale, _compact and not illustrated_desktop)
@@ -1865,12 +1986,6 @@ func _layout() -> void:
 	_enemy_paper.position = _enemy_panel.position - Vector2(12, 8)
 	_enemy_paper.size = _enemy_panel.size + Vector2(24, 16)
 	_enemy_paper.open_scene = _enemy_widgets.size() == 1
-	if _compact:
-		_enemy_paper.tilt = 0.0
-		_enemy_paper._place_sheet()
-	else:
-		_enemy_paper.tilt = 1.2
-		_enemy_paper._place_sheet()
 	_enemy_panel.position += Vector2(14, 0 if _compact else 16)
 	_enemy_panel.size -= Vector2(28, 0 if _compact else 32)
 	if Palette.STYLE_ID == "taopunk" and not illustrated_desktop:
@@ -1885,7 +2000,7 @@ func _layout() -> void:
 			# ScrollContainer 按整数分配空间，避免取整差产生一条无内容可滚的滚动条。
 			widget.custom_minimum_size.y = floorf(_enemy_panel.size.y) - 1
 		else:
-			widget.custom_minimum_size.y = (156 if not widget._status.entries.is_empty() else 112) * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
+			widget.custom_minimum_size.y = 156 * ui_scale if _compact or _enemy_widgets.size() > 1 else _enemy_panel.size.y
 	_board_view._layout()
 	if Palette.STYLE_ID == "taopunk":
 		_board_view._presentation.set_illustrated_framing(illustrated_desktop)
@@ -1945,15 +2060,19 @@ func _update_input() -> void:
 func _set_busy(value: bool) -> void:
 	_busy = value
 	_update_input()
+	if not value: SaveManager.request_save()
 
 
 func _mount_overlay(overlay: Control) -> void:
+	# 部件立绘含多级相对 z_index；模态遮罩和内容必须整体高于战斗绘制。
+	overlay.z_index = 100
 	_modal_count += 1
 	_update_input()
 	overlay.tree_exited.connect(func():
 		_modal_count = maxi(0, _modal_count - 1)
 		if is_inside_tree():
-			_update_input())
+			_update_input()
+			SaveManager.request_save())
 	add_child(overlay)
 
 
@@ -1967,6 +2086,7 @@ func _toggle_log() -> void:
 	if _busy:
 		return
 	_log_overlay.visible = not _log_overlay.visible
+	if _log_overlay.visible: _queue_log_refresh()
 	_modal_count += 1 if _log_overlay.visible else -1
 	_update_input()
 
@@ -2260,17 +2380,19 @@ func _gravity_in_play(result: Dictionary) -> bool:
 func _layout_illustrated_desktop(layout: Dictionary) -> void:
 	var unit: float = layout.scale
 	_topbar.get_node("Rule").hide()
-	_menu_btn.position = Vector2(_topbar.size.x - 140 * unit, -4 * unit)
+	_menu_btn.position = Vector2(_topbar.size.x - 140 * unit, 0)
 	_menu_btn.custom_minimum_size = Vector2(140, 80) * unit
 	_menu_btn.size = _menu_btn.custom_minimum_size
 	_menu_btn.add_theme_font_size_override("font_size", int(34 * unit))
 	_gold_strip.set_ui_scale(1.5 * unit, false)
 	var gold_width := maxf(100 * unit, _gold_strip.get_combined_minimum_size().x)
 	_gold_strip.position = Vector2(_menu_btn.position.x - gold_width - 8 * unit, 0)
-	_gold_strip.size = Vector2(gold_width, 76 * unit)
-	_turn_label.position = Vector2(550, 0) * unit
-	_turn_label.size = Vector2(150, 76) * unit
+	_gold_strip.size = Vector2(gold_width, 80 * unit)
 	_turn_label.add_theme_font_size_override("font_size", int(30 * unit))
+	var face := _turn_label.get_theme_font("font")
+	var turn_width := maxf(100 * unit, face.get_string_size(_turn_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, int(30 * unit)).x + 12 * unit)
+	_turn_label.position = Vector2(_gold_strip.position.x - 12 * unit - turn_width, 0)
+	_turn_label.size = Vector2(turn_width, 80 * unit)
 	_turn_label.show()
 	_player_hp.position.y = 7 * unit
 	_player_hp.size.y = 58 * unit
@@ -2279,9 +2401,15 @@ func _layout_illustrated_desktop(layout: Dictionary) -> void:
 	_hp_icon.size = Vector2.ONE * 30 * unit
 	_player_hp_value.position = _player_hp.position + Vector2(58, -7) * unit
 	_player_hp_value.size = Vector2(_player_hp.size.x - 66 * unit, 76 * unit)
-	_player_hp_value.add_theme_font_size_override("font_size", int(48 * unit))
+	var hp_font := int(48 * unit)
+	var hp_face := _player_hp_value.get_theme_font("font")
+	while hp_font > int(18 * unit) and hp_face.get_string_size(_player_hp_value.text, HORIZONTAL_ALIGNMENT_LEFT, -1, hp_font).x > _player_hp_value.size.x:
+		hp_font -= 1
+	_player_hp_value.add_theme_font_size_override("font_size", hp_font)
 	_player_status.position = layout.status.position - _player_panel.position
-	_player_status.size = layout.status.size
+	# 从右向左预算菜单、金币、回合，剩余区域才用于 Buff。
+	var status_end := minf(layout.status.end.x, _topbar.position.x + _turn_label.position.x - 12 * unit)
+	_player_status.size = Vector2(maxf(0, status_end - layout.status.position.x), layout.status.size.y)
 	var pad := Vector2(42, 24) * unit
 	_bubble.position = pad
 	_bubble.size = _preview_panel.size - pad * 2
@@ -2399,9 +2527,27 @@ func _open_pile(id: String) -> void:
 
 
 
-func _show_hud_details(title: String, body: String, scroll_body: bool) -> void:
+func _open_battle_guide() -> void:
+	# Pause menu releases its modal lock when queue_free runs at frame end.
+	await get_tree().process_frame
+	_open_battle_guide_ready.call_deferred()
+
+
+func _open_battle_guide_ready() -> void:
+	if not is_inside_tree(): return
+	var body := "当前遗物：\n"
+	if battle.relics.is_empty(): body += "暂无遗物。\n\n"
+	else:
+		for id in battle.relics: body += Relics.text(id) + "\n\n"
+	body += "触屏操作：\n点按字块选择单字；沿相邻字块滑动可预览词语。\n"
+	body += "松手后会尝试出字。\n" if Settings.drag_release_play else "松手只预览，点「出字」才会执行。\n"
+	body += "\n点按敌人可选择目标；需要目标的词请按提示选择，再点「发动」。状态图标、敌人意图、防御图标与资源均可点按查看详情；带下划线的词条可点按阅读。"
+	_show_hud_details("战斗与遗物说明", body, true, battle.relics)
+
+
+func _show_hud_details(title: String, body: String, scroll_body: bool, relic_ids: Array = []) -> void:
 	if _busy or _modal_count > 0:
 		return
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": title, "body": body, "hud_details": true, "scroll_body": scroll_body, "options": [{"text": "返回战斗", "primary": true}]})
+	overlay.setup({"title": title, "body": body, "relics": relic_ids, "hud_details": true, "scroll_body": scroll_body, "dismissible": true, "options": [{"text": "返回战斗", "primary": true}]})
 	_mount_overlay(overlay)

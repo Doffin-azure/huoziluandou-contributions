@@ -146,6 +146,7 @@ func _build_header() -> Control:
 	_relic_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_relic_label.mouse_filter = Control.MOUSE_FILTER_PASS
 	stats.add_child(_relic_label)
+	stats.add_child(_ghost("印章与遗物", _open_loadout))
 	row.add_child(stats)
 	_confront_btn = _ghost("迎战首领", func(): ex.confront())
 	_confront_btn.tooltip_text = "首领在 2 步内时可以主动迎战，不吃位置减益"
@@ -549,6 +550,8 @@ func _refresh_event() -> void:
 		"event": _event_mystery(p)
 		"seal_swap": _event_seal_swap(p)
 		"relic_bind": _event_relic_bind(p)
+		"relic_pick": _event_relic_pick(p)
+		"relic_wish": _event_relic_wish(p)
 		"act_end": _event_act_end()
 		_: _event_idle()
 
@@ -642,16 +645,18 @@ func _event_shop() -> void:
 				description.set_effect_text(EffectGlossary.character_hint(character))
 				_add(description)
 		if o.kind == "relic":
+			RelicArt.apply_button(b, str(o.relic))
 			var cap := Ink.caption(Relics.desc_of(o.relic))
 			cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			_add(cap)
 	for id in GameState.relics.duplicate():
 		var sell := _ghost("卖掉「%s」　❖ +%d" % [Relics.name_of(id), Relics.sell_price(id)], func(): ex.sell_relic(id))
 		sell.tooltip_text = Relics.text(id)
+		RelicArt.apply_button(sell, str(id))
 		_add(sell)
 	_add(Ink.caption("丢弃过的字可按半价回购。"))
-	var refresh := _ghost("刷新货架　❖ %d" % Expedition.SHOP_REFRESH_COST, func(): ex.refresh_shop())
-	refresh.disabled = GameState.gold < Expedition.SHOP_REFRESH_COST
+	var refresh := _ghost("刷新货架　❖ %d" % ex.shop_refresh_cost(), func(): ex.refresh_shop())
+	refresh.disabled = GameState.gold < ex.shop_refresh_cost()
 	_add(refresh)
 	_add(Ink.caption("刷新换一批字和遗物，服务保留。"))
 	_add(_ghost("离开", func(): ex.leave_panel()))
@@ -691,6 +696,29 @@ func _event_relic_bind(p: Dictionary) -> void:
 	_add(_ghost("从字袋里挑", func(): _pick_deck("「%s」绑哪一枚？" % Relics.name_of(p.relic), func(id): ex.bind_relic(id)), true))
 
 
+func _event_relic_pick(p: Dictionary) -> void:
+	var verb := "镀金" if Relics.pick_spec(p.relic)[0] == "gild" else "复制"
+	_add(Ink.h2("「%s」%s一枚字（还剩 %d 枚）" % [Relics.name_of(p.relic), verb, int(p.left)]))
+	var desc := Ink.body(Relics.desc_of(p.relic) + "。")
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_add(desc)
+	_add(_ghost("从字袋里挑", func(): _pick_deck("「%s」%s哪一枚？" % [Relics.name_of(p.relic), verb], func(id): ex.pick_relic(id)), true))
+
+
+func _event_relic_wish(p: Dictionary) -> void:
+	_add(Ink.h2(Relics.name_of("monkey") + " · 许一个愿"))
+	_add(Ink.body("每个愿望都有代价，只能许一次。"))
+	for i in p.options.size():
+		var wish: String = p.options[i]
+		var cb := func(): ex.choose_wish(i)
+		if wish == "endless_glyph":
+			cb = func(): _pick_deck("千字同文：字袋全部变成哪个字？", func(id): ex.choose_wish(i, id))
+		_add(_ghost("「%s」" % Relics.WISHES[wish][0], cb, i == 0))
+		var cap := Ink.caption(Relics.WISHES[wish][1])
+		cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_add(cap)
+
+
 ## 绑定类遗物：被绑的字已不在字袋时提示
 func _bind_note(id: String) -> String:
 	if not Relics.needs_bind(id):
@@ -705,7 +733,7 @@ func _event_act_end() -> void:
 	_add(Ink.body("本层已结束，未拿的奖励、商店和休息点不再可用。"))
 	if ex.act < 3:
 		var supply := ex.act_supply()
-		_add(Ink.body("进入下一幕后补给：金币 +%d，气血最多 +%d，墨 +%d。" % [supply.gold, supply.heal, supply.ink]))
+		_add(Ink.body("进入下一幕后补给：铜钱 +%d，气血最多 +%d，墨 +%d。" % [supply.gold, supply.heal, supply.ink]))
 		_add(Ink.caption("补给仅发放一次。剩余的墨、字匣、字袋、印章和遗物带入下一幕。"))
 
 
@@ -878,3 +906,18 @@ func _legend_row(glyph: String, bg: Color, fg: Color, desc: String) -> Control:
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(l)
 	return row
+
+
+func _open_loadout() -> void:
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title":"印章与遗物", "body":_seal_label.text + "\n" + _seal_label.tooltip_text + "\n\n" + "\n".join(GameState.relics.map(func(id): return Relics.text(id))), "relics":GameState.relics.duplicate(), "hud_details":true,"scroll_body":true,"dismissible":true,"options":[{"text":"返回整备","primary":true}]})
+	add_child(overlay)
+
+
+func _pick_deck(title: String, callback: Callable) -> void:
+	var overlay := CollectionOverlay.new()
+	overlay.setup({"title":title,"instances":GameState.deck,"counts":GameState.glyph_counts(),"pick_on_click":true})
+	overlay.picked.connect(func(character: CharacterData):
+		callback.call(character.id)
+		refresh())
+	add_child(overlay)

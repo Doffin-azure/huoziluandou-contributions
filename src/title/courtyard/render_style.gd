@@ -9,7 +9,7 @@ var material_count := 0
 var outlined_count := 0
 
 
-func apply(architecture: Node3D, landscape: Node3D) -> void:
+func apply(architecture: Node3D, landscape: Node3D, outlines := true) -> void:
 	var palette = architecture.palette
 	var roles := {
 		palette.wood: ["223438", "4f5649", "8c825f"],
@@ -31,7 +31,7 @@ func apply(architecture: Node3D, landscape: Node3D) -> void:
 			if str(instance.name).begins_with(group): colors = ["303c35", "7b6942", "b19a5e"]
 		# Suppress facet chatter in the curved soffit, while keeping the rafters distinct.
 		if str(instance.name).begins_with("RoofSoffits"): colors = ["1a2e35", "263e42", "3b514f"]
-		instance.material_override = _pigment(source, colors, _needs_outline(instance.name))
+		instance.material_override = _pigment(source, colors, outlines and _needs_outline(instance.name))
 		if str(instance.name).begins_with("TerraceBoards"):
 			# Let the two low lanterns paint a warm pool on the boards. Keep this
 			# local to the foreground, instead of tinting the whole garden orange.
@@ -70,7 +70,7 @@ func apply(architecture: Node3D, landscape: Node3D) -> void:
 			colors = ["641f30", "bd3b40", "e07950"]
 		else:
 			colors = ["343b30", "957442", "c3a464"]
-		instance.material_override = _pigment(source, colors, _needs_outline(instance.name), leaves)
+		instance.material_override = _pigment(source, colors, outlines and _needs_outline(instance.name), leaves)
 	var lettering := architecture.get_node_or_null("ArchiveLettering") as Label3D
 	if lettering != null:
 		lettering.shaded = false

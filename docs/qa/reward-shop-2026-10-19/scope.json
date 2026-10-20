@@ -1,0 +1,87 @@
+[
+  {
+    "file": "src/screens/reward_screen.gd",
+    "added": 52,
+    "deleted": 5
+  },
+  {
+    "file": "src/screens/shop_screen.gd",
+    "added": 54,
+    "deleted": 7
+  },
+  {
+    "file": "src/expedition/expedition.gd",
+    "added": 19,
+    "deleted": 0
+  },
+  {
+    "file": "src/screens/expedition_map_screen.gd",
+    "added": 4,
+    "deleted": 0
+  },
+  {
+    "file": "src/ui/object_stage/object_hud.gd",
+    "added": 14,
+    "deleted": 1
+  },
+  {
+    "file": "src/ui/object_stage/object_stage.gd",
+    "added": 2,
+    "deleted": 2
+  },
+  {
+    "file": "src/ui/battle_pile_overlay.gd",
+    "added": 21,
+    "deleted": 7
+  },
+  {
+    "file": "src/ui/relic_reward_flow.gd",
+    "added": 86,
+    "deleted": 0
+  },
+  {
+    "file": "tests/battle_pile_ui_test.gd",
+    "added": 6,
+    "deleted": 1
+  },
+  {
+    "file": "tests/object_stage_test.gd",
+    "added": 1,
+    "deleted": 1
+  },
+  {
+    "file": "tests/autosave_test.gd",
+    "added": 2,
+    "deleted": 2
+  },
+  {
+    "file": "tests/journey_ui_test.gd",
+    "added": 1,
+    "deleted": 1
+  },
+  {
+    "file": "tests/classic_relic_test.gd",
+    "added": 203,
+    "deleted": 0
+  },
+  {
+    "file": "tests/classic_relic_test.tscn",
+    "added": 12,
+    "deleted": 0
+  },
+  {
+    "file": "tests/shop_refresh_test.gd",
+    "added": 69,
+    "deleted": 0
+  },
+  {
+    "file": "tests/shop_refresh_test.tscn",
+    "added": 4,
+    "deleted": 0
+  },
+  {
+    "file": "src/ui/choice_overlay.gd",
+    "added": 5,
+    "deleted": 2
+  }
+]

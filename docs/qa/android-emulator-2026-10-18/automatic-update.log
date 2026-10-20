@@ -1,0 +1,10 @@
+Device: emulator-5554 Android SDK built for x86_64
+Building x86_64 APK; log: E:\gamejam10\huoziluandou\build\android\dev\x86_64\export.log
+Starting: Intent { cmp=com.huozi.game/com.godot.game.GodotAppLauncher }
+Status: ok
+LaunchState: COLD
+Activity: com.huozi.game/com.godot.game.GodotApp
+TotalTime: 922
+WaitTime: 931
+Complete
+Ready. --rebuild updates code; --profile changes display; --capture saves the current screen.

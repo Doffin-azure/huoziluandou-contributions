@@ -8,6 +8,9 @@ const GRID := ["击", "破", "回", "流", "防", "御", "加", "速", "充", "�
 
 
 func _ready() -> void:
+	Settings.storage_path = "user://active-status-hud-test-settings.cfg"
+	Settings.reduced_motion = true
+	SaveManager.enabled = false
 	_capture = OS.get_cmdline_user_args().has("--capture")
 	_run.call_deferred()
 
@@ -64,11 +67,12 @@ func _run() -> void:
 	_ok(strip.entries.slice(0, 2).map(func(item): return item.id) == RESOURCE_IDS and not strip.entries.any(func(item): return item.id in ["block", "persistent_block"]), "状态栏只保留热度、储能和能力，两种盾值不混入 Buff")
 	for id in RESOURCE_IDS:
 		var button: Control = strip.item_for(id)
-		_ok(button != strip and button.get_child_count() == 2 and button.get_child(0) is BattleSymbol, "%s 有独立图形与数量角标，1 点也显示" % id)
+		var item: Dictionary = strip.entries.filter(func(entry): return entry.id == id)[0]
+		_ok(button != strip and button.get_child_count() == 2 and button.get_node("Glyph").text == item.glyph and button.get_node("Stacks").text == str(item.stacks), "%s 使用汉字与右下角数量，1 点也显示" % id)
 		_ok(button.tooltip_text.contains("点") and not button.tooltip_text.contains("层"), "%s 的实际单位和说明保留" % id)
-	_ok(strip.item_for("heat").tooltip_text.contains("热容 10") and is_equal_approx(strip.item_for("heat").get_child(0).level, 0.3), "热容移入详情，火焰刻度保留")
+	_ok(strip.item_for("heat").tooltip_text.contains("热容 10") and strip.item_for("heat").get_node("Stacks").text == "3", "热容详情保留，方牌只显示汉字与实际热度")
 	_ok(strip.entries.any(func(item): return item.id == "draw_bonus_next" and item.stacks == 1) and strip.entries.any(func(item): return item.id == "ability:longword_draw"), "抽牌修正和无层数的持续能力仍按真实生效状态显示")
-	_ok(not strip.get_global_rect().intersects(_screen._player_hp_value.get_global_rect()) and not strip.get_global_rect().intersects(_screen._gold_strip.get_global_rect()), "桌面统一状态栏不挤压气血和金币")
+	_ok(not strip.get_global_rect().intersects(_screen._player_hp_value.get_global_rect()) and not strip.get_global_rect().intersects(_screen._gold_strip.get_global_rect()), "桌面统一状态栏不挤压气血和铜钱")
 	var defense: DefenseDisplay = _screen._player_defense
 	_ok(defense.badge_for("block").value == 1 and defense.badge_for("persistent_block").value == 6 and defense.badge_for("persistent_block").persistent, "两种盾值各有血条盾牌，持久盾用双边盾形区分")
 	_ok(absf(defense.get_global_rect().get_center().y - _screen._player_hp.get_global_rect().get_center().y) < 1 and defense.get_global_rect().end.x >= _screen._player_hp.get_global_rect().position.x, "盾牌贴住血条左端，并与血条垂直居中")

@@ -1,0 +1,39 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS refresh is named and disabled below five gold
+PASS sell button visible but disabled without relics
+PASS sell button shows owned relic count
+PASS sell button opens owned relics and return action
+PASS trade underneath sale dialog is blocked
+PASS sale confirmation names relic and exact tier-based price
+PASS cancel preserves relic and gold
+PASS confirmed bound relic sale clears binding and credits exactly once
+PASS selling preserves shop stock and RNG
+PASS sale updates balance, refresh availability and owned count
+PASS sale checkpoint accepted
+PASS sale checkpoint resumes
+PASS sale balance and ownership survive resume
+PASS last relic sale clears counter and disables empty seller
+PASS repeated stale sale cannot credit twice
+PASS refresh button spends five gold and preserves services
+PASS (1920, 1080) shop button fits with 48px touch height: 出售遗物 · 15
+PASS (1920, 1080) shop button fits with 48px touch height: 刷新货架 · 5 金币
+PASS (1920, 1080) shop button fits with 48px touch height: 离开市集
+PASS (1920, 1080) shop button fits with 48px touch height: 购入 · 14 金币
+PASS sell button does not cover balance
+PASS full relic list panel fits (1920, 1080)
+PASS (960, 432) shop button fits with 48px touch height: 出售遗物 · 15
+PASS (960, 432) shop button fits with 48px touch height: 刷新货架 · 5 金币
+PASS (960, 432) shop button fits with 48px touch height: 离开市集
+PASS (960, 432) shop button fits with 48px touch height: 购入 · 12 金币
+PASS sell button does not cover balance
+PASS full relic list panel fits (960, 432)
+PASS (640, 360) shop button fits with 48px touch height: 出售遗物 · 15
+PASS (640, 360) shop button fits with 48px touch height: 刷新货架 · 5 金币
+PASS (640, 360) shop button fits with 48px touch height: 离开市集
+PASS (640, 360) shop button fits with 48px touch height: 购入 · 12 金币
+PASS sell button does not cover balance
+PASS full relic list panel fits (640, 360)
+[shop_actions_test] PASS=34 FAIL=0 TOTAL=34

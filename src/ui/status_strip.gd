@@ -1,6 +1,6 @@
-extends HBoxContainer
+extends Control
 class_name StatusStrip
-## 图形能力符号：只常驻图形和层数，名称与说明放进悬停/点击详情。
+## 汉字状态方牌：单字、右下角层数；溢出以 +数量 方牌打开完整说明。
 signal details_requested(title: String, body: String, scroll_body: bool)
 var entries: Array = []
 var _ui_scale := 1.0
@@ -12,6 +12,7 @@ var _items: Dictionary = {}
 func _ready() -> void:
 	add_to_group("effect_help_avoid")
 	add_theme_constant_override("separation", 4)
+	mouse_filter = Control.MOUSE_FILTER_PASS
 	resized.connect(_rebuild)
 	_rebuild()
 
@@ -30,7 +31,8 @@ func _rebuild() -> void:
 	if not is_inside_tree():
 		return
 	var cell := 36.0 * _ui_scale
-	var capacity := maxi(1, int(size.x / (cell + 4)))
+	var gap := 4.0 * _ui_scale
+	var capacity := maxi(1, int((size.x + gap) / (cell + gap)))
 	var signature := str(entries) + str(capacity) + str(_ui_scale) + Palette.STYLE_ID
 	if signature == _signature:
 		return
@@ -43,79 +45,85 @@ func _rebuild() -> void:
 	var shown := mini(entries.size(), capacity if entries.size() <= capacity else maxi(0, capacity - 1))
 	for index in shown:
 		var entry: Dictionary = entries[index]
-		var button := _badge(str(entry.id), cell, BattleSymbol.color_for(str(entry.id), int(entry.kind) == StatusData.Kind.DEBUFF))
+		var glyph := str(entry.get("glyph", "状")).left(1)
+		if glyph.is_empty(): glyph = "状"
+		var color: Color = entry.get("color", Palette.GOLD)
+		color = color.lerp(Palette.PAPER_WARM, 0.52)
+		var button := _badge(str(entry.id), glyph, cell, gap, color)
 		button.tooltip_text = "%s · %d %s\n%s" % [entry.name, entry.stacks, entry.get("unit", "层"), entry.description]
 		button.pressed.connect(_show_entry.bind(entry))
-		if entry.has("capacity"):
-			button.get_child(0).level = clampf(float(entry.stacks) / maxf(1, entry.capacity), 0, 1)
-		if int(entry.stacks) > 1 or entry.get("unit", "层") != "层":
-			var badge := Panel.new()
-			badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			var paper := StyleBoxFlat.new()
-			paper.bg_color = Palette.PAPER
-			paper.set_corner_radius_all(int(6 * _ui_scale))
-			badge.add_theme_stylebox_override("panel", paper)
-			badge.size = Vector2(maxf(18, str(entry.stacks).length() * 7 + 6), 18) * _ui_scale
-			badge.position = Vector2(cell - badge.size.x, -1 * _ui_scale)
-			button.add_child(badge)
-			var count := Ink.label(str(entry.stacks), "", Palette.INK)
-			count.add_theme_font_size_override("font_size", int(13 * _ui_scale))
-			count.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			count.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-			badge.add_child(count)
+		var count := _label(str(entry.stacks), "Stacks", Palette.PAPER_WARM, 12)
+		count.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		count.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+		count.add_theme_color_override("font_shadow_color", Palette.INK)
+		count.add_theme_constant_override("shadow_offset_x", maxi(1, roundi(_ui_scale)))
+		count.add_theme_constant_override("shadow_offset_y", maxi(1, roundi(_ui_scale)))
+		# Keep exact multi-digit counts inside the tile, without widening the row.
+		var face := count.get_theme_font("font")
+		var font_size := count.get_theme_font_size("font_size")
+		while font_size > maxi(8, int(8 * _ui_scale)) and face.get_string_size(count.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x > cell - 4 * _ui_scale:
+			font_size -= 1
+		count.add_theme_font_size_override("font_size", font_size)
+		count.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		count.offset_left = 2 * _ui_scale
+		count.offset_right = -2 * _ui_scale
+		button.add_child(count)
 	if entries.size() > shown:
-		var more := _badge("more", cell, Palette.INK_SOFT)
-		more.tooltip_text = "查看全部状态与能力"
+		var hidden := entries.size() - shown
+		var more := _badge("more", "+%d" % hidden, cell, gap, Palette.INK_SOFT, true)
+		more.tooltip_text = "另有 %d 项，查看全部状态与能力" % hidden
 		more.pressed.connect(_show_details)
 
 
-func _badge(symbol: String, cell: float, color: Color) -> Button:
-	var illustrated := Palette.STYLE_ID == "taopunk"
-	var icon_color := color
-	if illustrated:
-		icon_color = Color("e9debd")
-		if color == Palette.VERMILION_DK: icon_color = Color("eca18d")
-		elif color == Palette.GOLD_DK: icon_color = Color("dcc48e")
+func _label(value: String, node_name: String, color: Color, font_size: int) -> Label:
+	var label := Label.new()
+	label.name = node_name
+	label.text = value
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.clip_text = true
+	label.add_theme_font_override("font", Ink.sans)
+	label.add_theme_font_size_override("font_size", int(font_size * _ui_scale))
+	label.add_theme_color_override("font_color", color)
+	return label
+
+
+func _badge(id: String, glyph: String, cell: float, gap: float, color: Color, more := false) -> Button:
 	var button := Ink.button("")
-	button.custom_minimum_size = Vector2(cell, cell)
-	button.add_theme_font_override("font", Ink.serif)
-	button.add_theme_font_size_override("font_size", int(19 * _ui_scale))
-	button.add_theme_color_override("font_color", icon_color)
+	button.name = "Status_" + id.replace(":", "_")
+	button.custom_minimum_size = Vector2.ONE * cell
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color("122b2d") if illustrated else Color.TRANSPARENT
-	style.border_color = Color("7b795c") if illustrated else Color.TRANSPARENT
-	if illustrated: style.set_border_width_all(1)
-	style.set_corner_radius_all(2)
+	style.bg_color = Palette.PAPER_WARM if more else Palette.PANEL_DARK
+	style.border_color = Palette.BORDER_SOFT.lightened(0.12)
+	style.set_border_width_all(maxi(1, roundi(1.5 * _ui_scale)))
+	style.set_corner_radius_all(maxi(2, roundi(5 * _ui_scale)))
 	style.set_content_margin_all(0)
 	button.add_theme_stylebox_override("normal", style)
-	if illustrated:
-		var hover: StyleBoxFlat = style.duplicate()
-		hover.bg_color = Color("274143")
-		hover.border_color = Color("cbb987")
-		button.add_theme_stylebox_override("hover", hover)
-		var pressed: StyleBoxFlat = style.duplicate()
-		pressed.bg_color = Color("0b1e20")
-		button.add_theme_stylebox_override("pressed", pressed)
-		var focus: StyleBoxFlat = style.duplicate()
-		focus.bg_color = Color.TRANSPARENT
-		focus.border_color = Color("e9debd")
-		focus.set_border_width_all(2)
-		button.add_theme_stylebox_override("focus", focus)
-		button.add_theme_stylebox_override("disabled", style)
+	var hover: StyleBoxFlat = style.duplicate()
+	hover.bg_color = Palette.PAPER if more else Palette.WOOD
+	hover.border_color = Palette.GOLD.lightened(0.15)
+	button.add_theme_stylebox_override("hover", hover)
+	var pressed: StyleBoxFlat = style.duplicate()
+	pressed.bg_color = Palette.PAPER_DARK if more else Palette.WOOD_DARK
+	button.add_theme_stylebox_override("pressed", pressed)
+	var focus: StyleBoxFlat = style.duplicate()
+	focus.bg_color = Color.TRANSPARENT
+	focus.border_color = Palette.PAPER
+	focus.set_border_width_all(maxi(2, roundi(2 * _ui_scale)))
+	button.add_theme_stylebox_override("focus", focus)
+	button.add_theme_stylebox_override("disabled", style)
+	# A single fixed row; text and counts never stretch the reserved HUD area.
+	button.position = Vector2(_buttons.size() * (cell + gap), 0)
 	add_child(button)
-	var icon := BattleSymbol.new()
-	icon.symbol = symbol
-	icon.ink = icon_color
-	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	icon.offset_left = cell * 0.12
-	icon.offset_top = cell * 0.12
-	icon.offset_right = -cell * 0.12
-	icon.offset_bottom = -cell * 0.12
-	button.add_child(icon)
+	button.size = Vector2.ONE * cell
+	var label := _label(glyph, "Glyph", color, 14 if more else 24)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	label.offset_top = (-1 if more else -3) * _ui_scale
+	label.offset_bottom = label.offset_top
+	button.add_child(label)
 	_buttons.append(button)
-	_items[symbol] = button
+	_items[id] = button
 	return button
 
 

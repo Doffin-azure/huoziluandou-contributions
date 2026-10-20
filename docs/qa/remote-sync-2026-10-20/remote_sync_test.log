@@ -1,0 +1,29 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 68 / 词 165 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS remote relic definitions include the new healing ink
+PASS every upstream relic has registered art
+PASS battle screen compiles after merge
+PASS reward screen compiles after merge
+PASS event screen compiles after merge
+PASS rest screen compiles after merge
+PASS shop screen compiles after merge
+PASS title screen compiles after merge
+PASS room_map screen compiles after merge
+PASS event_board screen compiles after merge
+PASS expedition_map screen compiles after merge
+PASS glyph_graph screen compiles after merge
+PASS new route shop retains five cards
+PASS new route shop retains three stocked relics
+PASS all stocked relic models render without empty shelf entries
+PASS new route purchase confirmation uses preserved icon ID
+PASS new route controller charges tier price and grants exactly the chosen relic
+PASS purchase removes the saved stock entry
+PASS first physical refresh charges five in both UI and run controller
+PASS second refresh charges ten and advances both next fees to fifteen
+PASS updated route saves with preserved inventory and shop fee
+PASS route resume preserves owned relic and refresh progression
+PASS new remote revival charges survive route resume
+[remote_sync_test] PASS=23 FAIL=0 TOTAL=23

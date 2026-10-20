@@ -1,0 +1,10 @@
+{
+  "ro.product.model": "Android SDK built for x86_64",
+  "ro.build.version.release": "15",
+  "ro.build.version.sdk": "35",
+  "ro.product.cpu.abi": "x86_64",
+  "apk_sha256": "f87adad9991a20d90ed651d131d703bdf2d70597fcd68ad2e6f78cf5f7ff6623",
+  "renderer": "GL Compatibility (emulator build only)",
+  "virtual_device": "Huozi_API_35",
+  "physical_phone_tested": false
+}

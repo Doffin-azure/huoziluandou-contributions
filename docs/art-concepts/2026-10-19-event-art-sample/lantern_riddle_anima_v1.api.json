@@ -1,0 +1,101 @@
+{
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "anima-aesthetic-v1.1.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_06b_base.safetensors",
+      "type": "stable_diffusion",
+      "device": "default"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "qwen_image_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "A finished hand-drawn 2D narrative game illustration, a Chinese underworld garden at night. Exactly THREE large blank paper lanterns suspended from an old roof eave above a still ink pond, all three complete and clearly separated. One wide central cinnabar lantern, one smaller round lantern on the left, one narrow red lantern hanging lower on the right. Their paper surfaces are completely blank, no letters or inscriptions. Oxidized dark teal bronze caps and frames, small antique ochre gold fittings, simple hanging red silk tassels. A small pale blue ghost flame below the central lantern, a few floating sparks, subtle pale ivory light filtering through the paper. A weathered stone pond bank and a few deep red maple leaves in the foreground. A dark carved garden window and a simple wooden pillar behind the lanterns, layered distant silhouettes, quiet mysterious solemn atmosphere, not a cheerful festival.\nSTYLE: strong clean black ink outlines, visibly hand-drawn contour variation, crisp flat color shapes, restrained two-tone cel shading, refined graphic illustration, deliberately simplified geometry, very few precise engraved bronze lines, subtle old print texture. Dark desaturated blue teal and charcoal environment, cinnabar red focal lanterns, restrained antique gold metal, pale warm ivory paper light, small desaturated blue-white ghost flame. Clear readable silhouettes, strong compositional hierarchy, central lantern group occupies about seventy percent of the square, edges remain dark and quiet. Original Chinese occult fantasy game art, mature tao-punk visual language. Flat illustration, no photorealism, no three dimensional rendering, no writing, no border, no UI, no people."
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "worst quality, low quality, blurry, jpeg artifacts, watercolor, watercolour, ink wash painting, grey wash, washed out, sepia, loose sketch, photorealistic, photo, realistic, 3d render, CGI, glossy plastic, bevel, neon, rainbow, purple lighting, overexposed, saturated green, clutter, excessive ornament, crowded city, festival crowd, people, person, girl, boy, chibi, cute, readable text, Chinese characters, calligraphy, handwriting, watermark, signature, logo, title, user interface, panel, poster, collage"
+    }
+  },
+  "6": {
+    "class_type": "EmptyLatentImage",
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    }
+  },
+  "7": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "latent_image": [
+        "6",
+        0
+      ],
+      "seed": 2026101901,
+      "steps": 30,
+      "cfg": 4.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1.0
+    }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "7",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "8",
+        0
+      ],
+      "filename_prefix": "lianziyu/lantern_riddle_anima_v1"
+    }
+  }
+}

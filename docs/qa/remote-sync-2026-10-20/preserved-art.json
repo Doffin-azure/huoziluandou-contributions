@@ -1,0 +1,462 @@
+[
+  {
+    "path": "assets/relics/icons/amber.png",
+    "before_sha256": "c0857c87fc97afb9411651e42bd668312198ef6efb5ebe0daa7884fa122602a9",
+    "after_sha256": "c0857c87fc97afb9411651e42bd668312198ef6efb5ebe0daa7884fa122602a9"
+  },
+  {
+    "path": "assets/relics/icons/barrier.png",
+    "before_sha256": "e82e8da113ed663ce2eee11046fd97e5a4db2feb5e525e6dc0282e97da406e32",
+    "after_sha256": "e82e8da113ed663ce2eee11046fd97e5a4db2feb5e525e6dc0282e97da406e32"
+  },
+  {
+    "path": "assets/relics/icons/binding.png",
+    "before_sha256": "3369dd237009a94bf7cbecfd8a71257bbe685061c5e18275216a2ffa85bc4d8a",
+    "after_sha256": "3369dd237009a94bf7cbecfd8a71257bbe685061c5e18275216a2ffa85bc4d8a"
+  },
+  {
+    "path": "assets/relics/icons/black_water.png",
+    "before_sha256": "360713358e8e1da8a104e87931d272bea83b7cf4d3d929e59681c7686bcf4b82",
+    "after_sha256": "360713358e8e1da8a104e87931d272bea83b7cf4d3d929e59681c7686bcf4b82"
+  },
+  {
+    "path": "assets/relics/icons/blitz.png",
+    "before_sha256": "b0fe8d518c172dfc0a637a78c107472c0c7742ff21bdd50d2ac0bb16fe0ae270",
+    "after_sha256": "b0fe8d518c172dfc0a637a78c107472c0c7742ff21bdd50d2ac0bb16fe0ae270"
+  },
+  {
+    "path": "assets/relics/icons/breach.png",
+    "before_sha256": "95e10d9824c1d8950e008f80d0b784666afa58c4d0de7bd7c6d27614d9426bfa",
+    "after_sha256": "95e10d9824c1d8950e008f80d0b784666afa58c4d0de7bd7c6d27614d9426bfa"
+  },
+  {
+    "path": "assets/relics/icons/buckler.png",
+    "before_sha256": "33f9e89c88afb4bb8f0398d056b2d00433225c8da30e4f6ef0033afa38628637",
+    "after_sha256": "33f9e89c88afb4bb8f0398d056b2d00433225c8da30e4f6ef0033afa38628637"
+  },
+  {
+    "path": "assets/relics/icons/chain.png",
+    "before_sha256": "fe6b9117168a71db147f82077b60a742222a9a3685979ddf1e8188b8badad4f9",
+    "after_sha256": "fe6b9117168a71db147f82077b60a742222a9a3685979ddf1e8188b8badad4f9"
+  },
+  {
+    "path": "assets/relics/icons/chaos_dice.png",
+    "before_sha256": "a6f0c7a5324e55bc56b2720eb04b14552fb916f72341813adfba4e8837dacb17",
+    "after_sha256": "a6f0c7a5324e55bc56b2720eb04b14552fb916f72341813adfba4e8837dacb17"
+  },
+  {
+    "path": "assets/relics/icons/clean.png",
+    "before_sha256": "863bb79c20624033fedd5510b1726168e0dcd44302efcb979ce687d0ab06c709",
+    "after_sha256": "863bb79c20624033fedd5510b1726168e0dcd44302efcb979ce687d0ab06c709"
+  },
+  {
+    "path": "assets/relics/icons/cracked_bottle.png",
+    "before_sha256": "26cfffaa72bd27e18826c25e221b8557df7b339522b0fc37fd60eefc126104de",
+    "after_sha256": "26cfffaa72bd27e18826c25e221b8557df7b339522b0fc37fd60eefc126104de"
+  },
+  {
+    "path": "assets/relics/icons/death.png",
+    "before_sha256": "37026bff25bdea99158f3b1b0a8d8dbd9cafbb4399a6ebcb8bb499aefefa05a0",
+    "after_sha256": "37026bff25bdea99158f3b1b0a8d8dbd9cafbb4399a6ebcb8bb499aefefa05a0"
+  },
+  {
+    "path": "assets/relics/icons/egg.png",
+    "before_sha256": "0b7fad87acbee54a811537c5560ff89d4e65c7081b06672360ae3c6e33848c1f",
+    "after_sha256": "0b7fad87acbee54a811537c5560ff89d4e65c7081b06672360ae3c6e33848c1f"
+  },
+  {
+    "path": "assets/relics/icons/empty_case.png",
+    "before_sha256": "131ec60d24b9cb56f35dfdd15fe557bb9940636b2941abf33d091f8d1d6f55e5",
+    "after_sha256": "131ec60d24b9cb56f35dfdd15fe557bb9940636b2941abf33d091f8d1d6f55e5"
+  },
+  {
+    "path": "assets/relics/icons/fertilizer.png",
+    "before_sha256": "d16db41ed0014ef230416982d1751edd4f2de4eaf5dc132be1ea673f3c83e22a",
+    "after_sha256": "d16db41ed0014ef230416982d1751edd4f2de4eaf5dc132be1ea673f3c83e22a"
+  },
+  {
+    "path": "assets/relics/icons/fireman.png",
+    "before_sha256": "c6b6c7e3479699b038d4d09027fdff2b3e6fcc6fcbd321531f085db12603f8c5",
+    "after_sha256": "c6b6c7e3479699b038d4d09027fdff2b3e6fcc6fcbd321531f085db12603f8c5"
+  },
+  {
+    "path": "assets/relics/icons/ghost_hand.png",
+    "before_sha256": "cc612bf6fb333244ddece68601fdeb4048cb4bfafca4332225ab8255796baa33",
+    "after_sha256": "cc612bf6fb333244ddece68601fdeb4048cb4bfafca4332225ab8255796baa33"
+  },
+  {
+    "path": "assets/relics/icons/goldleaf.png",
+    "before_sha256": "79cef8813e97501097ac0bf0fe8c85c112978ccd9e13be9160cd470cfba4f9b0",
+    "after_sha256": "79cef8813e97501097ac0bf0fe8c85c112978ccd9e13be9160cd470cfba4f9b0"
+  },
+  {
+    "path": "assets/relics/icons/life_debt.png",
+    "before_sha256": "d8fb2fddd3030afab59d4075d1a49b8efdfbadd6de537a266f6fcfa336964d84",
+    "after_sha256": "d8fb2fddd3030afab59d4075d1a49b8efdfbadd6de537a266f6fcfa336964d84"
+  },
+  {
+    "path": "assets/relics/icons/life_lantern.png",
+    "before_sha256": "83a93ca6e251384456130fc0911b106a7a6111c951ed7e25b3a60000ae895281",
+    "after_sha256": "83a93ca6e251384456130fc0911b106a7a6111c951ed7e25b3a60000ae895281"
+  },
+  {
+    "path": "assets/relics/icons/midas.png",
+    "before_sha256": "065e2d1af273f35ab0285afa8bfb5f1d8eb2b44c4e10ccc62a9f6977e4bd2fea",
+    "after_sha256": "065e2d1af273f35ab0285afa8bfb5f1d8eb2b44c4e10ccc62a9f6977e4bd2fea"
+  },
+  {
+    "path": "assets/relics/icons/monkey.png",
+    "before_sha256": "e30f32abf198f934aab3a5378263d23d9c171b5aab3394f98ee49c9541a45a59",
+    "after_sha256": "e30f32abf198f934aab3a5378263d23d9c171b5aab3394f98ee49c9541a45a59"
+  },
+  {
+    "path": "assets/relics/icons/moon.png",
+    "before_sha256": "6bd9271c7f7089aba26fd43799a6f58626b24f92ba5e12089a21acb6da86aa5c",
+    "after_sha256": "6bd9271c7f7089aba26fd43799a6f58626b24f92ba5e12089a21acb6da86aa5c"
+  },
+  {
+    "path": "assets/relics/icons/palindrome.png",
+    "before_sha256": "58a4e4993484fe8a7ecc66af72aafb6fca4491e89b73be3da67b4d6a0be25c06",
+    "after_sha256": "58a4e4993484fe8a7ecc66af72aafb6fca4491e89b73be3da67b4d6a0be25c06"
+  },
+  {
+    "path": "assets/relics/icons/powerbank.png",
+    "before_sha256": "e39530a8e374aacfe00db5b1439c7ecc635ffe73aeb9bc839dd18a2a9453bb27",
+    "after_sha256": "e39530a8e374aacfe00db5b1439c7ecc635ffe73aeb9bc839dd18a2a9453bb27"
+  },
+  {
+    "path": "assets/relics/icons/press.png",
+    "before_sha256": "63f187a5abb99758e4f4425628df665476946d113cd10291c562e9a60c32cbc6",
+    "after_sha256": "63f187a5abb99758e4f4425628df665476946d113cd10291c562e9a60c32cbc6"
+  },
+  {
+    "path": "assets/relics/icons/proof.png",
+    "before_sha256": "ed536781b1cc7cbd7a953d12513e1ebd9cd63339013156aaee67969e8ba06445",
+    "after_sha256": "ed536781b1cc7cbd7a953d12513e1ebd9cd63339013156aaee67969e8ba06445"
+  },
+  {
+    "path": "assets/relics/icons/question.png",
+    "before_sha256": "be6cb8de862f2c7cbd1ee15bb432ac878143764b198a332a20c91271c7a25a8c",
+    "after_sha256": "be6cb8de862f2c7cbd1ee15bb432ac878143764b198a332a20c91271c7a25a8c"
+  },
+  {
+    "path": "assets/relics/icons/rotting_fruit.png",
+    "before_sha256": "70a5cb58eb2fe9dfa99e9c0a87d9290e1154156681bddad97eb4e7a4d0bd2f31",
+    "after_sha256": "70a5cb58eb2fe9dfa99e9c0a87d9290e1154156681bddad97eb4e7a4d0bd2f31"
+  },
+  {
+    "path": "assets/relics/icons/rubbing.png",
+    "before_sha256": "0bafdddde70a9a7f7401d03bece899b1fc6c0285b047956559ec5149065944f3",
+    "after_sha256": "0bafdddde70a9a7f7401d03bece899b1fc6c0285b047956559ec5149065944f3"
+  },
+  {
+    "path": "assets/relics/icons/ruin.png",
+    "before_sha256": "e9f8dbb82ff5c74ecbf8809c2934b5258526b8755efaf5976d0a409363cd43a5",
+    "after_sha256": "e9f8dbb82ff5c74ecbf8809c2934b5258526b8755efaf5976d0a409363cd43a5"
+  },
+  {
+    "path": "assets/relics/icons/skyfire.png",
+    "before_sha256": "bf3ff9d95e7030586aea488ac165b9115a10c9f4d5ce5c2658fdc6d74443f120",
+    "after_sha256": "bf3ff9d95e7030586aea488ac165b9115a10c9f4d5ce5c2658fdc6d74443f120"
+  },
+  {
+    "path": "assets/relics/icons/slab.png",
+    "before_sha256": "8f0cca1892d00f6ab26ec2644ae51d2a66742d39364dbd1d6a198f041e558ee6",
+    "after_sha256": "8f0cca1892d00f6ab26ec2644ae51d2a66742d39364dbd1d6a198f041e558ee6"
+  },
+  {
+    "path": "assets/relics/icons/sleep.png",
+    "before_sha256": "ff003ef98b3722e987802341c5ad9eaa40b447ba4a0d44f59c9c781f8216723c",
+    "after_sha256": "ff003ef98b3722e987802341c5ad9eaa40b447ba4a0d44f59c9c781f8216723c"
+  },
+  {
+    "path": "assets/relics/icons/slot.png",
+    "before_sha256": "54153b0293374dde783bfa05939e790644de757aba391b76986c555b2b5819fb",
+    "after_sha256": "54153b0293374dde783bfa05939e790644de757aba391b76986c555b2b5819fb"
+  },
+  {
+    "path": "assets/relics/icons/stay_wax.png",
+    "before_sha256": "4409ea60d157feb95189d512780861811e693f3c15da81a525b2f7e6388c102b",
+    "after_sha256": "4409ea60d157feb95189d512780861811e693f3c15da81a525b2f7e6388c102b"
+  },
+  {
+    "path": "assets/relics/icons/strike.png",
+    "before_sha256": "78019dc63f8593b1fbd9e454a73756b891551ca14f9ab4a032d61284eb6d4cd1",
+    "after_sha256": "78019dc63f8593b1fbd9e454a73756b891551ca14f9ab4a032d61284eb6d4cd1"
+  },
+  {
+    "path": "assets/relics/icons/wheel.png",
+    "before_sha256": "a81ac72ef1e9c1ac527ec4598d63832f55abe9cf08651e0afb0ec61a4ba45476",
+    "after_sha256": "a81ac72ef1e9c1ac527ec4598d63832f55abe9cf08651e0afb0ec61a4ba45476"
+  },
+  {
+    "path": "assets/taopunk/enemies/blank_child.png",
+    "before_sha256": "3c3dbc112c621a183827325908e64cbcf4d3707c8af1da547b7516a333785519",
+    "after_sha256": "3c3dbc112c621a183827325908e64cbcf4d3707c8af1da547b7516a333785519"
+  },
+  {
+    "path": "assets/taopunk/enemies/bomb_press.png",
+    "before_sha256": "669008ea27b0e0cdbbac478ce3b95cc9faa04e1a67197c2d3e82972df5a63383",
+    "after_sha256": "669008ea27b0e0cdbbac478ce3b95cc9faa04e1a67197c2d3e82972df5a63383"
+  },
+  {
+    "path": "assets/taopunk/enemies/boss_chaos_press.png",
+    "before_sha256": "dc11ccb38d7a0ac66fb3b54c8b99d71e18d58cfd8a58cb1731f13a5bf06063f0",
+    "after_sha256": "dc11ccb38d7a0ac66fb3b54c8b99d71e18d58cfd8a58cb1731f13a5bf06063f0"
+  },
+  {
+    "path": "assets/taopunk/enemies/boss_lead_plate.png",
+    "before_sha256": "0c161ca714d087918ca29aef5ba31e55a23cd4cbdad176b2113b351d4e3e19de",
+    "after_sha256": "0c161ca714d087918ca29aef5ba31e55a23cd4cbdad176b2113b351d4e3e19de"
+  },
+  {
+    "path": "assets/taopunk/enemies/boss_word_demon.png",
+    "before_sha256": "0dcabb439102b7c9ec3b9e4784840533fecebcb2a97af869bc5709b9f8880072",
+    "after_sha256": "0dcabb439102b7c9ec3b9e4784840533fecebcb2a97af869bc5709b9f8880072"
+  },
+  {
+    "path": "assets/taopunk/enemies/bronze_seal.png",
+    "before_sha256": "a0cc6c05cb738b898195c1d13c8dcd1cd8881d2c38641bfb59e4737128d4c6ed",
+    "after_sha256": "a0cc6c05cb738b898195c1d13c8dcd1cd8881d2c38641bfb59e4737128d4c6ed"
+  },
+  {
+    "path": "assets/taopunk/enemies/charge_badger.png",
+    "before_sha256": "4a77bfaf4f13819945d9c1e5ff155c276bb23412ead7792683da49c6e1315da0",
+    "after_sha256": "4a77bfaf4f13819945d9c1e5ff155c276bb23412ead7792683da49c6e1315da0"
+  },
+  {
+    "path": "assets/taopunk/enemies/compiler_boss.png",
+    "before_sha256": "ed084e44b379b274d845a32c6739db263978c5e8e08387bd63c26b37f92ebebc",
+    "after_sha256": "ed084e44b379b274d845a32c6739db263978c5e8e08387bd63c26b37f92ebebc"
+  },
+  {
+    "path": "assets/taopunk/enemies/copy_master.png",
+    "before_sha256": "79a7b47ce7297b0141736eb9ad071d2d3b491e20518925b583624363c3eab0ba",
+    "after_sha256": "79a7b47ce7297b0141736eb9ad071d2d3b491e20518925b583624363c3eab0ba"
+  },
+  {
+    "path": "assets/taopunk/enemies/corrosion_beetle.png",
+    "before_sha256": "af4f66c032d9c5e3194cbe9ed5fb4a19d740ed88018abe7c93f6fb5bfc52a2f6",
+    "after_sha256": "af4f66c032d9c5e3194cbe9ed5fb4a19d740ed88018abe7c93f6fb5bfc52a2f6"
+  },
+  {
+    "path": "assets/taopunk/enemies/double_slip.png",
+    "before_sha256": "c90a8224f56baa79ddb4be6b5325f248914583b936cd06cc6798f12b459b9b32",
+    "after_sha256": "c90a8224f56baa79ddb4be6b5325f248914583b936cd06cc6798f12b459b9b32"
+  },
+  {
+    "path": "assets/taopunk/enemies/ember_imp.png",
+    "before_sha256": "fa1314f7c02a9a8cd62d0f3339f40a69df8bb29d315ef02fba4d279a6ded0f97",
+    "after_sha256": "fa1314f7c02a9a8cd62d0f3339f40a69df8bb29d315ef02fba4d279a6ded0f97"
+  },
+  {
+    "path": "assets/taopunk/enemies/fold_page_moth.png",
+    "before_sha256": "47e07ed7c2af404cffb316b8baf7967583362e084d97cc1abcc42694fa2d1d23",
+    "after_sha256": "47e07ed7c2af404cffb316b8baf7967583362e084d97cc1abcc42694fa2d1d23"
+  },
+  {
+    "path": "assets/taopunk/enemies/furnace_beast.png",
+    "before_sha256": "d036a44e40f902be23b2bf7c61e7c638a45cf7623bcd0147d2bf275c365b10b8",
+    "after_sha256": "d036a44e40f902be23b2bf7c61e7c638a45cf7623bcd0147d2bf275c365b10b8"
+  },
+  {
+    "path": "assets/taopunk/enemies/glutton.png",
+    "before_sha256": "ab1e108fb8785c5a2fbd06547bf23503136983608d8d535e8c6b1ad64ce0bb34",
+    "after_sha256": "ab1e108fb8785c5a2fbd06547bf23503136983608d8d535e8c6b1ad64ce0bb34"
+  },
+  {
+    "path": "assets/taopunk/enemies/ink_creditor.png",
+    "before_sha256": "6c5005d06f16bdb7dd5e1d4c6aa5531501ebb7fb07f8c89cdae2d897f9718918",
+    "after_sha256": "6c5005d06f16bdb7dd5e1d4c6aa5531501ebb7fb07f8c89cdae2d897f9718918"
+  },
+  {
+    "path": "assets/taopunk/enemies/iron_seal.png",
+    "before_sha256": "1aad41ba27172406bf2b2861085ebcd2f39b472ae178ff9a48a5b28334bcf397",
+    "after_sha256": "1aad41ba27172406bf2b2861085ebcd2f39b472ae178ff9a48a5b28334bcf397"
+  },
+  {
+    "path": "assets/taopunk/enemies/leech.png",
+    "before_sha256": "921d7dc46117932862d641e7f46df5b2392b87d86a812d0297661d0011023acd",
+    "after_sha256": "921d7dc46117932862d641e7f46df5b2392b87d86a812d0297661d0011023acd"
+  },
+  {
+    "path": "assets/taopunk/enemies/needle_wasp.png",
+    "before_sha256": "e72cfd1b6ad2836540634260329ef3fd4187f72113119055cdaf73fede0735fc",
+    "after_sha256": "e72cfd1b6ad2836540634260329ef3fd4187f72113119055cdaf73fede0735fc"
+  },
+  {
+    "path": "assets/taopunk/enemies/nest_moth.png",
+    "before_sha256": "5db513a43731f9a72054e0c9055e95e29dd91fdaebd7fc9842764ad971df432b",
+    "after_sha256": "5db513a43731f9a72054e0c9055e95e29dd91fdaebd7fc9842764ad971df432b"
+  },
+  {
+    "path": "assets/taopunk/enemies/paper_guard.png",
+    "before_sha256": "3ec61f1f1c1e8d4d4590f9728688cec7cd84b1418e78e32efb862982d7fd8d3c",
+    "after_sha256": "3ec61f1f1c1e8d4d4590f9728688cec7cd84b1418e78e32efb862982d7fd8d3c"
+  },
+  {
+    "path": "assets/taopunk/enemies/paper_shell_soldier.png",
+    "before_sha256": "5a7b47e9930f5271b23e8d35bacd941f1d7ff931e797a864164f8bcbd59095e9",
+    "after_sha256": "5a7b47e9930f5271b23e8d35bacd941f1d7ff931e797a864164f8bcbd59095e9"
+  },
+  {
+    "path": "assets/taopunk/enemies/proof_boss.png",
+    "before_sha256": "218a6f5a98540ada9b687d81ada54aec585d8ef68b4da310acad54ebb02290e9",
+    "after_sha256": "218a6f5a98540ada9b687d81ada54aec585d8ef68b4da310acad54ebb02290e9"
+  },
+  {
+    "path": "assets/taopunk/enemies/rail_boss.png",
+    "before_sha256": "d77e49e8d013c6e4a0ff432f2d8633cfe0a022e207d7e6c99ab2e7580dfa03eb",
+    "after_sha256": "d77e49e8d013c6e4a0ff432f2d8633cfe0a022e207d7e6c99ab2e7580dfa03eb"
+  },
+  {
+    "path": "assets/taopunk/enemies/rust_scribe.png",
+    "before_sha256": "036368c71cbf3e6c51732ddd5c0b46e7f47cebe37262c4340c65305c2e98a5ef",
+    "after_sha256": "036368c71cbf3e6c51732ddd5c0b46e7f47cebe37262c4340c65305c2e98a5ef"
+  },
+  {
+    "path": "assets/taopunk/enemies/seal_officer.png",
+    "before_sha256": "62b4f8dd6adf161edd09200c5c06e9d920e7a8029c0dab279877403634863084",
+    "after_sha256": "62b4f8dd6adf161edd09200c5c06e9d920e7a8029c0dab279877403634863084"
+  },
+  {
+    "path": "assets/taopunk/enemies/tilting_inkstone.png",
+    "before_sha256": "def992f050b9545c0d0c5063deae4e2241502206840f48bfa4a0a2a056743930",
+    "after_sha256": "def992f050b9545c0d0c5063deae4e2241502206840f48bfa4a0a2a056743930"
+  },
+  {
+    "path": "assets/taopunk/enemies/wheel_master.png",
+    "before_sha256": "0cebe5f3b0b9022803cacc0ac8ff8bd03bbaf174454a842965d025e94ee5247d",
+    "after_sha256": "0cebe5f3b0b9022803cacc0ac8ff8bd03bbaf174454a842965d025e94ee5247d"
+  },
+  {
+    "path": "assets/taopunk/enemies/bronze_masks/blank_child.png",
+    "before_sha256": "4b5d1e0fcf2db9f05f473b734bc420d731ece3380d58a145d5834ce87b3511df",
+    "after_sha256": "4b5d1e0fcf2db9f05f473b734bc420d731ece3380d58a145d5834ce87b3511df"
+  },
+  {
+    "path": "assets/taopunk/enemies/bronze_masks/compiler_boss.png",
+    "before_sha256": "6030715870cff4252bdd6c27dc447805f514bb006ab9bfe44a1327533413c3c8",
+    "after_sha256": "6030715870cff4252bdd6c27dc447805f514bb006ab9bfe44a1327533413c3c8"
+  },
+  {
+    "path": "assets/taopunk/enemies/bronze_masks/copy_master.png",
+    "before_sha256": "ea17e5289b3471684ca6c2b080f608b3ac80329d2b39c781c2caa1ae291df171",
+    "after_sha256": "ea17e5289b3471684ca6c2b080f608b3ac80329d2b39c781c2caa1ae291df171"
+  },
+  {
+    "path": "assets/taopunk/enemies/bronze_masks/ink_creditor.png",
+    "before_sha256": "3a74fb48fd091216da0914ae53d6fa560de5c3883ebd6a6c92b0d918876f4359",
+    "after_sha256": "3a74fb48fd091216da0914ae53d6fa560de5c3883ebd6a6c92b0d918876f4359"
+  },
+  {
+    "path": "assets/taopunk/enemies/bronze_masks/proof_boss.png",
+    "before_sha256": "b63a779886086e5998d850b2e589a0526128c4eb18f900dff383d8c4cc98bb82",
+    "after_sha256": "b63a779886086e5998d850b2e589a0526128c4eb18f900dff383d8c4cc98bb82"
+  },
+  {
+    "path": "assets/taopunk/enemies/bronze_masks/seal_officer.png",
+    "before_sha256": "577ecc181f2910eaf0399b882a2a360c246c35760b066df8ba3bdd2afca9e448",
+    "after_sha256": "577ecc181f2910eaf0399b882a2a360c246c35760b066df8ba3bdd2afca9e448"
+  },
+  {
+    "path": "assets/taopunk/enemies/bronze_masks/wheel_master.png",
+    "before_sha256": "9ee6418a362524113ed2361d219f74170cb730eb9a614d12d533de51f19dd00f",
+    "after_sha256": "9ee6418a362524113ed2361d219f74170cb730eb9a614d12d533de51f19dd00f"
+  },
+  {
+    "path": "assets/taopunk/enemies/human_repaint/blank_child.png",
+    "before_sha256": "6193a52df45f4ca44ea83a2d7c74ad6731ca55ec563b9215fd58970513694057",
+    "after_sha256": "6193a52df45f4ca44ea83a2d7c74ad6731ca55ec563b9215fd58970513694057"
+  },
+  {
+    "path": "assets/taopunk/enemies/human_repaint/compiler_boss.png",
+    "before_sha256": "ac70d1afefbbb6ae37b0be149f4a936c8a8610c3bead421638589fd787bf76ec",
+    "after_sha256": "ac70d1afefbbb6ae37b0be149f4a936c8a8610c3bead421638589fd787bf76ec"
+  },
+  {
+    "path": "assets/taopunk/enemies/human_repaint/copy_master.png",
+    "before_sha256": "6c5945583e37f28c8284ef64f15f135bdf2a069563a267a79d59dd5c8037cee0",
+    "after_sha256": "6c5945583e37f28c8284ef64f15f135bdf2a069563a267a79d59dd5c8037cee0"
+  },
+  {
+    "path": "assets/taopunk/enemies/human_repaint/ink_creditor.png",
+    "before_sha256": "c5eb7f4569171ad637a229315f1767abc5fe20bc04edac2ab9239786214a0485",
+    "after_sha256": "c5eb7f4569171ad637a229315f1767abc5fe20bc04edac2ab9239786214a0485"
+  },
+  {
+    "path": "assets/taopunk/enemies/human_repaint/proof_boss.png",
+    "before_sha256": "15f805189f65949c42b56418a2f19223d2c55e5b47e74d65522ab7d4069e8d85",
+    "after_sha256": "15f805189f65949c42b56418a2f19223d2c55e5b47e74d65522ab7d4069e8d85"
+  },
+  {
+    "path": "assets/taopunk/enemies/human_repaint/seal_officer.png",
+    "before_sha256": "c2bb4b490452b1e87687f834a04815e03345b1b51e3e553ec09247eb5fa057b3",
+    "after_sha256": "c2bb4b490452b1e87687f834a04815e03345b1b51e3e553ec09247eb5fa057b3"
+  },
+  {
+    "path": "assets/taopunk/enemies/human_repaint/wheel_master.png",
+    "before_sha256": "d4ea197a2fb8836fd2c408ecf83417c4d233e485aa190df38e7f83c1b0d9ad65",
+    "after_sha256": "d4ea197a2fb8836fd2c408ecf83417c4d233e485aa190df38e7f83c1b0d9ad65"
+  },
+  {
+    "path": "assets/taopunk/enemies/object_creatures/compiler_boss.png",
+    "before_sha256": "40ca8d5924419b958beafd1dfd605047ad90dd69b270afb95aaa4b721e55db50",
+    "after_sha256": "40ca8d5924419b958beafd1dfd605047ad90dd69b270afb95aaa4b721e55db50"
+  },
+  {
+    "path": "assets/taopunk/enemies/object_creatures/copy_master.png",
+    "before_sha256": "47a6fbaabeec657caa4f624d3e99bc046ac07864b12924d2503f0ebd0e1acecc",
+    "after_sha256": "47a6fbaabeec657caa4f624d3e99bc046ac07864b12924d2503f0ebd0e1acecc"
+  },
+  {
+    "path": "assets/taopunk/enemies/object_creatures/ink_creditor.png",
+    "before_sha256": "4107d6bc6955d7f0d78d9e646a1d25a495fed5a1d97703217e15a9a89a944b0f",
+    "after_sha256": "4107d6bc6955d7f0d78d9e646a1d25a495fed5a1d97703217e15a9a89a944b0f"
+  },
+  {
+    "path": "assets/taopunk/enemies/object_creatures/proof_boss.png",
+    "before_sha256": "c3f93d2450fff7f34170056d4d881d313ebfed175be9004ca16c040edeb2d84f",
+    "after_sha256": "c3f93d2450fff7f34170056d4d881d313ebfed175be9004ca16c040edeb2d84f"
+  },
+  {
+    "path": "assets/taopunk/enemies/object_creatures/seal_officer.png",
+    "before_sha256": "3f886ccdf53b3b156eb463761dda2c7af7511c243817a3917a7aeab7d70ab1de",
+    "after_sha256": "3f886ccdf53b3b156eb463761dda2c7af7511c243817a3917a7aeab7d70ab1de"
+  },
+  {
+    "path": "assets/taopunk/enemies/object_creatures/wheel_master.png",
+    "before_sha256": "2eb1a738d82e2c0cbf80f004f5e34a52ab325fae621d44f44830338f34089115",
+    "after_sha256": "2eb1a738d82e2c0cbf80f004f5e34a52ab325fae621d44f44830338f34089115"
+  },
+  {
+    "path": "assets/taopunk/enemies/zodiac_masks/compiler_boss.png",
+    "before_sha256": "4e3df44ace6e51af9eb8370dd9144141f7dd4bf5b99739cf5b27ab11f9b40ef7",
+    "after_sha256": "4e3df44ace6e51af9eb8370dd9144141f7dd4bf5b99739cf5b27ab11f9b40ef7"
+  },
+  {
+    "path": "assets/taopunk/enemies/zodiac_masks/copy_master.png",
+    "before_sha256": "28460fd11e1cd58cc013a83afba659c2a469e1e887caba82ed93910e6c37c2c5",
+    "after_sha256": "28460fd11e1cd58cc013a83afba659c2a469e1e887caba82ed93910e6c37c2c5"
+  },
+  {
+    "path": "assets/taopunk/enemies/zodiac_masks/ink_creditor.png",
+    "before_sha256": "a7c21d038f5b50b78fd8cdb3b684f7a715cd194bf457275c48984804f429f3df",
+    "after_sha256": "a7c21d038f5b50b78fd8cdb3b684f7a715cd194bf457275c48984804f429f3df"
+  },
+  {
+    "path": "assets/taopunk/enemies/zodiac_masks/proof_boss.png",
+    "before_sha256": "d75188b2b365828bfa2f18db71141e6db2e9f47e735eaa2bec2356d093ef532b",
+    "after_sha256": "d75188b2b365828bfa2f18db71141e6db2e9f47e735eaa2bec2356d093ef532b"
+  },
+  {
+    "path": "assets/taopunk/enemies/zodiac_masks/seal_officer.png",
+    "before_sha256": "cb4940560182ef974b04ecf4a1bffecf824ad990af35f3d90939d824bb79432b",
+    "after_sha256": "cb4940560182ef974b04ecf4a1bffecf824ad990af35f3d90939d824bb79432b"
+  },
+  {
+    "path": "assets/taopunk/enemies/zodiac_masks/wheel_master.png",
+    "before_sha256": "6f8671a9acbcc9733c057642bdee28797b972cdd59596bc2af520c653ce09b72",
+    "after_sha256": "6f8671a9acbcc9733c057642bdee28797b972cdd59596bc2af520c653ce09b72"
+  }
+]

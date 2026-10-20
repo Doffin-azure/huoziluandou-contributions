@@ -50,12 +50,12 @@ func _ready() -> void:
 	var close := JourneyStyle.button("关闭", _close)
 	close.custom_minimum_size.y = 48 * JourneyStyle.touch_scale(self)
 	header.add_child(close)
-	_summary = JourneyStyle.label("牌库 %d 枚 · 遗物 %d 件 · 金币 %d · 字匣 %d 枚" % [GameState.deck_size(), GameState.relics.size(), GameState.gold, tray().size()], "Muted")
+	_summary = JourneyStyle.label("牌库 %d 枚 · 遗物 %d 件 · 铜钱 %d · 字匣 %d 枚" % [GameState.deck_size(), GameState.relics.size(), GameState.gold, tray().size()], "Muted")
 	_summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_summary)
 	var tabs := HBoxContainer.new()
 	col.add_child(tabs)
-	for entry in [["deck", "牌库"], ["relics", "遗物"], ["gold", "金币"], ["tray", "字匣"]]:
+	for entry in [["deck", "牌库"], ["relics", "遗物"], ["gold", "铜钱"], ["tray", "字匣"]]:
 		var button := JourneyStyle.button(entry[1], show_tab.bind(entry[0]))
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.custom_minimum_size.y = 48 * JourneyStyle.touch_scale(self)
@@ -93,7 +93,7 @@ func show_tab(tab: String) -> void:
 					var interval := maxi(1, BattleBalance.i("egg_interval", Relics.EGG_EVERY))
 					body += "\n获胜进度：%d / %d" % [int(GameState.relic_counters.get(id, 0)) % interval, interval]
 				_entry(Relics.name_of(id), body)
-		"gold": _entry("金币 %d" % GameState.gold, "本局当前持有的金币，可在商店和部分事件中使用。")
+		"gold": _entry("铜钱 %d" % GameState.gold, "本局当前持有的铜钱，可在商店和部分事件中使用。")
 		"tray":
 			var capacity := tray_capacity()
 			if capacity == 0: _entry("当前模式没有字匣", "获得的字直接收入牌库。")

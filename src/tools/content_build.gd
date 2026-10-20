@@ -252,8 +252,8 @@ static func handler_note(handler: String, amount: int, status: String, args: Dic
 		"energy": return "获得 %d 点储能" % amount
 		"heat": return "热度 %+d" % amount if amount != 0 else "热度不变"
 		"heat_clear": return "清空当前热度"
-		"gold": return "获得 %d 金币" % amount
-		"gold": return "获得 %d 点金币" % amount
+		"gold": return "获得 %d 铜钱" % amount
+		"gold": return "获得 %d 点铜钱" % amount
 		"apply_status_self": return "获得状态【%s】×%d" % [status_name(status), max(1, amount)]
 		"apply_status_enemy": return "使敌人获得【%s】×%d" % [status_name(status), max(1, amount)]
 		"remove_enemy_block": return "移除敌人全部护盾"
@@ -275,11 +275,11 @@ static func handler_note(handler: String, amount: int, status: String, args: Dic
 		"transform_board": return "随机揭示 %d 枚实体字，选 1 枚替换盘面指定字" % int(args.get("reveal", 5))
 		"split_grow": return "删除一个盘面字，四周生长可组词临时字"
 		"empower_glyph": return "选择一个字，本场它被打出时额外触发单字效果"
-		"refine_remove": return "热度 -%d、金币 +%d，并移出一张牌" % [int(args.get("heat", 3)), int(args.get("gold", 4))]
+		"refine_remove": return "热度 -%d、铜钱 +%d，并移出一张牌" % [int(args.get("heat", 3)), int(args.get("gold", 4))]
 		"fuse_cards": return "选两张相邻己方牌融合为一格（本场不可拆）"
 		"refine_layer": return "选两枚同字原实体，第一枚本场每次入盘恢复 2 次额外使用，第二枚回袋"
-		"gild_glyph": return "选一枚字袋实体永久镀金；每次单字或组词打出+1金币"
-		"precision_place": return "支付 %d 金币，把弃字堆一枚字放进指定空格" % amount
+		"gild_glyph": return "选一枚字袋实体永久镀金；每次单字或组词打出+1铜钱"
+		"precision_place": return "支付 %d 铜钱，把弃字堆一枚字放进指定空格" % amount
 		"recast_board": return "把盘面上已有的字全部重新替换"
 		"recast_copy": return "从弃字堆选一张，把临时复制放进指定空格"
 		"repeat_last": return "复制上一手成功出字的末字为临时副本，不能复制【再】本身"
@@ -361,22 +361,22 @@ static func word_effects(word: String) -> Array:
 		"超速": return [e("ability_double_draw_next", 4, -1, "", "本回合下一次补字翻倍，最多额外 4 字；每额外 1 字升温 1", {}, -1, "next_word")]
 		# 经济
 		"金币": return [e("gold", 3)]
-		"投币": return [e("spend_gold_damage", 5, T.ENEMY, "", "支付最多 3 金币，每金币造成 5 伤", {"max": 3})]
-		"收购": return [e("capture_glyph", 4, T.ENEMY_GLYPH, "", "支付 4 金币，净化并永久收编一枚敌方实体字", {})]
+		"投币": return [e("spend_gold_damage", 5, T.ENEMY, "", "支付最多 3 铜钱，每铜钱造成 5 伤", {"max": 3})]
+		"收购": return [e("capture_glyph", 4, T.ENEMY_GLYPH, "", "支付 4 铜钱，净化并永久收编一枚敌方实体字", {})]
 		"复利投资": return [e("gild_glyph", 0, -1, "", WordDescriptionsS.TEXT[word], {"cost": 0}), e("gold", 3)]
 		# ---- 蓄放进阶 ----
 		"放热": return [e("energy_to_heat_damage", 2, T.ENEMY, "", "消耗全部储能：转为热度并对敌每点 2 伤", {"per": 2})]
 		"热能": return [e("heat_to_energy", 1, -1, "", "当前热度转为等量储能")]
 		"电流": return [e("flow_energy_or_draw", 2, -1, "", "本回合已补字则储能 +2，否则补 2 字", {})]
-		# ---- 普通金币 / 镀金 ----
+		# ---- 普通铜钱 / 镀金 ----
 		"投资": return [e("gild_glyph", 3, -1, "", WordDescriptionsS.TEXT[word], {"cost": 3})]
 		"利息": return [e("gold_percent_damage", 10, T.ENEMY, "", WordDescriptionsS.TEXT["利息"])]
 		"炼金": return [e("gold", 3), e("draw_random", 1)]
 		"纯金": return [e("gold", 3)]
-		"合金": return [e("alloy", 6, -1, "", "获得 6 持久盾与 2 金币", {"gold": 2})]
-		"铸币": return [e("mint", 2, -1, "", "获得 2 金币，并在原格生成一枚临时【币】", {"gold": 2})]
+		"合金": return [e("alloy", 6, -1, "", "获得 6 持久盾与 2 铜钱", {"gold": 2})]
+		"铸币": return [e("mint", 2, -1, "", "获得 2 铜钱，并在原格生成一枚临时【币】", {"gold": 2})]
 		"再投资": return [e("gild_glyph", 3, -1, "", WordDescriptionsS.TEXT[word], {"cost": 3}), e("draw_random", 2)]
-		"重金": return [e("bounty", 12, T.ENEMY, "", "支付 5 金币悬赏，本回合击杀返 12，否则本金不返", {"cost": 5})]
+		"重金": return [e("bounty", 12, T.ENEMY, "", "支付 5 铜钱悬赏，本回合击杀返 12，否则本金不返", {"cost": 5})]
 		# ---- 热暴 P3 ----
 		"爆冷": return [e("cold_snap", 4, T.ENEMY, "", "4 伤 + 上回合每失 1 生命额外 2 伤，清空热度", {"per": 2})]
 		"停火": return [e("ceasefire", 1, -1, "", "本回合未造成敌伤则免疫敌方攻击", {}, -1, "persistent")]
@@ -398,13 +398,13 @@ static func word_effects(word: String) -> Array:
 		"重复": return [e("repeat_word", 0, -1, "", "开启后每回合第一次有效多字词再执行一次其即时效果（不重复消耗字；需支付的照常再付）", {}, -1, "persistent")]
 		"防火": return [e("fireproof", 0, -1, "", "本场持续：自己打出的灼热【热】不再扣血（仍占字袋、不被自动净化）", {}, -1, "persistent")]
 		"防爆": return [e("blastproof", 0, -1, "", "本场持续：被爆破/爆炸摧毁的己方实体字改为回字袋，每救回 1 枚 +1 持久盾", {}, -1, "persistent")]
-		"合资": return [e("joint_funding", 0, -1, "", "本场持续：支付金币发动词效时可用 2 储能抵 1 金币，允许混合支付", {}, -1, "persistent")]
-		"分利": return [e("profit_share", 0, -1, "", "本回合剩余时间，每当实际获得金币就额外获得等量储能", {})]
+		"合资": return [e("joint_funding", 0, -1, "", "本场持续：支付铜钱发动词效时可用 2 储能抵 1 铜钱，允许混合支付", {}, -1, "persistent")]
+		"分利": return [e("profit_share", 0, -1, "", "本回合剩余时间，每当实际获得铜钱就额外获得等量储能", {})]
 		"停息": return [e("suspend", 0, -1, "", "立即结束出字阶段：清零全部热度，每 1 热度换 2 持久盾；敌人正常行动", {})]
 		# ---- 盘面改造（设计负责人直接定义）----
 		"转化": return [e("transform_board", 5, T.BOARD_TILE, "", "随机揭示 5 枚实体字，选 1 枚，把一个盘面字定向改成它", {"reveal": 5})]
 		"分化": return [e("split_grow", 4, T.BOARD_TILE, "", "删除一个盘面字，在其上下左右的空格各生长一枚可组词的临时字（打出即消耗，不进字袋）", {"max": 4})]
 		"强化": return [e("empower_glyph", 0, -1, "", "选择字袋中一个字；本场它被打出时（单字或成词）额外触发其单字效果", {})]
-		"炼化": return [e("refine_remove", 3, -1, "", "热度 -3、获得 4 金币，并指定一张牌在本场战斗移出循环", {"heat": 3, "gold": 4})]
+		"炼化": return [e("refine_remove", 3, -1, "", "热度 -3、获得 4 铜钱，并指定一张牌在本场战斗移出循环", {"heat": 3, "gold": 4})]
 		"精力": return [e("vigor", 0, -1, "", "本回合每打出一种不同的多字词，下回合基础补字 +1", {}, -1, "persistent")]
 	return []

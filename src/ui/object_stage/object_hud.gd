@@ -7,10 +7,12 @@ var action_text := ""
 var secondary_text := ""
 var on_action: Callable
 var on_secondary: Callable
-## 可选的第三个按钮（如商店刷新）；文字为空就不显示
 var tertiary_text := ""
 var on_tertiary: Callable
 var tertiary_button: Button
+var on_deck: Callable
+
+
 var detail_title: Label
 var description: EffectText
 var action_button: Button
@@ -49,6 +51,7 @@ func _ready() -> void:
 	status_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	status_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	header.add_child(status_label)
+	if on_deck.is_valid(): header.add_child(JourneyStyle.button("字袋", on_deck))
 	var empty := Ink.expander()
 	empty.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	main.add_child(empty)
@@ -76,19 +79,21 @@ func _ready() -> void:
 	actions.custom_minimum_size.x = 228 * factor
 	footer.add_child(actions)
 	action_button = JourneyStyle.button(action_text, on_action, true)
+	action_button.custom_minimum_size.y = 48 * factor
 	actions.add_child(action_button)
 	secondary_button = JourneyStyle.button(secondary_text, on_secondary)
+	secondary_button.custom_minimum_size.y = 48 * factor
 	if tertiary_text.is_empty():
 		actions.add_child(secondary_button)
 	else:
-		# 第三个按钮和次按钮并排，不加高底栏
 		var row := Ink.hbox(8)
 		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		actions.add_child(row)
 		tertiary_button = JourneyStyle.button(tertiary_text, on_tertiary)
-		for b in [tertiary_button, secondary_button]:
-			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			row.add_child(b)
+		for button in [tertiary_button, secondary_button]:
+			button.custom_minimum_size.y = 48 * factor
+			button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			row.add_child(button)
 	resized.connect(_layout)
 	_layout.call_deferred()
 

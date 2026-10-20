@@ -40,7 +40,7 @@ func _shot(name: String) -> void:
 
 func _run() -> void:
 	_old_style = Settings.visual_style
-	_old_font = Settings.board_font_path
+	_old_font = Settings.board_font_id
 	_old_path = Settings.storage_path
 	_old_cfg = Settings._cfg
 	_old_release = Settings.drag_release_play
@@ -48,6 +48,7 @@ func _run() -> void:
 	Settings.storage_path = _settings_path
 	Settings.visual_style = "taopunk"
 	Settings.drag_release_play = false
+	Settings.set_board_font_id(BoardTypography.DEFAULT_ID)
 	Ink.apply_style(GameStyle.taopunk())
 	get_window().size = Vector2i(1280, 720)
 	await _frames()
@@ -63,12 +64,12 @@ func _run() -> void:
 	for i in range(16, 32): _screen.battle.bag.append(GameState.deck[i])
 	_screen._refresh_all()
 	await _frames(25)
-	_ok(Palette.STYLE_ID == "taopunk" and Palette.TILE_KIND == "bronze", "青铜绘卷使用独立风格令牌")
-	_ok(stage._illustrated_backdrop.visible and not stage._display.visible and not stage.shared_table_active(), "定稿环境为独立手绘背景，保留书房场景供切换")
-	_ok(stage.viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED, "手绘战斗中停用隐藏的书房 3D 渲染")
+	_ok(Palette.STYLE_ID == "taopunk" and Palette.WOOD == Color("1f4946"), "青铜绘卷使用独立风格令牌")
+	_ok(stage._illustrated_backdrop.visible, "定稿环境为独立手绘背景")
+	_ok(stage.find_children("*", "SubViewport", true, false).is_empty() and stage.find_children("*", "Node3D", true, false).is_empty(), "旧书房和桌面不再创建隐藏视口或模型")
 	var board: BoardView = _screen._board_view
 	var presentation: BoardPresentation3D = board._presentation
-	_ok(presentation != null and presentation.actors.size() == 16 and presentation._shared_stage == null, "16 个字块仍有真实独立 3D 命中与动效")
+	_ok(presentation != null and presentation.actors.size() == 16 and presentation._tray.get_viewport() == presentation.viewport, "16 个字块仍有真实独立 3D 命中与动效")
 	_ok(presentation.get_children().any(func(child): return child is BronzeFrame), "青铜框独立于实时字块")
 	_ok(FileAccess.get_sha256("res://assets/taopunk/ink_guardian.png") == "ae32f6668a72608b730ca0215f3a35541851a3657533d25c45dae11f2a9ce915", "墨灵素材保持原版本，未采用精简或重绘稿")
 	var paths := []
@@ -92,8 +93,8 @@ func _run() -> void:
 	board._sync_selection()
 	get_window().size = Vector2i(1980, 792)
 	await _frames()
-	_ok(_screen._preview_panel.size.aspect() > 0.9 and _screen._preview_panel.size.aspect() < 1.1, "宽屏纸面保留定稿近方形构图")
-	_ok(board.size.x < _screen.size.x * 0.32 and _screen._topbar.size.x < _screen.size.x * 0.85, "桌面字盘与顶栏留出场景空间")
+	_ok(not _screen._preview_panel.get_rect().intersects(board.get_rect()) and _screen._preview_panel.size.y >= _screen.size.y * 0.7, "宽屏侧栏按窗口扩展且不覆盖字盘")
+	_ok(board.size.y >= _screen.size.y * 0.7 and _screen._topbar.size.x >= _screen.size.x * 0.9, "桌面字盘与顶栏充分使用窗口空间")
 	await _shot("taopunk-battle-reference-aspect")
 	_ok(not _screen._bubble._scroll.get_v_scroll_bar().visible, "定稿击破词效完整呈现，无需滚动")
 	get_window().size = Vector2i(1280, 720)
@@ -104,15 +105,20 @@ func _run() -> void:
 	var picker := BoardFontPicker.new()
 	_screen.add_child(picker)
 	var original_font: Font = Ink.board_font
-	picker._choose("res://assets/fonts/NotoSerifSC-VF.ttf")
+	picker._choose("serif_bold")
 	_ok(Ink.board_font != original_font and presentation.actors[0].glyph.font == Ink.board_font, "字体选择实时更新 3D 字盘字形")
-	_ok(board.tiles[0]._glyph.get_theme_font("font") == Ink.board_font, "2D 字盘回退也使用自定义字体")
+	_ok(board.tiles[0]._glyph.get_theme_font("font") == Ink.board_font, "2D 字盘回退也使用选中的内置字体")
 	var preferences := ConfigFile.new()
-	_ok(preferences.load(_settings_path) == OK and preferences.get_value("visual", "board_font") == "res://assets/fonts/NotoSerifSC-VF.ttf", "字体路径保存到配置")
+	_ok(preferences.load(_settings_path) == OK and preferences.get_value("visual", "board_font_id") == "serif_bold" and not preferences.has_section_key("visual", "board_font"), "配置只保存内置字体 ID")
 	picker._choose("res://missing-font.ttf")
-	_ok(Ink.board_font == presentation.actors[0].glyph.font and Settings.board_font_path == "res://assets/fonts/NotoSerifSC-VF.ttf", "无效字体不覆盖当前选择")
-	_ok(BoardTypography.load_font("res://project.godot", Ink.serif) == null, "非字体文件被拒绝")
-	Settings.set_board_font_path("")
+	_ok(Ink.board_font == presentation.actors[0].glyph.font and Settings.board_font_id == "serif_bold", "文件路径不覆盖内置字体选择")
+	_ok(BoardTypography.font_for_id("res://project.godot") == Ink.serif, "字体解析只使用内置白名单")
+	for entry in BoardTypography.STYLES:
+		picker._buttons[entry.id].pressed.emit()
+		_ok(Settings.board_font_id == entry.id and presentation.actors[0].glyph.font == BoardTypography.font_for_id(entry.id) and picker._buttons[entry.id].button_pressed, "内置样式 %s 可通过按钮实时选择" % entry.name)
+		await _shot("taopunk-battle-font-" + entry.id)
+	_ok(picker.find_children("*", "FileDialog", true, false).is_empty(), "字体设置不提供文件选择器")
+	Settings.set_board_font_id(BoardTypography.DEFAULT_ID)
 	_ok(Ink.board_font == Ink.serif, "恢复默认字体")
 	picker.queue_free()
 	_ok(_screen.battle.get_instance_id() == battle_id and _screen.battle.rng.state == rng_state and board.path.size() == 2, "字体切换不重置战斗、连线或随机数")
@@ -139,13 +145,13 @@ func _run() -> void:
 	var settings: SettingsOverlay = PauseMenu._instance._settings
 	_ok(settings.find_children("*", "Control", true, false).any(func(child): return child is BoardFontPicker), "真实设置页提供字体入口")
 	await _shot("taopunk-settings-phone")
-	settings._set_style("paper")
-	_ok(Palette.STYLE_ID == "taopunk" and Ink.pending_style == "paper" and _screen.battle.get_instance_id() == battle_id, "战斗切换风格延后生效，不拆解当前战斗")
+	settings.find_children("*", "Button", true, false).filter(func(b): return b.text == "关闭")[0].pressed.emit()
+	_ok(Palette.STYLE_ID == "taopunk" and _screen.battle.get_instance_id() == battle_id, "关闭设置保留青铜绘卷与当前战斗")
 	Router.goto("res://src/screens/map_screen.gd")
 	await _frames()
-	_ok(Palette.STYLE_ID == "paper" and Ink.pending_style.is_empty(), "离开战斗后应用待切换风格")
+	_ok(Palette.STYLE_ID == "taopunk", "离开战斗后仍使用青铜绘卷")
 	Settings.visual_style = _old_style
-	Settings.board_font_path = _old_font
+	Settings.board_font_id = _old_font
 	Settings.storage_path = _old_path
 	Settings._cfg = _old_cfg
 	Settings.drag_release_play = _old_release

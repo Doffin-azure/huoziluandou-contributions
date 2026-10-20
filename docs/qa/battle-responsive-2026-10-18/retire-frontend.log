@@ -1,0 +1,72 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS isolated settings directory is available
+PASS neon isolated settings fixture saves
+PASS neon resolves to a supported theme
+PASS neon migration preserves motion, input and volume, and uses bundled font
+PASS neon setter persists supported ids without legacy theme or font paths
+PASS unknown isolated settings fixture saves
+PASS unknown resolves to a supported theme
+PASS unknown migration preserves motion, input and volume, and uses bundled font
+PASS unknown setter persists supported ids without legacy theme or font paths
+PASS paper isolated settings fixture saves
+PASS paper resolves to a supported theme
+PASS paper migration preserves motion, input and volume, and uses bundled font
+PASS paper setter persists supported ids without legacy theme or font paths
+PASS taopunk isolated settings fixture saves
+PASS taopunk resolves to a supported theme
+PASS taopunk migration preserves motion, input and volume, and uses bundled font
+PASS taopunk setter persists supported ids without legacy theme or font paths
+PASS font migration accepts only bundled IDs: C:/Windows/Fonts/simsun.ttc
+PASS font migration removes external paths and preserves unrelated data
+PASS runtime rejects external font paths and unknown IDs
+PASS bundled font selection survives restart
+PASS font migration accepts only bundled IDs: user://untrusted.ttf
+PASS font migration removes external paths and preserves unrelated data
+PASS runtime rejects external font paths and unknown IDs
+PASS bundled font selection survives restart
+PASS font migration accepts only bundled IDs: res://project.godot
+PASS font migration removes external paths and preserves unrelated data
+PASS runtime rejects external font paths and unknown IDs
+PASS bundled font selection survives restart
+PASS font migration accepts only bundled IDs: https://example.com/font.ttf
+PASS font migration removes external paths and preserves unrelated data
+PASS runtime rejects external font paths and unknown IDs
+PASS bundled font selection survives restart
+PASS font migration accepts only bundled IDs: ../font.otf
+PASS font migration removes external paths and preserves unrelated data
+PASS runtime rejects external font paths and unknown IDs
+PASS bundled font selection survives restart
+PASS font migration accepts only bundled IDs: unknown
+PASS font migration removes external paths and preserves unrelated data
+PASS runtime rejects external font paths and unknown IDs
+PASS bundled font selection survives restart
+PASS font migration accepts only bundled IDs: serif_light
+PASS font migration removes external paths and preserves unrelated data
+PASS runtime rejects external font paths and unknown IDs
+PASS bundled font selection survives restart
+PASS font migration accepts only bundled IDs: serif_bold
+PASS font migration removes external paths and preserves unrelated data
+PASS runtime rejects external font paths and unknown IDs
+PASS bundled font selection survives restart
+PASS font migration accepts only bundled IDs: wenkai
+PASS font migration removes external paths and preserves unrelated data
+PASS runtime rejects external font paths and unknown IDs
+PASS bundled font selection survives restart
+PASS font migration accepts only bundled IDs: longcang
+PASS font migration removes external paths and preserves unrelated data
+PASS runtime rejects external font paths and unknown IDs
+PASS bundled font selection survives restart
+PASS bundled font covers all database glyphs: []
+PASS bundled font and bundled fallback cover all game glyphs: 思源宋体 · 标准
+PASS bundled font and bundled fallback cover all game glyphs: 思源宋体 · 细体
+PASS bundled font and bundled fallback cover all game glyphs: 思源宋体 · 粗体
+PASS bundled font and bundled fallback cover all game glyphs: 霞鹜文楷 · 楷体
+PASS bundled font and bundled fallback cover all game glyphs: 龙藏体 · 草书
+PASS retired theme factory is removed and new tokens use the approved style
+PASS taopunk retains its paper and wood materials
+PASS taopunk keeps its exact panel color, radius and shadow behavior
+PASS settings retain the font picker without theme switching
+[frontend_cleanup_test] PASS=67 FAIL=0

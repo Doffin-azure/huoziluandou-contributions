@@ -1,0 +1,86 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS route retains 72% height at [2436, 1120, 480]
+PASS route nodes retain touch targets
+PASS route node captions remain inside route
+PASS late route focuses the current node
+PASS rest action visible without scrolling: 选择调息
+PASS rest action visible without scrolling: 选择删字
+PASS rest action visible without scrolling: 选择修饰
+PASS touch removal needs no right mouse button
+PASS expedition retains 65% map height
+PASS map has priority over inspector width
+PASS current expedition cell visible
+PASS relic summary has a readable line height
+PASS tabs preserve steps and RNG
+PASS touch guide retains chase and ambush rules
+PASS guide close action visible before scrolling
+PASS reading guide preserves gameplay state
+PASS route retains 72% height at [1600, 720, 320]
+PASS route nodes retain touch targets
+PASS route node captions remain inside route
+PASS late route focuses the current node
+PASS rest action visible without scrolling: 选择调息
+PASS rest action visible without scrolling: 选择删字
+PASS rest action visible without scrolling: 选择修饰
+PASS touch removal needs no right mouse button
+PASS expedition retains 65% map height
+PASS map has priority over inspector width
+PASS current expedition cell visible
+PASS relic summary has a readable line height
+PASS tabs preserve steps and RNG
+PASS touch guide retains chase and ambush rules
+PASS guide close action visible before scrolling
+PASS reading guide preserves gameplay state
+PASS route retains 72% height at [2400, 1080, 440]
+PASS route nodes retain touch targets
+PASS route node captions remain inside route
+PASS late route focuses the current node
+PASS rest action visible without scrolling: 选择调息
+PASS rest action visible without scrolling: 选择删字
+PASS rest action visible without scrolling: 选择修饰
+PASS touch removal needs no right mouse button
+PASS expedition retains 65% map height
+PASS map has priority over inspector width
+PASS current expedition cell visible
+PASS relic summary has a readable line height
+PASS tabs preserve steps and RNG
+PASS touch guide retains chase and ambush rules
+PASS guide close action visible before scrolling
+PASS reading guide preserves gameplay state
+PASS route retains 72% height at [3200, 1440, 560]
+PASS route nodes retain touch targets
+PASS route node captions remain inside route
+PASS late route focuses the current node
+PASS rest action visible without scrolling: 选择调息
+PASS rest action visible without scrolling: 选择删字
+PASS rest action visible without scrolling: 选择修饰
+PASS touch removal needs no right mouse button
+PASS expedition retains 65% map height
+PASS map has priority over inspector width
+PASS current expedition cell visible
+PASS relic summary has a readable line height
+PASS tabs preserve steps and RNG
+PASS touch guide retains chase and ambush rules
+PASS guide close action visible before scrolling
+PASS reading guide preserves gameplay state
+PASS route retains 72% height at [1280, 720, 320]
+PASS route nodes retain touch targets
+PASS route node captions remain inside route
+PASS late route focuses the current node
+PASS rest action visible without scrolling: 选择调息
+PASS rest action visible without scrolling: 选择删字
+PASS rest action visible without scrolling: 选择修饰
+PASS touch removal needs no right mouse button
+PASS expedition retains 65% map height
+PASS map has priority over inspector width
+PASS current expedition cell visible
+PASS relic summary has a readable line height
+PASS tabs preserve steps and RNG
+PASS touch guide retains chase and ambush rules
+PASS guide close action visible before scrolling
+PASS reading guide preserves gameplay state
+DENSITY LAYOUT: 80 passed, 0 failed

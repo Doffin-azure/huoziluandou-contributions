@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-20",
+  "renderer": "Godot 4.7.2 Compatibility / NVIDIA RTX 4060 Laptop",
+  "test": {
+    "scene": "res://tests/enemy_art_completion_test.tscn",
+    "passed": 429,
+    "failed": 0,
+    "log": "test.log"
+  },
+  "masked_assets": 6,
+  "species": {
+    "ink_creditor": "鼠",
+    "copy_master": "牛",
+    "seal_officer": "虎",
+    "wheel_master": "马",
+    "proof_boss": "蛇",
+    "compiler_boss": "龙"
+  },
+  "blank_child": {
+    "path": "assets/taopunk/enemies/human_repaint/blank_child.png",
+    "sha256": "6193a52df45f4ca44ea83a2d7c74ad6731ca55ec563b9215fd58970513694057",
+    "preserved": true
+  },
+  "historical_asset_hashes_verified": {
+    "original": 16,
+    "human_repaint": 7,
+    "bronze_mask_draft": 7
+  },
+  "all_new_dimensions_match_input": true,
+  "alpha_verified": true,
+  "mipmaps_enabled": true,
+  "sha256_verified": true,
+  "manifest": "assets/taopunk/enemies/zodiac_masks/manifest.json",
+  "motion_adjustments": [
+    "Ox and dragon horns included in head influence regions.",
+    "Compiler scroll rotation reduced to avoid inverted hem triangles."
+  ],
+  "video": {
+    "path": "human-motion-preview.mp4",
+    "size": [
+      1280,
+      900
+    ],
+    "fps": 12,
+    "duration": 5.0,
+    "sha256": "d0a49a19ead79008b9a5f5ded245fb74ed8aa3d085b7bf0e9d53147ae55f22a9"
+  },
+  "screenshots": [
+    "all-seven.png",
+    "battle-compiler_boss.png",
+    "battle-proof_boss.png",
+    "mask-comparison.png",
+    "motion-attack.png",
+    "motion-death.png",
+    "motion-hit.png",
+    "motion-idle.png",
+    "motion-special.png",
+    "phone-compiler_boss.png",
+    "phone-proof_boss.png",
+    "six-zodiac-masks.png"
+  ],
+  "notes": [
+    "Phone aspect simulated on desktop, not a device performance test.",
+    "Preview video samples animation at 12 fps."
+  ]
+}

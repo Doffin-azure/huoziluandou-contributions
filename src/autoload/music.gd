@@ -37,6 +37,8 @@ func track_for_screen(screen_path: String) -> String:
 		return "title"
 	if screen_path.ends_with("/battle_screen.gd"):
 		return "battle"
+	if screen_path.ends_with("/defeat_screen.gd"):
+		return "defeat"
 	if screen_path.begins_with("res://src/screens/"):
 		return "explore"
 	return ""

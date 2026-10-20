@@ -1,0 +1,281 @@
+{
+  "generator": "built-in image_gen",
+  "date": "2026-10-20",
+  "transparent_background": true,
+  "artworks": [
+    {
+      "id": "blank_child",
+      "name": "留白童",
+      "design": "a small solemn child spirit, tiny ivory mask-like face with two low dark eyes, oversized completely blank warm ivory robe widening from narrow shoulders into a soft trapezoid, wide sleeves with dark oval openings, two tiny ink-blue hands and short feet. Stand with sleeves slightly separated, shy quiet posture, very restrained face. Main silhouette is a large unmarked paper-white gown. No writing on clothes, no hat.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-2bb37088-c13e-457f-b34f-a192dba629ef.png",
+      "path": "assets/taopunk/enemies/blank_child.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a small solemn child spirit, tiny ivory mask-like face with two low dark eyes, oversized completely blank warm ivory robe widening from narrow shoulders into a soft trapezoid, wide sleeves with dark oval openings, two tiny ink-blue hands and short feet. Stand with sleeves slightly separated, shy quiet posture, very restrained face. Main silhouette is a large unmarked paper-white gown. No writing on clothes, no hat.",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "3c3dbc112c621a183827325908e64cbcf4d3707c8af1da547b7516a333785519",
+      "alpha_range": [
+        0,
+        254
+      ]
+    },
+    {
+      "id": "corrosion_beetle",
+      "name": "墨蚀蠹",
+      "design": "a low elongated ink-eating book beetle, broad flattened dark blue-green shell tapering rearward, three large arched carapace sections with one ivory paper slit between, a small tucked head at the front left with two blunt ochre jaws, three pairs of jointed short legs clearly separated below, two soft short tail feelers. Head left, tail right. Calm predatory stance. No green goo, no spikes.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-03bf615b-fdf3-4672-9e42-ede89ce7cf41.png",
+      "path": "assets/taopunk/enemies/corrosion_beetle.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a low elongated ink-eating book beetle, broad flattened dark blue-green shell tapering rearward, three large arched carapace sections with one ivory paper slit between, a small tucked head at the front left with two blunt ochre jaws, three pairs of jointed short legs clearly separated below, two soft short tail feelers. Head left, tail right. Calm predatory stance. No green goo, no spikes.",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "af4f66c032d9c5e3194cbe9ed5fb4a19d740ed88018abe7c93f6fb5bfc52a2f6",
+      "alpha_range": [
+        0,
+        254
+      ]
+    },
+    {
+      "id": "glutton",
+      "name": "饕餮",
+      "design": "a crouching Chinese taotie ink glutton, a very wide ochre ancient beast face with low brows and small ivory eyes at front left, a huge open horizontal jaw with just four large squared ivory teeth, connected directly to a round heavy blue-black belly pouch on the right, two thick forearms propping it up and very small hindfeet. Clear separated upper and lower jaw, heavy soft belly. No lion mane, no armor, no decorative halo.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-9c6b649b-1f9c-499e-b047-e537ef7dd37b.png",
+      "path": "assets/taopunk/enemies/glutton.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a crouching Chinese taotie ink glutton, a very wide ochre ancient beast face with low brows and small ivory eyes at front left, a huge open horizontal jaw with just four large squared ivory teeth, connected directly to a round heavy blue-black belly pouch on the right, two thick forearms propping it up and very small hindfeet. Clear separated upper and lower jaw, heavy soft belly. No lion mane, no armor, no decorative halo.",
+      "size": [
+        1374,
+        1145
+      ],
+      "sha256": "ab1e108fb8785c5a2fbd06547bf23503136983608d8d535e8c6b1ad64ce0bb34",
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "furnace_beast",
+      "name": "炉腹兽",
+      "design": "a squat pear-shaped furnace-bellied beast, small long blunt snout pointing left, huge round drooping blue-black belly which is itself a furnace chamber, one horizontal dark vermilion glowing opening low on the abdomen, short sturdy legs, smooth hunched back and one short thick chimney at the nape. Small ivory eyes. Head and limbs clearly readable, whole creature in profile three-quarter facing left. Restrained ember orange inside the belly opening, no covering flames, no lava cracks.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-9a01ee75-0e94-4e17-9d99-427d4d06858f.png",
+      "path": "assets/taopunk/enemies/furnace_beast.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a squat pear-shaped furnace-bellied beast, small long blunt snout pointing left, huge round drooping blue-black belly which is itself a furnace chamber, one horizontal dark vermilion glowing opening low on the abdomen, short sturdy legs, smooth hunched back and one short thick chimney at the nape. Small ivory eyes. Head and limbs clearly readable, whole creature in profile three-quarter facing left. Restrained ember orange inside the belly opening, no covering flames, no lava cracks.",
+      "size": [
+        1191,
+        1321
+      ],
+      "sha256": "d036a44e40f902be23b2bf7c61e7c638a45cf7623bcd0147d2bf275c365b10b8",
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "charge_badger",
+      "name": "余电獾",
+      "design": "a stout low crouching badger spirit facing left, wedge shaped broad shoulders and blunt lowered muzzle, dark ink-teal fur with two broad ivory eyebrow stripes running from nose towards neck, small stubborn ochre eyes, three wide tufts of shoulder fur, large separated front paws with ivory claws, short hindlegs and short tail near ground. No constant electricity, no metallic armor, no spikes.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-f184e67f-f6f1-4560-bc3e-4fc4144efbd8.png",
+      "path": "assets/taopunk/enemies/charge_badger.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a stout low crouching badger spirit facing left, wedge shaped broad shoulders and blunt lowered muzzle, dark ink-teal fur with two broad ivory eyebrow stripes running from nose towards neck, small stubborn ochre eyes, three wide tufts of shoulder fur, large separated front paws with ivory claws, short hindlegs and short tail near ground. No constant electricity, no metallic armor, no spikes.",
+      "size": [
+        1416,
+        1111
+      ],
+      "sha256": "4a77bfaf4f13819945d9c1e5ff155c276bb23412ead7792683da49c6e1315da0",
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "ink_creditor",
+      "name": "赊墨商",
+      "design": "a thin stooped elderly ink merchant facing slightly left, long dark teal loose gown, neck stretched forward over hunched shoulders, narrow tired human face and polite sly smile, low flat square cap, a short wide rectangular account box on his back, one hand holding a tall narrow ivory ledger on left, the other hand emerging from a wide sleeve and held palm-up on right. Clear gaps between hands, arms and body. One vermilion account string. No piles of coins, no lanterns, no large hat.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-8d0e2e63-19c9-43d7-b045-c9cc14b7d7c1.png",
+      "path": "assets/taopunk/enemies/ink_creditor.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a thin stooped elderly ink merchant facing slightly left, long dark teal loose gown, neck stretched forward over hunched shoulders, narrow tired human face and polite sly smile, low flat square cap, a short wide rectangular account box on his back, one hand holding a tall narrow ivory ledger on left, the other hand emerging from a wide sleeve and held palm-up on right. Clear gaps between hands, arms and body. One vermilion account string. No piles of coins, no lanterns, no large hat.",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "6c5005d06f16bdb7dd5e1d4c6aa5531501ebb7fb07f8c89cdae2d897f9718918",
+      "alpha_range": [
+        0,
+        254
+      ]
+    },
+    {
+      "id": "double_slip",
+      "name": "双面简",
+      "design": "an animated pair of tall narrow ancient wooden writing slips, two upright slightly tapered slabs with differently cut angled tops, offset heights left and right, connected by one visible short central horizontal bronze axle. Each slab has one slim eye slit near its upper end and one small dark articulated support foot beneath. One face muted ivory ochre, the other deep ink teal. Half-open folding screen silhouette with a gap between the slabs. Not a humanoid and no extra face masks or yin-yang symbol.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-fd5e2e42-e9d2-450a-9431-f0503a87ddc6.png",
+      "path": "assets/taopunk/enemies/double_slip.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: an animated pair of tall narrow ancient wooden writing slips, two upright slightly tapered slabs with differently cut angled tops, offset heights left and right, connected by one visible short central horizontal bronze axle. Each slab has one slim eye slit near its upper end and one small dark articulated support foot beneath. One face muted ivory ochre, the other deep ink teal. Half-open folding screen silhouette with a gap between the slabs. Not a humanoid and no extra face masks or yin-yang symbol.",
+      "size": [
+        1151,
+        1366
+      ],
+      "sha256": "c90a8224f56baa79ddb4be6b5325f248914583b936cd06cc6798f12b459b9b32",
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "nest_moth",
+      "name": "铸巢蛾",
+      "design": "a short thick moth hauling a heavy dark ochre paper-and-lead nest above its back, small dark teal head at front left, two wide ink blue wings swept backward like eaves, thick short segmented abdomen, two ivory antennae, legs gripping an overhead low layered trough-shaped nest. One large simple dark entrance hole at the front of nest, one thin paper door slightly open. Hovering with clear gaps between wings body and nest. Distinguish stout compact moth from a flat white book moth. No honeycomb, no gold filigree.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-03903903-ed08-4fd1-a731-d4934216a1db.png",
+      "path": "assets/taopunk/enemies/nest_moth.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a short thick moth hauling a heavy dark ochre paper-and-lead nest above its back, small dark teal head at front left, two wide ink blue wings swept backward like eaves, thick short segmented abdomen, two ivory antennae, legs gripping an overhead low layered trough-shaped nest. One large simple dark entrance hole at the front of nest, one thin paper door slightly open. Hovering with clear gaps between wings body and nest. Distinguish stout compact moth from a flat white book moth. No honeycomb, no gold filigree.",
+      "size": [
+        1247,
+        1261
+      ],
+      "sha256": "5db513a43731f9a72054e0c9055e95e29dd91fdaebd7fc9842764ad971df432b",
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "bomb_press",
+      "name": "爆印机",
+      "design": "a low squat ancient printing automaton, dark ink-teal machine frame with two broad separated feet, a large diagonal press arm rising from back right then projecting down to front left, splitting into two clearly separate short stamp feet with vermilion undersides. One ochre eccentric flywheel and visible single connecting rod at rear right. A narrow dark observation slit beneath the central beam, no face. Broad bold mechanical components with open negative spaces, no clutter of gears or pipes.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-571463eb-a662-4e36-a7a1-4e747f3b2dab.png",
+      "path": "assets/taopunk/enemies/bomb_press.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a low squat ancient printing automaton, dark ink-teal machine frame with two broad separated feet, a large diagonal press arm rising from back right then projecting down to front left, splitting into two clearly separate short stamp feet with vermilion undersides. One ochre eccentric flywheel and visible single connecting rod at rear right. A narrow dark observation slit beneath the central beam, no face. Broad bold mechanical components with open negative spaces, no clutter of gears or pipes.",
+      "size": [
+        1242,
+        1266
+      ],
+      "sha256": "669008ea27b0e0cdbbac478ce3b95cc9faa04e1a67197c2d3e82972df5a63383",
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "copy_master",
+      "name": "拓印师",
+      "design": "an elderly focused Chinese rubbing artisan sitting low in an asymmetrical triangle, rounded back, tied-back hair, dark ink-teal clothes, one knee propped high at left and other leg folded underneath, head bowed but attentive ivory face, left hand stretching one large warm ivory rubbing paper across the lap, right hand holding one round flat dark rubbing pad raised above the paper on right. Clear readable face hands and pad, a single concentrated ink imprint on the broad paper. No symbols floating in air, no complex spell circles.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-8290b6b5-7ea0-4b75-bb92-95bca42e038b.png",
+      "path": "assets/taopunk/enemies/copy_master.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: an elderly focused Chinese rubbing artisan sitting low in an asymmetrical triangle, rounded back, tied-back hair, dark ink-teal clothes, one knee propped high at left and other leg folded underneath, head bowed but attentive ivory face, left hand stretching one large warm ivory rubbing paper across the lap, right hand holding one round flat dark rubbing pad raised above the paper on right. Clear readable face hands and pad, a single concentrated ink imprint on the broad paper. No symbols floating in air, no complex spell circles.",
+      "size": [
+        1312,
+        1199
+      ],
+      "sha256": "79a7b47ce7297b0141736eb9ad071d2d3b491e20518925b583624363c3eab0ba",
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "seal_officer",
+      "name": "钤印官",
+      "design": "a tall narrow upright Chinese underworld seal official in a long clean deep blue-green robe, low wide flat official crown, thin ivory human face with raised chin and stern narrow eyes. Left arm tucked into sleeve, right arm on image left has an oversized heavy forearm holding a single broad square old ochre seal below chest height, seal underside dark vermilion. Arm and stamp visibly separate from torso with clean negative space. Simple vertical silhouette, no chest ornaments, no halo, no pattern-covered robe.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-1bceaffe-1f16-4f87-bce6-eafdf7e6983c.png",
+      "path": "assets/taopunk/enemies/seal_officer.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a tall narrow upright Chinese underworld seal official in a long clean deep blue-green robe, low wide flat official crown, thin ivory human face with raised chin and stern narrow eyes. Left arm tucked into sleeve, right arm on image left has an oversized heavy forearm holding a single broad square old ochre seal below chest height, seal underside dark vermilion. Arm and stamp visibly separate from torso with clean negative space. Simple vertical silhouette, no chest ornaments, no halo, no pattern-covered robe.",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "62b4f8dd6adf161edd09200c5c06e9d920e7a8029c0dab279877403634863084",
+      "alpha_range": [
+        0,
+        254
+      ]
+    },
+    {
+      "id": "wheel_master",
+      "name": "轮印师",
+      "design": "a short hunchbacked long-armed Chinese printing worker behind one very large horizontal rolling stamp wheel in the front, round back, head peering around the upper left side of wheel, rough ivory hands visibly grasping the two ends of a horizontal ochre axle, short legs pushing from behind. Wheel is a single broad dark teal drum with one outer circular rim and just a few broad print bands. Three-quarter side view facing left. Clear silhouette of hands wheel and low crouching body, no nested concentric decorations or cogwheel clutter.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-1d728f21-e36e-413d-aa94-6194371aedaa.png",
+      "path": "assets/taopunk/enemies/wheel_master.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a short hunchbacked long-armed Chinese printing worker behind one very large horizontal rolling stamp wheel in the front, round back, head peering around the upper left side of wheel, rough ivory hands visibly grasping the two ends of a horizontal ochre axle, short legs pushing from behind. Wheel is a single broad dark teal drum with one outer circular rim and just a few broad print bands. Three-quarter side view facing left. Clear silhouette of hands wheel and low crouching body, no nested concentric decorations or cogwheel clutter.",
+      "size": [
+        1222,
+        1287
+      ],
+      "sha256": "0cebe5f3b0b9022803cacc0ac8ff8bd03bbaf174454a842965d025e94ee5247d",
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "leech",
+      "name": "漏电水蛭",
+      "design": "a long curved soft ink leech spirit, very slender front neck rises in an S curve to the left ending in a thick flat circular suction mouth with a deep black center, heavy low sagging gray-teal posterior abdomen on the right anchoring to the ground. No eyes. Two broad muted ivory longitudinal bands along the side, a very subtle pale ochre charge path from mouth towards belly. Segmented soft folds, readable curved silhouette and clear space inside the neck curve. No teeth ring, no machine parts, no persistent lightning.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-75fd0f69-6766-4bbc-b231-6bce61efa188.png",
+      "path": "assets/taopunk/enemies/leech.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a long curved soft ink leech spirit, very slender front neck rises in an S curve to the left ending in a thick flat circular suction mouth with a deep black center, heavy low sagging gray-teal posterior abdomen on the right anchoring to the ground. No eyes. Two broad muted ivory longitudinal bands along the side, a very subtle pale ochre charge path from mouth towards belly. Segmented soft folds, readable curved silhouette and clear space inside the neck curve. No teeth ring, no machine parts, no persistent lightning.",
+      "size": [
+        1247,
+        1261
+      ],
+      "sha256": "921d7dc46117932862d641e7f46df5b2392b87d86a812d0297661d0011023acd",
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "proof_boss",
+      "name": "对校官",
+      "design": "a commanding Chinese underworld proofreader official seated upright behind a low broad horizontal desk, stern thin ivory face slightly tilted, clear long eyebrows, deep teal wide-sleeved robe and simple low official cap. Left hand on image left holds a narrow ivory proofreading slip close to eye level, right hand on image right holds a short vermilion brush above the desk. Asymmetrical high and low wide sleeves, just two broad paper ribbons hanging down desk front, one dark red and one gray blue. Whole desk legs and feet visible, imposing dignified silhouette. No halo, no extra heads, no floating pages.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-09c1d4ff-4dd8-457f-966c-e3b3fa954dc7.png",
+      "path": "assets/taopunk/enemies/proof_boss.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a commanding Chinese underworld proofreader official seated upright behind a low broad horizontal desk, stern thin ivory face slightly tilted, clear long eyebrows, deep teal wide-sleeved robe and simple low official cap. Left hand on image left holds a narrow ivory proofreading slip close to eye level, right hand on image right holds a short vermilion brush above the desk. Asymmetrical high and low wide sleeves, just two broad paper ribbons hanging down desk front, one dark red and one gray blue. Whole desk legs and feet visible, imposing dignified silhouette. No halo, no extra heads, no floating pages.",
+      "size": [
+        1299,
+        1211
+      ],
+      "sha256": "218a6f5a98540ada9b687d81ada54aec585d8ef68b4da310acad54ebb02290e9",
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "rail_boss",
+      "name": "铅轨机",
+      "design": "a huge ancient lead-rail printing machine boss, extremely long low dark blue-green chassis like a compressed portal, two thick inward leaning support pillars holding a heavy horizontal sliding press beam, beneath the beam only five large blunt lead type teeth with muted vermilion lower edge. One large angular ochre traction head on the left, long exposed rail tail to the right, asymmetrical silhouette. The narrow open gap below the beam is clearly visible. Full machine isolated, strong mass and simple readable large components. No eyes or mouth, no cannon barrels, no dozens of gears or tubes.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-df072a3f-2765-4e5e-a9f1-2f26dc1844d8.png",
+      "path": "assets/taopunk/enemies/rail_boss.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a huge ancient lead-rail printing machine boss, extremely long low dark blue-green chassis like a compressed portal, two thick inward leaning support pillars holding a heavy horizontal sliding press beam, beneath the beam only five large blunt lead type teeth with muted vermilion lower edge. One large angular ochre traction head on the left, long exposed rail tail to the right, asymmetrical silhouette. The narrow open gap below the beam is clearly visible. Full machine isolated, strong mass and simple readable large components. No eyes or mouth, no cannon barrels, no dozens of gears or tubes.",
+      "size": [
+        1774,
+        887
+      ],
+      "sha256": "d77e49e8d013c6e4a0ff432f2d8633cfe0a022e207d7e6c99ab2e7580dfa03eb",
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "compiler_boss",
+      "name": "万词编纂者",
+      "design": "a very tall extremely thin elderly Chinese underworld compiler, small downcast gaunt ivory human face on a long neck, narrow shoulders and very long arms, central body a clean vertical deep ink-teal robe with only foot tips showing. Two huge complete ivory paper scrolls held in his long hands, hanging from shoulder height to the ground on either side, one wide loosely unfurled on image left and one narrow tightly rolled on image right. Clear gaps between robe and scrolls, hands readable, sparse broad dark ink blocks on the scrolls with generous empty paper, one vermilion binding band. Silent imposing final boss, no halo, no floating paper cloud, no ornate gold mask.",
+      "source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-b2db23dc-375f-4658-a414-2833348509bf.png",
+      "path": "assets/taopunk/enemies/compiler_boss.png",
+      "prompt": "Create a production-ready transparent full-body 2D game character cutout, ONE character only. Refined Chinese ink-and-paper fantasy illustration for an ancient movable-type printing courtyard roguelike. Large continuous matte color planes, confident slightly irregular dark ink contours, two or three controlled hard-edged painted shadow values, restrained surface grain, warm ivory paper / very dark blue-green ink / muted old ochre with small vermilion accents. Beautiful coherent anatomy and material shading, crisp readable silhouette at small game scale. Slight three-quarter front view facing LEFT, full subject entirely visible from head to feet with 10% clear padding, neutral ready-to-animate stance, separated readable limbs/accessories. True transparent background, absolutely no background color, vignette, ground plane, cast ground shadow, text labels, UI, border, sprite sheet, multiple poses or watermark. Character design: a very tall extremely thin elderly Chinese underworld compiler, small downcast gaunt ivory human face on a long neck, narrow shoulders and very long arms, central body a clean vertical deep ink-teal robe with only foot tips showing. Two huge complete ivory paper scrolls held in his long hands, hanging from shoulder height to the ground on either side, one wide loosely unfurled on image left and one narrow tightly rolled on image right. Clear gaps between robe and scrolls, hands readable, sparse broad dark ink blocks on the scrolls with generous empty paper, one vermilion binding band. Silent imposing final boss, no halo, no floating paper cloud, no ornate gold mask.",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "ed084e44b379b274d845a32c6739db263978c5e8e08387bd63c26b37f92ebebc",
+      "alpha_range": [
+        0,
+        254
+      ]
+    }
+  ],
+  "animation_source": "src/battle/roster_enemy_actor.gd",
+  "motion_profiles": "src/battle/enemy_animation_catalog.gd"
+}

@@ -21,7 +21,7 @@ func _ready() -> void:
 	add_child(panel)
 	var row := Ink.hbox(6)
 	panel.add_child(row)
-	for entry in [["deck", "牌库"], ["relics", "遗物"], ["gold", "金币"], ["tray", "字匣"]]:
+	for entry in [["deck", "牌库"], ["relics", "遗物"], ["gold", "铜钱"], ["tray", "字匣"]]:
 		var button := JourneyStyle.button(entry[1], open.bind(entry[0]))
 		button.custom_minimum_size = Vector2(0, 48 * clampf(JourneyStyle.touch_scale(self), 1.0, 1.85))
 		button.add_theme_font_size_override("font_size", int(16 * clampf(JourneyStyle.touch_scale(self), 1.0, 1.85)))
@@ -43,7 +43,7 @@ func _process(_delta: float) -> void:
 func refresh() -> void:
 	buttons.deck.text = "牌库 %d" % GameState.deck_size()
 	buttons.relics.text = "遗物 %d" % GameState.relics.size()
-	buttons.gold.text = "金币 %d" % GameState.gold
+	buttons.gold.text = "铜钱 %d" % GameState.gold
 	buttons.tray.text = "字匣 %d" % Viewer.tray().size()
 	var signature := str(GameState.relics)
 	if signature == _relic_signature: return

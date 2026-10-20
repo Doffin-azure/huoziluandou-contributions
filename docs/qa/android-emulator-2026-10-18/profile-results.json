@@ -1,0 +1,68 @@
+[
+  {
+    "profile": "phone-1080",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "size": "Physical size: 1080x2400",
+    "density": "Physical density: 420\nOverride density: 440",
+    "reinstalled": false,
+    "screenshot": "phone-1080-title.png"
+  },
+  {
+    "profile": "phone-1440",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "size": "Physical size: 1080x2400\nOverride size: 1440x3200",
+    "density": "Physical density: 420\nOverride density: 560",
+    "reinstalled": false,
+    "screenshot": "phone-1440-title.png"
+  },
+  {
+    "profile": "user-screenshot",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "size": "Physical size: 1080x2400\nOverride size: 1120x2436",
+    "density": "Physical density: 420\nOverride density: 480",
+    "reinstalled": false,
+    "screenshot": "user-screenshot-title.png"
+  },
+  {
+    "profile": "tablet",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "size": "Physical size: 1080x2400\nOverride size: 1200x1920",
+    "density": "Physical density: 420\nOverride density: 240",
+    "reinstalled": false,
+    "screenshot": "tablet-title.png"
+  },
+  {
+    "profile": "phone-720",
+    "pixels": [
+      1600,
+      720
+    ],
+    "size": "Physical size: 1080x2400\nOverride size: 720x1600",
+    "density": "Physical density: 420\nOverride density: 320",
+    "reinstalled": false,
+    "screenshot": "phone-720-title.png"
+  },
+  {
+    "profile": "compact",
+    "pixels": [
+      1280,
+      720
+    ],
+    "size": "Physical size: 1080x2400\nOverride size: 720x1280",
+    "density": "Physical density: 420\nOverride density: 320",
+    "reinstalled": false,
+    "screenshot": "compact-title.png"
+  }
+]

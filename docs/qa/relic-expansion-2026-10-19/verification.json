@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-19",
+  "engine": "Godot 4.7.2 stable",
+  "renderer": "gl_compatibility / NVIDIA RTX 4060 Laptop",
+  "new_models": 23,
+  "total_models_and_icons": 38,
+  "original_icons_preserved": 15,
+  "passed": 612,
+  "failed": 0,
+  "tests": [
+    {
+      "test": "relic_art_test",
+      "passed": 200,
+      "failed": 0,
+      "log": "relic-art-test.log"
+    },
+    {
+      "test": "relic_expansion_test",
+      "passed": 86,
+      "failed": 0,
+      "log": "relic-expansion-test.log"
+    },
+    {
+      "test": "classic_relic_test",
+      "passed": 60,
+      "failed": 0,
+      "log": "classic-relic-test.log"
+    },
+    {
+      "test": "shop_actions_test",
+      "passed": 161,
+      "failed": 0,
+      "log": "shop-actions-test.log"
+    },
+    {
+      "test": "remote_sync_test",
+      "passed": 23,
+      "failed": 0,
+      "log": "remote-sync-test.log"
+    },
+    {
+      "test": "relic_batch2_test",
+      "passed": 60,
+      "failed": 0,
+      "log": "relic-batch2-test.log"
+    },
+    {
+      "test": "room_reward_test",
+      "passed": 22,
+      "failed": 0,
+      "log": "room-reward-test.log"
+    }
+  ]
+}

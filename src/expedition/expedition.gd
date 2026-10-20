@@ -31,11 +31,12 @@ const BARRIER_HP := 4
 const FIGHT_T := 2
 const AMBUSH_T := 1
 const REST_T := 3
-## 战后奖励跳过换的金币
+## 战后奖励跳过换的铜钱
 const SKIP_GOLD := 16
 const SHOP_REFRESH_COST := 5
 ## 首领击败即封层；有限补给代替无压力清图，进入下一幕时发放。
 const ACT_SUPPLY := {1: {"gold": 12, "heal": 8, "ink": 1}, 2: {"gold": 16, "heal": 10, "ink": 1}}
+const SHOP_CARD_COUNT := 5
 ## 印章：效果 / 主要来源
 const SEALS := {
 	"镇纸": ["每场战斗少掉 4 点血", "精英"], "夜灯": ["视野 +1 格", "大赏"], "更漏": ["首领走路概率增长得更慢", "大赏"],
@@ -484,10 +485,12 @@ func pickup() -> bool:
 	return true
 
 
-## 发字：先进字匣；字匣满了进字袋；都满了折 8 金币
+## 发字：先进字匣；字匣满了进字袋；都满了折 8 铜钱
 func gain_glyph(g: String, why := "") -> void:
 	if Database.get_character_by_glyph(g) == null:
 		return
+	# 许愿笺·千字同文：之后拿到的字都变成许愿的字
+	g = Relics.redirect_glyph(Database.get_character_by_glyph(g)).glyph
 	var note := ("%s：" % why) if not why.is_empty() else ""
 	if tray.size() < tray_cap():
 		tray.append(g)
@@ -497,7 +500,7 @@ func gain_glyph(g: String, why := "") -> void:
 		_log("%s字匣满了，【%s】直接进字袋" % [note, g])
 	else:
 		GameState.add_gold(8)
-		_log("%s字匣、字袋都满了，【%s】折成 8 金币" % [note, g])
+		_log("%s字匣、字袋都满了，【%s】折成 8 铜钱" % [note, g])
 
 
 func push_panel(p: Dictionary) -> void:
@@ -597,7 +600,7 @@ func loot_options(tier: String) -> Array:
 	var n := 2 if tier == "小" else 3
 	if has_seal("拓本"):
 		n += 1
-	# 同一份奖励只出现一次；先保证字与金币，再抽特色和额外选项。
+	# 同一份奖励只出现一次；先保证字与铜钱，再抽特色和额外选项。
 	var pool: Array = []
 	var keys := {}
 	for option in opts:
@@ -631,7 +634,8 @@ func loot_options(tier: String) -> Array:
 func loot_relic_pool(tier: String) -> Array:
 	if tier not in ["中", "大"]: return []
 	var max_tier := 2 if tier == "中" else 3
-	return Relics.DEFS.keys().filter(func(id): return not GameState.has_relic(id) and int(Relics.TIER[id]) <= max_tier)
+	# 事件专属遗物不进开赏池（Relics.EVENT_ONLY）
+	return Relics.normal_pool().filter(func(id): return not GameState.has_relic(id) and int(Relics.TIER[id]) <= max_tier)
 
 
 func roll_loot_relic(tier: String) -> String:
@@ -744,6 +748,37 @@ func _grant_relic(id: String, why: String) -> bool:
 	_log("%s：得到遗物%s" % [why, Relics.text(id)])
 	if Relics.needs_bind(id) and not GameState.deck.is_empty():
 		push_panel({"kind": "relic_bind", "relic": id})
+	elif not Relics.pick_spec(id).is_empty() and not Relics.pick_candidates(id).is_empty():
+		push_panel({"kind": "relic_pick", "relic": id, "left": int(Relics.pick_spec(id)[1])})
+	elif id == "monkey":
+		push_panel({"kind": "relic_wish", "options": Relics.wish_options(relic_rng)})
+	return true
+
+
+## 泥金笔 / 复字拓片：挑一枚；挑够了关掉面板
+func pick_relic(glyph_id: String) -> bool:
+	var p := top_panel()
+	if p.get("kind", "") != "relic_pick" or not Relics.apply_pick(p.relic, glyph_id):
+		return false
+	_log("「%s」%s【%s】" % [Relics.name_of(p.relic), "镀金" if Relics.pick_spec(p.relic)[0] == "gild" else "复制", Database.get_character(glyph_id).glyph])
+	p.left = int(p.left) - 1
+	if int(p.left) <= 0 or Relics.pick_candidates(p.relic).is_empty():
+		pop_panel()
+	return true
+
+
+## 许愿笺：许愿；「千字同文」要带上字形 id
+func choose_wish(index: int, glyph_id := "") -> bool:
+	var p := top_panel()
+	if p.get("kind", "") != "relic_wish" or index < 0 or index >= p.options.size():
+		return false
+	var wish: String = p.options[index]
+	if wish == "endless_glyph" and glyph_id.is_empty():
+		return false
+	pop_panel()
+	if not Relics.grant_wish(wish, glyph_id):
+		return false
+	_log(Relics.name_of("monkey") + "：许下「%s」" % Relics.WISHES[wish][0])
 	return true
 
 
@@ -803,7 +838,7 @@ func rest(choice: String, glyph_id := "") -> bool:
 	return true
 
 
-## 修饰 = 镀金：单字或组词打出+1金币（GDD）
+## 修饰 = 镀金：单字或组词打出+1铜钱（GDD）
 func _gild(glyph_id: String) -> bool:
 	var n := 1
 	var done := 0
@@ -813,7 +848,7 @@ func _gild(glyph_id: String) -> bool:
 			done += 1
 	if done == 0:
 		return false
-	_log("镀金【%s】×%d：每次有效单字或组词打出+%d金币" % [Database.get_character(glyph_id).glyph, done, BattleBalance.i("gild_gold", 1)])
+	_log("镀金【%s】×%d：每次有效单字或组词打出+%d铜钱" % [Database.get_character(glyph_id).glyph, done, BattleBalance.i("gild_gold", 1)])
 	return true
 
 
@@ -823,14 +858,14 @@ func shop_offers() -> Array:
 	if m.has("shops") and m.shops.has(pos):
 		return m.shops[pos]
 	var offers: Array = []
-	# 同原商店：三枚 ≤2 稀有度的字，各 12～15 金币
-	for i in 3:
+	# 每批五枚 ≤2 稀有度的字，各 12～15 铜钱。
+	for i in SHOP_CARD_COUNT:
 		offers.append({"kind": "glyph", "glyph": roll_glyph(0), "base": rng.randi_range(12, 15)})
 	offers.append({"kind": "remove", "base": rng.randi_range(16, 20)})
 	offers.append({"kind": "gild", "base": rng.randi_range(28, 35)})
 	offers.append({"kind": "heal", "base": rng.randi_range(10, 14)})
-	# 遗物货架：每家一件，用遗物自己的随机数（不打乱原来的货）
-	for id in Relics.roll_choices(GameState.relics, relic_rng):
+	# 遗物使用独立随机数，三件现货。
+	for id in Relics.roll_choices(GameState.relics, relic_rng, 3):
 		offers.append({"kind": "relic", "relic": id, "base": Relics.price(id)})
 	if not m.has("shops"):
 		m["shops"] = {}
@@ -839,21 +874,29 @@ func shop_offers() -> Array:
 	return offers
 
 
-## 花 SHOP_REFRESH_COST 金币换一批字和遗物；删字 / 修饰 / 治疗这些服务原样保留。
+func shop_refresh_cost() -> int:
+	var counts: Dictionary = m.get("shop_refreshes", {})
+	return SHOP_REFRESH_COST * (int(counts.get(pos, 0)) + 1)
+
+
+## 每家商店依次收取 5、10、15…铜钱；服务保留，计数存于地图中。
 func refresh_shop() -> bool:
-	if top_panel().get("kind", "") != "shop" or GameState.gold < SHOP_REFRESH_COST:
+	var cost := shop_refresh_cost()
+	if top_panel().get("kind", "") != "shop" or GameState.gold < cost:
 		return false
 	var services: Array = shop_offers().filter(func(o): return o.kind in ["remove", "gild", "heal"])
-	GameState.spend_gold(SHOP_REFRESH_COST)
+	GameState.spend_gold(cost)
+	if not m.has("shop_refreshes"): m["shop_refreshes"] = {}
+	m.shop_refreshes[pos] = int(m.shop_refreshes.get(pos, 0)) + 1
 	var offers: Array = []
-	for i in 3:
+	for i in SHOP_CARD_COUNT:
 		offers.append({"kind": "glyph", "glyph": roll_glyph(0), "base": rng.randi_range(12, 15)})
 	offers.append_array(services)
-	for id in Relics.roll_choices(GameState.relics, relic_rng):
+	for id in Relics.roll_choices(GameState.relics, relic_rng, 3):
 		offers.append({"kind": "relic", "relic": id, "base": Relics.price(id)})
 	m.shops[pos] = offers
 	Achievements.register_offers(offers)
-	_log("商店：花 %d 金币刷新货架" % SHOP_REFRESH_COST)
+	_log("商店：花 %d 铜钱刷新货架，下次 %d 铜钱" % [cost, shop_refresh_cost()])
 	return true
 
 
@@ -1083,7 +1126,13 @@ func next_act() -> void:
 	var hp_before := GameState.player_hp
 	GameState.heal(int(supply.heal))
 	ink += int(supply.ink)
-	_log("幕间补给：金币 +%d，气血 +%d，墨 +%d" % [supply.gold, GameState.player_hp - hp_before, supply.ink])
+	_log("幕间补给：铜钱 +%d，气血 +%d，墨 +%d" % [supply.gold, GameState.player_hp - hp_before, supply.ink])
+	# Archive completed locations before load_act clears this act's map state.
+	# visited already belongs to the saved run, so its save schema stays compatible.
+	for key in taken:
+		GameState.visited["ex:%d:site:%s" % [act, key]] = true
+	for key in amb_done:
+		GameState.visited["ex:%d:ambush:%s" % [act, key]] = true
 	load_act(act + 1)
 
 
@@ -1107,6 +1156,8 @@ func _assign_encounter_stages() -> void:
 
 
 ## 伏兵用领地主人作锚点，换一个入口也不会换怪。阶段由地图固定，不随等待或绕路升级。
+
+
 func encounter_anchor(kind: String, cell: int) -> int:
 	if kind == "ambush":
 		var owner := int(m.get("terr", {}).get(cell, -1))
@@ -1125,6 +1176,7 @@ func stage_text(kind: String, cell: int) -> String:
 
 
 func encounter_enemy(kind: String, cell: int, commit := false) -> EnemyData:
+	if not m.is_empty() and not m.has("encounter_stages"): _assign_encounter_stages()
 	var stage := encounter_stage(kind, cell)
 	var pool: Array = NORMAL_STAGES[act][stage]
 	if kind == "boss": pool = [EnemyRoster.BOSSES[act]]
@@ -1164,15 +1216,15 @@ func encounter_info(encounter: Dictionary) -> Dictionary:
 	var ed := encounter_enemy(kind, int(encounter.k))
 	var rewards := encounter_rewards(encounter)
 	var hp := maxi(1, ed.max_hp - (6 if kind == "boss" and has_seal("朱笔") and not ed.mechanic.is_empty() else 0))
-	var rewards_text := "战利品%d选1；也可跳过，拿%d金币。" % [rewards.count, SKIP_GOLD] if kind != "boss" else "击败即结束本层，未拿资源放弃；随后处理印章与幕间结算。"
+	var rewards_text := "战利品%d选1；也可跳过，拿%d铜钱。" % [rewards.count, SKIP_GOLD] if kind != "boss" else "击败即结束本层，未拿资源放弃；随后处理印章与幕间结算。"
 	if rewards.seal:
 		rewards_text += " 获得1枚印章" + ("（印章位已满，需选择替换）" if seals.size() >= SEAL_CAP else "") + "。"
-	if int(rewards.gold) > 0: rewards_text += " 额外金币+%d。" % rewards.gold
+	if int(rewards.gold) > 0: rewards_text += " 额外铜钱+%d。" % rewards.gold
 	if int(rewards.ink) > 0: rewards_text += " 墨+%d。" % rewards.ink
 	if kind == "ambush": rewards_text += " 解封该伏兵控制的奖励。"
 	if kind == "boss" and act < 3:
 		var supply := act_supply()
-		rewards_text += " 进入下一幕后补给：金币+%d、气血最多+%d、墨+%d。" % [supply.gold, supply.heal, supply.ink]
+		rewards_text += " 进入下一幕后补给：铜钱+%d、气血最多+%d、墨+%d。" % [supply.gold, supply.heal, supply.ink]
 	var first: EnemyMoveData = ed.moves[0] if not ed.moves.is_empty() else null
 	return {"enemy": ed, "stage": stage_text(kind, int(encounter.k)), "hp": hp, "initial_block": ed.initial_block,
 		"mechanic": ed.description if not ed.description.is_empty() else "按行动循环攻击、防御或干扰字盘。",
@@ -1364,6 +1416,4 @@ func receive_reward_glyph(cd: CharacterData) -> void:
 
 
 func _log(text: String) -> void:
-	lines.push_front(text)
-	if lines.size() > 40:
-		lines.resize(40)
+	RecentLog.append(lines, text, true)

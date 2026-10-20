@@ -1,0 +1,14 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS first adventure battle enables inline tutorial
+PASS first battle instruction uses combat hint bubble
+PASS tutorial stage is included in battle checkpoint
+PASS resuming battle restores the active tutorial step
+PASS pause menu exposes skip while first-run tutorial is active
+PASS ending first real turn completes inline tutorial
+PASS completion is remembered for future adventures
+PASS skip action closes tutorial state
+PASS skip state is saved with battle
+First run tutorial: 9 passed / 0 failed

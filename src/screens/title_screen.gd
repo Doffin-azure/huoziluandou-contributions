@@ -13,7 +13,25 @@ var _veil: ColorRect
 var _wordmark: TextureRect
 var _ornament: Control
 var _utilities: HBoxContainer
+var _continue_button: Button
 var _main_buttons: Array[Button] = []
+
+
+func set_route_active(active: bool) -> void:
+	visible = active
+	process_mode = Node.PROCESS_MODE_INHERIT if active else Node.PROCESS_MODE_DISABLED
+	if not active:
+		_starting = false
+		if is_instance_valid(_entry_timer): _entry_timer.stop()
+		if _menu_tween != null: _menu_tween.kill()
+	else:
+		if is_instance_valid(_menu): _menu.modulate.a = 1.0
+		if is_instance_valid(_veil): _veil.color.a = 0.0
+		_refresh_continue()
+		_lock_buttons()
+	if is_instance_valid(_courtyard):
+		_courtyard.set_active(active)
+		if active: _courtyard.reset_camera()
 
 
 func has_scene_background() -> bool:
@@ -32,8 +50,10 @@ func build(root: Control) -> void:
 	_menu = GridContainer.new(); _menu.columns = 1
 	root.add_child(_menu)
 	_menu.add_child(_button("开始新冒险", _on_start, true))
-	if load("res://src/expedition/room_run_state.gd").has_continuable_save():
-		_menu.add_child(_button("继续冒险", _on_continue_rooms))
+	_continue_button = _button("继续冒险", _on_continue)
+	_menu.add_child(_continue_button)
+	_refresh_continue()
+	SaveManager.availability_changed.connect(_refresh_continue)
 	_menu.add_child(_button("字库图鉴",_on_library))
 	_menu.add_child(_button("成就总览",_on_achievements))
 	_menu.add_child(_button("设置",_open_settings))
@@ -192,7 +212,7 @@ func _on_custom() -> void:
 func _on_library() -> void:
 	if not _can_interact(): return
 	var viewer := CollectionOverlay.new()
-	viewer.setup({"title": "字库图鉴", "subtitle": "%d 种实体字 · %d 个词" % [Database.characters.size() - 1, Database.words.size()], "words": Database.words.values()})
+	viewer.setup({"title": "字库图鉴", "subtitle": "%d 种实体字 · %d 个词" % [Database.characters.size() - 1, Database.words.size()], "words": Database.words.values(), "show_relics": true})
 	_mount_overlay(viewer)
 
 
@@ -220,3 +240,14 @@ func _on_continue_rooms() -> void:
 	if run!=null:
 		if run.phase == "defeat" or GameState.player_hp <= 0: goto("res://src/screens/run_result_screen.gd")
 		else: goto("res://src/screens/room_map_screen.gd")
+
+
+func _refresh_continue() -> void:
+	if is_instance_valid(_continue_button):
+		_continue_button.visible = SaveManager.has_save() or (not bool(GameState.get_meta("courtyard_preview", false)) and load("res://src/expedition/room_run_state.gd").has_continuable_save())
+
+
+func _on_continue() -> void:
+	if not _can_interact(): return
+	if SaveManager.has_save(): SaveManager.resume_run()
+	else: _on_continue_rooms()

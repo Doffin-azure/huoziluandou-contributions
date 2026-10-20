@@ -25,6 +25,10 @@ func open() -> void:
 		return
 	var current: Control = Router.current
 	if current != null:
+		if current.has_method("open_practice_menu"):
+			current.call("open_practice_menu")
+			get_viewport().set_input_as_handled()
+			return
 		var modal_count: Variant = current.get("_modal_count")
 		if current.get("_busy") == true or (modal_count != null and int(modal_count) > 0):
 			return

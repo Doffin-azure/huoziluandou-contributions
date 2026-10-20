@@ -58,6 +58,9 @@ func _run() -> void:
 	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7, "node": fixture})
 	await _frames(8)
 	_screen = Router.current
+	var deadline := Time.get_ticks_msec() + 6000
+	while _screen._busy and Time.get_ticks_msec() < deadline: await get_tree().process_frame
+	_ok(not _screen._busy, "进入战斗演出结束后再检查意图交互")
 	var battle: BattleState = _screen.battle
 	var unit: Combatant = battle.enemies[0]
 	var view: EnemyView = _screen._enemy_widgets[0]
@@ -204,7 +207,7 @@ func _gallery(unit: Combatant) -> void:
 	var title := Ink.h2("墨印构型 · 三色图标与怪物意图")
 	title.position = Vector2(44, 22)
 	page.add_child(title)
-	var names := ["气血", "热度", "储能", "金币", "临挡", "持久盾", "攻击", "拆盾", "字袋", "补字", "净化", "重力", "回转", "反击", "蓄能", "过冷"]
+	var names := ["气血", "热度", "储能", "铜钱", "临挡", "持久盾", "攻击", "拆盾", "字袋", "补字", "净化", "重力", "回转", "反击", "蓄能", "过冷"]
 	var ids := ["health", "heat", "energy", "gold", "block", "persistent_block", "hit", "fracture", "bag", "manual_draw", "cleanse", "gravity_always", "rotate", "counter", "energy_idle", "next_heat_to_block"]
 	for index in ids.size():
 		var cell := Vector2(index % 8, index / 8) * Vector2(148, 130) + Vector2(44, 94)

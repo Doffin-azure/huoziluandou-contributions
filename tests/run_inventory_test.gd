@@ -51,7 +51,7 @@ func _run() -> void:
 		check(before == [GameState.gold, GameState.deck, GameState.rng.state, CharInstance._next_uid], page + " inventory is read only")
 		GameState.add_gold(7)
 		await frames()
-		check(bar.buttons.gold.text == "金币 %d" % GameState.gold, page + " gold updates live")
+		check(bar.buttons.gold.text == "铜钱 %d" % GameState.gold, page + " gold updates live")
 	var run = RoomRun.new()
 	run.reset({"seed":92, "layout":"node_graph"})
 	run.tray = ["火", "电"]

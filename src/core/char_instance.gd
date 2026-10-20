@@ -20,7 +20,7 @@ var temporary: bool = false
 var word_only: bool = false
 ## 融合（化合）：本格除主字形外附带的其他字形，作为一个不可拆的单位在牌堆中移动
 var fusion: Array[String] = []
-## 镀金（精金）：永久；每次有效单字或组词打出时 +1 金币；按实体计一次
+## 镀金（精金）：永久；每次有效单字或组词打出时 +1 铜钱；按实体计一次
 var gilded: bool = false
 ## 精铸（固定）：本场原格保留，每回合可使用一次；不可移动/换字
 var pinned: bool = false

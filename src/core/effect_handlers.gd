@@ -54,11 +54,11 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 			return ["蓄：下回合开始获得 %d 储能" % amount]
 		"payment_discount_once":
 			b.enable_ability("payment_discount_once", b.ability_value("payment_discount_once") + amount)
-			return [BattleBalance.fixed_text("币：本回合下一次金币费用 -%d，最低 0（仅一次）", "payment_discount_once", eff) % amount]
+			return [BattleBalance.fixed_text("币：本回合下一次铜钱费用 -%d，最低 0（仅一次）", "payment_discount_once", eff) % amount]
 		"profit_if_earned":
 			if b.gold_earned_this_turn <= 0:
-				return ["利：本回合此前没有获得金币，未获利"]
-			return ["利：此前已有金币收入，再获得 %d 金币" % b.earn_gold(amount)]
+				return ["利：本回合此前没有获得铜钱，未获利"]
+			return ["利：此前已有铜钱收入，再获得 %d 铜钱" % b.earn_gold(amount)]
 		"rest_cool":
 			b.add_heat(-amount)
 			if b.damage_dealt_this_turn <= 0:
@@ -214,7 +214,7 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 			return ["精心：下回合补字 -%d，但可从字袋定向选字（随机落地）" % amount]
 		"gold":
 			EffectUtil.add_gold(b, amount)
-			return ["获得 %d 金币（本战累计 %d）" % [amount, b.gold_earned]]
+			return ["获得 %d 铜钱（本战累计 %d）" % [amount, b.gold_earned]]
 		"energy":
 			b.add_energy(amount)
 			return ["储能 +%d（当前 %d）" % [amount, src.energy]]
@@ -432,9 +432,9 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 			b.abilities["double_next"] = 1
 			return ["超能力：本回合下一次持续能力触发结算两遍"]
 		"gold_to_shield":
-			return EffectUtil.simple_ability(b, "gold_to_shield", "收息：本回合每次花金币发动词效，同时获得等额持久盾")
+			return EffectUtil.simple_ability(b, "gold_to_shield", "收息：本回合每次花铜钱发动词效，同时获得等额持久盾")
 		"inject_bounty":
-			return EffectUtil.simple_ability(b, "inject_bounty", BattleBalance.fixed_text("加收：本回合敌人每注入 1 枚污染字，获得 2 金币", "inject_bounty", eff))
+			return EffectUtil.simple_ability(b, "inject_bounty", BattleBalance.fixed_text("加收：本回合敌人每注入 1 枚污染字，获得 2 铜钱", "inject_bounty", eff))
 		"instant_power":
 			return EffectUtil.simple_ability(b, "instant_power", BattleBalance.fixed_text("电力：本场持续——行列位移后可耗 1 储能额外位移一次", "instant_power", eff))
 		"heat_pollution_damage":
@@ -582,7 +582,7 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 			var maxg: int = int(eff.args.get("max", 3))
 			var pay: int = min(EffectUtil.available(b), maxg)
 			EffectUtil.pay(b, pay)
-			return EffectUtil.damage(b, enemy, amount * pay) + ["投币：支付 %d金币" % pay]
+			return EffectUtil.damage(b, enemy, amount * pay) + ["投币：支付 %d铜钱" % pay]
 		"capture_glyph":
 			return EffectHandlersActions._capture_glyph(b, ctx, amount)
 		"reveal_place":
@@ -620,6 +620,19 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 			return ["停电了……（拖动连出「开灯」恢复）"]
 		"lights_on":
 			return ["来电了。"]
+		"moon_pull":
+			var at: Vector2i = (ctx.get("path", []) as Array)[0] if not (ctx.get("path", []) as Array).is_empty() else Vector2i.ZERO
+			var pulled := b.converge_to(at)
+			return ["月：%d 枚字向【月】原位聚拢" % pulled]
+		"death_word":
+			src.hp = 0
+			return ["死亡。"]
+		"anti_death":
+			if GameState.relic_counters.get("anti_death_granted", false):
+				return ["反死亡：这一局已经拿过复活机会"]
+			GameState.relic_counters["anti_death_granted"] = true
+			GameState.revive_charges += 1
+			return ["反死亡：本局获得一次满血复活"]
 		"charge_overheat":
 			return EffectHandlersActions._charge_overheat(b, eff)
 		"recast_board":
@@ -643,9 +656,9 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 		"blastproof":
 			return EffectUtil.simple_ability(b, "blastproof", "防爆：本场被摧毁的己方字改为回字袋并获得持久盾")
 		"joint_funding":
-			return EffectUtil.simple_ability(b, "joint_funding", BattleBalance.fixed_text("合资：本场支付金币时可用 2 储能抵 1 金币（可混合）", "joint_funding", eff))
+			return EffectUtil.simple_ability(b, "joint_funding", BattleBalance.fixed_text("合资：本场支付铜钱时可用 2 储能抵 1 铜钱（可混合）", "joint_funding", eff))
 		"profit_share":
-			return EffectUtil.simple_ability(b, "profit_share", "分利：本回合每当实际获得金币，同时获得等量储能")
+			return EffectUtil.simple_ability(b, "profit_share", "分利：本回合每当实际获得铜钱，同时获得等量储能")
 		"suspend":
 			return EffectHandlersActions._suspend(b)
 
@@ -680,11 +693,11 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 			b.enable_ability("gravity_always", 1)
 			return ["重力：本战每次有效出字后自动全盘下落"]
 
-		# ---- 普通金币 ----
+		# ---- 普通铜钱 ----
 		"alloy":
 			src.add_persistent_block(amount)
 			EffectUtil.add_gold(b, int(eff.args.get("gold", 2)))
-			return ["合金：获得 %d 持久盾与 %d 金币" % [amount, int(eff.args.get("gold", 2))]]
+			return ["合金：获得 %d 持久盾与 %d 铜钱" % [amount, int(eff.args.get("gold", 2))]]
 		"mint":
 			EffectUtil.add_gold(b, amount)
 			var cd_mint: CharacterData = Database.get_character_by_glyph("币")
@@ -696,7 +709,7 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 					inst_m.owner = CharInstance.Owner.SELF_GENERATED
 					b.board.set_xy(pos_m, inst_m)
 					b.temp_chars.append(inst_m)
-			return ["铸币：+%d 金币并生成临时【币】" % amount]
+			return ["铸币：+%d 铜钱并生成临时【币】" % amount]
 		"bounty":
 			var bcost: int = int(eff.args.get("cost", 5))
 			if not EffectUtil.pay(b, bcost):

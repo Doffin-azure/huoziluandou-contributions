@@ -4,6 +4,7 @@ class_name JourneyStyle
 const TEXT := Color("e6d8b6")
 const MUTED := Color("a6b5a5")
 const GOLD := Color("c6aa70")
+const COIN := Color("fff2b0")
 const RED := Color("bd5143")
 const INK := Color("10262f")
 const SURFACE := Color("18333b")
@@ -13,6 +14,14 @@ const ROOT := "res://assets/ui/journey/"
 static var _theme: Theme
 static var _textures: Dictionary = {}
 static var _scaled_themes: Dictionary = {}
+
+
+static func currency(label: Label) -> void:
+	label.add_theme_color_override("font_color", COIN)
+	label.add_theme_color_override("font_outline_color", INK)
+	label.add_theme_constant_override("outline_size", 4)
+	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+	label.add_theme_constant_override("shadow_offset_y", 2)
 
 
 static func frame(kind := "panel", inset := 14.0) -> StyleBoxTexture:
@@ -146,7 +155,7 @@ static func section(caption: String, detail := "") -> Control:
 
 
 static func page(root: Control) -> VBoxContainer:
-	var mobile := touch_scale(root) > 1.1
+	var mobile := root.get_viewport_rect().size.x / touch_scale(root) < 1100
 	var pad := Ink.margin(16 if mobile else 28)
 	pad.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.add_child(pad)
@@ -157,14 +166,28 @@ static func page(root: Control) -> VBoxContainer:
 
 static func heading(caption: String, detail: String, accessory: Control = null) -> Control:
 	var panel := Ink.panel("PanelInset")
-	var row := Ink.hbox(24)
+	var window := Engine.get_main_loop().root as Window
+	var compact := window.get_visible_rect().size.x / BattleTouchLayout.unit_for(window.get_visible_rect().size, window.size) < 1000
+	var row := Ink.hbox(12 if compact else 24)
+	var unit := BattleTouchLayout.unit_for(window.get_visible_rect().size, window.size)
+	if compact: panel.add_theme_stylebox_override("panel", frame("inset", 8))
 	panel.add_child(row)
 	var col := Ink.vbox(3)
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	col.add_child(label(caption, "Heading"))
+	var title := label(caption, "Heading")
+	if compact: title.add_theme_font_size_override("font_size", int(20 * unit))
+	col.add_child(title)
 	var description := label(detail, "Muted")
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if compact: description.add_theme_font_size_override("font_size", int(12 * unit))
 	col.add_child(description)
 	row.add_child(col)
 	if accessory != null: row.add_child(accessory)
 	return panel
+
+
+static func flow(gap := 10) -> HFlowContainer:
+	var row := HFlowContainer.new()
+	row.add_theme_constant_override("h_separation", gap)
+	row.add_theme_constant_override("v_separation", gap)
+	return row

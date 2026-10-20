@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-20",
+  "renderer": "Godot 4.7.2 Compatibility / NVIDIA RTX 4060 Laptop",
+  "test": {
+    "scene": "res://tests/enemy_art_completion_test.tscn",
+    "passed": 429,
+    "failed": 0,
+    "log": "enemy-art-completion.log"
+  },
+  "repainted_assets": 7,
+  "original_assets_preserved": 16,
+  "alpha_verified": true,
+  "sha256_verified": true,
+  "manifest": "assets/taopunk/enemies/human_repaint/manifest.json",
+  "video": {
+    "path": "human-motion-preview.mp4",
+    "size": [
+      1280,
+      900
+    ],
+    "fps": 12.0,
+    "duration": 5.0,
+    "sha256": "c751a25eeecfafbe6a55629ba49421e2932319468943669b7164ab2cee108b7d"
+  },
+  "screenshots": [
+    "all-seven.png",
+    "battle-compiler_boss.png",
+    "battle-proof_boss.png",
+    "face-comparison.png",
+    "motion-attack.png",
+    "motion-death.png",
+    "motion-hit.png",
+    "motion-idle.png",
+    "motion-special.png",
+    "phone-compiler_boss.png",
+    "phone-proof_boss.png"
+  ],
+  "notes": [
+    "Native desktop render; phone aspect simulated by resizing the desktop window.",
+    "Preview uses 12 fps sampled animation poses; not a performance benchmark."
+  ]
+}

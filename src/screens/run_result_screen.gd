@@ -29,7 +29,7 @@ func build(root: Control) -> void:
 	if not str(result.location).is_empty(): lines.append(("完成于：" if won else "止步于：") + str(result.location))
 	if not str(result.enemies).is_empty(): lines.append("本场敌人：" + str(result.enemies) + ("　·　%d回合" % int(result.turn) if int(result.turn) > 0 else ""))
 	elif int(result.turn) > 0: lines.append("本场战斗：%d回合" % int(result.turn))
-	lines.append("经历战斗：%d场　·　金币：%d" % [int(result.battles), int(result.gold)])
+	lines.append("经历战斗：%d场　·　铜钱：%d" % [int(result.battles), int(result.gold)])
 	lines.append("牌库：%d枚　遗物：%d件　字匣：%d枚" % [int(result.deck_count), result.relics.size(), result.tray.size()])
 	var summary := EffectText.new()
 	summary.name = "RunSummary"

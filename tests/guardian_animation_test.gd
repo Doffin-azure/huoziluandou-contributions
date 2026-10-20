@@ -56,6 +56,8 @@ func _settled() -> void:
 
 func _run() -> void:
 	AudioServer.set_bus_mute(0, true)
+	SaveManager.enabled = false
+	Settings.storage_path = "user://guardian-test-settings.cfg"
 	_old_motion = Settings.reduced_motion
 	Settings.reduced_motion = false
 	Ink.apply_style(GameStyle.taopunk())
@@ -72,6 +74,8 @@ func _run() -> void:
 	Router.goto("res://src/screens/battle_screen.gd", {"node": data, "seed": 17})
 	_screen = Router.current
 	await _frames(25)
+	# 等待入场释放输入锁后再点击，不能把入场期间的禁用当作攻击丢失。
+	await _settled()
 	var visual: InkSpirit = _screen._enemy_widgets[0]._visual
 	var actor: InkGuardianActor = visual._actor
 	_ok(actor != null and actor.skeleton.get_bone_count() == 5, "墨灵使用五骨骼蒙皮，头部、背环、两侧披风独立运动")
@@ -138,7 +142,7 @@ func _run() -> void:
 	await _frames(2)
 	actor.defeated = true
 	await _frames(2)
-	_ok(not actor.player.is_playing(), "被击败后停止待机")
+	_ok(actor.player.current_animation == "death", "被击败后播放专属死亡动作而非继续待机")
 	Settings.reduced_motion = _old_motion
 	Router.study_stage = null
 	print("GUARDIAN ANIMATION: %d passed, %d failed" % [_pass, _fail])

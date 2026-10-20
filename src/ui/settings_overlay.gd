@@ -4,7 +4,6 @@ class_name SettingsOverlay
 
 signal closed
 
-var _style_row: VBoxContainer
 var _panel: PanelContainer
 
 
@@ -18,7 +17,7 @@ func _ready() -> void:
 
 func _layout() -> void:
 	if _panel != null:
-		_panel.custom_minimum_size = Vector2(minf(600, size.x - 32), minf(580, size.y - 32))
+		_panel.custom_minimum_size = Vector2(minf(680 * JourneyStyle.touch_scale(self), size.x - 32), minf(580, size.y - 32))
 
 
 func _build() -> void:
@@ -63,12 +62,7 @@ func _build() -> void:
 	col.add_child(Ink.caption("分别调节，实时生效并自动保存；调至 0% 静音。"))
 	col.add_child(Ink.hline())
 
-	# ---- 战斗字盘 ----
-	col.add_child(Ink.label("战斗字盘", "Subheading"))
-	col.add_child(Ink.caption("切换战斗字盘的显示风格，下场战斗生效。行旅界面保持墨青与朱砂配色。"))
-	_style_row = Ink.vbox(8)
-	col.add_child(_style_row)
-	_build_style_buttons()
+	# 字盘字体独立于美术风格，只选择随包发布的内置样式。
 	col.add_child(BoardFontPicker.new())
 
 	col.add_child(Ink.hline())
@@ -100,6 +94,8 @@ func _build() -> void:
 	motion_row.add_child(motion)
 	col.add_child(motion_row)
 
+	_wrap_labels(col)
+
 
 func _add_volume_control(parent: Control, control_name: String, title: String, initial: float, setter: Callable) -> void:
 	var group := Ink.vbox(0)
@@ -127,17 +123,12 @@ func _add_volume_control(parent: Control, control_name: String, title: String, i
 	group.add_child(slider)
 
 
-func _build_style_buttons() -> void:
-	for c in _style_row.get_children():
-		c.queue_free()
-	var options := [["taopunk", "青铜绘卷"], ["paper", "宣纸活字"], ["neon", "墨芯 · 大模型"]]
-	for opt in options:
-		var active: bool = Settings.visual_style == opt[0]
-		var b := Ink.button(opt[1] + ("　✓" if active else ""), active)
-		b.custom_minimum_size = Vector2(180, 48 * JourneyStyle.touch_scale(self))
-		b.disabled = active
-		b.pressed.connect(_set_style.bind(opt[0]))
-		_style_row.add_child(b)
+func _wrap_labels(node: Node) -> void:
+	for child in node.get_children():
+		if child is Label:
+			child.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			child.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_wrap_labels(child)
 
 
 func _toggle_text() -> String:
@@ -147,17 +138,6 @@ func _toggle_text() -> String:
 func _on_toggle(btn: Button) -> void:
 	Settings.set_drag_release_play(not Settings.drag_release_play)
 	btn.text = _toggle_text()
-
-
-func _set_style(style_id: String) -> void:
-	Settings.set_visual_style(style_id)
-	if Router.current_path.ends_with("/battle_screen.gd"):
-		Ink.pending_style = style_id
-	else:
-		Ink.apply_style(GameStyle.get_style(style_id))
-		Ink.pending_style = ""
-	# Journey pages own their theme. Rebuilding them would reroll rewards and shops.
-	_build_style_buttons()
 
 
 func _input(event: InputEvent) -> void:

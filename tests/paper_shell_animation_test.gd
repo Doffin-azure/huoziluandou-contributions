@@ -8,6 +8,7 @@ const GLYPHS := ["击", "破", "回", "流", "防", "御", "加", "速", "充", 
 
 
 func _ready() -> void:
+	Settings.storage_path = "user://paper_shell_animation_test-settings.cfg"
 	_run.call_deferred()
 
 

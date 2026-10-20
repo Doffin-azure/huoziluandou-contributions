@@ -31,7 +31,7 @@ func _ready() -> void:
 				ex.rng.seed = seed_value * 7 + 13
 				ex.relic_rng.seed = seed_value * 31 + 91
 				var opts := ex.loot_options(tier)
-				check(opts.size() == (2 if tier == "小" else 3) + (1 if bonus else 0) and opts.any(func(o): return o.kind == "gold") and opts.any(func(o): return o.kind == "glyphs"), "赏选项数、金币与字保底保持")
+				check(opts.size() == (2 if tier == "小" else 3) + (1 if bonus else 0) and opts.any(func(o): return o.kind == "gold") and opts.any(func(o): return o.kind == "glyphs"), "赏选项数、铜钱与字保底保持")
 				var unique := {}
 				for o in opts: unique[ex._loot_key(o)] = true
 				check(unique.size() == opts.size(), "每份奖励去重")
@@ -58,7 +58,7 @@ func _ready() -> void:
 		check(options.size() == (2 if tier == "小" else 3) and not options.any(func(o): return o.kind == "relic"), "全遗物持有后自动回退到有效奖励")
 	GameState.relics.clear()
 	GameState.relics.assign(ex.loot_relic_pool("中"))
-	check(ex.loot_relic_pool("中").is_empty() and ex.loot_relic_pool("大").size() == 3 and not ex.loot_options("中").any(func(o): return o.kind == "relic"), "中档耗尽不越级给稀有，大赏仍可给稀有")
+	check(ex.loot_relic_pool("中").is_empty() and ex.loot_relic_pool("大").size() == Relics.TIER.values().filter(func(t): return int(t) == 3).size() and not ex.loot_options("中").any(func(o): return o.kind == "relic"), "中档耗尽不越级给稀有，大赏仍可给稀有")
 	# Opening loot grants the chosen relic exactly once and handles bind/pickup effects.
 	ex = Expedition.start(32)
 	var cell := ex.pos
@@ -108,7 +108,7 @@ func _ready() -> void:
 	check(screen._event_box.get_global_rect().end.x <= viewport_width and relic_buttons[0].get_global_rect().end.x <= viewport_width, "遗物长说明换行，不撑宽右侧面板")
 	var saved: Array = GameState.relics.duplicate()
 	GameState.relics.assign(Relics.DEFS.keys()); screen._on_stats_changed(); await frames()
-	check(screen._relic_label.text.contains("15件") and screen._relic_label.tooltip_text.contains("蔓生墨") and screen._relic_label.get_global_rect().end.x <= viewport_width, "遗物数量多时摘要显示、完整效果可悬停阅读")
+	check(screen._relic_label.text.contains("%d件" % Relics.DEFS.size()) and screen._relic_label.tooltip_text.contains("蔓生墨") and screen._relic_label.get_global_rect().end.x <= viewport_width, "遗物数量多时摘要显示、完整效果可悬停阅读")
 	GameState.relics.assign(saved); screen.refresh(); await frames()
 	# Refresh rebuilt reward controls.
 	relic_buttons = screen._event_box.get_children().filter(func(c): return c is Button and c.text.contains("蔓生墨"))

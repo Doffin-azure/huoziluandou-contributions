@@ -1,25 +1,22 @@
 extends Node
 ## Ink —— 全局“美术工具箱”。
 ## 所有界面都用 Ink.xxx() 组装；改一处即全局换皮。
-## 风格由 GameStyle 令牌驱动（青铜绘卷 / 宣纸 / 墨芯）；战斗中换肤延后至离开页面。
+## 当前使用青铜绘卷令牌；字盘可独立选择内置字体样式。
 
 var theme: Theme
 var serif: Font
 var sans: Font
 var board_font: Font
-var pending_style := ""
 signal board_font_changed
 var style: GameStyle
 
 var _paper_shader: Shader
-var _bg_neon_shader: Shader
 var _wood_shader: Shader
-var _tile_neon_shader: Shader
 
 
 func _ready() -> void:
 	_load_fonts()
-	_reload_board_font(Settings.board_font_path)
+	_reload_board_font(Settings.board_font_id)
 	Settings.board_font_changed.connect(_reload_board_font)
 	_load_shaders()
 	var sid := "taopunk"
@@ -37,43 +34,18 @@ func apply_style(new_style: GameStyle) -> void:
 		get_tree().root.theme = theme
 
 
-func apply_pending_style() -> void:
-	if pending_style.is_empty(): return
-	apply_style(GameStyle.get_style(pending_style))
-	pending_style = ""
-
-
 func _load_fonts() -> void:
-	var bundled := "res://assets/fonts/NotoSerifSC-VF.ttf"
-	if ResourceLoader.exists(bundled):
-		var font_file: Font = load(bundled)
-		var weight_tag := TextServerManager.get_primary_interface().name_to_tag("wght")
-		var display := FontVariation.new()
-		display.base_font = font_file
-		display.variation_opentype = {weight_tag: 650.0}
-		serif = display
-		var reading := FontVariation.new()
-		reading.base_font = font_file
-		reading.variation_opentype = {weight_tag: 450.0}
-		sans = reading
-	else:
-		var sf := SystemFont.new()
-		sf.font_names = PackedStringArray(["Noto Serif SC", "SimSun", "Microsoft YaHei", "PingFang SC"])
-		serif = sf
-	if sans == null:
-		sans = serif
+	serif = BoardTypography.font_for_id(BoardTypography.DEFAULT_ID)
+	sans = BoardTypography.font_for_id("serif_light")
 
 
 func _load_shaders() -> void:
 	_paper_shader = load("res://src/shaders/paper.gdshader")
-	_bg_neon_shader = load("res://src/shaders/bg_neon.gdshader")
 	_wood_shader = load("res://src/shaders/wood.gdshader")
-	_tile_neon_shader = load("res://src/shaders/tile_neon.gdshader")
 
 
-func _reload_board_font(path: String) -> void:
-	var loaded := BoardTypography.load_font(path, serif)
-	board_font = loaded if loaded != null else serif
+func _reload_board_font(font_id: String) -> void:
+	board_font = BoardTypography.font_for_id(font_id)
 	board_font_changed.emit()
 
 
@@ -97,16 +69,16 @@ func _build_theme() -> Theme:
 	t.set_color("font_hover_color", "Button", Palette.VERMILION)
 	t.set_color("font_pressed_color", "Button", Palette.PAPER)
 	t.set_color("font_disabled_color", "Button", Palette.INK_FAINT)
-	t.set_stylebox("normal", "Button", _sb(Palette.PAPER_WARM, 8, Palette.BORDER, 2, 0.4))
-	t.set_stylebox("hover", "Button", _sb(Palette.PAPER, 8, Palette.VERMILION, 2, 1.0))
-	t.set_stylebox("pressed", "Button", _sb(Palette.VERMILION_DK, 8, Palette.VERMILION_DK, 2, 0.6))
+	t.set_stylebox("normal", "Button", _sb(Palette.PAPER_WARM, 8, Palette.BORDER, 2))
+	t.set_stylebox("hover", "Button", _sb(Palette.PAPER, 8, Palette.VERMILION, 2))
+	t.set_stylebox("pressed", "Button", _sb(Palette.VERMILION_DK, 8, Palette.VERMILION_DK, 2))
 	t.set_stylebox("disabled", "Button", _sb(Palette.PAPER_DARK, 8, Palette.BORDER_SOFT, 2))
 	t.set_stylebox("focus", "Button", _sb(Color(0, 0, 0, 0), 8, Palette.GOLD, 2))
 	t.set_constant("outline_size", "Button", 0)
 
 	# --- 面板 ---
-	t.set_stylebox("panel", "PanelContainer", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2, 0.8))
-	t.set_stylebox("panel", "Panel", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2, 0.8))
+	t.set_stylebox("panel", "PanelContainer", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2))
+	t.set_stylebox("panel", "Panel", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2))
 	# 提示框必须完整遮住桌面，不能让墨黑文字落在引擎的默认深底上。
 	var hint := StyleBoxFlat.new()
 	hint.bg_color = Color(Palette.PAPER, 1.0)
@@ -159,50 +131,46 @@ func _build_theme() -> Theme:
 		t.set_font("font", kind, serif)
 
 	t.set_type_variation("PanelCard", "PanelContainer")
-	t.set_stylebox("panel", "PanelCard", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2, 0.8))
+	t.set_stylebox("panel", "PanelCard", _sb(Palette.PAPER, 10, Palette.BORDER_SOFT, 2))
 
 	t.set_type_variation("PanelDark", "PanelContainer")
-	t.set_stylebox("panel", "PanelDark", _sb(Palette.PANEL_DARK, 12, Palette.GOLD_DK, 2, 0.5))
+	t.set_stylebox("panel", "PanelDark", _sb(Palette.PANEL_DARK, 12, Palette.GOLD_DK, 2))
 
 	t.set_type_variation("PanelInset", "PanelContainer")
-	t.set_stylebox("panel", "PanelInset", _sb(Palette.PAPER_WARM, 8, Palette.BORDER_SOFT, 1, 0.4))
+	t.set_stylebox("panel", "PanelInset", _sb(Palette.PAPER_WARM, 8, Palette.BORDER_SOFT, 1))
 
 	t.set_type_variation("StagePanel", "PanelContainer")
-	t.set_stylebox("panel", "StagePanel", _sb(Palette.STAGE, 12, Palette.STAGE_EDGE, 2, 0.75))
+	t.set_stylebox("panel", "StagePanel", _sb(Palette.STAGE, 12, Palette.STAGE_EDGE, 2))
 
 	t.set_type_variation("PrimaryButton", "Button")
 	t.set_color("font_color", "PrimaryButton", Palette.PAPER)
 	t.set_color("font_hover_color", "PrimaryButton", Palette.PAPER)
 	t.set_color("font_pressed_color", "PrimaryButton", Palette.PAPER)
-	t.set_stylebox("normal", "PrimaryButton", _sb(Palette.VERMILION, 8, Palette.VERMILION_DK, 2, 1.0))
-	t.set_stylebox("hover", "PrimaryButton", _sb(Palette.VERMILION_DK, 8, Palette.GOLD, 2, 1.2))
-	t.set_stylebox("pressed", "PrimaryButton", _sb(Palette.VERMILION_DK, 8, Palette.VERMILION_DK, 2, 0.6))
+	t.set_stylebox("normal", "PrimaryButton", _sb(Palette.VERMILION, 8, Palette.VERMILION_DK, 2))
+	t.set_stylebox("hover", "PrimaryButton", _sb(Palette.VERMILION_DK, 8, Palette.GOLD, 2))
+	t.set_stylebox("pressed", "PrimaryButton", _sb(Palette.VERMILION_DK, 8, Palette.VERMILION_DK, 2))
 	t.set_stylebox("focus", "PrimaryButton", _sb(Color(0, 0, 0, 0), 8, Palette.GOLD, 2))
 
 	t.set_type_variation("GhostButton", "Button")
 	t.set_color("font_color", "GhostButton", Palette.INK_SOFT)
 	t.set_stylebox("normal", "GhostButton", _sb(Color(0, 0, 0, 0), 8, Palette.INK_FAINT, 1))
-	t.set_stylebox("hover", "GhostButton", _sb(Palette.PAPER_WARM, 8, Palette.INK_SOFT, 1, 0.6))
+	t.set_stylebox("hover", "GhostButton", _sb(Palette.PAPER_WARM, 8, Palette.INK_SOFT, 1))
 
 	t.set_type_variation("DangerButton", "Button")
 	t.set_color("font_color", "DangerButton", Palette.PAPER)
-	t.set_stylebox("normal", "DangerButton", _sb(Palette.PLUM, 8, Palette.VERMILION_DK, 2, 0.8))
-	t.set_stylebox("hover", "DangerButton", _sb(Palette.VERMILION_DK, 8, Palette.GOLD, 2, 1.0))
+	t.set_stylebox("normal", "DangerButton", _sb(Palette.PLUM, 8, Palette.VERMILION_DK, 2))
+	t.set_stylebox("hover", "DangerButton", _sb(Palette.VERMILION_DK, 8, Palette.GOLD, 2))
 
 	return t
 
 
-func _sb(bg: Color, radius: int, border: Color, border_w: int, glow := 0.0) -> StyleBoxFlat:
+func _sb(bg: Color, radius: int, border: Color, border_w: int) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(bg.r, bg.g, bg.b, bg.a * Palette.PANEL_ALPHA)
+	sb.bg_color = bg
 	sb.set_corner_radius_all(radius + Palette.CORNER_BONUS)
 	sb.set_border_width_all(border_w)
 	sb.border_color = border
 	sb.set_content_margin_all(10)
-	if Palette.GLOW and glow > 0.0:
-		sb.shadow_color = Color(Palette.VERMILION.r, Palette.VERMILION.g, Palette.VERMILION.b, 0.22 * glow)
-		sb.shadow_size = int(7.0 * glow)
-		sb.shadow_offset = Vector2(0, 2)
 	return sb
 
 
@@ -210,19 +178,12 @@ func _sb(bg: Color, radius: int, border: Color, border_w: int, glow := 0.0) -> S
 func background(stain := 0.45) -> ColorRect:
 	var cr := ColorRect.new()
 	var mat := ShaderMaterial.new()
-	if Palette.BG_KIND == "neon":
-		mat.shader = _bg_neon_shader
-		mat.set_shader_parameter("top_color", Palette.BG_TOP)
-		mat.set_shader_parameter("bottom_color", Palette.BG_BOTTOM)
-		mat.set_shader_parameter("glow_color", Palette.VERMILION)
-		mat.set_shader_parameter("grid_color", Palette.VERMILION)
-	else:
-		mat.shader = _paper_shader
-		mat.set_shader_parameter("stain_amount", stain)
-		mat.set_shader_parameter("paper_color", Palette.PAPER)
-		mat.set_shader_parameter("grain", 0.025)
-		mat.set_shader_parameter("fiber", 0.025)
-		mat.set_shader_parameter("vignette", 0.18)
+	mat.shader = _paper_shader
+	mat.set_shader_parameter("stain_amount", stain)
+	mat.set_shader_parameter("paper_color", Palette.PAPER)
+	mat.set_shader_parameter("grain", 0.025)
+	mat.set_shader_parameter("fiber", 0.025)
+	mat.set_shader_parameter("vignette", 0.18)
 	cr.material = mat
 	cr.color = Color.WHITE
 	cr.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -238,13 +199,7 @@ func paper_layer(stain := 0.45) -> ColorRect:
 
 func make_tile_material(tint := Color.WHITE) -> ShaderMaterial:
 	var mat := ShaderMaterial.new()
-	if Palette.TILE_KIND == "glass":
-		mat.shader = _tile_neon_shader
-		mat.set_shader_parameter("edge", Palette.VERMILION)
-		mat.set_shader_parameter("edge_width", 2.2 + (1.6 if Palette.GLOW else 0.0))
-		mat.set_shader_parameter("glow", 1.0 if Palette.GLOW else 0.6)
-	else:
-		mat.shader = _wood_shader
+	mat.shader = _wood_shader
 	tile_set_tint(mat, tint)
 	return mat
 
@@ -254,17 +209,12 @@ func make_wood_material(tint := Color.WHITE) -> ShaderMaterial:
 	return make_tile_material(tint)
 
 
-## 按当前风格设置字块基色（木纹 or 玻璃）
+## 按当前风格设置木活字基色。
 func tile_set_tint(mat: ShaderMaterial, tint: Color) -> void:
 	if mat == null:
 		return
-	if Palette.TILE_KIND == "glass":
-		mat.set_shader_parameter("face", Palette.WOOD_DARK * tint)
-		mat.set_shader_parameter("face_light", Palette.WOOD_LIGHT * tint)
-		mat.set_shader_parameter("edge", Palette.VERMILION)
-	else:
-		mat.set_shader_parameter("wood_dark", Palette.WOOD_DARK * tint)
-		mat.set_shader_parameter("wood_light", Palette.WOOD_LIGHT * tint)
+	mat.set_shader_parameter("wood_dark", Palette.WOOD_DARK * tint)
+	mat.set_shader_parameter("wood_light", Palette.WOOD_LIGHT * tint)
 
 
 # ---------------------------------------------------------------- 工厂方法
@@ -275,7 +225,7 @@ func label(text: String, variation: String = "", override_color: Color = Color(0
 		l.theme_type_variation = variation
 	if override_color.a > 0.0:
 		l.add_theme_color_override("font_color", override_color)
-	l.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.25 if Palette.GLOW else 0.08))
+	l.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.08))
 	l.add_theme_constant_override("shadow_offset_x", 0)
 	l.add_theme_constant_override("shadow_offset_y", 1)
 	return l

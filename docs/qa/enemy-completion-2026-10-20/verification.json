@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-20",
+  "engine": "Godot 4.7.2 stable",
+  "renderer": "gl_compatibility / RTX 4060 Laptop",
+  "total_enemies": 29,
+  "new_portraits": 16,
+  "preserved_portraits": 13,
+  "passed": 918,
+  "failed": 0,
+  "tests": [
+    {
+      "test": "enemy_art_completion_test",
+      "passed": 435,
+      "failed": 0,
+      "log": "enemy_art_completion_test.log"
+    },
+    {
+      "test": "enemy_attack_animation_test",
+      "passed": 124,
+      "failed": 0,
+      "log": "enemy_attack_animation_test.log"
+    },
+    {
+      "test": "guardian_animation_test",
+      "passed": 28,
+      "failed": 0,
+      "log": "guardian_animation_test.log"
+    },
+    {
+      "test": "monster_ui_test",
+      "passed": 13,
+      "failed": 0,
+      "log": "monster_ui_test.log"
+    },
+    {
+      "test": "monster_regression",
+      "passed": 240,
+      "failed": 0,
+      "log": "monster_regression.log"
+    },
+    {
+      "test": "enemy_balance_test",
+      "passed": 39,
+      "failed": 0,
+      "log": "enemy_balance_test.log"
+    },
+    {
+      "test": "monster_save_test",
+      "passed": 39,
+      "failed": 0,
+      "log": "monster_save_test.log"
+    }
+  ],
+  "motion_preview": {
+    "path": "enemy-motion-preview.mp4",
+    "size": [
+      1280,
+      900
+    ],
+    "fps": 12,
+    "duration": 5.0
+  },
+  "generator": "built-in image_gen",
+  "prompt_set": "assets/taopunk/enemies/batch2-manifest.json"
+}

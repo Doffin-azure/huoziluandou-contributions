@@ -1,12 +1,19 @@
 extends Node2D
 class_name EnemyAttackActor
-## 使用新绘攻击关键姿势；原立绘只用于待机，不以整图晃动替代动作。
+## 保留新绘攻击关键姿势；待机、施术和受击/死亡由分部位蒙皮驱动。
 const ROOT := "res://assets/taopunk/attacks/"
 var enemy_id := ""
 var player: AnimationPlayer
 var profile: Dictionary
 var source_size := Vector2.ONE
-var defeated := false
+var defeated := false:
+	set(value):
+		if defeated == value: return
+		defeated = value
+		if _rest_actor != null:
+			pose_index = -1
+			player.stop()
+			_rest_actor.defeated = value
 var pose_index := -1:
 	set(value):
 		pose_index = value
@@ -17,6 +24,7 @@ var _frames: Array = []
 var _anchor := Vector2.ZERO
 var _neutral_rect := Rect2()
 var _resting := false
+var _rest_actor: RosterEnemyActor
 
 
 static func available(id: String) -> bool:
@@ -43,6 +51,12 @@ func _ready() -> void:
 	_skin = Polygon2D.new()
 	_skin.texture = _sheet
 	add_child(_skin)
+	_rest_actor = RosterEnemyActor.new()
+	_rest_actor.enemy_id = enemy_id
+	_rest_actor.texture_override = TaopunkArt.portrait(enemy_id)
+	add_child(_rest_actor)
+	_rest_actor.position = _neutral_rect.position
+	_rest_actor.scale = _neutral_rect.size / _rest_actor.source_size
 	_build_animations()
 	player.animation_finished.connect(func(_clip: StringName):
 		if not defeated and not Settings.reduced_motion: player.play("idle"))
@@ -53,6 +67,7 @@ func _ready() -> void:
 func _show_pose() -> void:
 	if _skin == null: return
 	_skin.visible = pose_index >= 0
+	if _rest_actor != null: _rest_actor.visible = pose_index < 0
 	if pose_index >= 0:
 		var frame: Dictionary = _frames[pose_index]
 		var anchor := Vector2(frame.anchor[0], frame.anchor[1])
@@ -68,7 +83,7 @@ func _show_pose() -> void:
 
 
 func _draw() -> void:
-	if pose_index < 0: draw_texture_rect(TaopunkArt.portrait(enemy_id), _neutral_rect, false)
+	if pose_index < 0 and _rest_actor == null: draw_texture_rect(TaopunkArt.portrait(enemy_id), _neutral_rect, false)
 
 
 func _build_animations() -> void:
@@ -104,7 +119,9 @@ func _add_poses(clip: Animation, times: Array, poses: Array) -> void:
 
 
 func play_action(move: EnemyMoveData, hit_index := 0) -> Dictionary:
-	if move.kind not in [EnemyMoveData.Kind.ATTACK, EnemyMoveData.Kind.ATTACK_BLOCK, EnemyMoveData.Kind.MULTI]: return {}
+	if move.kind not in [EnemyMoveData.Kind.ATTACK, EnemyMoveData.Kind.ATTACK_BLOCK, EnemyMoveData.Kind.MULTI]:
+		pose_index = -1
+		return _rest_actor.play_action(move,hit_index)
 	if Settings.reduced_motion or defeated: return {"release": 0.04, "duration": 0.04}
 	var clip := "followup" if hit_index > 0 else ("slam" if move.kind == EnemyMoveData.Kind.ATTACK_BLOCK else "attack")
 	player.stop(true)
@@ -112,6 +129,14 @@ func play_action(move: EnemyMoveData, hit_index := 0) -> Dictionary:
 	var release: float = profile.release * (0.65 if hit_index > 0 else 1.0)
 	if enemy_id == "ember_imp" and hit_index > 0: release = 0.19
 	return {"release": release, "duration": player.get_animation(clip).length, "action": clip}
+
+
+func apply_feedback(event: Dictionary) -> void:
+	if _rest_actor == null: return
+	if int(event.get("hp_loss",0)) > 0 or int(event.get("blocked",0)) > 0 or int(event.get("hp",1)) <= 0:
+		player.stop()
+		pose_index = -1
+		_rest_actor.apply_feedback(event)
 
 
 func eye_global_position() -> Vector2:

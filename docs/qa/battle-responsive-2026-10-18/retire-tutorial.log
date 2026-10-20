@@ -1,0 +1,157 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS title touch entry
+PASS 1280x720-0dpi deterministic lesson start
+PASS 1280x720-0dpi 48dp touch buttons
+PASS 1280x720-0dpi board and actions within viewport
+PASS 1280x720-0dpi instructions do not overlap board
+PASS 1280x720-0dpi wrong selection gets recovery hint without consumption
+PASS 1280x720-0dpi selection previews before spending
+PASS 1280x720-0dpi single glyph uses real damage and consumption
+PASS 1280x720-0dpi canceled native drag clears selection
+PASS 1280x720-0dpi tutorial requires confirmation without changing fast input preference
+PASS 1280x720-0dpi selected word preview visible without scrolling
+PASS 1280x720-0dpi combatant status visible alongside word preview
+PASS 1280x720-0dpi word uses real eight damage
+PASS 1280x720-0dpi defense word grants ten block
+PASS 1280x720-0dpi real enemy attack is blocked and turn advances
+PASS 1280x720-0dpi real next turn refills board
+PASS 1280x720-0dpi completion save bytes unchanged
+PASS 1280x720-0dpi completion permanent state and RNG unchanged
+PASS 1280x720-0dpi completion permanent card identities unchanged
+PASS 1280x720-0dpi replay resets local state
+PASS 1280x720-0dpi exit returns title
+PASS 1280x720-0dpi exit save bytes unchanged
+PASS 1280x720-0dpi exit permanent state and RNG unchanged
+PASS 1280x720-0dpi exit permanent card identities unchanged
+PASS title touch entry
+PASS 960x432-160dpi deterministic lesson start
+PASS 960x432-160dpi 48dp touch buttons
+PASS 960x432-160dpi board and actions within viewport
+PASS 960x432-160dpi instructions do not overlap board
+PASS 960x432-160dpi wrong selection gets recovery hint without consumption
+PASS 960x432-160dpi selection previews before spending
+PASS 960x432-160dpi single glyph uses real damage and consumption
+PASS 960x432-160dpi canceled native drag clears selection
+PASS 960x432-160dpi tutorial requires confirmation without changing fast input preference
+PASS 960x432-160dpi selected word preview visible without scrolling
+PASS 960x432-160dpi combatant status visible alongside word preview
+PASS 960x432-160dpi word uses real eight damage
+PASS 960x432-160dpi defense word grants ten block
+PASS 960x432-160dpi real enemy attack is blocked and turn advances
+PASS 960x432-160dpi real next turn refills board
+PASS 960x432-160dpi completion save bytes unchanged
+PASS 960x432-160dpi completion permanent state and RNG unchanged
+PASS 960x432-160dpi completion permanent card identities unchanged
+PASS 960x432-160dpi replay resets local state
+PASS 960x432-160dpi exit returns title
+PASS 960x432-160dpi exit save bytes unchanged
+PASS 960x432-160dpi exit permanent state and RNG unchanged
+PASS 960x432-160dpi exit permanent card identities unchanged
+PASS title touch entry
+PASS 1280x720-320dpi deterministic lesson start
+PASS 1280x720-320dpi 48dp touch buttons
+PASS 1280x720-320dpi board and actions within viewport
+PASS 1280x720-320dpi instructions do not overlap board
+PASS 1280x720-320dpi wrong selection gets recovery hint without consumption
+PASS 1280x720-320dpi selection previews before spending
+PASS 1280x720-320dpi single glyph uses real damage and consumption
+PASS 1280x720-320dpi canceled native drag clears selection
+PASS 1280x720-320dpi tutorial requires confirmation without changing fast input preference
+PASS 1280x720-320dpi selected word preview visible without scrolling
+PASS 1280x720-320dpi combatant status visible alongside word preview
+PASS 1280x720-320dpi word uses real eight damage
+PASS 1280x720-320dpi defense word grants ten block
+PASS 1280x720-320dpi real enemy attack is blocked and turn advances
+PASS 1280x720-320dpi real next turn refills board
+PASS 1280x720-320dpi completion save bytes unchanged
+PASS 1280x720-320dpi completion permanent state and RNG unchanged
+PASS 1280x720-320dpi completion permanent card identities unchanged
+PASS 1280x720-320dpi replay resets local state
+PASS 1280x720-320dpi exit returns title
+PASS 1280x720-320dpi exit save bytes unchanged
+PASS 1280x720-320dpi exit permanent state and RNG unchanged
+PASS 1280x720-320dpi exit permanent card identities unchanged
+PASS title touch entry
+PASS 2400x1080-440dpi deterministic lesson start
+PASS 2400x1080-440dpi 48dp touch buttons
+PASS 2400x1080-440dpi board and actions within viewport
+PASS 2400x1080-440dpi instructions do not overlap board
+PASS 2400x1080-440dpi wrong selection gets recovery hint without consumption
+PASS 2400x1080-440dpi selection previews before spending
+PASS 2400x1080-440dpi single glyph uses real damage and consumption
+PASS 2400x1080-440dpi canceled native drag clears selection
+PASS 2400x1080-440dpi tutorial requires confirmation without changing fast input preference
+PASS 2400x1080-440dpi selected word preview visible without scrolling
+PASS 2400x1080-440dpi combatant status visible alongside word preview
+PASS 2400x1080-440dpi word uses real eight damage
+PASS 2400x1080-440dpi defense word grants ten block
+PASS 2400x1080-440dpi real enemy attack is blocked and turn advances
+PASS 2400x1080-440dpi real next turn refills board
+PASS 2400x1080-440dpi completion save bytes unchanged
+PASS 2400x1080-440dpi completion permanent state and RNG unchanged
+PASS 2400x1080-440dpi completion permanent card identities unchanged
+PASS 2400x1080-440dpi replay resets local state
+PASS 2400x1080-440dpi exit returns title
+PASS 2400x1080-440dpi exit save bytes unchanged
+PASS 2400x1080-440dpi exit permanent state and RNG unchanged
+PASS 2400x1080-440dpi exit permanent card identities unchanged
+PASS title touch entry
+PASS 2532x1170-460dpi deterministic lesson start
+PASS 2532x1170-460dpi 48dp touch buttons
+PASS 2532x1170-460dpi board and actions within viewport
+PASS 2532x1170-460dpi instructions do not overlap board
+PASS 2532x1170-460dpi wrong selection gets recovery hint without consumption
+PASS 2532x1170-460dpi selection previews before spending
+PASS 2532x1170-460dpi single glyph uses real damage and consumption
+PASS 2532x1170-460dpi canceled native drag clears selection
+PASS 2532x1170-460dpi tutorial requires confirmation without changing fast input preference
+PASS 2532x1170-460dpi selected word preview visible without scrolling
+PASS 2532x1170-460dpi combatant status visible alongside word preview
+PASS 2532x1170-460dpi word uses real eight damage
+PASS 2532x1170-460dpi defense word grants ten block
+PASS 2532x1170-460dpi real enemy attack is blocked and turn advances
+PASS 2532x1170-460dpi real next turn refills board
+PASS 2532x1170-460dpi completion save bytes unchanged
+PASS 2532x1170-460dpi completion permanent state and RNG unchanged
+PASS 2532x1170-460dpi completion permanent card identities unchanged
+PASS 2532x1170-460dpi replay resets local state
+PASS 2532x1170-460dpi exit returns title
+PASS 2532x1170-460dpi exit save bytes unchanged
+PASS 2532x1170-460dpi exit permanent state and RNG unchanged
+PASS 2532x1170-460dpi exit permanent card identities unchanged
+PASS title touch entry
+PASS practice intercepts Android system back notification
+PASS Android back clears active selection first
+PASS Android system back opens practice pause without quitting
+PASS Android back dismisses practice pause
+PASS global Android back/ESC uses practice pause and locks board
+PASS practice does not expose adventure pause controls
+PASS continue unlocks practice
+PASS pause restart executes after unlocking
+PASS title touch entry
+PASS can leave step 0 using pause menu
+PASS skip step 0 save bytes unchanged
+PASS skip step 0 permanent state and RNG unchanged
+PASS skip step 0 permanent card identities unchanged
+PASS title touch entry
+PASS can leave step 1 using pause menu
+PASS skip step 1 save bytes unchanged
+PASS skip step 1 permanent state and RNG unchanged
+PASS skip step 1 permanent card identities unchanged
+PASS title touch entry
+PASS can leave step 2 using pause menu
+PASS skip step 2 save bytes unchanged
+PASS skip step 2 permanent state and RNG unchanged
+PASS skip step 2 permanent card identities unchanged
+PASS title touch entry
+PASS can leave step 3 using pause menu
+PASS skip step 3 save bytes unchanged
+PASS skip step 3 permanent state and RNG unchanged
+PASS skip step 3 permanent card identities unchanged
+PASS adventure remains resumable after practice
+PASS leaving practice restores the previous system back policy
+PASS resumes original adventure route and resources
+Tutorial interaction: 152 passed / 0 failed

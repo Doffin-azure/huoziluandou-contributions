@@ -1,0 +1,10 @@
+Device: emulator-5554 Android SDK built for x86_64
+APK unchanged; skipping installation.
+Starting: Intent { cmp=com.huozi.game/com.godot.game.GodotAppLauncher }
+Status: ok
+LaunchState: COLD
+Activity: com.huozi.game/com.godot.game.GodotApp
+TotalTime: 634
+WaitTime: 646
+Complete
+Ready. --rebuild updates code; --profile changes display; --capture saves the current screen.

@@ -9,7 +9,7 @@ kind = 29
 handler = "gold"
 amount = 3
 args = {}
-note = "立即获得3金币并随机补1字。"
+note = "立即获得3铜钱并随机补1字。"
 
 [sub_resource type="Resource" id="Economy_1"]
 script = ExtResource("1_xmsag")
@@ -17,18 +17,18 @@ kind = 29
 handler = "draw_random"
 amount = 1
 args = {}
-note = "立即获得3金币并随机补1字。"
+note = "立即获得3铜钱并随机补1字。"
 
 [resource]
 script = ExtResource("2_7smfk")
 id = "w074"
 word = "炼金"
 glyphs = Array[String](["炼", "金"])
-description = "立即获得3金币并随机补1字。"
+description = "立即获得3铜钱并随机补1字。"
 effects = Array[ExtResource("1_xmsag")]([SubResource("Economy_0"), SubResource("Economy_1")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "立即获得3金币并随机补1字。"
+effect_summary = "立即获得3铜钱并随机补1字。"
 effect_handler_id = "gold"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P3·补全词效"

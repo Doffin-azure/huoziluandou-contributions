@@ -1,0 +1,114 @@
+{
+  "generator": "built-in image_gen",
+  "date": "2026-10-20",
+  "style": "Chinese ink, bronze and paper possessed-object creatures; no zodiac constraint",
+  "transparent_background": true,
+  "unchanged": {
+    "blank_child": "assets/taopunk/enemies/human_repaint/blank_child.png"
+  },
+  "artworks": [
+    {
+      "id": "ink_creditor",
+      "path": "assets/taopunk/enemies/object_creatures/ink_creditor.png",
+      "style_reference": "assets/taopunk/enemies/zodiac_masks/ink_creditor.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-8357cff7-9609-4a4e-8b5d-d79155601f97.png",
+      "prompt": "Create ONE production-ready transparent full-body enemy sprite for the Chinese word-building roguelike 炼字狱, a haunted printing-underworld game. The provided image is ONLY a STYLE AND MATERIAL REFERENCE for ink outlines, hard-edged painted shading, paper ivory, dark blue-green ink, ochre aged bronze and restrained vermilion accents. Completely redesign the anatomy and silhouette as the described POSSESSED OBJECT CREATURE. The body IS the books/stone/seal/roller/desk/scrolls, with no person inside or behind it. It must read as a weird nonhuman monster immediately when reduced to 200 pixels high. No normal human torso, shoulders, arms, hands, legs, face, skin, beard, hair, scholar hat or person wearing a costume. Do not reuse the reference's humanoid pose. No zodiac theme, no animal-head masks, no fox/bull/tiger/horse/snake/dragon heads or horns. No humanoid body assembled by arranging objects into human anatomy. Rich distinctive intentional design, but simplify into 4-6 large readable masses with crisp silhouettes, assertive variable-width black contours, large connected ink shadows, sculptural hard light planes, selected engraved construction details. NO photoreal lighting, no smooth airbrush gradients, no uniform grain or tiny decorative noise. Full creature completely visible, slight three-quarter view directed toward image LEFT, resting poised for combat, about 8% transparent padding on every side. True transparent RGBA background, no background or vignette, no glow aura, no cast ground shadow, no ground plane, no pedestal/base plate, no captions/UI/labels/borders, not a sheet. The creature should belong to the existing painted ink/bronze/paper world, not imitate another game's specific creature. Design brief: 赊墨商, the haunted debt-ledger entity. A COMPACT LOPSIDED FLOATING PILE OF THREE THICK ANCIENT THREAD-BOUND ACCOUNT BOOKS, short wide/diagonal silhouette, dark ink-blue covers with aged bronze corner caps, ivory paper edges and vermilion binding cords. A large ledger on top opens like an angled snapping trap, page edges curling into a layered zigzag gap with short red tally-stroke marks deep inside, NOT a human face. Two very long narrow receipt-paper streamers coil out from different binding seams, one to image left and one lower right; they are clearly PAPER RIBBONS, no hands or feet. A small antique abacus is caught against the side by binding cord, a bronze coin clasp dangles below. No hat, cloak, limbs, body or animal details. The book pile itself is alive and predatory; a memorable bent-wedge outline. Generous separation of ribbons from main books for animation.",
+      "size": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "4107d6bc6955d7f0d78d9e646a1d25a495fed5a1d97703217e15a9a89a944b0f",
+      "style_reference_sha256": "a7c21d038f5b50b78fd8cdb3b684f7a715cd194bf457275c48984804f429f3df"
+    },
+    {
+      "id": "copy_master",
+      "path": "assets/taopunk/enemies/object_creatures/copy_master.png",
+      "style_reference": "assets/taopunk/enemies/zodiac_masks/copy_master.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-81250c5d-ffa3-4dfb-8ced-7a4f85d31be3.png",
+      "prompt": "Create ONE production-ready transparent full-body enemy sprite for the Chinese word-building roguelike 炼字狱, a haunted printing-underworld game. The provided image is ONLY a STYLE AND MATERIAL REFERENCE for ink outlines, hard-edged painted shading, paper ivory, dark blue-green ink, ochre aged bronze and restrained vermilion accents. Completely redesign the anatomy and silhouette as the described POSSESSED OBJECT CREATURE. The body IS the books/stone/seal/roller/desk/scrolls, with no person inside or behind it. It must read as a weird nonhuman monster immediately when reduced to 200 pixels high. No normal human torso, shoulders, arms, hands, legs, face, skin, beard, hair, scholar hat or person wearing a costume. Do not reuse the reference's humanoid pose. No zodiac theme, no animal-head masks, no fox/bull/tiger/horse/snake/dragon heads or horns. No humanoid body assembled by arranging objects into human anatomy. Rich distinctive intentional design, but simplify into 4-6 large readable masses with crisp silhouettes, assertive variable-width black contours, large connected ink shadows, sculptural hard light planes, selected engraved construction details. NO photoreal lighting, no smooth airbrush gradients, no uniform grain or tiny decorative noise. Full creature completely visible, slight three-quarter view directed toward image LEFT, resting poised for combat, about 8% transparent padding on every side. True transparent RGBA background, no background or vignette, no glow aura, no cast ground shadow, no ground plane, no pedestal/base plate, no captions/UI/labels/borders, not a sheet. The creature should belong to the existing painted ink/bronze/paper world, not imitate another game's specific creature. Design brief: 拓印师, the possessed rubbing-stone. A LOW BROAD HEAVY BROKEN STONE STELE CREATURE, asymmetrical roughly trapezoidal slab with jagged top, shorter left shoulder of STONE not anatomy, one large split fissure through stone containing dark ink. The entire main body is a single ancient slate-gray stone rubbing monument, wide squat silhouette. Ivory rubbing paper partly peels away from the FRONT FACE and folds out to image left like a stiff paper flap, exposing selected stamped ink glyph fragments underneath. A round black rubbing pad hangs at image RIGHT from a thick inky tether; clearly an object with no human fingers. The bottom terminates in THREE IRREGULAR STONE CONTACT POINTS, not carved legs or pedestal. Small worn bronze clamps and one vermilion seal patch hold torn paper. No bull horns, human apprentice, robe, hair, mask, face or animal skull. Heavy cracks in 3 broad shapes, selected carved lines, not dense wallpaper script.",
+      "size": [
+        1312,
+        1199
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "47a6fbaabeec657caa4f624d3e99bc046ac07864b12924d2503f0ebd0e1acecc",
+      "style_reference_sha256": "28460fd11e1cd58cc013a83afba659c2a469e1e887caba82ed93910e6c37c2c5"
+    },
+    {
+      "id": "seal_officer",
+      "path": "assets/taopunk/enemies/object_creatures/seal_officer.png",
+      "style_reference": "assets/taopunk/enemies/zodiac_masks/seal_officer.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-abd8e472-60c8-4ec5-b950-50da9e68668d.png",
+      "prompt": "Create ONE production-ready transparent full-body enemy sprite for the Chinese word-building roguelike 炼字狱, a haunted printing-underworld game. The provided image is ONLY a STYLE AND MATERIAL REFERENCE for ink outlines, hard-edged painted shading, paper ivory, dark blue-green ink, ochre aged bronze and restrained vermilion accents. Completely redesign the anatomy and silhouette as the described POSSESSED OBJECT CREATURE. The body IS the books/stone/seal/roller/desk/scrolls, with no person inside or behind it. It must read as a weird nonhuman monster immediately when reduced to 200 pixels high. No normal human torso, shoulders, arms, hands, legs, face, skin, beard, hair, scholar hat or person wearing a costume. Do not reuse the reference's humanoid pose. No zodiac theme, no animal-head masks, no fox/bull/tiger/horse/snake/dragon heads or horns. No humanoid body assembled by arranging objects into human anatomy. Rich distinctive intentional design, but simplify into 4-6 large readable masses with crisp silhouettes, assertive variable-width black contours, large connected ink shadows, sculptural hard light planes, selected engraved construction details. NO photoreal lighting, no smooth airbrush gradients, no uniform grain or tiny decorative noise. Full creature completely visible, slight three-quarter view directed toward image LEFT, resting poised for combat, about 8% transparent padding on every side. True transparent RGBA background, no background or vignette, no glow aura, no cast ground shadow, no ground plane, no pedestal/base plate, no captions/UI/labels/borders, not a sheet. The creature should belong to the existing painted ink/bronze/paper world, not imitate another game's specific creature. Design brief: 钤印官, an execution-command bronze seal entity. TALL NARROW VERTICALLY STACKED LEVITATING BRONZE SEAL ASSEMBLY with large gaps between separate geometric components. An ancient broad square seal block occupies the LOWER MIDDLE, tilted so its vermilion engraved stamp face is visibly aimed down-left toward the player. Above floats a smaller hollow angular bronze frame and a solid irregular command-plaque shaped crest, NO HEAD OR MASK. Two broken bronze seal-frame fragments orbit near upper sides, unequally sized; thin black INK FILAMENTS link the pieces vertically across gaps, clearly incorporeal supports, not human arms. A single old red binding ribbon spirals around the stack, two short torn ivory edict strips hang below. No humanoid shoulders, no empty human-shaped robe, no hands/feet, no lion-shaped handle or zodiac motifs. A readable threatening suspended stamp-machine/ritual construct, with heavy flat metal planes, sparse deep incised seal-script marks and patina in recesses.",
+      "size": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "3f886ccdf53b3b156eb463761dda2c7af7511c243817a3917a7aeab7d70ab1de",
+      "style_reference_sha256": "cb4940560182ef974b04ecf4a1bffecf824ad990af35f3d90939d824bb79432b"
+    },
+    {
+      "id": "wheel_master",
+      "path": "assets/taopunk/enemies/object_creatures/wheel_master.png",
+      "style_reference": "assets/taopunk/enemies/zodiac_masks/wheel_master.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-ca702e6b-f1d1-4cb2-9553-770e9f4fc315.png",
+      "prompt": "Create ONE production-ready transparent full-body enemy sprite for the Chinese word-building roguelike 炼字狱, a haunted printing-underworld game. The provided image is ONLY a STYLE AND MATERIAL REFERENCE for ink outlines, hard-edged painted shading, paper ivory, dark blue-green ink, ochre aged bronze and restrained vermilion accents. Completely redesign the anatomy and silhouette as the described POSSESSED OBJECT CREATURE. The body IS the books/stone/seal/roller/desk/scrolls, with no person inside or behind it. It must read as a weird nonhuman monster immediately when reduced to 200 pixels high. No normal human torso, shoulders, arms, hands, legs, face, skin, beard, hair, scholar hat or person wearing a costume. Do not reuse the reference's humanoid pose. No zodiac theme, no animal-head masks, no fox/bull/tiger/horse/snake/dragon heads or horns. No humanoid body assembled by arranging objects into human anatomy. Rich distinctive intentional design, but simplify into 4-6 large readable masses with crisp silhouettes, assertive variable-width black contours, large connected ink shadows, sculptural hard light planes, selected engraved construction details. NO photoreal lighting, no smooth airbrush gradients, no uniform grain or tiny decorative noise. Full creature completely visible, slight three-quarter view directed toward image LEFT, resting poised for combat, about 8% transparent padding on every side. True transparent RGBA background, no background or vignette, no glow aura, no cast ground shadow, no ground plane, no pedestal/base plate, no captions/UI/labels/borders, not a sheet. The creature should belong to the existing painted ink/bronze/paper world, not imitate another game's specific creature. Design brief: 轮印师, a haunted cylindrical printing-roller engine. VERY LOW WIDE HORIZONTAL MECHANICAL CREATURE. One enormous INK-BLUE WOODEN PRINTING ROLLER lies diagonally, with a pale engraved landscape band and three large broad vermilion worn streaks. Its thick bronze axle ends protrude from either side and connect to a compact asymmetrical wood-and-bronze frame resting on TWO SMALL OFFSET ROLLERS; no humanoid pushing it. A second narrower scroll spool arches behind at a different angle. Loose ivory printed paper feeds from the cylinder and curls sharply up at image LEFT like an animated cutting tongue. Dark ink drips form short rigid-looking hooks under the frame, NO HUMAN HANDS OR FEET. One small hot-red narrow fissure deep in the axle hub suggests possession; no animal head, horse ears, face or horns. 70% of the silhouette is the large rolling cylinder, with clear mechanical attachment points; no pedestal/ground/baseplate.",
+      "size": [
+        1536,
+        1024
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "2eb1a738d82e2c0cbf80f004f5e34a52ab325fae621d44f44830338f34089115",
+      "style_reference_sha256": "6f8671a9acbcc9733c057642bdee28797b972cdd59596bc2af520c653ce09b72"
+    },
+    {
+      "id": "proof_boss",
+      "path": "assets/taopunk/enemies/object_creatures/proof_boss.png",
+      "style_reference": "assets/taopunk/enemies/zodiac_masks/proof_boss.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-9c4f3a1a-63a1-4e51-a4ce-17e4ec07e994.png",
+      "prompt": "Create ONE production-ready transparent full-body enemy sprite for the Chinese word-building roguelike 炼字狱, a haunted printing-underworld game. The provided image is ONLY a STYLE AND MATERIAL REFERENCE for ink outlines, hard-edged painted shading, paper ivory, dark blue-green ink, ochre aged bronze and restrained vermilion accents. Completely redesign the anatomy and silhouette as the described POSSESSED OBJECT CREATURE. The body IS the books/stone/seal/roller/desk/scrolls, with no person inside or behind it. It must read as a weird nonhuman monster immediately when reduced to 200 pixels high. No normal human torso, shoulders, arms, hands, legs, face, skin, beard, hair, scholar hat or person wearing a costume. Do not reuse the reference's humanoid pose. No zodiac theme, no animal-head masks, no fox/bull/tiger/horse/snake/dragon heads or horns. No humanoid body assembled by arranging objects into human anatomy. Rich distinctive intentional design, but simplify into 4-6 large readable masses with crisp silhouettes, assertive variable-width black contours, large connected ink shadows, sculptural hard light planes, selected engraved construction details. NO photoreal lighting, no smooth airbrush gradients, no uniform grain or tiny decorative noise. Full creature completely visible, slight three-quarter view directed toward image LEFT, resting poised for combat, about 8% transparent padding on every side. True transparent RGBA background, no background or vignette, no glow aura, no cast ground shadow, no ground plane, no pedestal/base plate, no captions/UI/labels/borders, not a sheet. The creature should belong to the existing painted ink/bronze/paper world, not imitate another game's specific creature. Design brief: 对校官, a living judgement-writing desk monster, broad low furniture creature, NO PERSON anywhere. The entire body is a WIDE ANTIQUE DARK WOOD MAGISTRATE DESK, heavy thick tabletop angled toward image left, asymmetric bronze corners and FOUR SHORT CROOKED FURNITURE LEGS, unmistakably wooden table legs not human/animal limbs. Thick uneven piles of bound ivory case-files loom directly out of the tabletop at the rear like an off-center broken battlement, no scholar-shaped silhouette. A single enormous detached CALLIGRAPHY BRUSH floats diagonally above image RIGHT, pointed inwards toward the tabletop, tethered by a thin ink filament; a pair of narrow RED AND BLUE correction slips flutter off image LEFT. Beneath the front table rail is a long dark fissure with short scarlet proofreader strokes inside, no human eyes/nose/lips. Two long vermilion and ivory paper edict strips hang from the front, kept separate and clear of the table's feet. A bronze official seal sits on the tabletop as an ordinary prop; no animal-face carving, throne, head/hat/robe/clerk. A weird sentient instrument of bureaucracy, sharp direct large shape design.",
+      "size": [
+        1438,
+        1094
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "c3f93d2450fff7f34170056d4d881d313ebfed175be9004ca16c040edeb2d84f",
+      "style_reference_sha256": "d75188b2b365828bfa2f18db71141e6db2e9f47e735eaa2bec2356d093ef532b"
+    },
+    {
+      "id": "compiler_boss",
+      "path": "assets/taopunk/enemies/object_creatures/compiler_boss.png",
+      "style_reference": "assets/taopunk/enemies/zodiac_masks/compiler_boss.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-cf5097a4-4249-4b9e-82d5-917aad54d51f.png",
+      "prompt": "Create ONE production-ready transparent full-body enemy sprite for the Chinese word-building roguelike 炼字狱, a haunted printing-underworld game. The provided image is ONLY a STYLE AND MATERIAL REFERENCE for ink outlines, hard-edged painted shading, paper ivory, dark blue-green ink, ochre aged bronze and restrained vermilion accents. Completely redesign the anatomy and silhouette as the described POSSESSED OBJECT CREATURE. The body IS the books/stone/seal/roller/desk/scrolls, with no person inside or behind it. It must read as a weird nonhuman monster immediately when reduced to 200 pixels high. No normal human torso, shoulders, arms, hands, legs, face, skin, beard, hair, scholar hat or person wearing a costume. Do not reuse the reference's humanoid pose. No zodiac theme, no animal-head masks, no fox/bull/tiger/horse/snake/dragon heads or horns. No humanoid body assembled by arranging objects into human anatomy. Rich distinctive intentional design, but simplify into 4-6 large readable masses with crisp silhouettes, assertive variable-width black contours, large connected ink shadows, sculptural hard light planes, selected engraved construction details. NO photoreal lighting, no smooth airbrush gradients, no uniform grain or tiny decorative noise. Full creature completely visible, slight three-quarter view directed toward image LEFT, resting poised for combat, about 8% transparent padding on every side. True transparent RGBA background, no background or vignette, no glow aura, no cast ground shadow, no ground plane, no pedestal/base plate, no captions/UI/labels/borders, not a sheet. The creature should belong to the existing painted ink/bronze/paper world, not imitate another game's specific creature. Design brief: 万词编纂者, the final living archive storm. A TALL HOLLOW ASYMMETRICAL SPIRAL OF ANCIENT IVORY SCROLLS AND DARK INK, rising from narrow loosely coiled paper tails into a broad broken ring at the upper half, with a LARGE CLEAR NEGATIVE SPACE through its center. Paper rolls, detached bronze roller caps and layered dark blue-green binding strips orbit as a single coherent archive creature. Three MAIN BROAD SCROLL BANDS form the silhouette, individually readable, with torn stepping edges and sparse forceful black character fragments. A suspended small rectangular vermilion seal mark sits off-center in the hollow space; NO FACE, eye pair, head, horns, dragon/snake anatomy, human person, robe or legs. Long lower scroll tails are curled stiff paper and never resemble human feet. Occasional black ink filaments connect the rolls. It should feel monumental and alien, like laws and texts have become an autonomous cyclone, not a human sorcerer surrounded by papers. Body broad in upper half and narrower below, 3/4 view, stable dramatic shape, no glow aura.",
+      "size": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "40ca8d5924419b958beafd1dfd605047ad90dd69b270afb95aaa4b721e55db50",
+      "style_reference_sha256": "4e3df44ace6e51af9eb8370dd9144141f7dd4bf5b99739cf5b27ab11f9b40ef7"
+    }
+  ],
+  "unchanged_blank_child_sha256": "6193a52df45f4ca44ea83a2d7c74ad6731ca55ec563b9215fd58970513694057"
+}

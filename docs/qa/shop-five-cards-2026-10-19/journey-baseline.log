@@ -1,0 +1,16 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS reward screen builds
+PASS shop screen builds
+PASS rest screen builds
+PASS event screen builds
+PASS map screen builds
+PASS custom_deck screen builds
+PASS expedition_map screen builds
+PASS glyph_graph screen builds
+PASS word collection retains readable linked rule descriptions
+PASS journey rule popover explicitly retains ivory text across CanvasLayer
+PASS ESC closes the menu even after a button receives keyboard focus
+[journey_ui_test] PASS=11 FAIL=0

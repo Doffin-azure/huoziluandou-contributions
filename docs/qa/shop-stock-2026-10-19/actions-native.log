@@ -1,0 +1,134 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+WARNING: Volumetric fog is only available when using the Forward+ renderer.
+   at: environment_set_volumetric_fog (servers/rendering/storage/environment_storage.cpp:458)
+   GDScript backtrace (most recent call first):
+       [0] _build_light (res://src/ui/object_stage/object_stage.gd:91)
+       [1] _ready (res://src/ui/object_stage/object_stage.gd:22)
+       [2] _ready (res://src/ui/object_stage/object_stage_view.gd:22)
+       [3] build (res://src/screens/shop_screen.gd:34)
+       [4] _ready (res://src/screens/screen_base.gd:35)
+       [5] goto (res://src/autoload/router.gd:44)
+       [6] _run (res://tests/shop_actions_test.gd:64)
+WARNING: Depth of field blur is only available when using the Forward+ or Mobile renderer.
+   at: camera_attributes_set_dof_blur (servers/rendering/storage/camera_attributes_storage.cpp:74)
+   GDScript backtrace (most recent call first):
+       [0] _build_light (res://src/ui/object_stage/object_stage.gd:119)
+       [1] _ready (res://src/ui/object_stage/object_stage.gd:22)
+       [2] _ready (res://src/ui/object_stage/object_stage_view.gd:22)
+       [3] build (res://src/screens/shop_screen.gd:34)
+       [4] _ready (res://src/screens/screen_base.gd:35)
+       [5] goto (res://src/autoload/router.gd:44)
+       [6] _run (res://tests/shop_actions_test.gd:64)
+PASS refresh disabled below five gold
+PASS stock contains three distinct random relics
+PASS stock prices follow relic rarity and exclude owned relics
+PASS build complete relic model: strike
+PASS build complete relic model: breach
+PASS build complete relic model: slab
+PASS build complete relic model: press
+PASS build complete relic model: sleep
+PASS build complete relic model: clean
+PASS build complete relic model: wheel
+PASS build complete relic model: powerbank
+PASS build complete relic model: fireman
+PASS build complete relic model: fertilizer
+PASS build complete relic model: skyfire
+PASS build complete relic model: blitz
+PASS build complete relic model: egg
+PASS build complete relic model: buckler
+PASS build complete relic model: barrier
+PASS only an actual stocked relic can enter purchase confirmation
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS seed sweep covers distinct stock and all three price tiers
+PASS insufficient gold cannot purchase
+PASS clicked specimen opens its own description and exact price
+PASS confirmation blocks underlying refresh and purchase
+PASS cancel changes no ownership, gold or RNG
+PASS confirmed specimen purchase debits its own price exactly once
+PASS bought specimen leaves a gap and other stock remains
+PASS purchased display slot is not replaced
+PASS capture sold-slot
+PASS purchase checkpoint accepted
+PASS purchase checkpoint resumes
+PASS ownership, prices and empty slot survive resume
+PASS first refresh spends five and preserves services
+PASS refresh restores three stock items without owned relics
+PASS compact dial updates next fee to ten
+PASS refresh count checkpoint accepted
+PASS refresh count checkpoint resumes
+PASS resume preserves next refresh fee
+PASS second refresh costs ten and advances fee to fifteen
+PASS owned collection produces no stock
+PASS one remaining relic produces one sale item
+PASS rare bound relic costs seventy and opens glyph picker
+PASS binding blocks refresh charges
+PASS closing picker completes binding and unlocks shop
+PASS one small refresh dial replaces the giant generic buttons
+PASS individual relic retains 48px target: clean
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: strike
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: slab
+PASS displayed specimen matches offered identity
+PASS refresh dial is compact with accessible hit target
+PASS capture shop-1920x1080
+PASS actual mouse click selects displayed relic
+PASS capture purchase-1920x1080
+PASS mouse activates compact refresh exactly once (gold=195, next=10)
+PASS capture refreshed-1920x1080
+PASS touch selects physical relic
+PASS keyboard activates focused relic
+PASS one small refresh dial replaces the giant generic buttons
+PASS individual relic retains 48px target: clean
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: strike
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: slab
+PASS displayed specimen matches offered identity
+PASS refresh dial is compact with accessible hit target
+PASS capture shop-960x432
+PASS actual mouse click selects displayed relic
+PASS capture purchase-960x432
+PASS mouse activates compact refresh exactly once (gold=195, next=10)
+PASS capture refreshed-960x432
+PASS touch selects physical relic
+PASS keyboard activates focused relic
+PASS one small refresh dial replaces the giant generic buttons
+PASS individual relic retains 48px target: clean
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: strike
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: slab
+PASS displayed specimen matches offered identity
+PASS refresh dial is compact with accessible hit target
+PASS capture shop-640x360
+PASS actual mouse click selects displayed relic
+PASS capture purchase-640x360
+PASS mouse activates compact refresh exactly once (gold=195, next=10)
+PASS capture refreshed-640x360
+PASS touch selects physical relic
+PASS keyboard activates focused relic
+[shop_actions_test] PASS=108 FAIL=0 TOTAL=108

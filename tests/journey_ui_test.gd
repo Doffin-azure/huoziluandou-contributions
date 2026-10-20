@@ -174,10 +174,9 @@ func _verify_actions() -> void:
 	var offer_count: int = shop._offers.size()
 	var settings := SettingsOverlay.new()
 	shop.add_child(settings)
-	settings._set_style("neon")
+	settings.find_children("*", "Button", true, false).filter(func(b): return b.text == "关闭")[0].pressed.emit()
 	await _frames()
-	_ok(Router.current == current and GameState.rng.state == rng_state and shop._offers.size() == offer_count, "battle theme setting does not recreate the shop or reroll its offers")
-	settings.queue_free()
+	_ok(Router.current == current and GameState.rng.state == rng_state and shop._offers.size() == offer_count, "opening and closing settings does not recreate the shop or reroll its offers")
 	Ink.apply_style(GameStyle.paper())
 	var rest := await _open("rest")
 	var hp_before: int = GameState.player_hp

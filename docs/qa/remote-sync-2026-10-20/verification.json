@@ -1,0 +1,125 @@
+{
+  "upstream_main": "995ed750260acfed86b3e6da0e5b93b2ca01123e",
+  "local_checkpoint": "b5c8347",
+  "branch": "refactor/frontend-legacy-cleanup",
+  "remote_commits_merged": 24,
+  "suites": [
+    {
+      "suite": "logic_test",
+      "checks": 251,
+      "failures": 0,
+      "log": "logic_test.log"
+    },
+    {
+      "suite": "relic_test",
+      "checks": 136,
+      "failures": 0,
+      "log": "relic_test.log"
+    },
+    {
+      "suite": "relic_batch2_test",
+      "checks": 60,
+      "failures": 0,
+      "log": "relic_batch2_test.log"
+    },
+    {
+      "suite": "relic_edge_test",
+      "checks": 104,
+      "failures": 0,
+      "log": "relic_edge_test.log"
+    },
+    {
+      "suite": "jialiu_word_test",
+      "checks": 5,
+      "failures": 0,
+      "log": "jialiu_word_test.log"
+    },
+    {
+      "suite": "event_system_test",
+      "checks": 630,
+      "failures": 0,
+      "log": "event_system_test.log"
+    },
+    {
+      "suite": "garden_route_planning_test",
+      "checks": 94,
+      "failures": 0,
+      "log": "garden_route_planning_test.log"
+    },
+    {
+      "suite": "node_route_test",
+      "checks": 196,
+      "failures": 0,
+      "log": "node_route_test.log"
+    },
+    {
+      "suite": "shop_refresh_test",
+      "checks": 24,
+      "failures": 0,
+      "log": "shop_refresh_test.log"
+    },
+    {
+      "suite": "event_interaction_test",
+      "checks": 43,
+      "failures": 0,
+      "log": "event_interaction_test.log"
+    },
+    {
+      "suite": "relic_compendium_test",
+      "checks": 23,
+      "failures": 0,
+      "log": "relic_compendium_test.log"
+    },
+    {
+      "suite": "shop_actions_test",
+      "checks": 162,
+      "failures": 0,
+      "log": "shop_actions_test.log"
+    },
+    {
+      "suite": "remote_sync_test",
+      "checks": 23,
+      "failures": 0,
+      "log": "remote_sync_test.log"
+    },
+    {
+      "suite": "relic_art_test",
+      "checks": 205,
+      "failures": 0,
+      "log": "relic_art_test.log"
+    },
+    {
+      "suite": "relic_expansion_test",
+      "checks": 81,
+      "failures": 0,
+      "log": "relic_expansion_test.log"
+    },
+    {
+      "suite": "node_route_runtime",
+      "checks": 21,
+      "failures": 0,
+      "log": "node_route_runtime.log"
+    },
+    {
+      "suite": "enemy_art_completion_test",
+      "checks": 429,
+      "failures": 0,
+      "log": "enemy_art_completion_test.log"
+    },
+    {
+      "suite": "title_menu_test",
+      "checks": 18,
+      "failures": 0,
+      "log": "title_menu_test.log"
+    }
+  ],
+  "checks": 2505,
+  "failures": 0,
+  "preserved_pngs": 92,
+  "current_relic_icons": 39,
+  "known_baseline_test_issue": {
+    "suite": "autosave_test",
+    "baseline_commit": "b5c8347",
+    "reason": "Legacy test references title_screen._continue_button, which was already absent before this merge. Kept unchanged; not included in the passing suite count. Current room-run save/restore is covered by remote_sync_test and relic_expansion_test."
+  }
+}

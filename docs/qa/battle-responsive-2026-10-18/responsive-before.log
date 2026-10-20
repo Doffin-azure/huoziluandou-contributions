@@ -1,0 +1,355 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+MEASURE 1280x720-0dpi viewport=(1280.0, 720.0) board=[P: (449.2929, 162.1818), S: (365.2525, 365.2525)] paper=[P: (129.2929, 189.3333), S: (316.7677, 336.1617)]
+ERROR: 1280x720-0dpi desktop board occupies at least 70% of height
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:55)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 1280x720-0dpi desktop header uses top of viewport
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:56)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 1280x720-0dpi desktop paper uses left side of viewport
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:57)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 1280x720-0dpi paper and board stay separate
+PASS 1280x720-0dpi real solo play applies next-turn draw buff
+ERROR: 1280x720-0dpi first buff does not move or shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:69)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 1280x720-0dpi first buff does not shift board or enemy paper
+PASS 1280x720-0dpi player buff does not shift enemy portrait
+ERROR: 1280x720-0dpi many buffs do not shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:81)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 1280x720-0dpi status strip never covers paper or board
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:83)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 1280x720-0dpi status strip does not cover HP or wallet
+PASS 1280x720-0dpi each status fits reserved row
+PASS 1280x720-0dpi each status fits reserved row
+PASS 1280x720-0dpi each status fits reserved row
+PASS 1280x720-0dpi each status fits reserved row
+PASS 1280x720-0dpi each status fits reserved row
+PASS 1280x720-0dpi each status fits reserved row
+PASS 1280x720-0dpi each status fits reserved row
+PASS 1280x720-0dpi each status fits reserved row
+PASS 1280x720-0dpi excessive buffs have a details entry
+PASS 1280x720-0dpi removing all statuses leaves paper unchanged
+PASS 1280x720-0dpi main region fits viewport
+PASS 1280x720-0dpi main region fits viewport
+PASS 1280x720-0dpi main region fits viewport
+PASS 1280x720-0dpi main region fits viewport
+PASS 1280x720-0dpi main region fits viewport
+MEASURE 1920x1080-0dpi viewport=(1280.0, 720.0) board=[P: (449.2929, 162.1818), S: (365.2525, 365.2525)] paper=[P: (129.2929, 189.3333), S: (316.7677, 336.1617)]
+ERROR: 1920x1080-0dpi desktop board occupies at least 70% of height
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:55)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 1920x1080-0dpi desktop header uses top of viewport
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:56)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 1920x1080-0dpi desktop paper uses left side of viewport
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:57)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 1920x1080-0dpi paper and board stay separate
+PASS 1920x1080-0dpi real solo play applies next-turn draw buff
+ERROR: 1920x1080-0dpi first buff does not move or shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:69)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 1920x1080-0dpi first buff does not shift board or enemy paper
+PASS 1920x1080-0dpi player buff does not shift enemy portrait
+ERROR: 1920x1080-0dpi many buffs do not shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:81)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 1920x1080-0dpi status strip never covers paper or board
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:83)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 1920x1080-0dpi status strip does not cover HP or wallet
+PASS 1920x1080-0dpi each status fits reserved row
+PASS 1920x1080-0dpi each status fits reserved row
+PASS 1920x1080-0dpi each status fits reserved row
+PASS 1920x1080-0dpi each status fits reserved row
+PASS 1920x1080-0dpi each status fits reserved row
+PASS 1920x1080-0dpi each status fits reserved row
+PASS 1920x1080-0dpi each status fits reserved row
+PASS 1920x1080-0dpi each status fits reserved row
+PASS 1920x1080-0dpi excessive buffs have a details entry
+PASS 1920x1080-0dpi removing all statuses leaves paper unchanged
+PASS 1920x1080-0dpi main region fits viewport
+PASS 1920x1080-0dpi main region fits viewport
+PASS 1920x1080-0dpi main region fits viewport
+PASS 1920x1080-0dpi main region fits viewport
+PASS 1920x1080-0dpi main region fits viewport
+MEASURE 2560x1440-0dpi viewport=(1280.0, 720.0) board=[P: (449.2929, 162.1818), S: (365.2525, 365.2525)] paper=[P: (129.2929, 189.3333), S: (316.7677, 336.1617)]
+ERROR: 2560x1440-0dpi desktop board occupies at least 70% of height
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:55)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 2560x1440-0dpi desktop header uses top of viewport
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:56)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 2560x1440-0dpi desktop paper uses left side of viewport
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:57)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 2560x1440-0dpi paper and board stay separate
+PASS 2560x1440-0dpi real solo play applies next-turn draw buff
+ERROR: 2560x1440-0dpi first buff does not move or shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:69)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 2560x1440-0dpi first buff does not shift board or enemy paper
+PASS 2560x1440-0dpi player buff does not shift enemy portrait
+ERROR: 2560x1440-0dpi many buffs do not shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:81)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 2560x1440-0dpi status strip never covers paper or board
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:83)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 2560x1440-0dpi status strip does not cover HP or wallet
+PASS 2560x1440-0dpi each status fits reserved row
+PASS 2560x1440-0dpi each status fits reserved row
+PASS 2560x1440-0dpi each status fits reserved row
+PASS 2560x1440-0dpi each status fits reserved row
+PASS 2560x1440-0dpi each status fits reserved row
+PASS 2560x1440-0dpi each status fits reserved row
+PASS 2560x1440-0dpi each status fits reserved row
+PASS 2560x1440-0dpi each status fits reserved row
+PASS 2560x1440-0dpi excessive buffs have a details entry
+PASS 2560x1440-0dpi removing all statuses leaves paper unchanged
+PASS 2560x1440-0dpi main region fits viewport
+PASS 2560x1440-0dpi main region fits viewport
+PASS 2560x1440-0dpi main region fits viewport
+PASS 2560x1440-0dpi main region fits viewport
+PASS 2560x1440-0dpi main region fits viewport
+MEASURE 3200x1778-0dpi viewport=(1295.0, 720.0) board=[P: (454.5581, 159.8636), S: (369.5329, 369.5328)] paper=[P: (130.8081, 187.3333), S: (320.4798, 340.101)]
+ERROR: 3200x1778-0dpi desktop board occupies at least 70% of height
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:55)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 3200x1778-0dpi desktop header uses top of viewport
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:56)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 3200x1778-0dpi desktop paper uses left side of viewport
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:57)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 3200x1778-0dpi paper and board stay separate
+PASS 3200x1778-0dpi real solo play applies next-turn draw buff
+ERROR: 3200x1778-0dpi first buff does not move or shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:69)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 3200x1778-0dpi first buff does not shift board or enemy paper
+PASS 3200x1778-0dpi player buff does not shift enemy portrait
+ERROR: 3200x1778-0dpi many buffs do not shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:81)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 3200x1778-0dpi status strip never covers paper or board
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:83)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 3200x1778-0dpi status strip does not cover HP or wallet
+PASS 3200x1778-0dpi each status fits reserved row
+PASS 3200x1778-0dpi each status fits reserved row
+PASS 3200x1778-0dpi each status fits reserved row
+PASS 3200x1778-0dpi each status fits reserved row
+PASS 3200x1778-0dpi each status fits reserved row
+PASS 3200x1778-0dpi each status fits reserved row
+PASS 3200x1778-0dpi each status fits reserved row
+PASS 3200x1778-0dpi each status fits reserved row
+PASS 3200x1778-0dpi excessive buffs have a details entry
+PASS 3200x1778-0dpi removing all statuses leaves paper unchanged
+PASS 3200x1778-0dpi main region fits viewport
+PASS 3200x1778-0dpi main region fits viewport
+PASS 3200x1778-0dpi main region fits viewport
+PASS 3200x1778-0dpi main region fits viewport
+PASS 3200x1778-0dpi main region fits viewport
+MEASURE 3440x1440-0dpi viewport=(1720.0, 720.0) board=[P: (603.7374, 94.18182), S: (490.808, 490.808)] paper=[P: (173.7374, 130.6667), S: (425.6566, 451.7171)]
+ERROR: 3440x1440-0dpi desktop board occupies at least 70% of height
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:55)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 3440x1440-0dpi desktop header uses top of viewport
+ERROR: 3440x1440-0dpi desktop paper uses left side of viewport
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:57)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 3440x1440-0dpi paper and board stay separate
+PASS 3440x1440-0dpi real solo play applies next-turn draw buff
+ERROR: 3440x1440-0dpi first buff does not move or shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:69)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 3440x1440-0dpi first buff does not shift board or enemy paper
+PASS 3440x1440-0dpi player buff does not shift enemy portrait
+ERROR: 3440x1440-0dpi many buffs do not shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:81)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 3440x1440-0dpi status strip never covers paper or board
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:83)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 3440x1440-0dpi status strip does not cover HP or wallet
+PASS 3440x1440-0dpi each status fits reserved row
+PASS 3440x1440-0dpi each status fits reserved row
+PASS 3440x1440-0dpi each status fits reserved row
+PASS 3440x1440-0dpi each status fits reserved row
+PASS 3440x1440-0dpi each status fits reserved row
+PASS 3440x1440-0dpi each status fits reserved row
+PASS 3440x1440-0dpi each status fits reserved row
+PASS 3440x1440-0dpi each status fits reserved row
+PASS 3440x1440-0dpi excessive buffs have a details entry
+PASS 3440x1440-0dpi removing all statuses leaves paper unchanged
+PASS 3440x1440-0dpi main region fits viewport
+PASS 3440x1440-0dpi main region fits viewport
+PASS 3440x1440-0dpi main region fits viewport
+PASS 3440x1440-0dpi main region fits viewport
+PASS 3440x1440-0dpi main region fits viewport
+MEASURE 1280x720-320dpi viewport=(1280.0, 720.0) board=[P: (388.0, 104.0), S: (504.0, 504.0)] paper=[P: (16.0, 104.0), S: (360.0, 504.0)]
+PASS 1280x720-320dpi paper and board stay separate
+PASS 1280x720-320dpi real solo play applies next-turn draw buff
+ERROR: 1280x720-320dpi first buff does not move or shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:69)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 1280x720-320dpi first buff does not shift board or enemy paper
+PASS 1280x720-320dpi player buff does not shift enemy portrait
+ERROR: 1280x720-320dpi many buffs do not shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:81)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 1280x720-320dpi status strip never covers paper or board
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:83)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 1280x720-320dpi status strip does not cover HP or wallet
+PASS 1280x720-320dpi each status fits reserved row
+PASS 1280x720-320dpi each status fits reserved row
+PASS 1280x720-320dpi each status fits reserved row
+PASS 1280x720-320dpi excessive buffs have a details entry
+PASS 1280x720-320dpi phone keeps 48dp status and action targets
+PASS 1280x720-320dpi removing all statuses leaves paper unchanged
+PASS 1280x720-320dpi main region fits viewport
+PASS 1280x720-320dpi main region fits viewport
+PASS 1280x720-320dpi main region fits viewport
+PASS 1280x720-320dpi main region fits viewport
+PASS 1280x720-320dpi main region fits viewport
+MEASURE 2400x1080-440dpi viewport=(1280.0, 720.0) board=[P: (428.5, 143.0), S: (423.0, 423.0)] paper=[P: (22.0, 143.0), S: (390.0, 423.0)]
+PASS 2400x1080-440dpi paper and board stay separate
+PASS 2400x1080-440dpi real solo play applies next-turn draw buff
+ERROR: 2400x1080-440dpi first buff does not move or shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:69)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 2400x1080-440dpi first buff does not shift board or enemy paper
+PASS 2400x1080-440dpi player buff does not shift enemy portrait
+ERROR: 2400x1080-440dpi many buffs do not shrink paper
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:81)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+ERROR: 2400x1080-440dpi status strip never covers paper or board
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/battle_responsive_layout_test.gd:24)
+       [1] profile (res://tests/battle_responsive_layout_test.gd:83)
+       [2] frames (res://tests/battle_responsive_layout_test.gd:19)
+PASS 2400x1080-440dpi status strip does not cover HP or wallet
+PASS 2400x1080-440dpi each status fits reserved row
+PASS 2400x1080-440dpi each status fits reserved row
+PASS 2400x1080-440dpi excessive buffs have a details entry
+PASS 2400x1080-440dpi phone keeps 48dp status and action targets
+PASS 2400x1080-440dpi removing all statuses leaves paper unchanged
+PASS 2400x1080-440dpi main region fits viewport
+PASS 2400x1080-440dpi main region fits viewport
+PASS 2400x1080-440dpi main region fits viewport
+PASS 2400x1080-440dpi main region fits viewport
+PASS 2400x1080-440dpi main region fits viewport
+RESPONSIVE BATTLE: 132 passed / 35 failed

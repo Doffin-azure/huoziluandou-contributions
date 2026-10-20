@@ -99,7 +99,7 @@ static func _replay_last_attack(b: BattleState) -> Array:
 	if b.last_attack_word == null or b.last_attack_effects.is_empty():
 		return ["连击：此前没有可重演的即时攻击"]
 	var msgs: Array = []
-	# 刑卒护指（打击增强）：重演不算「带【击】」的出字
+	# 刻刀（打击增强）：重演不算「带【击】」的出字
 	var strike_was := b.strike_active
 	b.strike_active = false
 	for e in b.last_attack_effects:
@@ -236,7 +236,7 @@ static func _solo_neighbor_action(b: BattleState, ctx: Dictionary, handler: Stri
 			b.temp_chars.erase(target)
 			var earned := b.earn_gold(BattleBalance.i("refine_junk_gold", 1))
 			b.add_heat(BattleBalance.i("refine_junk_heat", 1))
-			return ["炼：移除杂字【%s】，获得 %d 金币、热度 +1" % [target.glyph(), earned]]
+			return ["炼：移除杂字【%s】，获得 %d 铜钱、热度 +1" % [target.glyph(), earned]]
 	return []
 
 ## 精/购移动选定原实体；候选预览不改变字袋，只有确认成功才记补字或支付。
@@ -299,6 +299,8 @@ static func _cleanse_adjacent(b: BattleState, ctx: Dictionary, all_tags := false
 		inst.clear_pollutions()
 	else:
 		inst.pollutions.remove_at(0)
+	if inst.pollutions.is_empty():
+		Relics.on_cleansed(b, 1)
 	return ["%s：清除【%s】的 %d 个污染标签（保留原字与归属）" % [name, inst.glyph(), n]]
 
 static func _move_neighbor(b: BattleState, ctx: Dictionary) -> Array:
@@ -361,7 +363,7 @@ static func _capture_glyph(b: BattleState, ctx: Dictionary, cost: int) -> Array:
 	inst.clear_pollutions()
 	b.board.clear_xy(tile)
 	b.captured_chars.append(inst)
-	return ["收购：支付 %d 金币，永久收编【%s】" % [cost, inst.glyph()]]
+	return ["收购：支付 %d 铜钱，永久收编【%s】" % [cost, inst.glyph()]]
 
 static func _empower_glyph(b: BattleState, ctx: Dictionary) -> Array:
 	var g: String = str(ctx.get("target", {}).get("empower_glyph", ""))
@@ -375,7 +377,7 @@ static func _refine_remove(b: BattleState, ctx: Dictionary, eff: EffectData) -> 
 	var gold_up: int = int(eff.args.get("gold", 4))
 	b.add_heat(-heat_down)
 	EffectUtil.add_gold(b, gold_up)
-	var msgs: Array = ["炼化：热度 -%d，获得 %d 金币" % [heat_down, gold_up]]
+	var msgs: Array = ["炼化：热度 -%d，获得 %d 铜钱" % [heat_down, gold_up]]
 	var g: String = str(ctx.get("target", {}).get("remove_glyph", ""))
 	var removed: CharInstance = b.remove_from_battle_glyph(g)
 	if removed != null:
@@ -437,7 +439,7 @@ static func _gild_glyph(b: BattleState, ctx: Dictionary, eff: EffectData) -> Arr
 		return ["镀金：金币不足"]
 	GameState.gild_character(inst)
 	EventBus.deck_changed.emit()
-	return ["镀金：【%s】#%d 永久镀金，每次有效单字或组词打出+%d金币" % [inst.glyph(), inst.uid, BattleBalance.i("gild_gold", 1)]]
+	return ["镀金：【%s】#%d 永久镀金，每次有效单字或组词打出+%d铜钱" % [inst.glyph(), inst.uid, BattleBalance.i("gild_gold", 1)]]
 
 ## 精铸：把盘面一枚己方实体字固定（本场不消耗、可反复使用；不可移动/换字）。
 static func _pin_glyph(b: BattleState, ctx: Dictionary) -> Array:

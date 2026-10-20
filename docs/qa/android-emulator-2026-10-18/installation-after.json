@@ -1,0 +1,9 @@
+{
+  "fields": [
+    "versionCode=2026101801 minSdk=24 targetSdk=36",
+    "versionName=2026.10.18-automatic-test",
+    "lastUpdateTime=2026-10-18 04:03:25",
+    "firstInstallTime=2026-10-18 04:01:01"
+  ],
+  "preset_sha256": "c7cb2438566c435e4fd408cb280f98ae5d950072420c19ddde25f21c27d6c571"
+}

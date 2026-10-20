@@ -11,6 +11,7 @@ const GLYPHS := ["击", "破", "回", "流", "防", "御", "加", "速", "充", 
 
 
 func _ready() -> void:
+	Settings.storage_path = "user://battle_presentation_regression-settings.cfg"
 	_capture = OS.get_cmdline_user_args().has("--capture")
 	_saved_motion = Settings.reduced_motion
 	_saved_volume = Settings.sfx_volume
@@ -114,9 +115,9 @@ func _run() -> void:
 	battle.enable_ability("counter", 3)
 	_screen._refresh_all()
 	_ok(_screen._player_status.entries.any(func(item): return item.id == "heat" and item.stacks == 4) and _screen._player_status.entries.any(func(item): return item.id == "energy" and item.stacks == 3), "资源并入状态栏，读取真实热度与储能数值")
-	_ok(_screen._player_status._buttons.all(func(button): return button.text.is_empty() and button.get_child(0) is BattleSymbol), "能力按钮没有汉字标签，使用独立图形符号")
-	var descriptions_available := StatusDisplay.ABILITY_NAMES.keys().all(func(id): return BattleSymbol.SPECS.has(id))
-	_ok(descriptions_available, "词库中的所有已知能力都有对应图形，没有字形回退")
+	_ok(_screen._player_status._buttons.all(func(button): return button.get_node("Glyph") is Label and not button.get_node("Glyph").text.is_empty()), "能力按钮显示汉字方牌，不使用图形符号")
+	var descriptions_available := _screen._player_status.entries.all(func(entry): return str(entry.glyph).length() == 1 and not str(entry.description).is_empty())
+	_ok(descriptions_available, "每个活动状态都有单字标签和完整说明")
 	_screen._player_status.item_for("heat").pressed.emit()
 	await _frames()
 	_ok(_screen._modal_count == 1 and not board._interactable, "点击资源符号可查看热度说明，浮层不穿透战斗")
@@ -392,7 +393,7 @@ func _run() -> void:
 		battle.player.persistent_block = 256
 		_screen._refresh_all()
 		await _frames()
-		_ok(not _screen._gold_strip.get_global_rect().intersects(_screen._player_status.get_global_rect()) and not _screen._gold_strip.get_global_rect().intersects(_screen._turn_label.get_global_rect()), "手机只显示普通金币，不与回合或状态挤在一起")
+		_ok(not _screen._gold_strip.get_global_rect().intersects(_screen._player_status.get_global_rect()) and not _screen._gold_strip.get_global_rect().intersects(_screen._turn_label.get_global_rect()), "手机只显示普通铜钱，不与回合或状态挤在一起")
 		_ok(not _screen._player_hp_value.get_global_rect().intersects(_screen._player_status.get_global_rect()), "三位数护盾不覆盖手机气血数值")
 		await _shot("battle-symbol-hud-phone-resources")
 		battle.player.block = 0

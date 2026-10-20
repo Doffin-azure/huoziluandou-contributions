@@ -61,3 +61,6 @@ __pycache__/
 
 # Documentation preview import sidecars are generated locally by the editor.
 docs/**/*.import
+
+# Local QA captures and intermediate exports; selected review artifacts are tracked explicitly.
+/docs/qa/

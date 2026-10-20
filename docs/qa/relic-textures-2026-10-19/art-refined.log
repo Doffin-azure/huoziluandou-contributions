@@ -1,0 +1,117 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS every current relic has an exported texture
+PASS strike imports at 1024 square
+PASS strike has visible art on transparent background
+PASS strike has its own intact specimen render
+PASS strike stands directly on the counter without a display plinth
+PASS strike keeps authored components batched into at most twelve material surfaces
+PASS breach imports at 1024 square
+PASS breach has visible art on transparent background
+PASS breach has its own intact specimen render
+PASS breach stands directly on the counter without a display plinth
+PASS breach keeps authored components batched into at most twelve material surfaces
+PASS slab imports at 1024 square
+PASS slab has visible art on transparent background
+PASS slab has its own intact specimen render
+PASS slab stands directly on the counter without a display plinth
+PASS slab keeps authored components batched into at most twelve material surfaces
+PASS press imports at 1024 square
+PASS press has visible art on transparent background
+PASS press has its own intact specimen render
+PASS press stands directly on the counter without a display plinth
+PASS press keeps authored components batched into at most twelve material surfaces
+PASS sleep imports at 1024 square
+PASS sleep has visible art on transparent background
+PASS sleep has its own intact specimen render
+PASS sleep stands directly on the counter without a display plinth
+PASS sleep keeps authored components batched into at most twelve material surfaces
+PASS clean imports at 1024 square
+PASS clean has visible art on transparent background
+PASS clean has its own intact specimen render
+PASS clean stands directly on the counter without a display plinth
+PASS clean keeps authored components batched into at most twelve material surfaces
+PASS wheel imports at 1024 square
+PASS wheel has visible art on transparent background
+PASS wheel has its own intact specimen render
+PASS wheel stands directly on the counter without a display plinth
+PASS wheel keeps authored components batched into at most twelve material surfaces
+PASS powerbank imports at 1024 square
+PASS powerbank has visible art on transparent background
+PASS powerbank has its own intact specimen render
+PASS powerbank stands directly on the counter without a display plinth
+PASS powerbank keeps authored components batched into at most twelve material surfaces
+PASS fireman imports at 1024 square
+PASS fireman has visible art on transparent background
+PASS fireman has its own intact specimen render
+PASS fireman stands directly on the counter without a display plinth
+PASS fireman keeps authored components batched into at most twelve material surfaces
+PASS fertilizer imports at 1024 square
+PASS fertilizer has visible art on transparent background
+PASS fertilizer has its own intact specimen render
+PASS fertilizer stands directly on the counter without a display plinth
+PASS fertilizer keeps authored components batched into at most twelve material surfaces
+PASS skyfire imports at 1024 square
+PASS skyfire has visible art on transparent background
+PASS skyfire has its own intact specimen render
+PASS skyfire stands directly on the counter without a display plinth
+PASS skyfire keeps authored components batched into at most twelve material surfaces
+PASS blitz imports at 1024 square
+PASS blitz has visible art on transparent background
+PASS blitz has its own intact specimen render
+PASS blitz stands directly on the counter without a display plinth
+PASS blitz keeps authored components batched into at most twelve material surfaces
+PASS egg imports at 1024 square
+PASS egg has visible art on transparent background
+PASS egg has its own intact specimen render
+PASS egg stands directly on the counter without a display plinth
+PASS egg keeps authored components batched into at most twelve material surfaces
+PASS buckler imports at 1024 square
+PASS buckler has visible art on transparent background
+PASS buckler has its own intact specimen render
+PASS buckler stands directly on the counter without a display plinth
+PASS buckler keeps authored components batched into at most twelve material surfaces
+PASS barrier imports at 1024 square
+PASS barrier has visible art on transparent background
+PASS barrier has its own intact specimen render
+PASS barrier stands directly on the counter without a display plinth
+PASS barrier keeps authored components batched into at most twelve material surfaces
+PASS unknown relic cannot display an unrelated icon
+WARNING: Volumetric fog is only available when using the Forward+ renderer.
+   at: environment_set_volumetric_fog (servers/rendering/storage/environment_storage.cpp:458)
+   GDScript backtrace (most recent call first):
+       [0] _build_light (res://src/ui/object_stage/object_stage.gd:92)
+       [1] _ready (res://src/ui/object_stage/object_stage.gd:23)
+       [2] _ready (res://src/ui/object_stage/object_stage_view.gd:22)
+       [3] build (res://src/screens/shop_screen.gd:41)
+       [4] _ready (res://src/screens/screen_base.gd:35)
+       [5] goto (res://src/autoload/router.gd:44)
+       [6] _run (res://tests/relic_art_test.gd:70)
+WARNING: Depth of field blur is only available when using the Forward+ or Mobile renderer.
+   at: camera_attributes_set_dof_blur (servers/rendering/storage/camera_attributes_storage.cpp:74)
+   GDScript backtrace (most recent call first):
+       [0] _build_light (res://src/ui/object_stage/object_stage.gd:120)
+       [1] _ready (res://src/ui/object_stage/object_stage.gd:23)
+       [2] _ready (res://src/ui/object_stage/object_stage_view.gd:22)
+       [3] build (res://src/screens/shop_screen.gd:41)
+       [4] _ready (res://src/screens/screen_base.gd:35)
+       [5] goto (res://src/autoload/router.gd:44)
+       [6] _run (res://tests/relic_art_test.gd:70)
+PASS capture shop-refined-1280
+PASS purchase confirmation depicts the exact stocked relic
+PASS capture purchase-1280
+PASS previewing art leaves purchase and gold unchanged
+PASS (1280, 720) reward art matches all three candidates
+PASS (1280, 720) reward icons keep every choice visible
+PASS capture reward-1280
+PASS (640, 360) reward art matches all three candidates
+PASS (640, 360) reward icons keep every choice visible
+PASS capture reward-640
+PASS battle guide displays the full owned collection
+PASS capture battle-collection-1280
+PASS expedition loadout displays the full owned collection
+PASS capture loadout-1280
+[relic_art_test] PASS=91 FAIL=0 TOTAL=91

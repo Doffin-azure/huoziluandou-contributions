@@ -6,6 +6,7 @@ const EXPECTED_CHECKS := 417
 var checks: Array = []
 
 func _ready() -> void:
+	Settings.storage_path = "user://word_effect_regression-settings.cfg"
 	_run_controls()
 	_run_logic()
 	_run_baojinbi()
@@ -159,7 +160,7 @@ func _run_description_previews() -> void:
 		unified = unified and word.describe() == BattleText.word(word) and word.description == word.effect_summary
 		for stale in ["P23初稿", "尚未收敛", "临时草案", "未定稿", "倾向删除"]:
 			unified = unified and not stale in word.describe()
-	_check("word_description_source", unified and BattleText.WORDS.size() == 162, "全部162词共享完整说明，游戏介绍没有旧设计草稿")
+	_check("word_description_source", unified and WordDescriptions.TEXT.size() == Database.words.size(), "全部%d词共享完整说明，游戏介绍没有旧设计草稿" % Database.words.size())
 	var b := _battle()
 	var pos := Vector2i(3, 3)
 	var source := _place(b, pos, "再")
@@ -390,7 +391,7 @@ func _run_word_balance() -> void:
 	_word(b, "复利")
 	_word(b, "复利")
 	b.begin_player_turn(false)
-	_check("immediate_profit_no_passive", GameState.gold == 104 and not b.has_ability("compound_equity"), "复利只即时给普通金币，没有股权或被动首投奖励")
+	_check("immediate_profit_no_passive", GameState.gold == 104 and not b.has_ability("compound_equity"), "复利只即时给普通铜钱，没有股权或被动首投奖励")
 
 func _occurrences(b: BattleState, inst: CharInstance) -> int:
 	var n := 0
@@ -833,7 +834,7 @@ func _run_solo_balance_four() -> void:
 	b.bag.append(bought)
 	GameState.gold = 1
 	result = b.try_play([Vector2i.ZERO], {"bag_uid": bought.uid})
-	_check("solo_buy_no_payment_no_consume", not result.ok and GameState.gold == 1 and b.board.cells.has(source) and b.bag.has(bought), "购支付不足时保留原字、候选和金币")
+	_check("solo_buy_no_payment_no_consume", not result.ok and GameState.gold == 1 and b.board.cells.has(source) and b.bag.has(bought), "购支付不足时保留原字、候选和铜钱")
 	b.enable_ability("payment_discount_once", 1)
 	result = b.try_play([Vector2i.ZERO], {"bag_uid": bought.uid})
 	_check("solo_buy_discount_and_identity", result.ok and GameState.gold == 0 and b.board.get_xy(Vector2i.ZERO) == bought and bought.gilded and bought.glyph_list() == ["防", "御"] and not b.has_ability("payment_discount_once") and b.drawn_this_turn == 1 and _unique_circulation(b), "购使用正常支付优惠，原实体原属性补入指定格")
@@ -994,7 +995,7 @@ func _run_solo_balance_three() -> void:
 	invalid = b.try_play([Vector2i.ZERO], {"tile": Vector2i(1, 0)})
 	_check("solo_refine_preserves_permanent", not invalid.ok and b.board.get_xy(Vector2i.ZERO) == source and b.board.get_xy(Vector2i(1, 0)) == original, "炼不能删除污染过的永久己方实体，无效目标不消费")
 	b.try_play([Vector2i.ZERO], {"tile": Vector2i(0, 1)})
-	_check("solo_refine_junk_reward", GameState.gold == 101 and b.player.heat == 1 and b.board.get_xy(Vector2i(0, 1)) == null and not b.temp_chars.has(copy) and not b.discard.has(copy) and b.board.cells.has(original), "炼移除临时字，不进入循环，成功后才给1金币和1热")
+	_check("solo_refine_junk_reward", GameState.gold == 101 and b.player.heat == 1 and b.board.get_xy(Vector2i(0, 1)) == null and not b.temp_chars.has(copy) and not b.discard.has(copy) and b.board.cells.has(original), "炼移除临时字，不进入循环，成功后才给1铜钱和1热")
 	b = _battle()
 	_place(b, Vector2i.ZERO, "炼")
 	result = b.try_play([Vector2i.ZERO])
@@ -1123,7 +1124,7 @@ func _run_solo_balance_two() -> void:
 	b.begin_player_turn(false)
 	_place(b, Vector2i.ZERO, "利")
 	b.try_play([Vector2i.ZERO])
-	_check("solo_profit_prior_income", no_early_profit and profited_after_spend and GameState.gold == 102, "利需要本回合此前的真实金币收入，之后花掉金币不取消资格，跨回合重置")
+	_check("solo_profit_prior_income", no_early_profit and profited_after_spend and GameState.gold == 102, "利需要本回合此前的真实铜钱收入，之后花掉铜钱不取消资格，跨回合重置")
 
 	b = _battle()
 	source = _place(b, Vector2i.ZERO, "投")
@@ -1152,7 +1153,7 @@ func _run_solo_balance_two() -> void:
 	GameState.gold = 0
 	b.enable_ability("payment_discount_once", 1)
 	result = b.try_play([Vector2i.ZERO], {"tile": Vector2i(1, 0), "tile2": Vector2i.ZERO})
-	_check("solo_throw_discount_full_board", result.ok and b.board.get_cell(0, 0) == moved and b.board.get_cell(1, 0) == null and GameState.gold == 0 and not b.has_ability("payment_discount_once") and _unique_circulation(b), "满盘时允许投到本字将腾出的原格，币减免后可零金币发动")
+	_check("solo_throw_discount_full_board", result.ok and b.board.get_cell(0, 0) == moved and b.board.get_cell(1, 0) == null and GameState.gold == 0 and not b.has_ability("payment_discount_once") and _unique_circulation(b), "满盘时允许投到本字将腾出的原格，币减免后可零铜钱发动")
 	b = _battle()
 	b.player.hp = 40
 	b.player.heat = 2
@@ -1351,21 +1352,21 @@ func _run_baojinbi() -> void:
 	_check("baojinbi_word", r.ok and r.word != null and r.word.word == "爆金币", "成词=%s" % (r.word.word if r.word != null else "无"))
 	_check("baojinbi_multi_hit", hp0 - e.hp == 5, "5 段 1 伤后掉血=%d，预期 5" % (hp0 - e.hp))
 	_check("baojinbi_status", e.status_stacks("gold_burst") == 1, "爆金层=%d，预期 1" % e.status_stacks("gold_burst"))
-	_check("baojinbi_gold_per_hit", GameState.gold == gold0 + 5, "本词 5 段金币 %d→%d，预期 +5" % [gold0, GameState.gold])
+	_check("baojinbi_gold_per_hit", GameState.gold == gold0 + 5, "本词 5 段铜钱 %d→%d，预期 +5" % [gold0, GameState.gold])
 	# 敌方有护甲/格挡时，攻击被吸收也照样给钱
 	var gold1: int = GameState.gold
 	e.add_block(50)
 	var hp1: int = e.hp
 	b.deal_damage(e, 1, true)
-	_check("baojinbi_through_block", e.hp == hp1 and GameState.gold == gold1 + 1, "50 格挡下受击 HP %d→%d、金币 %d→%d（预期 HP 不变、金币 +1）" % [hp1, e.hp, gold1, GameState.gold])
-	# 金币收入已开放上限（gold_cap_per_battle = 0）：反复受击可越过旧上限 18
+	_check("baojinbi_through_block", e.hp == hp1 and GameState.gold == gold1 + 1, "50 格挡下受击 HP %d→%d、铜钱 %d→%d（预期 HP 不变、铜钱 +1）" % [hp1, e.hp, gold1, GameState.gold])
+	# 铜钱收入已开放上限（gold_cap_per_battle = 0）：反复受击可越过旧上限 18
 	var b2 := _battle()
 	var e2: Combatant = b2.enemies[0]
 	e2.add_status("gold_burst", 1)
 	var gold_before: int = GameState.gold
 	for i in 25:
 		b2.deal_damage(e2, 1, true)
-	_check("baojinbi_no_gold_cap", GameState.gold == gold_before + 25, "25 次受击金币 %d→%d（旧上限 18 已开放）" % [gold_before, GameState.gold])
+	_check("baojinbi_no_gold_cap", GameState.gold == gold_before + 25, "25 次受击铜钱 %d→%d（旧上限 18 已开放）" % [gold_before, GameState.gold])
 
 
 func _run_fenhua() -> void:
@@ -1574,7 +1575,7 @@ func _run_logic() -> void:
 	GameState.deck.append(gild_card)
 	_word(b, "再投资", 0, {"gild_uid": gild_card.uid})
 	GameState.settle_victory_economy()
-	_check("gild_immediate_cost", GameState.gold == 97 and gild_card.gilded, "再投资即时支付3金币并镀金，无当场返还")
+	_check("gild_immediate_cost", GameState.gold == 97 and gild_card.gilded, "再投资即时支付3铜钱并镀金，无当场返还")
 
 func _new_screen():
 	GameState.start_new_run("v03")
@@ -1585,6 +1586,7 @@ func _new_screen():
 	add_child(screen)
 	for i in 4:
 		await get_tree().process_frame
+	await _wait_for_screen_idle(screen)
 	screen.battle.board.cells.fill(null)
 	screen.battle.bag.clear()
 	screen.battle.discard.clear()
@@ -1633,7 +1635,7 @@ func _run_controls() -> void:
 	_check("control_cool", b.player.heat == 3, "正常冷单字降热2")
 	b = _battle()
 	_word(b, "金币")
-	_check("control_gold", GameState.gold == 103, "正常金币获得3金币")
+	_check("control_gold", GameState.gold == 103, "正常铜钱获得3铜钱")
 	b = _battle()
 	_word(b, "重击")
 	_word(b, "连击", 1)
@@ -1831,7 +1833,7 @@ func _run_boundaries() -> void:
 	b.try_play([Vector2i.ZERO])
 	b.draw_one_to(Vector2i(3, 3))
 	_word(b, "回购", 1, {"discard_uid": original.uid})
-	_check("recover_stale_rejected", GameState.gold == 100 and _occurrences(b, original) == 1, "已抽回盘面的历史消耗字不能回购，也不能扣金币")
+	_check("recover_stale_rejected", GameState.gold == 100 and _occurrences(b, original) == 1, "已抽回盘面的历史消耗字不能回购，也不能扣铜钱")
 
 	b = _battle()
 	original = _place(b, Vector2i.ZERO, "洗")
@@ -1950,7 +1952,7 @@ func _run_boundaries() -> void:
 	second.start(GameState.make_battle_deck(), [b.enemies[0].enemy_data], 7)
 	GameState.settle_victory_economy()
 	GameState.settle_victory_economy()
-	_check("gild_cross_battle", gild_next.gilded and GameState.gold == 97, "永久镀金跨战保留，胜利重复结算不生金币")
+	_check("gild_cross_battle", gild_next.gilded and GameState.gold == 97, "永久镀金跨战保留，胜利重复结算不生铜钱")
 
 	b = _battle()
 	_pad(b)
@@ -2083,7 +2085,7 @@ func _run_ui_word_balance() -> void:
 		screen._board_view._on_tile_pressed(Vector2i(1, 0))
 		screen._on_primary()
 		var picker := _choice(screen, text + "：")
-		_check("ui_transfer_preview_" + text, picker != null and GameState.gold == 10 and screen.battle.rng.state == rng_before and screen.battle.board.fill_count() == 2, "选字预览不消费原字、金币或随机数")
+		_check("ui_transfer_preview_" + text, picker != null and GameState.gold == 10 and screen.battle.rng.state == rng_before and screen.battle.board.fill_count() == 2, "选字预览不消费原字、铜钱或随机数")
 		assert(picker != null)
 		picker._on_choose(1)
 		_check("ui_transfer_cancel_" + text, GameState.gold == 10 and screen.battle.rng.state == rng_before and (screen.battle.bag.has(original) or screen.battle.discard.has(original)) and screen._modal_count == 0, "取消选字保持原实体和资源")
@@ -2291,13 +2293,13 @@ func _run_ui_solo_balance_four() -> void:
 		_check("ui_bag_preview_" + glyph, picker != null and screen.battle.bag == [first, second] and screen.battle.board.cells.has(source) and GameState.gold == 10 and screen.battle.rng.state == state_before, "选字弹窗按实体列出同字形候选，确认前不取牌或扣费")
 		assert(picker != null)
 		picker._on_choose(2)
-		_check("ui_bag_cancel_" + glyph, screen.battle.bag == [first, second] and screen.battle.board.cells.has(source) and GameState.gold == 10 and not screen._solo_bag_picker_active and screen._modal_count == 0, "取消选字保留棋盘、字袋和金币，并恢复输入")
+		_check("ui_bag_cancel_" + glyph, screen.battle.bag == [first, second] and screen.battle.board.cells.has(source) and GameState.gold == 10 and not screen._solo_bag_picker_active and screen._modal_count == 0, "取消选字保留棋盘、字袋和铜钱，并恢复输入")
 		screen._on_primary()
 		picker = _choice(screen, glyph + "：")
 		assert(picker != null)
 		picker._on_choose(1)
 		await _wait_for_screen_idle(screen)
-		_check("ui_bag_execute_" + glyph, screen.battle.board.get_xy(Vector2i.ZERO) == first and first.gilded and screen.battle.bag == [second] and GameState.gold == (8 if glyph == "购" else 10) and screen.battle.drawn_this_turn == 1 and not screen._busy and screen._modal_count == 0, "确认后补入指定原实体，购支付2金币，精不支付")
+		_check("ui_bag_execute_" + glyph, screen.battle.board.get_xy(Vector2i.ZERO) == first and first.gilded and screen.battle.bag == [second] and GameState.gold == (8 if glyph == "购" else 10) and screen.battle.drawn_this_turn == 1 and not screen._busy and screen._modal_count == 0, "确认后补入指定原实体，购支付2铜钱，精不支付")
 		await _dispose_screen(screen)
 	Settings.reduced_motion = saved_motion
 
@@ -2369,14 +2371,14 @@ func _run_ui_solo_throw() -> void:
 	screen._board_view.rebuild()
 	screen._board_view._on_tile_pressed(Vector2i.ZERO)
 	screen._on_primary()
-	_check("ui_throw_neighbor_picker", screen._solo_throw_active and screen._board_view._valid_pick(Vector2i(1, 0)) and not screen._board_view._valid_pick(Vector2i(0, 1)) and screen.battle.board.get_cell(0, 0) == source and GameState.gold == 2, "投先选非固定四邻字，选择前不消费施词字与金币")
+	_check("ui_throw_neighbor_picker", screen._solo_throw_active and screen._board_view._valid_pick(Vector2i(1, 0)) and not screen._board_view._valid_pick(Vector2i(0, 1)) and screen.battle.board.get_cell(0, 0) == source and GameState.gold == 2, "投先选非固定四邻字，选择前不消费施词字与铜钱")
 	screen._board_view._on_tile_pressed(Vector2i(1, 0))
 	var landing_picker: bool = screen._board_view.pick_mode == "throw_destination" and screen._board_view._valid_pick(Vector2i.ZERO) and screen._board_view._valid_pick(Vector2i(3, 3)) and not screen._board_view._valid_pick(Vector2i(1, 0))
 	screen._board_view._on_tile_pressed(Vector2i(3, 3))
 	_check("ui_throw_ready_after_two_targets", landing_picker and not screen._ready_action.is_empty() and screen.battle.board.get_cell(1, 0) == moved and GameState.gold == 2, "投的第二步只选合法落点，选齐后仍等待确认")
 	screen._on_primary()
 	await _wait_for_screen_idle(screen)
-	_check("ui_throw_complete", screen.battle.board.get_cell(3, 3) == moved and screen.battle.board.get_cell(1, 0) == null and GameState.gold == 1 and screen.battle.discard.has(source) and not screen._busy and screen._board_view._interactable and screen._board_view.pick_mode.is_empty(), "投确认后扣1金币并移动原实体，结束选择和演出后恢复输入")
+	_check("ui_throw_complete", screen.battle.board.get_cell(3, 3) == moved and screen.battle.board.get_cell(1, 0) == null and GameState.gold == 1 and screen.battle.discard.has(source) and not screen._busy and screen._board_view._interactable and screen._board_view.pick_mode.is_empty(), "投确认后扣1铜钱并移动原实体，结束选择和演出后恢复输入")
 	await _dispose_screen(screen)
 	screen = await _new_screen()
 	GameState.gold = 2
@@ -2387,7 +2389,7 @@ func _run_ui_solo_throw() -> void:
 	screen._on_primary()
 	screen._board_view._on_tile_pressed(Vector2i(1, 0))
 	screen._on_clear_cancel()
-	_check("ui_throw_cancel_clean", not screen._solo_throw_active and screen._ready_action.is_empty() and screen._board_view.pick_mode.is_empty() and screen.battle.board.get_cell(0, 0) == source and screen.battle.board.get_cell(1, 0) == moved and GameState.gold == 2, "取消投的两步选择清除临时状态，原字、目标和金币保留")
+	_check("ui_throw_cancel_clean", not screen._solo_throw_active and screen._ready_action.is_empty() and screen._board_view.pick_mode.is_empty() and screen.battle.board.get_cell(0, 0) == source and screen.battle.board.get_cell(1, 0) == moved and GameState.gold == 2, "取消投的两步选择清除临时状态，原字、目标和铜钱保留")
 	await _dispose_screen(screen)
 	Settings.reduced_motion = saved_motion
 

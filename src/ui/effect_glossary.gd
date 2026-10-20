@@ -45,7 +45,7 @@ const ENTRIES := {
 	],
 	"gilded": [
 		"镀金",
-		"每次打出此字获得金币；组词也生效。永久保留。"
+		"每次打出此字获得铜钱；组词也生效。永久保留。"
 	],
 	"word_only": [
 		"仅供组词",
@@ -85,7 +85,7 @@ const ENTRIES := {
 	],
 	"bounty": [
 		"爆金",
-		"目标每受到一次攻击，你获得金币；多段攻击逐段计数，被护盾挡住也算。"
+		"目标每受到一次攻击，你获得铜钱；多段攻击逐段计数，被护盾挡住也算。"
 	],
 	"burn": [
 		"灼烧",
@@ -171,7 +171,7 @@ static func status_description(id: String) -> String:
 		"regen": return "回合开始时，回复层数×%d生命。" % BattleBalance.i("regen_per_stack", 1)
 		"poison": return "回合开始时，受到层数×%d伤害，可被护盾抵挡。" % BattleBalance.i("poison_per_stack", 1)
 		"heart_corrosion": return "敌人每次行动后受到层数×%d非攻击伤害。本场不减层。" % BattleBalance.i("corrosion_per_stack", 1)
-		"gold_burst": return "目标每受到一次攻击，你获得%d金币；多段攻击逐段计数，被护盾全挡也算。" % BattleBalance.i("bounty_on_hit", 1)
+		"gold_burst": return "目标每受到一次攻击，你获得%d铜钱；多段攻击逐段计数，被护盾全挡也算。" % BattleBalance.i("bounty_on_hit", 1)
 		"next_double": return "下一次攻击的基础伤害、力量和热力加成×%d；蓄力、连载、过火不放大。攻击后消耗1层，被全挡也消耗，可跨回合保留。" % BattleBalance.i("double_attack_mult", 2)
 	var data := Database.get_status(id)
 	if id == "next_extra": return "下一个词的即时效果重演，用后消耗1层。字不再消耗，费用再付，可跨回合保留。"
@@ -198,7 +198,7 @@ static func entry(meta: String) -> Dictionary:
 		var key := meta.trim_prefix("term:")
 		if ENTRIES.has(key):
 			var description: String = ENTRIES[key][1]
-			if key == "gilded": description = "每次打出此字获得%d金币，组词也算；仅弃字不算，融合字只计一次。永久保留，临时复制不继承。" % BattleBalance.i("gild_gold", 1)
+			if key == "gilded": description = "每次打出此字获得%d铜钱，组词也算；仅弃字不算，融合字只计一次。永久保留，临时复制不继承。" % BattleBalance.i("gild_gold", 1)
 			elif key == "vulnerable":
 				var status := Database.get_status("vulnerable")
 				var decay := status.decay_per_turn if status != null else 1
