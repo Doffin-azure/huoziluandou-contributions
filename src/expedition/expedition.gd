@@ -31,7 +31,7 @@ const BARRIER_HP := 4
 const FIGHT_T := 2
 const AMBUSH_T := 1
 const REST_T := 3
-## 战后奖励跳过换的金币
+## 战后奖励跳过换的铜钱
 const SKIP_GOLD := 16
 const SHOP_REFRESH_COST := 5
 ## 首领击败即封层；有限补给代替无压力清图，进入下一幕时发放。
@@ -485,7 +485,7 @@ func pickup() -> bool:
 	return true
 
 
-## 发字：先进字匣；字匣满了进字袋；都满了折 8 金币
+## 发字：先进字匣；字匣满了进字袋；都满了折 8 铜钱
 func gain_glyph(g: String, why := "") -> void:
 	if Database.get_character_by_glyph(g) == null:
 		return
@@ -500,7 +500,7 @@ func gain_glyph(g: String, why := "") -> void:
 		_log("%s字匣满了，【%s】直接进字袋" % [note, g])
 	else:
 		GameState.add_gold(8)
-		_log("%s字匣、字袋都满了，【%s】折成 8 金币" % [note, g])
+		_log("%s字匣、字袋都满了，【%s】折成 8 铜钱" % [note, g])
 
 
 func push_panel(p: Dictionary) -> void:
@@ -600,7 +600,7 @@ func loot_options(tier: String) -> Array:
 	var n := 2 if tier == "小" else 3
 	if has_seal("拓本"):
 		n += 1
-	# 同一份奖励只出现一次；先保证字与金币，再抽特色和额外选项。
+	# 同一份奖励只出现一次；先保证字与铜钱，再抽特色和额外选项。
 	var pool: Array = []
 	var keys := {}
 	for option in opts:
@@ -836,7 +836,7 @@ func rest(choice: String, glyph_id := "") -> bool:
 	return true
 
 
-## 修饰 = 镀金：单字或组词打出+1金币（GDD）
+## 修饰 = 镀金：单字或组词打出+1铜钱（GDD）
 func _gild(glyph_id: String) -> bool:
 	var n := 1
 	var done := 0
@@ -846,7 +846,7 @@ func _gild(glyph_id: String) -> bool:
 			done += 1
 	if done == 0:
 		return false
-	_log("镀金【%s】×%d：每次有效单字或组词打出+%d金币" % [Database.get_character(glyph_id).glyph, done, BattleBalance.i("gild_gold", 1)])
+	_log("镀金【%s】×%d：每次有效单字或组词打出+%d铜钱" % [Database.get_character(glyph_id).glyph, done, BattleBalance.i("gild_gold", 1)])
 	return true
 
 
@@ -856,7 +856,7 @@ func shop_offers() -> Array:
 	if m.has("shops") and m.shops.has(pos):
 		return m.shops[pos]
 	var offers: Array = []
-	# 每批五枚 ≤2 稀有度的字，各 12～15 金币。
+	# 每批五枚 ≤2 稀有度的字，各 12～15 铜钱。
 	for i in SHOP_CARD_COUNT:
 		offers.append({"kind": "glyph", "glyph": roll_glyph(0), "base": rng.randi_range(12, 15)})
 	offers.append({"kind": "remove", "base": rng.randi_range(16, 20)})
@@ -876,7 +876,7 @@ func shop_refresh_cost() -> int:
 	return SHOP_REFRESH_COST * (int(counts.get(pos, 0)) + 1)
 
 
-## 每家商店依次收取 5、10、15…金币；服务保留，计数存于地图中。
+## 每家商店依次收取 5、10、15…铜钱；服务保留，计数存于地图中。
 func refresh_shop() -> bool:
 	var cost := shop_refresh_cost()
 	if top_panel().get("kind", "") != "shop" or GameState.gold < cost:
@@ -892,7 +892,7 @@ func refresh_shop() -> bool:
 	for id in Relics.roll_choices(GameState.relics, relic_rng, 3):
 		offers.append({"kind": "relic", "relic": id, "base": Relics.price(id)})
 	m.shops[pos] = offers
-	_log("商店：花 %d 金币刷新货架，下次 %d 金币" % [cost, shop_refresh_cost()])
+	_log("商店：花 %d 铜钱刷新货架，下次 %d 铜钱" % [cost, shop_refresh_cost()])
 	return true
 
 
@@ -1116,7 +1116,7 @@ func next_act() -> void:
 	var hp_before := GameState.player_hp
 	GameState.heal(int(supply.heal))
 	ink += int(supply.ink)
-	_log("幕间补给：金币 +%d，气血 +%d，墨 +%d" % [supply.gold, GameState.player_hp - hp_before, supply.ink])
+	_log("幕间补给：铜钱 +%d，气血 +%d，墨 +%d" % [supply.gold, GameState.player_hp - hp_before, supply.ink])
 	# Archive completed locations before load_act clears this act's map state.
 	# visited already belongs to the saved run, so its save schema stays compatible.
 	for key in taken:
@@ -1194,15 +1194,15 @@ func encounter_info(encounter: Dictionary) -> Dictionary:
 	var ed := encounter_enemy(kind, int(encounter.k))
 	var rewards := encounter_rewards(encounter)
 	var hp := maxi(1, ed.max_hp - (6 if kind == "boss" and has_seal("朱笔") and not ed.mechanic.is_empty() else 0))
-	var rewards_text := "战利品%d选1；也可跳过，拿%d金币。" % [rewards.count, SKIP_GOLD] if kind != "boss" else "击败即结束本层，未拿资源放弃；随后处理印章与幕间结算。"
+	var rewards_text := "战利品%d选1；也可跳过，拿%d铜钱。" % [rewards.count, SKIP_GOLD] if kind != "boss" else "击败即结束本层，未拿资源放弃；随后处理印章与幕间结算。"
 	if rewards.seal:
 		rewards_text += " 获得1枚印章" + ("（印章位已满，需选择替换）" if seals.size() >= SEAL_CAP else "") + "。"
-	if int(rewards.gold) > 0: rewards_text += " 额外金币+%d。" % rewards.gold
+	if int(rewards.gold) > 0: rewards_text += " 额外铜钱+%d。" % rewards.gold
 	if int(rewards.ink) > 0: rewards_text += " 墨+%d。" % rewards.ink
 	if kind == "ambush": rewards_text += " 解封该伏兵控制的奖励。"
 	if kind == "boss" and act < 3:
 		var supply := act_supply()
-		rewards_text += " 进入下一幕后补给：金币+%d、气血最多+%d、墨+%d。" % [supply.gold, supply.heal, supply.ink]
+		rewards_text += " 进入下一幕后补给：铜钱+%d、气血最多+%d、墨+%d。" % [supply.gold, supply.heal, supply.ink]
 	var first: EnemyMoveData = ed.moves[0] if not ed.moves.is_empty() else null
 	return {"enemy": ed, "stage": stage_text(kind, int(encounter.k)), "hp": hp, "initial_block": ed.initial_block,
 		"mechanic": ed.description if not ed.description.is_empty() else "按行动循环攻击、防御或干扰字盘。",

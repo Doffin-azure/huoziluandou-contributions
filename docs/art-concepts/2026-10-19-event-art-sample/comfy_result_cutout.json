@@ -1,0 +1,101 @@
+{
+  "prompt": [
+    0,
+    "e25ac7a5-ae88-42e3-a3f4-e273789537e1",
+    {
+      "1": {
+        "class_type": "LoadImage",
+        "inputs": {
+          "image": "lianziyu_lantern_riddle_sample_v1_source.png"
+        }
+      },
+      "2": {
+        "class_type": "BiRefNetRMBG",
+        "inputs": {
+          "image": [
+            "1",
+            0
+          ],
+          "model": "BiRefNet_toonout",
+          "sensitivity": 1.0,
+          "mask_blur": 0,
+          "mask_offset": 0,
+          "invert_output": false,
+          "refine_foreground": false,
+          "unload_model": true,
+          "background": "Alpha",
+          "background_color": "#222222"
+        }
+      },
+      "3": {
+        "class_type": "SaveImage",
+        "inputs": {
+          "images": [
+            "2",
+            0
+          ],
+          "filename_prefix": "lianziyu/lantern_riddle_cutout_v1"
+        }
+      }
+    },
+    {
+      "client_id": "lianziyu-event-art-sample",
+      "create_time": 1792416682762
+    },
+    [
+      "3"
+    ]
+  ],
+  "outputs": {
+    "3": {
+      "images": [
+        {
+          "filename": "lantern_riddle_cutout_v1_00001_.png",
+          "subfolder": "lianziyu",
+          "type": "output",
+          "metadata": {
+            "kind": "image",
+            "width": 1024,
+            "height": 1024
+          }
+        }
+      ]
+    }
+  },
+  "status": {
+    "status_str": "success",
+    "completed": true,
+    "messages": [
+      [
+        "execution_start",
+        {
+          "prompt_id": "e25ac7a5-ae88-42e3-a3f4-e273789537e1",
+          "timestamp": 1792416682763
+        }
+      ],
+      [
+        "execution_cached",
+        {
+          "nodes": [],
+          "prompt_id": "e25ac7a5-ae88-42e3-a3f4-e273789537e1",
+          "timestamp": 1792416682781
+        }
+      ],
+      [
+        "execution_success",
+        {
+          "prompt_id": "e25ac7a5-ae88-42e3-a3f4-e273789537e1",
+          "timestamp": 1792416687818
+        }
+      ]
+    ]
+  },
+  "meta": {
+    "3": {
+      "node_id": "3",
+      "display_node": "3",
+      "parent_node": null,
+      "real_node_id": "3"
+    }
+  }
+}

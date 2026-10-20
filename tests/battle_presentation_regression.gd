@@ -393,7 +393,7 @@ func _run() -> void:
 		battle.player.persistent_block = 256
 		_screen._refresh_all()
 		await _frames()
-		_ok(not _screen._gold_strip.get_global_rect().intersects(_screen._player_status.get_global_rect()) and not _screen._gold_strip.get_global_rect().intersects(_screen._turn_label.get_global_rect()), "手机只显示普通金币，不与回合或状态挤在一起")
+		_ok(not _screen._gold_strip.get_global_rect().intersects(_screen._player_status.get_global_rect()) and not _screen._gold_strip.get_global_rect().intersects(_screen._turn_label.get_global_rect()), "手机只显示普通铜钱，不与回合或状态挤在一起")
 		_ok(not _screen._player_hp_value.get_global_rect().intersects(_screen._player_status.get_global_rect()), "三位数护盾不覆盖手机气血数值")
 		await _shot("battle-symbol-hud-phone-resources")
 		battle.player.block = 0

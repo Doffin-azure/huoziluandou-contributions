@@ -8,14 +8,14 @@ script = ExtResource("2_7naw4")
 kind = 5
 handler = "gold"
 amount = 1
-note = "获得 1 金币"
+note = "获得 1 铜钱"
 
 [resource]
 script = ExtResource("1_vq3o5")
 id = "jin"
 glyph = "金"
 pinyin = "jin"
-description = "获得 1 金币"
+description = "获得 1 铜钱"
 tags = Array[String](["economy"])
 solo_effects = Array[ExtResource("2_7naw4")]([SubResource("Resource_0h6nk")])
 solo_handler = "gold"

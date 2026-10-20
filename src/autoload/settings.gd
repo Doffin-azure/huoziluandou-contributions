@@ -21,6 +21,7 @@ var sfx_volume := 0.65
 var music_volume := 0.6
 var bgm_volume := 0.35
 var first_run_tutorial_completed := false
+var route_hint_seen := false
 
 var _cfg := ConfigFile.new()
 
@@ -37,6 +38,7 @@ func _ready() -> void:
 		music_volume = clampf(float(_cfg.get_value("audio", "music_volume", 0.6)), 0.0, 1.0)
 		bgm_volume = clampf(float(_cfg.get_value("audio", "bgm_volume", 0.35)), 0.0, 1.0)
 		first_run_tutorial_completed = bool(_cfg.get_value("onboarding", "first_run_tutorial_completed", false))
+		route_hint_seen = bool(_cfg.get_value("guides", "route_hint_seen", false))
 		if stored_style != visual_style or _cfg.has_section_key("visual", "style") or stored_font != board_font_id or _cfg.has_section_key("visual", "board_font"):
 			_save()
 
@@ -72,7 +74,14 @@ func _save() -> void:
 	_cfg.set_value("audio", "music_volume", music_volume)
 	_cfg.set_value("audio", "bgm_volume", bgm_volume)
 	_cfg.set_value("onboarding", "first_run_tutorial_completed", first_run_tutorial_completed)
+	_cfg.set_value("guides", "route_hint_seen", route_hint_seen)
 	_cfg.save(storage_path)
+
+
+func dismiss_route_hint() -> void:
+	if route_hint_seen: return
+	route_hint_seen = true
+	_save()
 
 
 func set_reduced_motion(value: bool) -> void:

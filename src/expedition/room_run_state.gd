@@ -231,7 +231,7 @@ func _spawn_after_event(kind: String) -> void:
 		"treasure":
 			if _grant_treasure_relic().is_empty():
 				GameState.add_gold(30)
-				_log("宝箱：普通遗物已收集完，改为金币 +30")
+				_log("宝箱：普通遗物已收集完，改为铜钱 +30")
 			_complete_node()
 		"battle":
 			spawned_battle = true
@@ -371,7 +371,7 @@ func _arrive(id: String) -> void:
 			var found := _grant_treasure_relic()
 			if found.is_empty():
 				GameState.add_gold(30)
-				_log("宝箱：普通遗物已收集完，改为金币 +30")
+				_log("宝箱：普通遗物已收集完，改为铜钱 +30")
 			if layout_kind=="node_graph":
 				if not contents.has(current_room): contents[current_room] = {}
 				contents[current_room]["treasure"] = {"relic":found}
@@ -466,11 +466,11 @@ func _grant_battle_relic(mode: String) -> void:
 		id = str(choices[0]) if not choices.is_empty() else ""
 	if id.is_empty():
 		GameState.add_gold(35)
-		_log("奇遇：遗物已取尽，改为金币 +35")
+		_log("奇遇：遗物已取尽，改为铜钱 +35")
 		return
 	if not GameState.add_relic(id):
 		GameState.add_gold(35)
-		_log("奇遇：遗物未能取得，改为金币 +35")
+		_log("奇遇：遗物未能取得，改为铜钱 +35")
 		return
 	if Relics.needs_bind(id):
 		for inst: CharInstance in GameState.deck:
@@ -766,7 +766,7 @@ func shop_refresh_cost() -> int:
 
 func _apply_shop(type: String, action: Dictionary) -> Dictionary:
 	if type=="shop_refresh":
-		if phase!="shop" or not GameState.spend_gold(shop_refresh_cost()): return _fail("金币不足或正在处理服务")
+		if phase!="shop" or not GameState.spend_gold(shop_refresh_cost()): return _fail("铜钱不足或正在处理服务")
 		if not contents.has(current_room): contents[current_room] = {}
 		contents[current_room]["shop_refreshes"] = int(contents[current_room].get("shop_refreshes", 0)) + 1
 		var services: Array = shop_offers.filter(func(item):return item.kind not in ["buy_char","relic"])
@@ -776,7 +776,7 @@ func _apply_shop(type: String, action: Dictionary) -> Dictionary:
 	var index := int(action.get("index",-1))
 	if type=="shop_buy" and index>=0 and index<shop_offers.size() and shop_offers[index].kind=="relic":
 		var item: Dictionary = shop_offers[index]
-		if not GameState.spend_gold(int(item.price)): return _fail("金币不足")
+		if not GameState.spend_gold(int(item.price)): return _fail("铜钱不足")
 		_grant_battle_relic(str(item.relic))
 		shop_offers.remove_at(index)
 		return {"ok":true,"phase":phase,"relic":item.relic}

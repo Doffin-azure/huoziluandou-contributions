@@ -725,7 +725,7 @@ func _event_act_end() -> void:
 	_add(Ink.body("本层已结束，未拿的奖励、商店和休息点不再可用。"))
 	if ex.act < 3:
 		var supply := ex.act_supply()
-		_add(Ink.body("进入下一幕后补给：金币 +%d，气血最多 +%d，墨 +%d。" % [supply.gold, supply.heal, supply.ink]))
+		_add(Ink.body("进入下一幕后补给：铜钱 +%d，气血最多 +%d，墨 +%d。" % [supply.gold, supply.heal, supply.ink]))
 		_add(Ink.caption("补给仅发放一次。剩余的墨、字匣、字袋、印章和遗物带入下一幕。"))
 
 

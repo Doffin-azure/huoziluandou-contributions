@@ -236,7 +236,7 @@ static func _solo_neighbor_action(b: BattleState, ctx: Dictionary, handler: Stri
 			b.temp_chars.erase(target)
 			var earned := b.earn_gold(BattleBalance.i("refine_junk_gold", 1))
 			b.add_heat(BattleBalance.i("refine_junk_heat", 1))
-			return ["炼：移除杂字【%s】，获得 %d 金币、热度 +1" % [target.glyph(), earned]]
+			return ["炼：移除杂字【%s】，获得 %d 铜钱、热度 +1" % [target.glyph(), earned]]
 	return []
 
 ## 精/购移动选定原实体；候选预览不改变字袋，只有确认成功才记补字或支付。
@@ -362,7 +362,7 @@ static func _capture_glyph(b: BattleState, ctx: Dictionary, cost: int) -> Array:
 	inst.clear_pollutions()
 	b.board.clear_xy(tile)
 	b.captured_chars.append(inst)
-	return ["收购：支付 %d 金币，永久收编【%s】" % [cost, inst.glyph()]]
+	return ["收购：支付 %d 铜钱，永久收编【%s】" % [cost, inst.glyph()]]
 
 static func _empower_glyph(b: BattleState, ctx: Dictionary) -> Array:
 	var g: String = str(ctx.get("target", {}).get("empower_glyph", ""))
@@ -376,7 +376,7 @@ static func _refine_remove(b: BattleState, ctx: Dictionary, eff: EffectData) -> 
 	var gold_up: int = int(eff.args.get("gold", 4))
 	b.add_heat(-heat_down)
 	EffectUtil.add_gold(b, gold_up)
-	var msgs: Array = ["炼化：热度 -%d，获得 %d 金币" % [heat_down, gold_up]]
+	var msgs: Array = ["炼化：热度 -%d，获得 %d 铜钱" % [heat_down, gold_up]]
 	var g: String = str(ctx.get("target", {}).get("remove_glyph", ""))
 	var removed: CharInstance = b.remove_from_battle_glyph(g)
 	if removed != null:
@@ -435,10 +435,10 @@ static func _gild_glyph(b: BattleState, ctx: Dictionary, eff: EffectData) -> Arr
 		return ["镀金：未选择合法实体字"]
 	var cost := int(eff.args.get("cost", 0)) if eff != null else 0
 	if not EffectUtil.pay(b, cost):
-		return ["镀金：金币不足"]
+		return ["镀金：铜钱不足"]
 	inst.gilded = true
 	EventBus.deck_changed.emit()
-	return ["镀金：【%s】#%d 永久镀金，每次有效单字或组词打出+%d金币" % [inst.glyph(), inst.uid, BattleBalance.i("gild_gold", 1)]]
+	return ["镀金：【%s】#%d 永久镀金，每次有效单字或组词打出+%d铜钱" % [inst.glyph(), inst.uid, BattleBalance.i("gild_gold", 1)]]
 
 ## 精铸：把盘面一枚己方实体字固定（本场不消耗、可反复使用；不可移动/换字）。
 static func _pin_glyph(b: BattleState, ctx: Dictionary) -> Array:

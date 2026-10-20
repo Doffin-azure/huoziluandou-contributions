@@ -1,5 +1,5 @@
 extends Node
-## 一局冒险的全局状态：字袋、生命、金币、进度。
+## 一局冒险的全局状态：字袋、生命、铜钱、进度。
 ## 所有“构筑”操作（加字/删字/复制/换字）都通过这里改动 deck。
 
 var rules: BattleRules = null
@@ -153,7 +153,7 @@ func add_captured(instances: Array) -> void:
 		EventBus.deck_changed.emit()
 
 
-## 兼容现有胜利流程；金币在打字时即时结算。
+## 兼容现有胜利流程；铜钱在打字时即时结算。
 func settle_victory_economy() -> void:
 	pass
 

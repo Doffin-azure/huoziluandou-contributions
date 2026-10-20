@@ -95,7 +95,7 @@ func _ready() -> void:
 	ex.fight = {"kind":kind,"k":deep,"name":"测试","g":"测","amb":0}
 	screen.refresh(); await frames()
 	text = labels(screen._event_box)
-	check(text.contains("兑现·终局考验") and text.contains("金币+2") and text.contains("墨+1") and text.contains("行动循环"), "战前显示阶段、真实奖励与行动")
+	check(text.contains("兑现·终局考验") and text.contains("铜钱+2") and text.contains("墨+1") and text.contains("行动循环"), "战前显示阶段、真实奖励与行动")
 	var buttons: Array = screen._event_box.get_children().filter(func(c): return c is Button and c.text == "开战")
 	check(buttons.size() == 1 and buttons[0].get_global_rect().end.y <= screen._event_box.get_parent().get_global_rect().end.y, "加入阶段说明后开战按钮仍在首屏")
 	if OS.get_cmdline_user_args().has("--capture"):

@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "style_id": "event_scene_v1",
+  "events": {
+    "ink_pool": {
+      "path": "assets/events/ink_pool.png",
+      "style": "ink",
+      "status": "existing",
+      "prompt": null
+    },
+    "broken_stele": {
+      "path": "assets/events/broken_stele.png",
+      "style": "ink",
+      "status": "existing",
+      "prompt": null
+    },
+    "old_bookshop": {
+      "path": "assets/events/old_bookshop.png",
+      "style": "ink",
+      "status": "existing",
+      "prompt": null
+    },
+    "lantern_riddle": {
+      "path": "assets/events/lantern_riddle_v1.png",
+      "style": "scene",
+      "status": "existing",
+      "prompt": null
+    },
+    "lantern_pages": {
+      "path": "assets/events/lantern_pages_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "well_echo": {
+      "path": "assets/events/well_echo_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "foundation_stone": {
+      "path": "assets/events/foundation_stone_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "borrow_life": {
+      "path": "assets/events/borrow_life_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "debt_collector": {
+      "path": "assets/events/debt_collector_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "mossy_steps": {
+      "path": "assets/events/mossy_steps_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "rain_corridor": {
+      "path": "assets/events/rain_corridor_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "pine_roots": {
+      "path": "assets/events/pine_roots_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "angler_pool": {
+      "path": "assets/events/angler_pool_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "stone_table_score": {
+      "path": "assets/events/stone_table_score_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "kite_in_tree": {
+      "path": "assets/events/kite_in_tree_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "old_gardener": {
+      "path": "assets/events/old_gardener_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "old_inkstone": {
+      "path": "assets/events/old_inkstone_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "ferry_no_boat": {
+      "path": "assets/events/ferry_no_boat_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "lost_type_case": {
+      "path": "assets/events/lost_type_case_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "rubbing_worker": {
+      "path": "assets/events/rubbing_worker_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "floating_lantern": {
+      "path": "assets/events/floating_lantern_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "night_knock": {
+      "path": "assets/events/night_knock_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "niche_offering": {
+      "path": "assets/events/niche_offering_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "jade_case": {
+      "path": "assets/events/jade_case_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "buy_case": {
+      "path": "assets/events/buy_case_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "carry_jade": {
+      "path": "assets/events/carry_jade_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "snatch_gold": {
+      "path": "assets/events/snatch_gold_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "bed_censer": {
+      "path": "assets/events/bed_censer_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "trim_words": {
+      "path": "assets/events/trim_words_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "delete_poems": {
+      "path": "assets/events/delete_poems_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "return_brush": {
+      "path": "assets/events/return_brush_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "ink_wash": {
+      "path": "assets/events/ink_wash_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "purge_mirror": {
+      "path": "assets/events/purge_mirror_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "xuanji_board": {
+      "path": "assets/events/xuanji_board_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "chaos_dice": {
+      "path": "assets/events/chaos_dice_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "battle_relic": {
+      "path": "assets/events/battle_relic_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    },
+    "shefu": {
+      "path": "assets/events/shefu_v1.png",
+      "style": "scene",
+      "status": "generated",
+      "prompt": "prompts_batch_2026-10-19.json"
+    }
+  }
+}

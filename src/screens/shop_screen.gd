@@ -1,5 +1,5 @@
 extends ScreenBase
-## 商店：定向增字、复制、删字、治疗，外加一件遗物（统一 45 金币）。价格取自 GDD V0.3 测试起点。
+## 商店：定向增字、复制、删字、治疗，外加一件遗物（统一 45 铜钱）。价格取自 GDD V0.3 测试起点。
 
 const SERVICE_SLOT := 5
 const RELIC_SLOT := 8
@@ -112,7 +112,7 @@ func refresh_cost() -> int:
 	return Expedition.SHOP_REFRESH_COST * (_refresh_count + 1)
 
 
-## 每次成功刷新后涨价 5 金币；每家商店单独计数，随货架保存。
+## 每次成功刷新后涨价 5 铜钱；每家商店单独计数，随货架保存。
 func _refresh_stock() -> void:
 	if _busy or not _pending_kind.is_empty() or _has_shop_dialog(): return
 	if _room_session != null:
@@ -164,10 +164,10 @@ func _refresh() -> void:
 
 
 func _update_action_keys() -> void:
-	_hud.status_label.text = "金币 %d" % GameState.gold
+	_hud.status_label.text = "铜钱 %d" % GameState.gold
 	if _hud.tertiary_button != null:
 		_hud.tertiary_button.set_offer("换货", refresh_cost(), not _busy and _pending_kind.is_empty() and GameState.gold >= refresh_cost())
-		_hud.tertiary_button.tooltip_text = "花 %d 金币更换字和遗物，下次再加 5 金币；已购买服务不补回，未购买服务保留。" % refresh_cost()
+		_hud.tertiary_button.tooltip_text = "花 %d 铜钱更换字和遗物，下次再加 5 铜钱；已购买服务不补回，未购买服务保留。" % refresh_cost()
 
 
 func _layout_offers() -> void:
@@ -224,8 +224,8 @@ func _inspect(index: int) -> void:
 	else:
 		title = ch.glyph if ch != null else {"remove": "删字", "copy": "复制", "heal": "调息"}[item.kind]
 		body = ch.description if ch != null else {"remove": "从字袋中永久移除一枚字。", "copy": "复制字袋中的一枚字。", "heal": "回复 %d 点气血。" % _heal_amount()}[item.kind]
-	_hud.set_detail(title + "  ·  " + str(item.price) + " 金币", body)
-	_hud.action_button.text = "金币不足" if GameState.gold < int(item.price) else "购入 · %d 金币" % item.price
+	_hud.set_detail(title + "  ·  " + str(item.price) + " 铜钱", body)
+	_hud.action_button.text = "铜钱不足" if GameState.gold < int(item.price) else "购入 · %d 铜钱" % item.price
 	_hud.action_button.disabled = GameState.gold < int(item.price)
 
 
@@ -364,7 +364,7 @@ func _open_relic_purchase(index: int) -> void:
 	var offer: Dictionary = _offers[index]
 	_inspect(index)
 	if GameState.has_relic(offer.relic) or GameState.gold < int(offer.price): return
-	_show_shop_dialog({"title": "购买「%s」？" % Relics.name_of(offer.relic), "relic_id": offer.relic, "body": Relics.desc_of(offer.relic) + "\n\n售价：%d 金币。" % offer.price, "options": [{"text": "取消"}, {"text": "确认购买 · %d 金币" % offer.price, "primary": true}], "dismissible": true}, func(choice: int):
+	_show_shop_dialog({"title": "购买「%s」？" % Relics.name_of(offer.relic), "relic_id": offer.relic, "body": Relics.desc_of(offer.relic) + "\n\n售价：%d 铜钱。" % offer.price, "options": [{"text": "取消"}, {"text": "确认购买 · %d 铜钱" % offer.price, "primary": true}], "dismissible": true}, func(choice: int):
 		if choice != 1: return
 		var current := _offers.find_custom(func(o): return o.kind == "relic" and o.relic == offer.relic)
 		if current >= 0: _buy(current))

@@ -142,7 +142,7 @@ func _build_statuses() -> void:
 		{"id": "heart_corrosion", "name": "心蚀", "glyph": "蚀", "kind": 1, "color": "8a4a63", "decay": 0,
 		 "desc": "每回合损失等量层数的生命（不衰减）。"},
 		{"id": "gold_burst", "name": "爆金", "glyph": "币", "kind": 1, "color": "b8912e", "decay": 0,
-		 "desc": "每受到一次攻击，攻击者获得 1 金币（被护甲/格挡吸收也算）。"},
+		 "desc": "每受到一次攻击，攻击者获得 1 铜钱（被护甲/格挡吸收也算）。"},
 		{"id": "regen", "name": "再生", "glyph": "生", "kind": 0, "color": "4a8f66", "decay": 1,
 		 "desc": "回合开始时回复等于层数的生命。"},
 	]
@@ -197,10 +197,10 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"冷": return {"h": "heat", "a": -2, "note": "热度 -2"}
 		"电": return {"h": "energy", "a": 1, "note": "储能 +1"}
 		"蓄": return {"h": "energy_next_turn", "a": 2, "note": "下回合开始获得 2 储能，仅一次"}
-		"金": return {"h": "gold", "a": 1, "note": "获得 1 金币"}
-		"币": return {"h": "payment_discount_once", "a": 1, "note": "本回合下一次字／词的金币费用 -1，最低 0，仅一次"}
-		"利": return {"h": "profit_if_earned", "a": 2, "note": "若本回合此前已获得过金币，再获得 2 金币；否则无收益"}
-		"投": return {"h": "throw_neighbor", "target": EffectDataS.Target.BOARD_TILE, "note": "支付 1 金币，将原格四邻的一枚非固定字移到指定空格"}
+		"金": return {"h": "gold", "a": 1, "note": "获得 1 铜钱"}
+		"币": return {"h": "payment_discount_once", "a": 1, "note": "本回合下一次字／词的铜钱费用 -1，最低 0，仅一次"}
+		"利": return {"h": "profit_if_earned", "a": 2, "note": "若本回合此前已获得过铜钱，再获得 2 铜钱；否则无收益"}
+		"投": return {"h": "throw_neighbor", "target": EffectDataS.Target.BOARD_TILE, "note": "支付 1 铜钱，将原格四邻的一枚非固定字移到指定空格"}
 		"急": return {"effects": [{"h": "draw_excluding_source", "a": 1, "note": "立即补 1 字，排除本次打出的实体"}, {"h": "heat", "a": 1, "note": "热度 +1"}], "note": "立即补 1 字、热度 +1；排除本次打出的实体"}
 		"息": return {"h": "rest_cool", "a": 1, "note": "热度 -1；若本回合尚未造成伤害，再回复 1 生命"}
 		"力": return {"h": "force_once", "a": 2, "note": "下一次攻击总伤害 +2，仅一次（多段攻击只增加一次）"}
@@ -223,7 +223,7 @@ func _solo_spec(glyph: String) -> Dictionary:
 		# 下一批（复合 / 独立定位）
 		"充": return {"effects": [{"h": "energy", "a": 1, "note": "储能 +1"}, {"h": "draw_bonus_next", "a": 1, "note": "下回合多补 1 字"}], "note": "储能 +1，下回合多补 1 字"}
 		"爆": return {"effects": [{"h": "damage", "a": 2, "note": "造成 2 伤害"}, {"h": "heat", "a": 1, "note": "热度 +1"}], "note": "造成 2 伤，热度 +1"}
-		"资": return {"h": "gold", "a": 2, "note": "获得 2 点金币"}
+		"资": return {"h": "gold", "a": 2, "note": "获得 2 点铜钱"}
 		"收": return {"h": "draw_excluding_source", "a": 1, "note": "随机补 1 字，排除本次打出的实体；没有其他可补字时不补"}
 		"障": return {"h": "block_temp", "a": 2, "note": "获得 2 点临时格挡"}
 		"合": return {"h": "combine_next_word", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次成功组词后，获得 2 点临时格挡和 1 点储能，仅一次"}
@@ -233,7 +233,7 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"停": return {"h": "stop_cool", "a": 4, "target": EffectDataS.Target.NONE, "note": "热度 -4，立即结束出字阶段；敌人正常行动"}
 		"载": return {"h": "turn_heat_capacity", "a": 2, "target": EffectDataS.Target.NONE, "note": "本回合热容 +2，下回合开始撤销临时加成；热度保持不变"}
 		"铸": return {"h": "recast_neighbor", "a": 0, "target": EffectDataS.Target.BOARD_TILE, "note": "选择原格四邻的一枚非固定己方实体字，将原实体放回字袋，原格随机换入另一枚实体字；排除目标及本次打出的字，无替换字则保留目标"}
-		"炼": return {"h": "refine_junk_neighbor", "a": 0, "target": EffectDataS.Target.BOARD_TILE, "note": "选择原格四邻的一枚非固定敌方字、临时字或自生污染字，移除并获得 1 金币、热度 +1；不移除永久己方字"}
+		"炼": return {"h": "refine_junk_neighbor", "a": 0, "target": EffectDataS.Target.BOARD_TILE, "note": "选择原格四邻的一枚非固定敌方字、临时字或自生污染字，移除并获得 1 铜钱、热度 +1；不移除永久己方字"}
 		"加": return {"h": "solo_gain_once", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次单字的首项直接伤害、临时格挡、治疗或储能收益 +1，仅一次；不增加热度、费用或持续标记"}
 		"超": return {"h": "next_gap", "a": 1, "target": EffectDataS.Target.NONE, "note": "本回合下一次成功组词允许横向或纵向跨过一个空格，最多一次；不能跨过有字的格子"}
 		"精": return {"h": "precision_draw", "a": 0, "target": EffectDataS.Target.BAG_GLYPH, "note": "从字袋揭示 2 枚实体字，选择 1 枚补入原格，另一枚留在字袋；只有 1 枚时直接补入，空袋时只弃字"}
@@ -241,7 +241,7 @@ func _solo_spec(glyph: String) -> Dictionary:
 		"死": return {"h": "damage", "a": 7, "note": "造成 7 伤害"}
 		"亡": return {"h": "apply_status_enemy", "a": 1, "status": "vulnerable", "note": "使目标获得 1 层易伤"}
 		"月": return {"h": "moon_pull", "a": 0, "note": "其他字向【月】原位聚拢"}
-		"购": return {"h": "buy_bag_solo", "a": 2, "target": EffectDataS.Target.BAG_GLYPH, "note": "支付 2 金币，从字袋选择 1 枚己方实体字补入原格，保留原属性；空袋时只弃字，不支付"}
+		"购": return {"h": "buy_bag_solo", "a": 2, "target": EffectDataS.Target.BAG_GLYPH, "note": "支付 2 铜钱，从字袋选择 1 枚己方实体字补入原格，保留原属性；空袋时只弃字，不支付"}
 	return {}
 
 
@@ -477,7 +477,7 @@ func _build_extra_words() -> void:
 
 	# 精金：永久镀金
 	_save(_extra("extra_jinjin", "精金", ["精", "金"], "经济", "choose_glyph_gild",
-		"选择一枚己方实体字，将其永久镀金；此后它每次单字或组词打出获得1金币",
+		"选择一枚己方实体字，将其永久镀金；此后它每次单字或组词打出获得1铜钱",
 		ContentBuild.e("gild_glyph", 0, -1, "", "选择一枚己方字永久镀金", {})),
 		"%s/words/extra_jinjin.tres" % RES)
 
@@ -625,12 +625,12 @@ func _build_extra_words() -> void:
 		[ContentBuild.e("move_cell", 0, -1, "", "把选中字移动到空格", {})]),
 		"%s/words/extra_shoufang.tres" % RES)
 	_save(_extra_list("extra_shouxi", "收息", ["收", "息"], "经济", "",
-		"本回合每次花金币发动词效，同时获得等额持久盾",
-		[ContentBuild.e("gold_to_shield", 0, -1, "", "本回合花金币附等额持久盾", {})]),
+		"本回合每次花铜钱发动词效，同时获得等额持久盾",
+		[ContentBuild.e("gold_to_shield", 0, -1, "", "本回合花铜钱附等额持久盾", {})]),
 		"%s/words/extra_shouxi.tres" % RES)
 	_save(_extra_list("extra_jiashou", "加收", ["加", "收"], "经济", "",
-		"本回合敌人每往字盘塞入一枚污染字，获得 2 金币；污染照常存在",
-		[ContentBuild.e("inject_bounty", 0, -1, "", "本回合敌人注入污染字获得金币", {})]),
+		"本回合敌人每往字盘塞入一枚污染字，获得 2 铜钱；污染照常存在",
+		[ContentBuild.e("inject_bounty", 0, -1, "", "本回合敌人注入污染字获得铜钱", {})]),
 		"%s/words/extra_jiashou.tres" % RES)
 	_save(_extra_list("extra_dianli", "电力", ["电", "力"], "蓄放", "",
 		"本场持续：每次行列位移后，可消耗 1 储能额外再位移一次",
@@ -800,7 +800,7 @@ func _build_extra_words() -> void:
 
 	# 爆金币（5 段伤害 + 爆金印记）
 	_save(_extra_list("extra_baojinbi", "爆金币", ["爆", "金", "币"], "经济", "",
-		"造成 5 段 1 点伤害，并使目标获得【爆金】：此后每受到一次攻击你获得 1 金币（被护甲/格挡吸收也算）",
+		"造成 5 段 1 点伤害，并使目标获得【爆金】：此后每受到一次攻击你获得 1 铜钱（被护甲/格挡吸收也算）",
 		[ContentBuild.e("apply_status_enemy", 1, EffectDataS.Target.ENEMY, "gold_burst", "使目标获得【爆金】"),
 			ContentBuild.e("damage_multi", 1, EffectDataS.Target.ENEMY, "", "5 段 1 点伤害", {"hits": 5})]),
 		"%s/words/extra_baojinbi.tres" % RES)
@@ -1004,5 +1004,5 @@ func _build_rules() -> void:
 	r.starting_gold = 6
 	r.plays_per_turn = 0   # V0.2：无固定出字次数上限
 	r.heat_capacity = 10
-	r.gold_cap_per_battle = 0   # 开放：战内金币收入不设上限
+	r.gold_cap_per_battle = 0   # 开放：战内铜钱收入不设上限
 	_save(r, "%s/rules/default_rules.tres" % RES)

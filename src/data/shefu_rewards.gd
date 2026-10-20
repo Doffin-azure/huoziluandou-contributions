@@ -19,7 +19,7 @@ static func fill(event: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 static func build(seed_value: int) -> Array:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
-	# 一只碗有稀有字，另外两只空碗；没有金币和遗物。
+	# 一只碗有稀有字，另外两只空碗；没有铜钱和遗物。
 	var rewards: Array = [
 		{"effects": [{"type": "gain_character", "min_rarity": 2, "max_rarity": 4}]},
 		{"effects": []},

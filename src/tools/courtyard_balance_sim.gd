@@ -1,5 +1,5 @@
 extends Node
-## 庭院大循环 heuristic 试玩：只使用 RoomRunState 的合法动作，不直接改血量、金币或牌库。
+## 庭院大循环 heuristic 试玩：只使用 RoomRunState 的合法动作，不直接改血量、铜钱或牌库。
 ## 目的不是证明 AI 会玩，而是观察事件、奖励、商店、遗物在多个种子下能否收敛成流派。
 ##
 ## 运行：
@@ -428,7 +428,7 @@ func _write_json(report: Array) -> void:
 func _write_markdown(report: Array) -> void:
 	var file := FileAccess.open(OUTPUT_MD, FileAccess.WRITE)
 	if file == null: return
-	var lines: Array[String] = ["# 庭院大循环启发式试玩", "", "只通过 RoomRunState 的合法动作推进；不使用直接改血量、金币或牌库的作弊。", ""]
+	var lines: Array[String] = ["# 庭院大循环启发式试玩", "", "只通过 RoomRunState 的合法动作推进；不使用直接改血量、铜钱或牌库的作弊。", ""]
 	for policy in POLICIES:
 		var rows: Array = report.filter(func(r): return r.policy == policy)
 		if rows.is_empty(): continue
@@ -452,11 +452,11 @@ func _write_markdown(report: Array) -> void:
 		lines.append("|---|---:|")
 		lines.append("| 通关 | %.0f%% |" % (100.0 * wins / n))
 		lines.append("| 终局气血 | %.1f |" % (hp / n))
-		lines.append("| 终局金币 | %.1f |" % (gold / n))
+		lines.append("| 终局铜钱 | %.1f |" % (gold / n))
 		lines.append("| 终局牌数 | %.1f |" % (deck / n))
 		lines.append("| 事件次数 | %.1f |" % (events / n))
 		lines.append("| 战斗次数 | %.1f |" % (battles / n))
 		lines.append("| 拿奖励 / 跳过 | %.1f / %.1f |" % [taken / n, skipped / n])
-		lines.append("| 金币收入 / 支出 | %.1f / %.1f |" % [earned / n, spent / n])
+		lines.append("| 铜钱收入 / 支出 | %.1f / %.1f |" % [earned / n, spent / n])
 		lines.append("")
 	file.close()

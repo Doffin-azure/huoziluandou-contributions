@@ -216,7 +216,7 @@ func _run() -> void:
 	BattleBalance.values["core/deploy_choices"] = 6
 	BattleBalance.values["core/buyback_layer"] = 4
 	var deploy_brief := EffectGlossary.brief(Database.get_word_by_glyphs_string("投放"))
-	_check(deploy_brief.contains("支付9金币") and deploy_brief.contains("袋顶6字") and deploy_brief.contains("选1字") and deploy_brief.contains("额外使用+4"), "费用、候选数和复制层单独绑定，选一枚不被误改")
+	_check(deploy_brief.contains("支付9铜钱") and deploy_brief.contains("袋顶6字") and deploy_brief.contains("选1字") and deploy_brief.contains("额外使用+4"), "费用、候选数和复制层单独绑定，选一枚不被误改")
 	BattleBalance.values["core/vulnerable_mult"] = 2.25
 	var vulnerability := Database.get_status("vulnerable")
 	var saved_decay := vulnerability.decay_per_turn

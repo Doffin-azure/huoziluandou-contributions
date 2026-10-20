@@ -143,11 +143,11 @@ static func install() -> void:
 		GameState.player_max_hp = b.player.max_hp
 		_refresh()
 		return ["MaxHP = %d" % b.player.max_hp])
-	register("gold", "设置金币", func(a):
+	register("gold", "设置铜钱", func(a):
 		GameState.gold = maxi(0, _int(a, 0, GameState.gold))
 		EventBus.gold_changed.emit(GameState.gold)
 		_refresh()
-		return ["金币 = %d" % GameState.gold])
+		return ["铜钱 = %d" % GameState.gold])
 	register("heat", "设置热度", func(a):
 		var b := _battle()
 		if b == null: return _ck()
@@ -185,11 +185,11 @@ static func install() -> void:
 		if b != null: b.rules.plays_per_turn = Database.rules.plays_per_turn
 		_refresh()
 		return ["每回合出字 = %d" % Database.rules.plays_per_turn])
-	register("goldcap", "设置每战金币收入上限（0 = 不限）", func(a):
+	register("goldcap", "设置每战铜钱收入上限（0 = 不限）", func(a):
 		Database.rules.gold_cap_per_battle = maxi(0, _int(a, 0, Database.rules.gold_cap_per_battle))
 		var b := _battle()
 		if b != null: b.rules.gold_cap_per_battle = Database.rules.gold_cap_per_battle
-		return ["金币上限 = %s" % ("不限" if Database.rules.gold_cap_per_battle <= 0 else str(Database.rules.gold_cap_per_battle))])
+		return ["铜钱上限 = %s" % ("不限" if Database.rules.gold_cap_per_battle <= 0 else str(Database.rules.gold_cap_per_battle))])
 
 	# ---- B. 盘面 ----
 	register("board", "打印字盘（0 基坐标）", func(_a): return _print_board())
