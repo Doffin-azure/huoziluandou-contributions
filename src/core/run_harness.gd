@@ -195,6 +195,7 @@ func legal_actions() -> Array:
 			var out3: Array = []
 			for g in pending_glyphs:
 				out3.append({"type": "pick", "glyph": g})
+			out3.append({"type": "cancel_pick"})
 			return out3
 		"event":
 			var opts: Array = current_event().get("options", [])
@@ -202,6 +203,7 @@ func legal_actions() -> Array:
 			for i in opts.size():
 				if not EventEffects.option_available(opts[i]): continue
 				out4.append({"type": "event", "index": i, "text": opts[i].text, "primary": bool(opts[i].get("primary", false))})
+			if bool(current_event().get("allow_leave", true)): out4.append({"type": "event_leave"})
 			return out4
 		"rest":
 			return [
@@ -325,6 +327,7 @@ func _apply_shop(t: String, action: Dictionary) -> Dictionary:
 	if GameState.gold < int(o.price):
 		return {"ok": false, "reason": "金币不足"}
 	if o.kind == "remove" or o.kind == "copy":
+		if GameState.deck_size() == 0: return {"ok": false, "reason": "字袋中没有可选择的字"}
 		GameState.spend_gold(int(o.price))
 		pending_kind = o.kind
 		pending_index = i
@@ -336,7 +339,7 @@ func _apply_shop(t: String, action: Dictionary) -> Dictionary:
 		GameState.add_character(o.character, 1)
 		_log("买入字：%s" % o.character.glyph)
 	elif o.kind == "heal":
-		# 商店治疗不算休息，不加安魂枕
+		# 商店治疗不算休息，不加安神香
 		var shop_heal := int(round(GameState.player_max_hp * 0.3))
 		GameState.heal(shop_heal)
 		_log("治疗 +%d" % shop_heal)
@@ -345,11 +348,14 @@ func _apply_shop(t: String, action: Dictionary) -> Dictionary:
 
 
 func _apply_pick(action: Dictionary) -> Dictionary:
+	if str(action.get("type", "")) == "cancel_pick": return _cancel_pick()
 	if str(action.get("type", "")) != "pick": return {"ok": false, "reason": "此时不能执行这个动作"}
 	var g := str(action.get("glyph", ""))
 	if not pending_glyphs.has(g):
 		return {"ok": false, "reason": "无效字 %s" % g}
 	var cd: CharacterData = Database.get_character_by_glyph(g)
+	if cd == null or not GameState.glyph_counts().has(g):
+		return {"ok": false, "reason": "所选字已不存在，请取消后重新选择"}
 	if phase == "shop_choose":
 		if pending_kind == "remove":
 			GameState.remove_character_id(cd.id)
@@ -385,6 +391,27 @@ func _apply_pick(action: Dictionary) -> Dictionary:
 	return {"ok": true, "phase": phase}
 
 
+func _cancel_pick() -> Dictionary:
+	match phase:
+		"event_choose":
+			# Until all targets are chosen, none of the option's effects have run.
+			pending_event_effect.clear()
+			pending_event_next = ""
+			phase = "event"
+		"shop_choose":
+			if pending_index < 0 or pending_index >= shop_offers.size():
+				return {"ok": false, "reason": "待选商品已不存在"}
+			# The service was prepaid on entry; leave its stock intact and refund once.
+			GameState.add_gold(int(shop_offers[pending_index].price))
+			phase = "shop"
+		"rest_choose": phase = "rest"
+		_: return {"ok": false, "reason": "此时没有待取消的选择"}
+	pending_glyphs.clear()
+	pending_kind = ""
+	pending_index = -1
+	return {"ok": true, "phase": phase}
+
+
 func _apply_upgrade(ch: CharacterData) -> void:
 	var copy: CharacterData = ch.duplicate()
 	var new_effects: Array[EffectData] = []
@@ -408,10 +435,16 @@ func _start_event() -> void:
 	event_data = SHEFU.fill(event_data, GameState.rng)
 	event_node = "start"
 	pending_event_next = ""
+	pending_event_effect.clear()
+	pending_glyphs.clear()
 	phase = "event"
 
 
 func _apply_event(action: Dictionary) -> Dictionary:
+	if str(action.get("type", "")) == "event_leave":
+		if not bool(current_event().get("allow_leave", true)): return {"ok": false, "reason": "这场遭遇需要作出选择"}
+		_complete_node()
+		return {"ok": true, "phase": phase}
 	if str(action.get("type", "")) != "event": return {"ok": false, "reason": "此时不能执行这个动作"}
 	var current := current_event()
 	var index := int(action.get("index", -1))
@@ -437,6 +470,7 @@ func _apply_rest(t: String, action: Dictionary) -> Dictionary:
 		_log("休整治疗 +%d" % _heal_amount())
 		_complete_node()
 	elif kind == "remove" or kind == "upgrade":
+		if GameState.deck_size() == 0: return {"ok": false, "reason": "字袋中没有可选择的字"}
 		pending_kind = kind
 		pending_glyphs = GameState.glyph_counts().keys()
 		phase = "rest_choose"

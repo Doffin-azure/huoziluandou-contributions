@@ -45,7 +45,7 @@ func _ready() -> void:
 
 func _run() -> void:
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/relics/icons/manifest.json"))
-	check(RelicArt.TEXTURES.size() == 38 and manifest.icons.size() == 38 and RelicArt.TEXTURES.keys().all(func(id): return Relics.DEFS.has(id)), "all thirty-eight icons still map to valid upstream relic IDs")
+	check(RelicArt.TEXTURES.size() == Relics.DEFS.size() and manifest.icons.size() == Relics.DEFS.size() and RelicArt.TEXTURES.keys().all(func(id): return Relics.DEFS.has(id)), "all current icons map to valid upstream relic IDs")
 	var hashes: Array = []
 	var provider := preload("res://src/ui/object_stage/object_stage.gd").new()
 	var specimen_script := preload("res://src/ui/object_stage/relic_specimen.gd")
@@ -105,7 +105,7 @@ func _run() -> void:
 	Router.current._open_battle_guide_ready()
 	await frames()
 	dialog = choice()
-	check(dialog != null and pictures(dialog).size() == 38, "battle guide displays the full owned collection")
+	check(dialog != null and pictures(dialog).size() == Relics.DEFS.size(), "battle guide displays the full owned collection")
 	await shot("battle-collection-1280")
 	GameState.start_new_run()
 	Expedition.start(41)
@@ -115,7 +115,7 @@ func _run() -> void:
 	Router.current._open_loadout()
 	await frames()
 	dialog = choice()
-	check(dialog != null and pictures(dialog).size() == 38, "expedition loadout displays the full owned collection")
+	check(dialog != null and pictures(dialog).size() == Relics.DEFS.size(), "expedition loadout displays the full owned collection")
 	await shot("loadout-1280")
 	SaveManager.clear_run()
 	SaveManager.enabled = false

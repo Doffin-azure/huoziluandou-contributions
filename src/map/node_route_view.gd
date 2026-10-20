@@ -16,9 +16,14 @@ var _pressed := false
 var _dragged := false
 var _pointer := -1
 var _hover := ""
+## 规划模式：从当前所在往右一格格点选，候选亮起、其余压暗，选中的格子描一圈红
+var planning := false
+var _circles := {} # id -> 红圈描画进度 0..1
+const CIRCLE_TIME := .35
 
 
 func _ready() -> void:
+	set_process(planning)
 	clip_contents = true
 	custom_minimum_size.y = 220
 	focus_mode = Control.FOCUS_ALL
@@ -29,7 +34,33 @@ func _ready() -> void:
 
 
 func refresh() -> void:
+	_sync_circles()
 	_layout()
+
+
+func set_planning(on: bool) -> void:
+	planning = on
+	_sync_circles()
+	set_process(on)
+	queue_redraw()
+
+
+## 新预选的格子从 0 开始描红圈；已撤掉的去掉
+func _sync_circles() -> void:
+	if run == null: return
+	for id: String in _circles.keys():
+		if not run.planned_route.has(id): _circles.erase(id)
+	for id: String in run.planned_route:
+		if not _circles.has(id): _circles[id] = 0.0 if planning else 1.0
+
+
+func circle_progress(id: String) -> float:
+	return float(_circles.get(id, 0.0))
+
+
+func _process(delta: float) -> void:
+	for id: String in _circles: _circles[id] = minf(1.0, _circles[id] + delta / CIRCLE_TIME)
+	queue_redraw() # 候选格的呼吸光也要一直刷新
 
 
 func show_overview() -> void:
@@ -87,6 +118,8 @@ func _get_tooltip(at_position: Vector2) -> String:
 
 
 func _status(id: String) -> String:
+	if planning and run.planned_route.has(id): return "已预选第 %d 站 · 再点最后一站可撤回" % (run.planned_route.find(id) + 1)
+	if planning and run.plan_choices().has(id): return "预选候选 · 点击加入路线"
 	if id==run.current_room: return "当前所在"
 	if run.visited_rooms.has(id): return "已走过 · 不能返回"
 	if run.sealed.has(id): return "已放弃"
@@ -155,12 +188,14 @@ func _draw() -> void:
 		var b: Vector2 = points[edge.to]
 		var walked: bool = run.visited_rooms.has(edge.from) and run.visited_rooms.has(edge.to)
 		var reachable: bool = edge.from==run.current_room and run.next_rooms().has(edge.to)
+		if planning: reachable = edge.from==plan_end() and run.plan_choices().has(edge.to)
 		var planned: bool = _planned_edge(edge.from,edge.to)
 		var abandoned: bool = run.sealed.has(edge.from) or run.sealed.has(edge.to)
 		var color := Color(JourneyStyle.GOLD,.46)
+		if planning and not (walked or planned or reachable): color = Color(JourneyStyle.GOLD,.14)
 		if abandoned: color = Color(JourneyStyle.EDGE,.2)
 		elif walked: color = JourneyStyle.RED
-		elif planned: color = JourneyStyle.GOLD
+		elif planned: color = JourneyStyle.RED if planning else JourneyStyle.GOLD
 		elif reachable: color = Color(JourneyStyle.GOLD,.9)
 		var delta := b-a
 		var trimmed_a := a+delta.normalized()*29*_unit
@@ -172,10 +207,55 @@ func _draw() -> void:
 			var axis := delta.normalized()
 			draw_polyline(PackedVector2Array([middle-axis.rotated(-.48)*7*_unit,middle,middle-axis.rotated(.48)*7*_unit]),color,1.5*_unit,true)
 	for id: String in points: _draw_node(id)
+	if planning: _draw_planning()
 	if _span>size.x+2:
 		var width := (size.x-margin*2)*size.x/_span
 		var x := margin+(size.x-margin*2-width)*_offset/maxf(1,_span-size.x)
 		draw_line(Vector2(x,size.y-8),Vector2(x+width,size.y-8),Color(JourneyStyle.GOLD,.6),3,true)
+
+
+## 规划走到的最右一格：还没点就是当前所在
+func plan_end() -> String:
+	return run.planned_route[-1] if not run.planned_route.is_empty() else run.current_room
+
+
+## 规划模式下这一格是否亮着：当前所在、已规划的、下一步候选
+func plan_lit(id: String) -> bool:
+	return id==run.current_room or run.planned_route.has(id) or run.plan_choices().has(id)
+
+
+func _draw_planning() -> void:
+	var pulse := .55 + .45 * sin(Time.get_ticks_msec() * .006)
+	var end := plan_end()
+	for id: String in points:
+		var center: Vector2 = points[id]
+		var radius: float = (27 if run.graph.rooms[id].kind=="boss" else 23) * _unit
+		if not plan_lit(id):
+			# 压暗：不在这一步能走到的格子
+			draw_circle(center, radius + 3 * _unit, Color(0.04, 0.07, 0.08, .68))
+			continue
+		if run.plan_choices().has(id):
+			draw_arc(center, radius + 7 * _unit, 0, TAU, 40, Color(JourneyStyle.GOLD, .35 + .5 * pulse), 2 * _unit, true)
+		if run.planned_route.has(id):
+			_draw_red_circle(center, radius + 9 * _unit, circle_progress(id))
+			_text(str(run.planned_route.find(id) + 1), center + Vector2(radius + 14 * _unit, -radius), 13, JourneyStyle.RED)
+		if id==end:
+			# 规划走到的位置：外加一道呼吸的细圈（还没点时标在当前所在）
+			var color: Color = JourneyStyle.RED if id!=run.current_room else JourneyStyle.GOLD
+			draw_arc(center, radius + 16 * _unit, 0, TAU, 48, Color(color, .35 + .45 * pulse), 1.5 * _unit, true)
+
+
+## 手绘红圈：从左上起笔顺时针描一圈，略微收尾出头，半径随笔画轻微起伏
+func _draw_red_circle(center: Vector2, radius: float, progress: float) -> void:
+	if progress <= 0: return
+	var sweep := TAU * 1.08 * progress
+	var steps := maxi(2, int(48 * progress))
+	var line := PackedVector2Array()
+	for i in steps + 1:
+		var t := float(i) / steps
+		var angle := -PI * .75 + sweep * t
+		line.append(center + Vector2.from_angle(angle) * radius * (1.0 + .06 * t + .02 * sin(angle * 3)))
+	draw_polyline(line, JourneyStyle.RED, 3 * _unit, true)
 
 
 func _planned_edge(from: String, to: String) -> bool:
@@ -215,7 +295,7 @@ func _draw_node(id: String) -> void:
 		_text(caption,center+Vector2(0,43*_unit),14,JourneyStyle.GOLD if current or available else text)
 	if abandoned:
 		draw_line(center+Vector2(-14,13)*_unit,center+Vector2(14,-13)*_unit,Color(JourneyStyle.EDGE,.8),1.5*_unit,true)
-	if planned:
+	if planned and not planning:
 		_text(str(run.planned_route.find(id)+1),center+Vector2(24,-22)*_unit,12,JourneyStyle.GOLD)
 
 

@@ -29,7 +29,7 @@ var custom_deck: Array = []
 var expedition: Expedition = null
 ## New courtyard mode has independent room IDs and progression; legacy expedition stays intact.
 var room_run: RefCounted = null
-## 遗物（见 src/core/relics.gd）：按获得顺序；绑定类记永久实体 uid；计数器（孕字卵）
+## 遗物（见 src/core/relics.gd）：按获得顺序；绑定类记永久实体 uid；计数器（字种）
 var relics: Array = []
 var relic_binds: Dictionary = {}
 var relic_counters: Dictionary = {}
@@ -89,7 +89,7 @@ func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> voi
 func add_character(data: CharacterData, count: int = 1) -> void:
 	if data == null:
 		return
-	# 阴司愿帖·千字同文：之后拿到的字都变成许愿的字；金缕衣：新字也镀金
+	# 许愿笺·千字同文：之后拿到的字都变成许愿的字；金字碑：新字也镀金
 	data = Relics.redirect_glyph(data)
 	for i in count:
 		var inst := CharInstance.new(data)

@@ -12,7 +12,7 @@ func _ready() -> void:
 	_saved_motion = Settings.reduced_motion
 	_saved_style = Settings.visual_style
 	Settings.reduced_motion = false
-	Ink.apply_style(GameStyle.paper())
+	Ink.apply_style(GameStyle.taopunk())
 	_run.call_deferred()
 
 
@@ -74,6 +74,11 @@ func _run() -> void:
 	_press(title, "字库图鉴")
 	await _frames()
 	_ok(title._modal_count == 1 and title.find_children("*", "CollectionOverlay", true, false).size() == 1, "library button opens the real collection overlay")
+	var library: CollectionOverlay = title.find_children("*", "CollectionOverlay", true, false)[0]
+	_ok(is_instance_valid(library._relic_page), "production library includes the relic subpage")
+	library._show_tab("relics")
+	await _frames()
+	_ok(library._relic_page.is_visible_in_tree() and library._relic_page._grid.get_child_count() == Relics.DEFS.size(), "production relic tab shows every relic")
 	_press(title, "设置")
 	title._on_start()
 	title._on_custom()
@@ -111,14 +116,15 @@ func _run() -> void:
 	_press(title, "自定义构筑")
 	await _frames()
 	_ok(Router.current_path.ends_with("/custom_deck_screen.gd"), "custom deck button opens the existing builder")
-	_ok(old_view.get_ref() == null, "leaving title releases scenery and its settings subscription")
+	var cached_view: Control = old_view.get_ref()
+	_ok(cached_view != null and not cached_view._active and cached_view.viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED, "leaving title suspends cached scenery and viewport rendering")
 	Router.goto("res://src/screens/title_screen.gd")
 	await _frames()
 	title = Router.current
 	_press(title, "字网图谱")
 	await _frames()
 	_ok(Router.current_path.ends_with("/glyph_graph_screen.gd"), "glyph graph action still uses the existing route")
-	_ok(is_zero_approx(Router.study_stage.camera_blend) and Router.study_stage.camera.projection == Camera3D.PROJECTION_PERSPECTIVE, "glyph graph keeps its original room background camera")
+	_ok(not Router.study_stage.visible and Router.study_stage.find_children("*", "SubViewport", true, false).is_empty(), "glyph graph keeps the battle backdrop hidden without a legacy 3D viewport")
 	Ink.apply_style(GameStyle.taopunk())
 	Router.goto("res://src/screens/title_screen.gd")
 	await _frames()

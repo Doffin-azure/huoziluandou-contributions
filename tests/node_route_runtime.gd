@@ -22,9 +22,9 @@ func run_checks() -> void:
 	var map: Control = Router.current
 	check(map.find_children("*","SubViewport",true,false).is_empty(),"2D map has no 3D viewport")
 	var before: int = GameState.rng.state
-	map._select_node(run.plan_choices()[0]); map._plan_selected()
-	map._select_node(run.plan_choices()[0]); map._plan_selected()
-	map._select_node(run.plan_choices()[0]); map._plan_selected()
+	map._toggle_planning()
+	for i in 3: map._select_node(run.plan_choices()[0])
+	map._toggle_planning()
 	check(GameState.rng.state==before and run.current_room=="start","planning three stops never enters a node or consumes RNG")
 	await frames(4); await snap("node-map-1920.png")
 	get_window().size = Vector2i(1280,720); await frames(10)
@@ -36,8 +36,8 @@ func run_checks() -> void:
 	get_window().size = Vector2i(1280,720); await frames(8)
 	map.map_view.focus_current(); await frames(2)
 	var points: Dictionary = map.map_view.points.duplicate()
-	map._open_inventory(); await frames(2); map._close_inventory(); await frames(2)
-	check(map.map_view.points==points,"inventory does not move the route scroll")
+	map._open_deck(); await frames(2); picker_of(map)._close(); await frames(2)
+	check(map.map_view.points==points,"viewing the deck does not move the route scroll")
 	var first: String = run.next_rooms()[0]
 	map._select_node(first); map._confirm_selected(); await frames(16)
 	check(Router.current_path.ends_with("battle_screen.gd") and run.phase=="battle","confirm enters real combat")
@@ -45,10 +45,12 @@ func run_checks() -> void:
 	run.finish_live_battle(true)
 	Router.goto("res://src/screens/reward_screen.gd",{"room_run":true,"node":run.node}); await frames(12)
 	var reward: Control = Router.current
+	var reward_deck_size := GameState.deck_size()
 	var chosen: CharacterData = reward._options[1]
+	var chosen_count := int(GameState.glyph_counts().get(chosen.glyph,0))
 	reward._inspect(1); reward._accept_pick(); await frames(10)
 	check_cached()
-	check(run.tray==[chosen.glyph],"reward reaches tray once")
+	check(GameState.deck_size()==reward_deck_size+1 and int(GameState.glyph_counts().get(chosen.glyph,0))==chosen_count+1,"reward reaches the deck once")
 	Router.current.map_view.show_overview(); await frames(4); await snap("node-map-progress.png")
 	var id := prepare("event")
 	run.event_data = EVENTS.get_event("old_bookshop").duplicate(true); run.event_node = "start"; run._sync_content()

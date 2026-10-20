@@ -84,7 +84,7 @@ func _ready() -> void:
 func _run() -> void:
 	var preserved: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://docs/qa/remote-sync-2026-10-19/preserved-icons.json"))
 	check(preserved.icons.all(func(entry): return FileAccess.get_sha256("res://" + entry.path) == entry.before_sha256), "original fifteen PNGs remain byte-identical")
-	check(RelicArt.TEXTURES.size() == 38, "all thirty-eight relics have registered art")
+	check(Relics.DEFS.keys().all(func(id): return RelicArt.texture(id) != null), "every current relic has registered art")
 	check(Relics.EVENT_ONLY.all(func(id): return not Relics.normal_pool().has(id)), "three event-only relics keep their original acquisition rules")
 	for window_size in [Vector2i(1280, 720), Vector2i(640, 360)]:
 		get_window().size = window_size
@@ -116,9 +116,9 @@ func _run() -> void:
 			check(is_equal_approx(first._pivot.rotation.y, -0.16), "interaction rotates the actual specimen")
 			first.highlight(false)
 			check(screen._busy and screen._hud.action_button.disabled and screen._hud.secondary_button.disabled, "glyph claim stays blocked until relic pickup finishes")
-			var before_tray: Array = run.tray.duplicate()
+			var before_deck := GameState.deck.duplicate()
 			screen._accept_pick(); screen._on_skip()
-			check(run.phase == "reward" and run.tray == before_tray, "pending relic cannot be bypassed through glyph claim or skip")
+			check(run.phase == "reward" and GameState.deck == before_deck, "pending relic cannot be bypassed through glyph claim or skip")
 			await capture(kind + "-%d" % window_size.x)
 			var before := GameState.relics.size()
 			var target: Control = buttons[0] if window_size.x == 640 else choice.find_child("Take_" + str(candidates[0]), true, false)

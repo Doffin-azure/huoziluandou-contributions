@@ -31,8 +31,8 @@ func _ready() -> void:
 
 
 func _run() -> void:
-	check(Relics.DEFS.size() == 38, "remote thirty-eight relic definitions remain available")
-	check(RelicArt.TEXTURES.size() == 38, "thirty-eight authored icons are registered")
+	check(Relics.DEFS.size() == 39 and Relics.DEFS.has("vial"), "remote relic definitions include the new healing ink")
+	check(RelicArt.TEXTURES.size() == Relics.DEFS.size(), "every upstream relic has registered art")
 	for path in ["battle", "reward", "event", "rest", "shop", "title", "room_map", "event_board", "expedition_map", "glyph_graph"]:
 		var script: GDScript = load("res://src/screens/%s_screen.gd" % path)
 		check(script != null and script.can_instantiate(), path + " screen compiles after merge")

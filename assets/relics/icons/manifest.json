@@ -2,7 +2,7 @@
 	"icons": [
 		{
 			"id": "strike",
-			"name": "刑卒护指",
+			"name": "刻刀",
 			"path": "res://assets/relics/icons/strike.png",
 			"sha256": "78019dc63f8593b1fbd9e454a73756b891551ca14f9ab4a032d61284eb6d4cd1",
 			"size": [
@@ -12,7 +12,7 @@
 		},
 		{
 			"id": "breach",
-			"name": "定罪朱签",
+			"name": "蚀刻",
 			"path": "res://assets/relics/icons/breach.png",
 			"sha256": "95e10d9824c1d8950e008f80d0b784666afa58c4d0de7bd7c6d27614d9426bfa",
 			"size": [
@@ -22,7 +22,7 @@
 		},
 		{
 			"id": "slab",
-			"name": "坠字石",
+			"name": "压字石",
 			"path": "res://assets/relics/icons/slab.png",
 			"sha256": "8f0cca1892d00f6ab26ec2644ae51d2a66742d39364dbd1d6a198f041e558ee6",
 			"size": [
@@ -32,7 +32,7 @@
 		},
 		{
 			"id": "press",
-			"name": "续碑座",
+			"name": "对开版",
 			"path": "res://assets/relics/icons/press.png",
 			"sha256": "63f187a5abb99758e4f4425628df665476946d113cd10291c562e9a60c32cbc6",
 			"size": [
@@ -42,7 +42,7 @@
 		},
 		{
 			"id": "sleep",
-			"name": "安魂枕",
+			"name": "安神香",
 			"path": "res://assets/relics/icons/sleep.png",
 			"sha256": "ff003ef98b3722e987802341c5ad9eaa40b447ba4a0d44f59c9c781f8216723c",
 			"size": [
@@ -52,7 +52,7 @@
 		},
 		{
 			"id": "clean",
-			"name": "无垢拓纸",
+			"name": "净版布",
 			"path": "res://assets/relics/icons/clean.png",
 			"sha256": "863bb79c20624033fedd5510b1726168e0dcd44302efcb979ce687d0ab06c709",
 			"size": [
@@ -62,7 +62,7 @@
 		},
 		{
 			"id": "wheel",
-			"name": "四方轮",
+			"name": "转轮架",
 			"path": "res://assets/relics/icons/wheel.png",
 			"sha256": "a81ac72ef1e9c1ac527ec4598d63832f55abe9cf08651e0afb0ec61a4ba45476",
 			"size": [
@@ -72,7 +72,7 @@
 		},
 		{
 			"id": "powerbank",
-			"name": "藏雷珠",
+			"name": "蓄电瓶",
 			"path": "res://assets/relics/icons/powerbank.png",
 			"sha256": "e39530a8e374aacfe00db5b1439c7ecc635ffe73aeb9bc839dd18a2a9453bb27",
 			"size": [
@@ -82,7 +82,7 @@
 		},
 		{
 			"id": "fireman",
-			"name": "余烬匣",
+			"name": "火种",
 			"path": "res://assets/relics/icons/fireman.png",
 			"sha256": "c6b6c7e3479699b038d4d09027fdff2b3e6fcc6fcbd321531f085db12603f8c5",
 			"size": [
@@ -92,7 +92,7 @@
 		},
 		{
 			"id": "fertilizer",
-			"name": "寄字菌",
+			"name": "蔓生墨",
 			"path": "res://assets/relics/icons/fertilizer.png",
 			"sha256": "d16db41ed0014ef230416982d1751edd4f2de4eaf5dc132be1ea673f3c83e22a",
 			"size": [
@@ -102,7 +102,7 @@
 		},
 		{
 			"id": "skyfire",
-			"name": "天火遗诏",
+			"name": "天火",
 			"path": "res://assets/relics/icons/skyfire.png",
 			"sha256": "bf3ff9d95e7030586aea488ac165b9115a10c9f4d5ce5c2658fdc6d74443f120",
 			"size": [
@@ -112,7 +112,7 @@
 		},
 		{
 			"id": "blitz",
-			"name": "借时香",
+			"name": "急就章",
 			"path": "res://assets/relics/icons/blitz.png",
 			"sha256": "b0fe8d518c172dfc0a637a78c107472c0c7742ff21bdd50d2ac0bb16fe0ae270",
 			"size": [
@@ -122,7 +122,7 @@
 		},
 		{
 			"id": "egg",
-			"name": "孕字卵",
+			"name": "字种",
 			"path": "res://assets/relics/icons/egg.png",
 			"sha256": "0b7fad87acbee54a811537c5560ff89d4e65c7081b06672360ae3c6e33848c1f",
 			"size": [
@@ -132,7 +132,7 @@
 		},
 		{
 			"id": "buckler",
-			"name": "龟甲片",
+			"name": "铜护板",
 			"path": "res://assets/relics/icons/buckler.png",
 			"sha256": "33f9e89c88afb4bb8f0398d056b2d00433225c8da30e4f6ef0033afa38628637",
 			"size": [
@@ -142,7 +142,7 @@
 		},
 		{
 			"id": "barrier",
-			"name": "护身纸符",
+			"name": "纸屏风",
 			"path": "res://assets/relics/icons/barrier.png",
 			"sha256": "e82e8da113ed663ce2eee11046fd97e5a4db2feb5e525e6dc0282e97da406e32",
 			"size": [
@@ -172,7 +172,7 @@
 		},
 		{
 			"id": "amber",
-			"name": "血珀",
+			"name": "朱砂印泥",
 			"path": "res://assets/relics/icons/amber.png",
 			"sha256": "c0857c87fc97afb9411651e42bd668312198ef6efb5ebe0daa7884fa122602a9",
 			"size": [
@@ -192,7 +192,7 @@
 		},
 		{
 			"id": "cracked_bottle",
-			"name": "裂雷瓶",
+			"name": "裂墨瓶",
 			"path": "res://assets/relics/icons/cracked_bottle.png",
 			"sha256": "26cfffaa72bd27e18826c25e221b8557df7b339522b0fc37fd60eefc126104de",
 			"size": [
@@ -202,7 +202,7 @@
 		},
 		{
 			"id": "rotting_fruit",
-			"name": "将腐供果",
+			"name": "褪墨",
 			"path": "res://assets/relics/icons/rotting_fruit.png",
 			"sha256": "70a5cb58eb2fe9dfa99e9c0a87d9290e1154156681bddad97eb4e7a4d0bd2f31",
 			"size": [
@@ -222,7 +222,7 @@
 		},
 		{
 			"id": "black_water",
-			"name": "黑水瓶",
+			"name": "黑水墨",
 			"path": "res://assets/relics/icons/black_water.png",
 			"sha256": "360713358e8e1da8a104e87931d272bea83b7cf4d3d929e59681c7686bcf4b82",
 			"size": [
@@ -252,7 +252,7 @@
 		},
 		{
 			"id": "chain",
-			"name": "九连环",
+			"name": "连字环",
 			"path": "res://assets/relics/icons/chain.png",
 			"sha256": "fe6b9117168a71db147f82077b60a742222a9a3685979ddf1e8188b8badad4f9",
 			"size": [
@@ -262,7 +262,7 @@
 		},
 		{
 			"id": "question",
-			"name": "问冥签",
+			"name": "问字签",
 			"path": "res://assets/relics/icons/question.png",
 			"sha256": "be6cb8de862f2c7cbd1ee15bb432ac878143764b198a332a20c91271c7a25a8c",
 			"size": [
@@ -272,7 +272,7 @@
 		},
 		{
 			"id": "goldleaf",
-			"name": "贴金纸",
+			"name": "泥金笔",
 			"path": "res://assets/relics/icons/goldleaf.png",
 			"sha256": "79cef8813e97501097ac0bf0fe8c85c112978ccd9e13be9160cd470cfba4f9b0",
 			"size": [
@@ -282,7 +282,7 @@
 		},
 		{
 			"id": "moon",
-			"name": "望乡月",
+			"name": "月字模",
 			"path": "res://assets/relics/icons/moon.png",
 			"sha256": "6bd9271c7f7089aba26fd43799a6f58626b24f92ba5e12089a21acb6da86aa5c",
 			"size": [
@@ -292,7 +292,7 @@
 		},
 		{
 			"id": "slot",
-			"name": "三生石",
+			"name": "叠字钱",
 			"path": "res://assets/relics/icons/slot.png",
 			"sha256": "54153b0293374dde783bfa05939e790644de757aba391b76986c555b2b5819fb",
 			"size": [
@@ -322,7 +322,7 @@
 		},
 		{
 			"id": "rubbing",
-			"name": "替身草人",
+			"name": "复字拓片",
 			"path": "res://assets/relics/icons/rubbing.png",
 			"sha256": "0bafdddde70a9a7f7401d03bece899b1fc6c0285b047956559ec5149065944f3",
 			"size": [
@@ -332,7 +332,7 @@
 		},
 		{
 			"id": "midas",
-			"name": "金缕衣",
+			"name": "金字碑",
 			"path": "res://assets/relics/icons/midas.png",
 			"sha256": "065e2d1af273f35ab0285afa8bfb5f1d8eb2b44c4e10ccc62a9f6977e4bd2fea",
 			"size": [
@@ -342,7 +342,7 @@
 		},
 		{
 			"id": "monkey",
-			"name": "阴司愿帖",
+			"name": "许愿笺",
 			"path": "res://assets/relics/icons/monkey.png",
 			"sha256": "e30f32abf198f934aab3a5378263d23d9c171b5aab3394f98ee49c9541a45a59",
 			"size": [
@@ -352,7 +352,7 @@
 		},
 		{
 			"id": "palindrome",
-			"name": "阴阳镜",
+			"name": "反字模",
 			"path": "res://assets/relics/icons/palindrome.png",
 			"sha256": "58a4e4993484fe8a7ecc66af72aafb6fca4491e89b73be3da67b4d6a0be25c06",
 			"size": [
@@ -362,7 +362,7 @@
 		},
 		{
 			"id": "binding",
-			"name": "轮回绳",
+			"name": "串字绳",
 			"path": "res://assets/relics/icons/binding.png",
 			"sha256": "3369dd237009a94bf7cbecfd8a71257bbe685061c5e18275216a2ffa85bc4d8a",
 			"size": [
@@ -372,9 +372,19 @@
 		},
 		{
 			"id": "proof",
-			"name": "辟邪尺",
+			"name": "校勘尺",
 			"path": "res://assets/relics/icons/proof.png",
 			"sha256": "ed536781b1cc7cbd7a953d12513e1ebd9cd63339013156aaee67969e8ba06445",
+			"size": [
+				1024,
+				1024
+			]
+		},
+		{
+			"id": "vial",
+			"name": "还魂墨",
+			"path": "res://assets/relics/icons/vial.png",
+			"sha256": "b96e2392995736314f0addc228f012769bebacc0304cfadb7e452c6f8f380108",
 			"size": [
 				1024,
 				1024
@@ -383,11 +393,11 @@
 	],
 	"renderer": "Godot orthographic shop pigments",
 	"source": "res://src/ui/object_stage/relic_specimen.gd",
-	"source_sha256": "629dcaddfd3f424ec170f0a5cd89ee0605b9efb3fa4666258ea68463fbab2c05",
+	"source_sha256": "d5f42d2112b470d8844e7f77bbcf681fc5f65ea6742f13334af1424e4746c856",
 	"sources": {
-		"res://src/ui/object_stage/relic_expansion.gd": "d86654327a1ece91ff6bdf5dd790ed910b090b4b590727401f8b68bec86ca72a",
+		"res://src/ui/object_stage/relic_expansion.gd": "e1245e56eacf3b4a9936320f151ea94fc85fdf0883046f296422999dd8c52f98",
 		"res://src/ui/object_stage/relic_mesh.gd": "585389da04f7940e6446fa781277ed92d3b7b2e54dfb81bdfcf0e11c94b00430",
 		"res://src/ui/object_stage/relic_pigment.gdshader": "81a48ce67bd911e4e3194016104b1e4655e3c1be6014193687a0a66ae4ad853c",
-		"res://src/ui/object_stage/relic_specimen.gd": "629dcaddfd3f424ec170f0a5cd89ee0605b9efb3fa4666258ea68463fbab2c05"
+		"res://src/ui/object_stage/relic_specimen.gd": "d5f42d2112b470d8844e7f77bbcf681fc5f65ea6742f13334af1424e4746c856"
 	}
 }

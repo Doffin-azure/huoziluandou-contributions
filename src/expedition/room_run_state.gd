@@ -19,16 +19,13 @@ var resolved := {}
 var visited_rooms := {}
 var choices := {}
 var sealed := {}
-var contents := {} # Per-room cached event, inventory and reward resources.
+var contents := {} # Per-room cached event, shop stock and reward resources.
 var seen_events: Array = [] # Event IDs already drawn in this run; avoids repeats until the act pool is exhausted.
 var event_bags := {}
 var last_event_id := ""
 var position := Vector2i.ZERO
 var autosave := false
 var generation_error := ""
-var plate := [["", ""], ["", ""]]
-var tray: Array = []
-var active := {}
 var layout_kind := "procedural"
 var generation_ms := 0.0
 var travel: RefCounted
@@ -51,7 +48,6 @@ func reset(cfg: Dictionary = {}) -> void:
 	GameState.expedition = null
 	resolved.clear(); visited_rooms.clear(); choices.clear(); sealed.clear(); contents.clear()
 	seen_events.clear(); event_bags.clear(); last_event_id = ""
-	tray.clear(); plate = [["",""],["",""]]; active.clear()
 	_load_act(1)
 
 
@@ -157,6 +153,15 @@ func _advance_event() -> void:
 		_spawn_after_event(spawn)
 		return
 	super._advance_event()
+
+
+func _cancel_pick() -> Dictionary:
+	var was_event := phase == "event_choose"
+	var result := super._cancel_pick()
+	if result.get("ok", false) and was_event:
+		pending_spawn = ""
+		pending_spawn_relic = ""
+	return result
 
 
 ## 璇玑字盘：进入后只做一次选词，选中的词给其中不重复的字。
@@ -486,10 +491,8 @@ func finish_live_battle(victory: bool) -> void:
 		return
 	var kind: String = graph.rooms[current_room].kind
 	GameState.add_gold(20 if kind=="elite" else (30 if kind=="boss" else 10))
-	if active.has("金币"): GameState.add_gold(2)
-	if kind in ["elite","boss"] and active.has("铸币"): GameState.add_gold(5)
 	GameState.rng.seed = int(graph.rooms[current_room].content_seed)^0xA11CE
-	reward_options = _pick_from_db(1 if kind in ["elite","boss"] else 0,4 if kind=="boss" else 2,4 if active.has("分流") else 3)
+	reward_options = _pick_from_db(1 if kind in ["elite","boss"] else 0,4 if kind=="boss" else 2,3)
 	phase = "reward"
 	_sync_content()
 	if kind=="elite" or kind=="boss" and GameState.act_index<3:
@@ -505,7 +508,6 @@ func _start_battle(_n: MapNodeData) -> void:
 	# The adapter's act scaling and live/headless setups must be identical.
 	battle_h.battle.enemies[0].max_hp = node.enemies[0].max_hp
 	battle_h.battle.enemies[0].hp = node.enemies[0].max_hp
-	apply_battle_setup(battle_h.battle)
 	phase = "battle"
 
 
@@ -519,22 +521,6 @@ func _end_battle() -> void:
 	finish_live_battle(b.is_victory())
 
 
-func apply_battle_setup(b: BattleState) -> void:
-	# Adapted opening lexicon only. Old pursuit / hazard words are never advertised here.
-	if active.has("护盾"): b.player.add_block(4)
-	if active.has("护甲"): b.player.add_persistent_block(2)
-	for word in ["蓄能","充电"]:
-		if active.has(word): b.player.add_energy(2)
-	if active.has("加急"): b.draw_to_board(1)
-	if active.has("重击"): b.pierce_once = true
-	if active.has("蓄力"): b.enable_ability("force_once",b.ability_value("force_once")+4)
-	if active.has("火力") and not b.enemies.is_empty(): b.deal_damage(b.enemies[0],4,false)
-	if active.has("电击") and graph.rooms[current_room].kind in ["elite","boss"]: b.deal_damage(b.enemies[0],6,false)
-	if active.has("蓄冷"): b.player.heat_capacity += 3
-	if active.has("清热"): b.player.add_heat(-2)
-	if active.has("防御力"): b.player.permanent_damage_reduction += 1
-
-
 func _apply_reward(t: String, action: Dictionary) -> Dictionary:
 	if not contents.get(current_room,{}).get("battle_relics",[]).is_empty(): return _fail("请先选择遗物奖励")
 	if t=="skip": GameState.add_gold(Expedition.SKIP_GOLD)
@@ -542,8 +528,7 @@ func _apply_reward(t: String, action: Dictionary) -> Dictionary:
 		var index := int(action.get("index",-1))
 		if index<0 or index>=reward_options.size(): return _fail("无效奖励")
 		var character: CharacterData = reward_options[index]
-		if tray.size()<6: tray.append(character.glyph)
-		else: GameState.add_character(character)
+		GameState.add_character(character)
 	_complete_node()
 	return {"ok":true,"phase":phase}
 
@@ -616,9 +601,6 @@ func apply(action: Dictionary) -> Dictionary:
 		_grant_battle_relic(str(ids[index]))
 		contents[current_room]["battle_relics"] = []
 		result = {"ok":true,"relic":ids[index]}
-	elif type=="tray_to_deck": result = _manage(action,false)
-	elif type=="plate": result = _manage(action,true)
-	elif type=="take_plate": result = {"ok":take_plate(int(action.get("row",-1)),int(action.get("col",-1)))}
 	else:
 		var valid := legal_actions().any(func(a):
 			if a.type!=type: return false
@@ -631,35 +613,6 @@ func apply(action: Dictionary) -> Dictionary:
 	return result
 
 
-func _manage(action: Dictionary, to_plate: bool) -> Dictionary:
-	if phase not in ["map","rest","shop"]: return _fail("请先处理当前遭遇")
-	var index := int(action.get("index",-1))
-	if index<0 or index>=tray.size(): return _fail("无效字匣位置")
-	if to_plate:
-		var row := int(action.get("row",-1)); var col := int(action.get("col",-1))
-		if row<0 or row>=2 or col<0 or col>=2 or not str(plate[row][col]).is_empty(): return _fail("请选择版面空格")
-		plate[row][col] = tray[index]
-		_refresh_active()
-	else: GameState.add_character(Database.get_character_by_glyph(tray[index]))
-	tray.remove_at(index)
-	return {"ok":true}
-
-
-func take_plate(row: int, col: int) -> bool:
-	if phase not in ["map","rest","shop"] or row<0 or row>=2 or col<0 or col>=2 or tray.size()>=6: return false
-	if str(plate[row][col]).is_empty(): return false
-	tray.append(plate[row][col]); plate[row][col] = ""
-	_refresh_active(); _save_if_enabled()
-	return true
-
-
-func _refresh_active() -> void:
-	active = Lexicon.scan(plate).words
-	var supported := ["护盾","护甲","蓄能","充电","加急","重击","蓄力","火力","电击","蓄冷","清热","防御力","金币","铸币","分流"]
-	for word in active.keys():
-		if word not in supported: active.erase(word)
-
-
 func _apply_upgrade(ch: CharacterData) -> void:
 	for inst in GameState.deck:
 		if inst.id()==ch.id and not inst.gilded: inst.gilded = true; return
@@ -668,7 +621,7 @@ func _apply_upgrade(ch: CharacterData) -> void:
 func observe() -> Dictionary:
 	var result := super.observe()
 	var kind: String = graph.rooms.get(current_room,{}).get("kind","")
-	result.merge({"mode":"courtyard","schema":1,"layout":layout_kind,"generation":layout.site.get("generation",{}).duplicate(true),"seed":seed,"current_room":current_room,"room_kind":kind,"next_rooms":next_rooms(),"resolved":resolved.keys(),"branch_choices":choices.duplicate(),"sealed_rooms":sealed.keys(),"position":[position.x,position.y],"tray":tray.duplicate(),"plate":plate.duplicate(true),"generation_error":generation_error,"grid_step":layout.walk_step,"grid_origin":[layout.grid_origin.x,layout.grid_origin.y],"seen_events":seen_events.duplicate()},true)
+	result.merge({"mode":"courtyard","schema":2,"layout":layout_kind,"generation":layout.site.get("generation",{}).duplicate(true),"seed":seed,"current_room":current_room,"room_kind":kind,"next_rooms":next_rooms(),"resolved":resolved.keys(),"branch_choices":choices.duplicate(),"sealed_rooms":sealed.keys(),"position":[position.x,position.y],"generation_error":generation_error,"grid_step":layout.walk_step,"grid_origin":[layout.grid_origin.x,layout.grid_origin.y],"seen_events":seen_events.duplicate()},true)
 	result["pending_reward"] = phase=="reward"
 	result["candidate_nodes"] = graph.rooms.size()
 	result["forward_only"] = travel!=null or layout_kind=="node_graph"
@@ -694,22 +647,7 @@ func observe() -> Dictionary:
 				"remaining": int(pending_event_effect.get("remaining", 0)),
 				"glyphs": pending_event_effect.get("glyphs", []).duplicate(),
 			}
-	result["inventory_actions"] = inventory_actions()
 	return result
-
-
-func inventory_actions() -> Array:
-	var actions: Array = []
-	if phase not in ["map","rest","shop"]: return actions
-	for i in tray.size():
-		actions.append({"type":"tray_to_deck","index":i,"glyph":tray[i]})
-		for row in 2:
-			for col in 2:
-				if str(plate[row][col]).is_empty(): actions.append({"type":"plate","index":i,"row":row,"col":col})
-	for row in 2:
-		for col in 2:
-			if not str(plate[row][col]).is_empty(): actions.append({"type":"take_plate","row":row,"col":col})
-	return actions
 
 
 func summary() -> Dictionary:
@@ -722,7 +660,7 @@ func save_run(path := SAVE_PATH) -> Error:
 	if phase in ["battle","generation_error"]: return ERR_BUSY
 	_sync_content()
 	var data := SAVE.new()
-	data.run = {"seed":seed,"act":GameState.act_index,"graph":graph,"current_room":current_room,"resolved":resolved,"visited":visited_rooms,"choices":choices,"sealed":sealed,"contents":contents,"seen_events":seen_events,"event_bags":event_bags,"last_event_id":last_event_id,"event_node":event_node,"pending_event_next":pending_event_next,"event_temp_hp":GameState.event_temp_hp,"position":position,"phase":phase,"plate":plate,"tray":tray,"active":active,"pending_glyphs":pending_glyphs,"pending_kind":pending_kind,"pending_index":pending_index,"pending_event_effect":pending_event_effect,"pending_spawn":pending_spawn,"pending_spawn_relic":pending_spawn_relic,"spawned_battle":spawned_battle,"spawn_battle_relic":spawn_battle_relic,"event_board":event_board.duplicate(true),"log":log_lines,"rng":GameState.rng.state}
+	data.run = {"seed":seed,"act":GameState.act_index,"graph":graph,"current_room":current_room,"resolved":resolved,"visited":visited_rooms,"choices":choices,"sealed":sealed,"contents":contents,"seen_events":seen_events,"event_bags":event_bags,"last_event_id":last_event_id,"event_node":event_node,"pending_event_next":pending_event_next,"event_temp_hp":GameState.event_temp_hp,"position":position,"phase":phase,"pending_glyphs":pending_glyphs,"pending_kind":pending_kind,"pending_index":pending_index,"pending_event_effect":pending_event_effect,"pending_spawn":pending_spawn,"pending_spawn_relic":pending_spawn_relic,"spawned_battle":spawned_battle,"spawn_battle_relic":spawn_battle_relic,"event_board":event_board.duplicate(true),"log":log_lines,"rng":GameState.rng.state}
 	if travel!=null: data.run["forward"] = {"history":travel.history.duplicate(),"departed":travel.departed}
 	data.run["planned_route"] = planned_route.duplicate()
 	data.player = {"hp":GameState.player_hp,"max_hp":GameState.player_max_hp,"gold":GameState.gold,"sequence":GameState.battle_sequence,"relics":GameState.relics,"binds":GameState.relic_binds,"counters":GameState.relic_counters,"reduction":GameState.permanent_damage_reduction,"deck":[]}
@@ -761,7 +699,7 @@ static func restore(path := SAVE_PATH, as_nodes := false):
 	run.event_bags = state.get("event_bags",{}); run.last_event_id = str(state.get("last_event_id",""))
 	run.event_node = state.get("event_node", "start"); run.pending_event_next = state.get("pending_event_next", "")
 	GameState.event_temp_hp = int(state.get("event_temp_hp", 0))
-	run.position = state.position; run.phase = state.phase; run.plate = state.plate; run.tray = state.tray; run.active = state.active
+	run.position = state.position; run.phase = state.phase
 	run._restore_travel(state.get("forward",{}))
 	# Bridge routing may be refined between development builds. Preserve all room
 	# progress; only an invalid walking position returns to that room's safe stand.
@@ -783,10 +721,24 @@ static func restore(path := SAVE_PATH, as_nodes := false):
 	GameState.revive_charges = int(player.get("revive_charges", 0))
 	GameState.permanent_damage_reduction = player.reduction
 	GameState.rng.state = state.rng
+	_restore_legacy_inventory(state)
 	if run.layout_kind=="node_graph":
 		run._seal_abandoned()
 	run.autosave = not bool(GameState.get_meta("courtyard_preview",false))
 	return run
+
+
+static func _restore_legacy_inventory(state: Dictionary) -> void:
+	# Old trays and plates stored extra glyphs outside the deck. Import them once;
+	# new saves omit these fields, so saving and loading cannot duplicate them.
+	var glyphs: Array = []
+	if state.get("tray") is Array: glyphs.append_array(state.tray)
+	if state.get("plate") is Array:
+		for row in state.plate:
+			if row is Array: glyphs.append_array(row)
+	for glyph in glyphs:
+		var character := Database.get_character_by_glyph(str(glyph))
+		if character != null: GameState.add_character(character)
 
 
 func use_node_map() -> void:

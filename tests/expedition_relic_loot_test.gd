@@ -108,7 +108,7 @@ func _ready() -> void:
 	check(screen._event_box.get_global_rect().end.x <= viewport_width and relic_buttons[0].get_global_rect().end.x <= viewport_width, "遗物长说明换行，不撑宽右侧面板")
 	var saved: Array = GameState.relics.duplicate()
 	GameState.relics.assign(Relics.DEFS.keys()); screen._on_stats_changed(); await frames()
-	check(screen._relic_label.text.contains("15件") and screen._relic_label.tooltip_text.contains("蔓生墨") and screen._relic_label.get_global_rect().end.x <= viewport_width, "遗物数量多时摘要显示、完整效果可悬停阅读")
+	check(screen._relic_label.text.contains("%d件" % Relics.DEFS.size()) and screen._relic_label.tooltip_text.contains("蔓生墨") and screen._relic_label.get_global_rect().end.x <= viewport_width, "遗物数量多时摘要显示、完整效果可悬停阅读")
 	GameState.relics.assign(saved); screen.refresh(); await frames()
 	# Refresh rebuilt reward controls.
 	relic_buttons = screen._event_box.get_children().filter(func(c): return c is Button and c.text.contains("蔓生墨"))

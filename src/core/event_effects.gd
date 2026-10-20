@@ -20,7 +20,7 @@ static func node(event: Dictionary, node_id := "start") -> Dictionary:
 		var nodes: Dictionary = event.get("nodes", {})
 		raw = nodes.get(node_id, nodes.get("start", {})).duplicate(true)
 	var result: Dictionary = raw.duplicate(true)
-	for key in ["id", "title", "illustration", "acts", "tags"]:
+	for key in ["id", "title", "illustration", "acts", "tags", "allow_leave"]:
 		if not result.has(key) and event.has(key): result[key] = event[key]
 	result["body"] = resolve_text(str(result.get("body", "")))
 	var options: Array = result.get("options", [])
@@ -91,7 +91,10 @@ static func valid_option(event: Dictionary, option_index: int) -> bool:
 
 
 static func option_available(option: Dictionary) -> bool:
-	return condition_met(option.get("requires", {}))
+	if not condition_met(option.get("requires", {})): return false
+	var effects: Array = option.get("effects", [])
+	var plan := _removal_plan(effects)
+	return plan.get("ok", false) and _can_complete_removal(effects, plan.get("counts", []), [])
 
 
 static func condition_met(condition: Variant) -> bool:
@@ -120,9 +123,20 @@ static func condition_met(condition: Variant) -> bool:
 
 static func resolve(effects: Array, rng: RandomNumberGenerator) -> Dictionary:
 	## 有目标选择的选项先返回待选数据；不产生任何副作用，取消选择可安全重选。
-	var removal_counts: Array[int] = []
-	var remaining := GameState.deck_size()
+	var plan := _removal_plan(effects)
+	if not plan.get("ok", false): return plan
+	var removal_counts: Array = plan.counts
+	if not _can_complete_removal(effects, removal_counts, []):
+		return {"ok": false, "reason": "字袋中符合条件的字不足，无法完成这次删字"}
 	var total := 0
+	for count: int in removal_counts: total += count
+	if total > 0:
+		return {"ok": true, "pending": _pending(effects, removal_counts, [], total)}
+	return _execute(effects, removal_counts, [], rng)
+
+
+static func _removal_plan(effects: Array) -> Dictionary:
+	var removal_counts: Array[int] = []
 	for effect: Dictionary in effects:
 		var kind := str(effect.get("type", ""))
 		if kind not in SUPPORTED:
@@ -134,20 +148,25 @@ static func resolve(effects: Array, rng: RandomNumberGenerator) -> Dictionary:
 			if not nested.get("ok", false): return nested
 		var count := 0
 		if kind == "remove_character":
-			count = mini(maxi(1, int(effect.get("count", 1))), remaining)
-			remaining -= count
-			total += count
+			count = maxi(1, int(effect.get("count", 1)))
 		removal_counts.append(count)
-	if total > 0:
-		return {"ok": true, "pending": _pending(effects, removal_counts, [], total)}
-	return _execute(effects, removal_counts, [], rng)
+	return {"ok": true, "counts": removal_counts}
 
 
 static func resume(pending: Dictionary, glyph: String, rng: RandomNumberGenerator) -> Dictionary:
 	if str(pending.get("type", "")) != "remove_character" or not (pending.get("glyphs", []) as Array).has(glyph):
 		return {"ok": false, "reason": "无效删字选择"}
+	var plan := _removal_plan(pending.get("effects", []))
+	if not plan.get("ok", false) or plan.get("counts", []) != pending.get("removal_counts", []):
+		return {"ok": false, "reason": "删字条件已变化，请取消后重新选择"}
 	var selected: Array = pending.get("selected", []).duplicate()
+	var total := 0
+	for count: int in plan.counts: total += count
+	if int(pending.get("remaining", 0)) <= 0 or selected.size() + int(pending.get("remaining", 0)) != total:
+		return {"ok": false, "reason": "删字进度已失效，请取消后重新选择"}
 	selected.append(glyph)
+	if not _can_complete_removal(pending.get("effects", []), pending.get("removal_counts", []), selected):
+		return {"ok": false, "reason": "可删除的字已变化，请取消后重新选择"}
 	var remaining := int(pending.get("remaining", 0)) - 1
 	if remaining > 0:
 		return {"ok": true, "pending": _pending(pending.get("effects", []), pending.get("removal_counts", []), selected, remaining)}
@@ -155,26 +174,62 @@ static func resume(pending: Dictionary, glyph: String, rng: RandomNumberGenerato
 
 
 static func _pending(effects: Array, removal_counts: Array, selected: Array, remaining: int) -> Dictionary:
-	# 已选中的字形先从候选数量里扣掉，避免只剩一枚时还能被选第二次。
-	var counts: Dictionary = GameState.glyph_counts()
-	for chosen in selected:
-		counts[str(chosen)] = int(counts.get(str(chosen), 0)) - 1
-	var glyphs: Array = counts.keys().filter(func(g): return int(counts.get(g, 0)) > 0)
-	# 第一个删字效果可以限制稀有度；同一选项里暂不混用多种删字过滤。
-	for effect: Dictionary in effects:
-		if str(effect.get("type", "")) != "remove_character":
-			continue
-		if effect.has("min_rarity") or effect.has("max_rarity"):
-			var lo := int(effect.get("min_rarity", 0))
-			var hi := int(effect.get("max_rarity", 4))
-			var allowed := {}
-			for inst: CharInstance in GameState.deck:
-				if inst.data != null and not inst.data.is_pollution and inst.data.rarity >= lo and inst.data.rarity <= hi:
-					allowed[inst.glyph()] = true
-			glyphs = glyphs.filter(func(g): return allowed.has(g))
-		break
+	var counts := remaining_counts({"selected": selected})
+	# Only offer a choice if the rest of the required targets can still be filled.
+	var glyphs: Array = counts.keys().filter(func(g):
+		return int(counts[g]) > 0 and _can_complete_removal(effects, removal_counts, selected + [g]))
 	return {"type": "remove_character", "effects": effects.duplicate(true), "removal_counts": removal_counts.duplicate(),
 		"selected": selected.duplicate(), "remaining": remaining, "glyphs": glyphs}
+
+
+static func remaining_counts(pending: Dictionary) -> Dictionary:
+	var counts := GameState.glyph_counts()
+	for glyph in pending.get("selected", []):
+		counts[str(glyph)] = maxi(0, int(counts.get(str(glyph), 0)) - 1)
+	return counts
+
+
+static func _removal_matches(character: CharacterData, effect: Dictionary) -> bool:
+	if character == null: return false
+	if not effect.has("min_rarity") and not effect.has("max_rarity"): return true
+	return not character.is_pollution and character.rarity >= int(effect.get("min_rarity", 0)) and character.rarity <= int(effect.get("max_rarity", 4))
+
+
+static func _can_complete_removal(effects: Array, counts: Array, selected: Array) -> bool:
+	var targets: Array = []
+	for i in mini(effects.size(), counts.size()):
+		if targets.size() + int(counts[i]) > GameState.deck_size(): return false
+		for _n in int(counts[i]): targets.append(effects[i])
+	if selected.size() > targets.size() or targets.size() > GameState.deck_size(): return false
+	if targets.is_empty(): return true
+	var available := GameState.glyph_counts()
+	var reserved := {}
+	for i in selected.size():
+		var glyph := str(selected[i])
+		if int(available.get(glyph, 0)) <= 0 or not _removal_matches(Database.get_character_by_glyph(glyph), targets[i]): return false
+		available[glyph] -= 1
+		reserved[glyph] = int(reserved.get(glyph, 0)) + 1
+	var candidates: Array = []
+	for inst: CharInstance in GameState.deck:
+		var glyph := inst.glyph()
+		if int(reserved.get(glyph, 0)) > 0: reserved[glyph] -= 1
+		else: candidates.append(inst.data)
+	var assigned: Array = []
+	assigned.resize(candidates.size()); assigned.fill(-1)
+	for i in range(selected.size(), targets.size()):
+		if not _match_removal(i, targets, candidates, assigned, {}): return false
+	return true
+
+
+## Small bipartite match: overlapping rarity filters must not reserve the same entity twice.
+static func _match_removal(index: int, targets: Array, candidates: Array, assigned: Array, seen: Dictionary) -> bool:
+	for i in candidates.size():
+		if seen.has(i) or not _removal_matches(candidates[i], targets[index]): continue
+		seen[i] = true
+		if int(assigned[i]) < 0 or _match_removal(int(assigned[i]), targets, candidates, assigned, seen):
+			assigned[i] = index
+			return true
+	return false
 
 
 static func _execute(effects: Array, removal_counts: Array, selected: Array, rng: RandomNumberGenerator) -> Dictionary:

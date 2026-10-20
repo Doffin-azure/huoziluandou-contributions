@@ -1,0 +1,24 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 68 / 词 165 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS normal project entry opens the courtyard title
+PASS all existing title actions retained in the branded menu
+PASS title rendering leaves gameplay RNG untouched
+PASS keyboard focus starts on the primary action
+PASS library button opens the real collection overlay
+PASS production library includes the relic subpage
+PASS production relic tab shows every relic
+PASS modal prevents underlying start, settings and custom actions
+PASS ESC closes collection and unlocks the menu
+PASS settings button opens shared production settings
+PASS live reduced-motion preference pauses scenery and hides falling petals
+PASS restoring motion resumes scenery
+PASS custom deck button opens the existing builder
+PASS leaving title suspends cached scenery and viewport rendering
+PASS glyph graph action still uses the existing route
+PASS glyph graph keeps the battle backdrop hidden without a legacy 3D viewport
+PASS title art stays consistent when the battle theme changes
+PASS closing main cleans the active screen, router host and persistent study
+[title_menu_test] PASS=18 FAIL=0

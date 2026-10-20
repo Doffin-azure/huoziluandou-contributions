@@ -78,7 +78,7 @@ func _run() -> void:
 		var in_view: AABB = camera.global_transform.affine_inverse() * bounds
 		camera.size = maxf(in_view.size.x, in_view.size.y) * 1.17
 		for frame in 4: await get_tree().process_frame
-		await RenderingServer.frame_post_draw
+		RenderingServer.force_draw(false)
 		var picture := viewport.get_texture().get_image()
 		picture.convert(Image.FORMAT_RGBA8)
 		picture.resize(1024, 1024, Image.INTERPOLATE_LANCZOS)
@@ -99,8 +99,9 @@ func _run() -> void:
 	var file := FileAccess.open(OUTPUT + "manifest.json", FileAccess.WRITE)
 	file.store_string(JSON.stringify({"source": "res://src/ui/object_stage/relic_specimen.gd", "source_sha256": FileAccess.get_sha256("res://src/ui/object_stage/relic_specimen.gd"), "sources": sources, "renderer": "Godot orthographic shop pigments", "icons": manifest}, "\t"))
 	file.close()
-	await _gallery()
-	await _gallery(Specimen.IDS.slice(15), GALLERY.get_base_dir() + "/new-23-relics.png", "遗物 · 新增二十三件")
+	if not OS.get_cmdline_user_args().has("--skip-gallery"):
+		await _gallery(Specimen.IDS, GALLERY, "遗物 · %d 件实体模型" % Specimen.IDS.size())
+		await _gallery(Specimen.IDS.slice(15, 38), GALLERY.get_base_dir() + "/new-23-relics.png", "遗物 · 新增二十三件")
 	print("[bake_relic_icons] exported %d transparent textures" % _pictures.size())
 	get_tree().quit()
 
@@ -153,6 +154,6 @@ func _gallery(ids: Array = Specimen.IDS, path: String = GALLERY, heading := "遗
 		tier.add_theme_color_override("font_color", Color("a6b5a5"))
 		cell.add_child(tier)
 	for frame in 4: await get_tree().process_frame
-	await RenderingServer.frame_post_draw
+	RenderingServer.force_draw(false)
 	viewport.get_texture().get_image().save_png(path)
 	viewport.queue_free()

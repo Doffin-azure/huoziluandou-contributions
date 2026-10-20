@@ -2,7 +2,6 @@ extends Control
 ## 遗物边界：真实手动补字时序、共享实体、指定目标、逐件存档续战。
 
 var checks: Array = []
-const EXPECTED_CHECKS := 56
 
 
 func _ok(ok: bool, label: String) -> void:
@@ -175,8 +174,9 @@ func _ready() -> void:
 	_target_and_shared()
 	_save_each()
 	var failures := checks.filter(func(c): return not c.ok).size()
-	if checks.size() != EXPECTED_CHECKS:
+	var expected_checks := 26 + 2 * Relics.DEFS.size()
+	if checks.size() != expected_checks:
 		failures += 1
-		push_error("遗物边界用例未完整执行：%d/%d" % [checks.size(), EXPECTED_CHECKS])
+		push_error("遗物边界用例未完整执行：%d/%d" % [checks.size(), expected_checks])
 	print("[relic_edge_test] PASS=%d FAIL=%d TOTAL=%d" % [checks.size() - failures, failures, checks.size()])
 	get_tree().quit(1 if failures else 0)

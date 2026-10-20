@@ -40,6 +40,7 @@ const TEXTURES := {
 	"palindrome": preload("res://assets/relics/icons/palindrome.png"),
 	"binding": preload("res://assets/relics/icons/binding.png"),
 	"proof": preload("res://assets/relics/icons/proof.png"),
+	"vial": preload("res://assets/relics/icons/vial.png"),
 }
 
 

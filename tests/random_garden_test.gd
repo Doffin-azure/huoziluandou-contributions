@@ -39,7 +39,7 @@ func run_checks() -> void:
 			run.graph = graph.duplicate(true); run.layout = layout
 			run.current_room = "start"; run.resolved = {"start":true}; run.visited_rooms = {"start":true}
 			run.choices = {}; run.sealed = {}; run.contents = {}; run.seen_events = []
-			run.tray = []; run.position = layout.rooms.start.stand_cell; run.phase = "map"
+			run.position = layout.rooms.start.stand_cell; run.phase = "map"
 			var order: Array = ["opening_1","passage_event","opening_2"]
 			for g in 3:
 				order.append_array(graph.groups[g].branches[(mask>>g)&1]); order.append(graph.groups[g].merge)
@@ -86,9 +86,9 @@ func resolve(run: RefCounted) -> void:
 			check(run.phase=="reward" and GameState.gold>gold_before,"battle settles gold and reward")
 			resolve(run)
 		"reward":
-			var before: int = run.tray.size()
+			var before: int = GameState.deck_size()
 			check(run.apply(run.legal_actions()[0]).get("ok",false),"treasure/battle reward selection")
-			check(run.resolved.has(run.current_room) and (run.tray.size()==before+1 or before==6),"reward enters tray/deck and opens exit")
+			check(run.resolved.has(run.current_room) and GameState.deck_size()==before+1,"reward enters deck and opens exit")
 			check(not run.apply({"type":"reward","index":0}).get("ok",false),"reward cannot settle twice")
 		"event":
 			for i in 12:

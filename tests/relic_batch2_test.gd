@@ -1,6 +1,6 @@
 extends Control
 ## 遗物第二批：清单里剩下的条目逐件验证默认规则。
-## 空铅盒、留字蜡、血珀、补字鬼手、裂雷瓶、将腐供果、乱文骨骰已由主分支实现，测试在 relic_test。
+## 空铅盒、留字蜡、朱砂印泥、补字鬼手、裂墨瓶、褪墨、乱文骨骰已由主分支实现，测试在 relic_test。
 
 var _pass := 0
 var _fail := 0
@@ -119,7 +119,7 @@ func _test_names() -> void:
 		words[w.word] = true
 	_ok(not names.any(func(n): return words.has(n) or Expedition.SEALS.has(n)), "遗物名不和词、印章重名")
 	_ok(Relics.DEFS.keys().all(func(id): return Relics.TIER.has(id)), "每件遗物都有档次")
-	_ok(["九连环", "问冥签", "望乡月", "金缕衣", "阴司愿帖", "判官笔", "生死簿"].all(func(n): return names.has(n)), "新遗物按冥府镇物、葬仪旧物命名")
+	_ok(["连字环", "问字签", "月字模", "金字碑", "许愿笺", "判官笔", "生死簿"].all(func(n): return names.has(n)), "新遗物以字为主题命名")
 
 
 # ---------------------------------------------------------------- 消消乐
@@ -131,69 +131,69 @@ func _test_chain() -> void:
 	_place(b, Vector2i(3, 0), "防")
 	var hp: int = b.enemies[0].hp
 	Relics.run_chain(b)
-	_ok(b.enemies[0].hp < hp and _logged(b, "自动打出【击破】"), "九连环：开局自动打出已连成的【击破】")
-	_ok(b.board.get_cell(3, 3) != null and b.board.get_cell(3, 3).glyph() == "防", "九连环：出字后全盘下落")
+	_ok(b.enemies[0].hp < hp and _logged(b, "自动打出【击破】"), "连字环：开局自动打出已连成的【击破】")
+	_ok(b.board.get_cell(3, 3) != null and b.board.get_cell(3, 3).glyph() == "防", "连字环：出字后全盘下落")
 	_clear_board(b)
 	_place(b, Vector2i(0, 3), "死")
 	_place(b, Vector2i(1, 3), "亡")
 	Relics.run_chain(b)
-	_ok(b.player.is_alive() and _count(b, "死") == 1, "九连环：不会自动打出【死亡】")
+	_ok(b.player.is_alive() and _count(b, "死") == 1, "连字环：不会自动打出【死亡】")
 	var no := _battle([])
 	_clear_board(no)
 	_place(no, Vector2i(0, 3), "击")
 	_place(no, Vector2i(1, 3), "破")
 	Relics.run_chain(no)
-	_ok(_count(no, "击") == 1, "没有九连环时不自动出词")
+	_ok(_count(no, "击") == 1, "没有连字环时不自动出词")
 
 
 # ---------------------------------------------------------------- 问字签
 func _test_question() -> void:
 	var b := _battle(["question"], _deck("击防"), 2)
-	_ok(b.question_choices.size() == 3, "问冥签：开局给出 3 枚候选")
+	_ok(b.question_choices.size() == 3, "问字签：开局给出 3 枚候选")
 	var pick: String = b.question_choices[0]
 	var before := _count(b, pick)
-	_ok(not b.take_question("不在候选里"), "问冥签：不在候选里的字不能拿")
-	_ok(b.take_question(pick) and _count(b, pick) == before + 1 and b.question_choices.is_empty(), "问冥签：选中的字落到盘上，只能选一次")
+	_ok(not b.take_question("不在候选里"), "问字签：不在候选里的字不能拿")
+	_ok(b.take_question(pick) and _count(b, pick) == before + 1 and b.question_choices.is_empty(), "问字签：选中的字落到盘上，只能选一次")
 	var placed: Array = b.board.cells.filter(func(c): return c != null and c.glyph() == pick and c.temporary)
-	_ok(not placed.is_empty() and b.temp_chars.has(placed[0]), "问冥签：落下的是本场临时字")
+	_ok(not placed.is_empty() and b.temp_chars.has(placed[0]), "问字签：落下的是本场临时字")
 
 
 # ---------------------------------------------------------------- 月
 func _test_moon() -> void:
 	var b := _battle(["moon"], _deck("击击防防"), 4, 0, 0)
-	_ok(_count(b, "月") == 1 and b.moon_uid >= 0, "望乡月：开局盘上有一枚临时【月】")
+	_ok(_count(b, "月") == 1 and b.moon_uid >= 0, "月字模：开局盘上有一枚临时【月】")
 	var moon := Relics.moon_pos(b)
 	_clear_board(b)
 	b.board.set_xy(Vector2i(0, 0), b.temp_chars.filter(func(c): return c.uid == b.moon_uid)[0])
 	_place(b, Vector2i(3, 3), "防")
 	_place(b, Vector2i(3, 0), "击")
 	b.try_play([Vector2i(3, 0)])
-	_ok(b.board.get_cell(3, 3) == null, "望乡月：出字后其他字向【月】聚拢")
+	_ok(b.board.get_cell(3, 3) == null, "月字模：出字后其他字向【月】聚拢")
 	b.end_player_turn()
-	_ok(_count(b, "月") == 0 and b.moon_uid == -1, "望乡月：下回合消失")
+	_ok(_count(b, "月") == 0 and b.moon_uid == -1, "月字模：下回合消失")
 	var b2 := _battle(["moon"], [], 0, 0, 0)
 	_clear_board(b2)
 	_place(b2, Vector2i(1, 1), "月")
 	_place(b2, Vector2i(3, 3), "防")
-	_ok(b2.try_play([Vector2i(1, 1)]).ok and b2.board.get_cell(3, 3) == null, "望乡月：打出【月】也会聚拢一次（%s）" % str(moon))
+	_ok(b2.try_play([Vector2i(1, 1)]).ok and b2.board.get_cell(3, 3) == null, "月字模：打出【月】也会聚拢一次（%s）" % str(moon))
 
 
-# ---------------------------------------------------------------- 三生石 / 阴阳镜
+# ---------------------------------------------------------------- 叠字钱 / 反字模
 func _test_slot_palindrome() -> void:
 	var b := _battle(["slot"])
 	var plain: BattleState
 	var gold := GameState.gold
 	var r := _play_word(b, "击击击")
-	_ok(r.ok and GameState.gold == gold + 50 and _count(b, "击") == 0, "三生石：三连相同字拿 50 金币，三枚都消耗")
+	_ok(r.ok and GameState.gold == gold + 50 and _count(b, "击") == 0, "叠字钱：三连相同字拿 50 金币，三枚都消耗")
 	plain = _battle([])
-	_ok(not _play_word(plain, "击击击").ok, "没有三生石时三连相同字不成词")
+	_ok(not _play_word(plain, "击击击").ok, "没有叠字钱时三连相同字不成词")
 
 	b = _battle(["palindrome"])
 	var hp: int = b.enemies[0].hp
 	r = _play_word(b, "破击")
-	_ok(r.ok and r.word != null and r.word.word == "击破" and b.enemies[0].hp < hp, "阴阳镜：倒着连【破击】发动【击破】")
+	_ok(r.ok and r.word != null and r.word.word == "击破" and b.enemies[0].hp < hp, "反字模：倒着连【破击】发动【击破】")
 	plain = _battle([])
-	_ok(not _play_word(plain, "破击").ok, "没有阴阳镜时倒连不成词")
+	_ok(not _play_word(plain, "破击").ok, "没有反字模时倒连不成词")
 
 
 # ---------------------------------------------------------------- 装订线
@@ -202,30 +202,30 @@ func _test_binding() -> void:
 	_clear_board(b)
 	_place(b, Vector2i(3, 1), "击")
 	_place(b, Vector2i(0, 1), "破")
-	_ok(b.board.wrap_rows and b.try_play([Vector2i(3, 1), Vector2i(0, 1)]).ok, "轮回绳：最右和最左两格相邻，可以跨边连词")
+	_ok(b.board.wrap_rows and b.try_play([Vector2i(3, 1), Vector2i(0, 1)]).ok, "串字绳：最右和最左两格相邻，可以跨边连词")
 	var plain := _battle([])
 	_clear_board(plain)
 	_place(plain, Vector2i(3, 1), "击")
 	_place(plain, Vector2i(0, 1), "破")
-	_ok(not plain.try_play([Vector2i(3, 1), Vector2i(0, 1)]).ok, "没有轮回绳时不能跨边")
+	_ok(not plain.try_play([Vector2i(3, 1), Vector2i(0, 1)]).ok, "没有串字绳时不能跨边")
 	_clear_board(b)
 	_place(b, Vector2i(3, 1), "击")
 	_place(b, Vector2i(0, 2), "破")
-	_ok(not b.try_play([Vector2i(3, 1), Vector2i(0, 2)]).ok, "轮回绳：只连同一行")
+	_ok(not b.try_play([Vector2i(3, 1), Vector2i(0, 2)]).ok, "串字绳：只连同一行")
 
 
-# ---------------------------------------------------------------- 战外挑字：贴金纸 / 替身草人
+# ---------------------------------------------------------------- 战外挑字：泥金笔 / 复字拓片
 func _test_glyph_relics() -> void:
 	_reset()
 	GameState.deck.assign(_deck("击击防"))
 	GameState.add_relic("goldleaf")
 	var ji := Database.get_character_by_glyph("击").id
-	_ok(Relics.apply_pick("goldleaf", ji) and Relics.apply_pick("goldleaf", ji), "贴金纸：两枚【击】镀金")
-	_ok(GameState.deck.filter(func(c): return c.gilded).size() == 2 and not Relics.apply_pick("goldleaf", ji), "贴金纸：已镀金的不再算候选")
+	_ok(Relics.apply_pick("goldleaf", ji) and Relics.apply_pick("goldleaf", ji), "泥金笔：两枚【击】镀金")
+	_ok(GameState.deck.filter(func(c): return c.gilded).size() == 2 and not Relics.apply_pick("goldleaf", ji), "泥金笔：已镀金的不再算候选")
 	GameState.add_relic("rubbing")
 	var n := GameState.deck_size()
-	_ok(Relics.apply_pick("rubbing", ji) and GameState.deck_size() == n + 1 and GameState.deck.back().gilded, "替身草人：复制一枚字，保留镀金")
-	_ok(GameState.deck.back().uid != GameState.deck[0].uid, "替身草人：复制出来的是新实体")
+	_ok(Relics.apply_pick("rubbing", ji) and GameState.deck_size() == n + 1 and GameState.deck.back().gilded, "复字拓片：复制一枚字，保留镀金")
+	_ok(GameState.deck.back().uid != GameState.deck[0].uid, "复字拓片：复制出来的是新实体")
 
 
 # ---------------------------------------------------------------- 死 / 亡 / 死亡 / 反死亡
@@ -255,15 +255,15 @@ func _test_midas() -> void:
 	_reset()
 	GameState.deck.assign(_deck("击防"))
 	GameState.add_relic("midas")
-	_ok(GameState.deck.all(func(c): return c.gilded), "金缕衣：现有字全部镀金")
+	_ok(GameState.deck.all(func(c): return c.gilded), "金字碑：现有字全部镀金")
 	GameState.add_character(Database.get_character_by_glyph("破"))
-	_ok(GameState.deck.back().gilded, "金缕衣：之后拿到的字也镀金")
+	_ok(GameState.deck.back().gilded, "金字碑：之后拿到的字也镀金")
 	var b := BattleState.new(Database.rules.duplicate())
 	b.start([], [_enemy_data()], 3)
 	b.earn_gold(19)
-	_ok(b.player.is_alive(), "金缕衣：19 金币还活着")
+	_ok(b.player.is_alive(), "金字碑：19 金币还活着")
 	b.earn_gold(1)
-	_ok(not b.player.is_alive() and b.is_over(), "金缕衣：一场赚满 20 金币化为金像")
+	_ok(not b.player.is_alive() and b.is_over(), "金字碑：一场赚满 20 金币化为金像")
 
 
 # ---------------------------------------------------------------- 猴爪
@@ -271,9 +271,9 @@ func _test_monkey() -> void:
 	_reset(["monkey"])
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 5
-	_ok(Relics.wish_options(rng).size() == 3, "阴司愿帖：从 4 个愿望里展示 3 个")
+	_ok(Relics.wish_options(rng).size() == 3, "许愿笺：从 4 个愿望里展示 3 个")
 	_ok(Relics.grant_wish("endless_guard") and GameState.player_max_hp == 1 and GameState.player_hp == 1, "固若金汤：生命上限变为 1")
-	_ok(not Relics.grant_wish("endless_life"), "阴司愿帖：一件只能许一次")
+	_ok(not Relics.grant_wish("endless_life"), "许愿笺：一件只能许一次")
 	var b := BattleState.new(Database.rules.duplicate())
 	b.start([], [_enemy_data()], 3)
 	_ok(b.player.persistent_block == 118, "固若金汤：开局持久盾 = 2 × 失去的上限（2 × 59）")
@@ -297,16 +297,16 @@ func _test_monkey() -> void:
 	Relics.grant_wish("endless_life")
 	b = BattleState.new(Database.rules.duplicate())
 	b.start([], [_enemy_data()], 3)
-	_ok(b.player.is_alive() and b.player.persistent_block >= 99, "生生不息 + 血珀：溢出先转成持久盾")
+	_ok(b.player.is_alive() and b.player.persistent_block >= 99, "生生不息 + 朱砂印泥：溢出先转成持久盾")
 
 	_reset(["monkey"])
-	_ok(Relics.grant_wish("endless_gold") and GameState.has_relic("midas"), "点石成金：得到金缕衣")
+	_ok(Relics.grant_wish("endless_gold") and GameState.has_relic("midas"), "点石成金：得到金字碑")
 	_reset(["monkey", "midas"])
 	rng.seed = 9
-	_ok(not Relics.wish_options(rng).has("endless_gold"), "已有金缕衣时不出「点石成金」")
+	_ok(not Relics.wish_options(rng).has("endless_gold"), "已有金字碑时不出「点石成金」")
 
 
-# ---------------------------------------------------------------- 辟邪尺
+# ---------------------------------------------------------------- 校勘尺
 func _test_proof() -> void:
 	var b: BattleState
 	b = _battle(["proof"], _deck("防防防"))
@@ -315,7 +315,7 @@ func _test_proof() -> void:
 		_place(b, Vector2i(x, 0), "击").add_pollution("scorch")
 	var before := b.board.cells.filter(func(c): return c != null).size()
 	b.cleanse_board()
-	_ok(b.board.cells.filter(func(c): return c != null).size() == before + 1, "辟邪尺：净化 2 枚污染字，补 1 字")
+	_ok(b.board.cells.filter(func(c): return c != null).size() == before + 1, "校勘尺：净化 2 枚污染字，补 1 字")
 
 
 # ---------------------------------------------------------------- 拾取流程（经典 + 远征）
@@ -328,7 +328,7 @@ func _test_flows() -> void:
 	RelicRewardFlow.grant(host, "monkey", func(id): got.id = id)
 	await get_tree().process_frame
 	var choice: ChoiceOverlay = host.get_children().filter(func(c): return c is ChoiceOverlay).front()
-	_ok(choice != null and choice.cfg.options.size() == 3, "经典模式：阴司愿帖弹出三个愿望")
+	_ok(choice != null and choice.cfg.options.size() == 3, "经典模式：许愿笺弹出三个愿望")
 	var at: int = choice.cfg.options.find_custom(func(o): return o.text.contains("固若金汤"))
 	if at < 0:
 		at = choice.cfg.options.find_custom(func(o): return not o.text.contains("千字同文"))
@@ -344,13 +344,13 @@ func _test_flows() -> void:
 		var picker: CollectionOverlay = host.get_children().filter(func(c): return c is CollectionOverlay and c.is_inside_tree() and not c.is_queued_for_deletion()).back()
 		picker._close()
 	await get_tree().process_frame
-	_ok(got.id == "goldleaf" and GameState.deck.all(func(c): return c.gilded), "经典模式：贴金纸关窗也会随机挑满两枚")
+	_ok(got.id == "goldleaf" and GameState.deck.all(func(c): return c.gilded), "经典模式：泥金笔关窗也会随机挑满两枚")
 
 	_reset()
 	var ex := Expedition.start(5)
 	GameState.deck.assign(_deck("击防防"))
 	ex._grant_relic("goldleaf", "测试")
-	_ok(ex.top_panel().get("kind", "") == "relic_pick", "远征：贴金纸弹出挑字面板")
+	_ok(ex.top_panel().get("kind", "") == "relic_pick", "远征：泥金笔弹出挑字面板")
 	ex.pick_relic(Database.get_character_by_glyph("防").id)
 	ex.pick_relic(Database.get_character_by_glyph("防").id)
 	_ok(ex.top_panel().get("kind", "") != "relic_pick" and GameState.deck.filter(func(c): return c.gilded).size() == 2, "远征：挑满两枚后面板关闭")
@@ -358,7 +358,7 @@ func _test_flows() -> void:
 	_ok(Relics.roll_choices([], GameState.rng, 99).size() == Relics.normal_pool().size() and Relics.normal_pool().has("monkey"), "经典：商店 / 精英 / 首领 / 事件的候选覆盖全部普通遗物，含第二批")
 	ex._grant_relic("monkey", "测试")
 	var wish_panel := ex.top_panel()
-	_ok(wish_panel.get("kind", "") == "relic_wish" and wish_panel.options.size() == 3, "远征：阴司愿帖弹出三个愿望")
+	_ok(wish_panel.get("kind", "") == "relic_wish" and wish_panel.options.size() == 3, "远征：许愿笺弹出三个愿望")
 	var pick: int = wish_panel.options.find("endless_glyph")
 	if pick >= 0:
 		_ok(not ex.choose_wish(pick), "远征：千字同文没挑字不能许")

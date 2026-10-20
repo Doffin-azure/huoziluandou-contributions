@@ -51,17 +51,17 @@ var enemy_skip_turns := 0               ## 墨途远征「停火」：敌方跳�
 ## 遗物（src/core/relics.gd）：开战时从 GameState 复制，按获得顺序
 var relics: Array = []
 var relic_binds: Dictionary = {}        ## 遗物 id -> 永久实体 uid
-var wheel_step := 0                     ## 四方轮：已转过几次
-var blitz_turn := 0                     ## 借时香：这一回合结束时敌人跳过行动（0 = 不跳）
-var slab_uid := -1                      ## 坠字石绑定的实体
-var slab_uses := 0                      ## 坠字石本场剩余额外次数
+var wheel_step := 0                     ## 转轮架：已转过几次
+var blitz_turn := 0                     ## 急就章：这一回合结束时敌人跳过行动（0 = 不跳）
+var slab_uid := -1                      ## 压字石绑定的实体
+var slab_uses := 0                      ## 压字石本场剩余额外次数
 var magic_hand_left := 3                ## 补字鬼手：本场还能补位的字数
-var fruit_uid := -1                      ## 将腐供果：本场被替换为临时副本的永久实体
-var moon_uid := -1                      ## 望乡月：本场那枚【月】
-var moon_turn := 0                      ## 望乡月：放下它的回合，下回合消失
-var cleansed_count := 0                 ## 辟邪尺：攒着的净化数
-var question_choices: Array = []        ## 问冥签：开局待选的三枚字（选完清空）
-var breeders: Dictionary = {}           ## 寄字菌：有繁殖资格的临时字 uid
+var fruit_uid := -1                      ## 褪墨：本场被替换为临时副本的永久实体
+var moon_uid := -1                      ## 月字模：本场那枚【月】
+var moon_turn := 0                      ## 月字模：放下它的回合，下回合消失
+var cleansed_count := 0                 ## 校勘尺：攒着的净化数
+var question_choices: Array = []        ## 问字签：开局待选的三枚字（选完清空）
+var breeders: Dictionary = {}           ## 蔓生墨：有繁殖资格的临时字 uid
 var strike_active := false              ## 打击增强：当前出字带【击】
 var bounty_paid: bool = false
 var bounty_reward: int = 0
@@ -363,11 +363,11 @@ func add_energy(amount: int) -> void:
 		_log("能：本次额外获得 %d 储能" % bonus)
 	if amount > 0 and relics.has("cracked_bottle"):
 		amount *= 2
-		_log("裂雷瓶：本次储能翻倍（+%d）" % amount)
+		_log("裂墨瓶：本次储能翻倍（+%d）" % amount)
 	player.add_energy(amount)
 
 
-## 玩家治疗；血珀把溢出部分转成持久盾。
+## 玩家治疗；朱砂印泥把溢出部分转成持久盾。
 func heal_player(amount: int) -> int:
 	var value := maxi(0, amount)
 	var before := player.hp
@@ -376,7 +376,7 @@ func heal_player(amount: int) -> int:
 	if relics.has("amber") and value > healed:
 		var overflow := value - healed
 		player.add_persistent_block(overflow)
-		_log("血珀：溢出治疗 %d 转为持久盾" % overflow)
+		_log("朱砂印泥：溢出治疗 %d 转为持久盾" % overflow)
 	return healed
 
 
@@ -626,7 +626,7 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 	return executed
 
 
-## 遗物包一层：打击增强按本次出字是否带【击】；出字后坠字石下落
+## 遗物包一层：打击增强按本次出字是否带【击】；出字后压字石下落
 func _execute_prepared_play(play: Dictionary, shared: Dictionary) -> Dictionary:
 	var prev := strike_active
 	strike_active = Relics.play_has_strike(play.glyphs)
@@ -935,7 +935,11 @@ func _execute_play_inner(play: Dictionary, shared: Dictionary) -> Dictionary:
 			for wid in words_played_this_turn:
 				distinct[wid] = true
 			abilities["vigor_next"] = distinct.size()
-		if _is_attack_word(word):
+		if _replays_attack(word):
+			# 连击重演了一个攻击词（可能是上回合的）：本回合算打出过攻击词，【回防】等条件能接上；
+			# 但不改写「上一个攻击词」，免得下一次连击重演的是连击自己
+			attack_words_this_turn += 1
+		elif _is_attack_word(word):
 			attack_words_this_turn += 1
 			last_attack_word = word
 			last_attack_glyphs = glyphs.duplicate()
@@ -1173,6 +1177,16 @@ func _is_attack_word(word: WordData) -> bool:
 	return false
 
 
+## 这个词是否带【连击】式重演，且确实有攻击词可重演
+func _replays_attack(word: WordData) -> bool:
+	if word == null or last_attack_word == null or last_attack_effects.is_empty():
+		return false
+	for e in word.effects:
+		if e.handler == "replay_last_attack":
+			return true
+	return false
+
+
 ## 消耗一个路径；返回 [{inst, kind}]，kind = real / layer / pinned / retained。
 
 func _consume_path(path: Array, expected: Array, shared: Dictionary) -> Array:
@@ -1209,7 +1223,7 @@ func _consume_path(path: Array, expected: Array, shared: Dictionary) -> Array:
 		if slab_kind == "layer":
 			item.kind = "layer"
 		elif slab_kind == "exhausted":
-			# 坠字石：次数用尽，本场移出循环（回收、回放都拿不回来），下场恢复
+			# 压字石：次数用尽，本场移出循环（回收、回放都拿不回来），下场恢复
 			removed_this_battle.append(inst)
 			board.cells[physical_index] = null
 		elif item.kind in ["pinned", "layer"]:
@@ -1488,22 +1502,22 @@ func end_player_turn() -> void:
 
 	# 空铅盒：回合结束、敌人行动前，按空行给持久盾
 	Relics.on_player_turn_end(self)
-	# 寄字菌：回合结束、敌人行动前繁殖
+	# 蔓生墨：回合结束、敌人行动前繁殖
 	Relics.breed(self)
 	EnemyMechanics.replicate_glyphs(self)
 	if relics.has("cracked_bottle") and player.energy > 0:
 		var cleared := player.energy
 		player.energy = 0
-		_log("裂雷瓶：回合结束清空 %d 储能" % cleared)
+		_log("裂墨瓶：回合结束清空 %d 储能" % cleared)
 	_log("玩家结束回合")
 	var blitz := blitz_turn > 0 and turn == blitz_turn
 	for e in enemies:
 		if not e.is_alive():
 			continue
 		if blitz:
-			# 借时香：所有敌人跳过这一次行动（意图顺延，和停火一样推进招式）
+			# 急就章：所有敌人跳过这一次行动（意图顺延，和停火一样推进招式）
 			e.move_index += 1
-			_log("借时香：%s 这一回合不行动" % e.display_name)
+			_log("急就章：%s 这一回合不行动" % e.display_name)
 			continue
 		_enemy_act(e)
 		if not player.is_alive():
@@ -1902,7 +1916,7 @@ func cleanse_scorch() -> int:
 	Relics.on_cleansed(self, n)
 	return n
 
-## 问冥签：玩家从三枚里挑一枚
+## 问字签：玩家从三枚里挑一枚
 func take_question(glyph: String) -> bool:
 	return Relics.take_question(self, glyph)
 

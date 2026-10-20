@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="WordData" format=3]
+
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="1_m4jks"]
+[ext_resource type="Script" path="res://src/data/word_data.gd" id="2_koscl"]
+
+[sub_resource type="Resource" id="Resource_b1gs4"]
+script = ExtResource("1_m4jks")
+kind = 6
+handler = "apply_status_enemy"
+amount = 2
+status_id = "vulnerable"
+note = "使目标获得2层易伤"
+
+[sub_resource type="Resource" id="Resource_ym14w"]
+script = ExtResource("1_m4jks")
+handler = "damage"
+amount = 8
+note = "造成8点伤害"
+
+[resource]
+script = ExtResource("2_koscl")
+id = "extra_jialiu"
+word = "甲流"
+glyphs = Array[String](["甲", "流"])
+description = "流感传染：使目标获得2层易伤，再造成8点伤害（这一击已吃易伤）。"
+effects = Array[ExtResource("1_m4jks")]([SubResource("Resource_b1gs4"), SubResource("Resource_ym14w")])
+group = "攻击"
+design_stage = "设计负责人新增"
+effect_summary = "流感传染：使目标获得2层易伤，再造成8点伤害（这一击已吃易伤）。"
+effect_handler_id = "apply_status_enemy"
+priority = "攻击"
+implemented = true

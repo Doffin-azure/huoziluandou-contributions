@@ -8,54 +8,56 @@ class_name Relics
 ## 战斗侧所有钩子都只读 BattleState.relics（开战时从 GameState 复制），测试可直接改它。
 
 ## id -> [名称, 说明, 是否需要绑定一枚字]
-## 名称走冥府镇物、葬仪与庭院旧物一路；内部 id 不变（存档、测试都用 id）
+## 名称以活字印刷作坊里的器物和字为主，少数带一点地府色彩；内部 id 不变（存档、测试都用 id）
 const DEFS := {
-	"strike": ["刑卒护指", "带【击】的单字、词，每段攻击伤害 +2", false],
-	"breach": ["定罪朱签", "每场开局，所有敌人获得 2 层易伤", false],
-	"slab": ["坠字石", "选一枚字：它在盘面上始终下落；本场额外使用 5 次，用尽后本场移出", true],
-	"press": ["续碑座", "字盘变为 5×5；开局多补 4 枚字", false],
-	"sleep": ["安魂枕", "休息处治疗额外 +20", false],
-	"clean": ["无垢拓纸", "回合补字后，若盘面没有污染字，多补 1 枚", false],
-	"wheel": ["四方轮", "每回合按 上、下、左、右 轮流让全盘下落", false],
-	"powerbank": ["藏雷珠", "每场开局获得 4 储能", false],
-	"fireman": ["余烬匣", "拾取时获得 4 枚【火】", false],
-	"fertilizer": ["寄字菌", "选一枚字：本场它变为临时字，每回合结束向四邻空格繁殖临时复制", true],
-	"skyfire": ["天火遗诏", "打出【流火】时，额外对敌人造成 50 点伤害", false],
-	"blitz": ["借时香", "每场第一回合结束后，敌人跳过这一次行动", false],
-	"egg": ["孕字卵", "每赢 4 场战斗，获得 1 枚字", false],
-	"buckler": ["龟甲片", "每场开局获得 4 持久盾", false],
-	"barrier": ["护身纸符", "每场开局获得 10 临时格挡（第一回合有效）", false],
+	"strike": ["刻刀", "带【击】的单字、词，每段攻击伤害 +2", false],
+	"breach": ["蚀刻", "每场开局，所有敌人获得 2 层易伤", false],
+	"slab": ["压字石", "选一枚字：它在盘面上始终下落；本场额外使用 5 次，用尽后本场移出", true],
+	"press": ["对开版", "字盘变为 5×5；开局多补 4 枚字", false],
+	"sleep": ["安神香", "休息处治疗额外 +20", false],
+	"clean": ["净版布", "回合补字后，若盘面没有污染字，多补 1 枚", false],
+	"wheel": ["转轮架", "每回合按 上、下、左、右 轮流让全盘下落", false],
+	"powerbank": ["蓄电瓶", "每场开局获得 4 储能", false],
+	"fireman": ["火种", "拾取时获得 4 枚【火】", false],
+	"fertilizer": ["蔓生墨", "选一枚字：本场它变为临时字，每回合结束向四邻空格繁殖临时复制", true],
+	"skyfire": ["天火", "打出【流火】时，额外对敌人造成 50 点伤害", false],
+	"blitz": ["急就章", "每场第一回合结束后，敌人跳过这一次行动", false],
+	"egg": ["字种", "每赢 4 场战斗，获得 1 枚字", false],
+	"buckler": ["铜护板", "每场开局获得 4 持久盾", false],
+	"barrier": ["纸屏风", "每场开局获得 10 临时格挡（第一回合有效）", false],
 	"empty_case": ["空铅盒", "回合结束时，每有一整行为空，获得 2 持久盾", false],
 	"stay_wax": ["留字蜡", "打出的字有 5% 概率留在原位", false],
-	"amber": ["血珀", "溢出的治疗量转为持久盾", false],
+	"amber": ["朱砂印泥", "溢出的治疗量转为持久盾", false],
 	"ghost_hand": ["补字鬼手", "每场前 3 枚实际打出的字立即补位", false],
-	"cracked_bottle": ["裂雷瓶", "获得的储能翻倍；每回合结束清空储能", false],
-	"rotting_fruit": ["将腐供果", "每场开局随机一枚字本场变为临时字", false],
+	"cracked_bottle": ["裂墨瓶", "获得的储能翻倍；每回合结束清空储能", false],
+	"rotting_fruit": ["褪墨", "每场开局随机一枚字本场变为临时字", false],
 	"chaos_dice": ["乱文骨骰", "拾取时重铸字袋：所有字替换为随机字，并额外补 3 枚", false],
-	"black_water": ["黑水瓶", "事件中封存幽都黑水；部分井、墨、渡口事件出现额外选项", false],
+	"black_water": ["黑水墨", "事件中封存幽都黑水；部分井、墨、渡口事件出现额外选项", false],
 	"life_lantern": ["命灯", "借来的寿火；连续事件中可抵挡一次反噬", false],
 	"life_debt": ["寿契", "记着未还的寿债；持有期间，讨债事件可能找上门", false],
 	# ---- 第二批（清单其余条目，默认取值见 docs/遗物接入说明_第二批.md）
-	"chain": ["九连环", "每次出字后全盘下落；每场开局自动打出盘上已连成的词，补字后接着找，直到连不出（要选目标、要付费的词留给你）", false],
-	"question": ["问冥签", "每场开局从 3 枚能配词的字里挑 1 枚，作为本场临时字落到盘上", false],
-	"goldleaf": ["贴金纸", "拾取时选两枚字，永久镀金", false],
-	"moon": ["望乡月", "每场开局盘上多一枚临时【月】：它在场时，每次出字后其他字向它聚拢；打出【月】再聚拢一次；下回合消失", false],
-	"slot": ["三生石", "可以连出三枚相连的相同字，获得 50 金币", false],
+	"chain": ["连字环", "每次出字后全盘下落；每场开局自动打出盘上已连成的词，补字后接着找，直到连不出（要选目标、要付费的词留给你）", false],
+	"question": ["问字签", "每场开局从 3 枚能配词的字里挑 1 枚，作为本场临时字落到盘上", false],
+	"goldleaf": ["泥金笔", "拾取时选两枚字，永久镀金", false],
+	"moon": ["月字模", "每场开局盘上多一枚临时【月】：它在场时，每次出字后其他字向它聚拢；打出【月】再聚拢一次；下回合消失", false],
+	"slot": ["叠字钱", "可以连出三枚相连的相同字，获得 50 金币", false],
 	"death": ["判官笔", "拾取时获得 1 枚【死】", false],
 	"ruin": ["生死簿", "拾取时获得 1 枚【亡】", false],
-	"rubbing": ["替身草人", "拾取时选一枚字复制，保留镀金和强化", false],
-	"midas": ["金缕衣", "所有己方字永久镀金，之后拿到的也镀金；一场战斗累计赚到 20 金币时，你化为金像，立即死去", false],
-	"monkey": ["阴司愿帖", "拾取时许一个愿：从 3 个有代价的愿望里选 1 个", false],
-	"palindrome": ["阴阳镜", "二字词可以倒着连出，发动原词效果；正着本身成词时按正着算", false],
-	"binding": ["轮回绳", "同一行最左和最右两格视作相邻，可以跨边连词", false],
-	"proof": ["辟邪尺", "本场每净化 2 枚污染字，随机补 1 字", false],
+	"rubbing": ["复字拓片", "拾取时选一枚字复制，保留镀金和强化", false],
+	"midas": ["金字碑", "所有己方字永久镀金，之后拿到的也镀金；一场战斗累计赚到 20 金币时，你化为金像，立即死去", false],
+	"monkey": ["许愿笺", "拾取时许一个愿：从 3 个有代价的愿望里选 1 个", false],
+	"palindrome": ["反字模", "二字词可以倒着连出，发动原词效果；正着本身成词时按正着算", false],
+	"binding": ["串字绳", "同一行最左和最右两格视作相邻，可以跨边连词", false],
+	"proof": ["校勘尺", "本场每净化 2 枚污染字，随机补 1 字", false],
+	# ---- 补充
+	"vial": ["还魂墨", "每场开局回复 2 气血", false],
 }
-## 拾取时要从字袋挑字的遗物：[动作, 挑几枚]。绑定类（坠字石、寄字菌）另见 DEFS 第三项。
+## 拾取时要从字袋挑字的遗物：[动作, 挑几枚]。绑定类（压字石、蔓生墨）另见 DEFS 第三项。
 const PICK := {"goldleaf": ["gild", 2], "rubbing": ["copy", 1]}
-## 阴司愿帖的愿望：id -> [名称, 说明]
+## 许愿笺的愿望：id -> [名称, 说明]
 const WISHES := {
 	"endless_glyph": ["千字同文", "选一个字：字袋全部变成它，之后拿到的字也都是它；它每场额外使用 +2"],
-	"endless_gold": ["点石成金", "获得遗物「金缕衣」"],
+	"endless_gold": ["点石成金", "获得遗物「金字碑」"],
 	"endless_guard": ["固若金汤", "生命上限变为 1；每场开局获得 2 倍于失去上限的持久盾"],
 	"endless_life": ["生生不息", "每场开局回复 99 生命，溢出的部分反噬为对自己的伤害"],
 }
@@ -66,6 +68,7 @@ const TIER := {
 	"fireman": 1, "fertilizer": 3, "skyfire": 2, "blitz": 2, "egg": 2, "buckler": 1, "barrier": 1, "empty_case": 2, "stay_wax": 2, "amber": 3, "ghost_hand": 2, "cracked_bottle": 2, "rotting_fruit": 2, "chaos_dice": 3, "black_water": 2, "life_lantern": 2, "life_debt": 2,
 	"chain": 3, "question": 2, "goldleaf": 2, "moon": 2, "slot": 2, "death": 1, "ruin": 1, "rubbing": 1,
 	"midas": 3, "monkey": 3, "palindrome": 2, "binding": 2, "proof": 1,
+	"vial": 1,
 }
 const PRICE := {1: 35, 2: 50, 3: 70}
 const EGG_EVERY := 4
@@ -138,7 +141,7 @@ static func opening_draw(rules: BattleRules, relics: Array) -> int:
 	return rules.opening_draw + (BattleBalance.i("press_draw", 4) if relics.has("press") else 0)
 
 
-## 洗袋之前：寄字菌母本换成本场临时副本；坠字石记下绑定的实体。
+## 洗袋之前：蔓生墨母本换成本场临时副本；压字石记下绑定的实体。
 static func prepare_deck(b: BattleState) -> void:
 	if b.relics.has("slab"):
 		var inst := _bag_inst(b, int(b.relic_binds.get("slab", -1)))
@@ -169,7 +172,7 @@ static func prepare_deck(b: BattleState) -> void:
 			b.bag[b.bag.find(picked)] = fruit
 			b.fruit_uid = picked.uid
 			b.temp_chars.append(fruit)
-	# 阴司愿帖·千字同文：许愿的字每场额外使用 +2
+	# 许愿笺·千字同文：许愿的字每场额外使用 +2
 	var wish_glyph := wish_glyph_id()
 	if not wish_glyph.is_empty():
 		for inst in b.bag:
@@ -190,20 +193,23 @@ static func _bag_inst(b: BattleState, uid: int) -> CharInstance:
 static func on_battle_start(b: BattleState) -> void:
 	if b.relics.has("barrier"):
 		b.player.add_block(BattleBalance.i("barrier_block", 10))
-		b._log("护身纸符：临时格挡 +%d" % BattleBalance.i("barrier_block", 10))
+		b._log("纸屏风：临时格挡 +%d" % BattleBalance.i("barrier_block", 10))
 	if b.relics.has("buckler"):
 		b.player.add_persistent_block(BattleBalance.i("buckler_block", 4))
-		b._log("龟甲片：持久盾 +%d" % BattleBalance.i("buckler_block", 4))
+		b._log("铜护板：持久盾 +%d" % BattleBalance.i("buckler_block", 4))
+	if b.relics.has("vial"):
+		var healed := b.heal_player(BattleBalance.i("vial_heal", 2))
+		b._log("还魂墨：回复 %d 气血" % healed)
 	if b.relics.has("powerbank"):
 		b.add_energy(BattleBalance.i("powerbank_energy", 4))
-		b._log("藏雷珠：储能 +%d" % BattleBalance.i("powerbank_energy", 4))
+		b._log("蓄电瓶：储能 +%d" % BattleBalance.i("powerbank_energy", 4))
 	if b.relics.has("breach"):
 		for e in b.alive_enemies():
 			e.add_status("vulnerable", BattleBalance.i("breach_stacks", 2))
-		b._log("定罪朱签：敌人获得 %d 层易伤" % BattleBalance.i("breach_stacks", 2))
+		b._log("蚀刻：敌人获得 %d 层易伤" % BattleBalance.i("breach_stacks", 2))
 	if b.relics.has("blitz"):
 		b.blitz_turn = 1
-		b._log("借时香：第一回合结束后，敌人跳过这一次行动")
+		b._log("急就章：第一回合结束后，敌人跳过这一次行动")
 	_battle_start_batch2(b)
 	# 第一回合也按获得顺序发动一次重力（开局补字不走 begin_player_turn 的补字分支）
 	apply_gravity_relics(b)
@@ -214,7 +220,7 @@ static func on_battle_start(b: BattleState) -> void:
 static func after_turn_draw(b: BattleState) -> void:
 	if b.relics.has("clean") and not board_dirty(b):
 		if b.draw_to_board(BattleBalance.i("clean_draw", 1)) > 0:
-			b._log("无垢拓纸：盘面没有污染字，多补 %d 枚" % BattleBalance.i("clean_draw", 1))
+			b._log("净版布：盘面没有污染字，多补 %d 枚" % BattleBalance.i("clean_draw", 1))
 
 
 ## 回合结束：空铅盒按整行空置数给持久盾。
@@ -256,7 +262,7 @@ static func apply_gravity_relics(b: BattleState) -> void:
 					"down": b.apply_gravity()
 					"left": b.apply_gravity_left()
 					"right": b.apply_gravity_right()
-				b._log("四方轮：全盘向%s压" % WHEEL_TEXT[dir])
+				b._log("转轮架：全盘向%s压" % WHEEL_TEXT[dir])
 			"slab":
 				slab_fall(b)
 			"chain":
@@ -293,9 +299,9 @@ static func slab_fall(b: BattleState) -> void:
 static func consume_slab(b: BattleState, inst: CharInstance) -> String:
 	if b.slab_uses > 0:
 		b.slab_uses -= 1
-		b._log("坠字石：【%s】留在盘上（额外次数还剩 %d）" % [inst.glyph(), b.slab_uses])
+		b._log("压字石：【%s】留在盘上（额外次数还剩 %d）" % [inst.glyph(), b.slab_uses])
 		return "layer"
-	b._log("坠字石：【%s】次数用尽，本场移出" % inst.glyph())
+	b._log("压字石：【%s】次数用尽，本场移出" % inst.glyph())
 	return "exhausted"
 
 
@@ -357,7 +363,7 @@ static func breed(b: BattleState) -> void:
 			b.breeders[child.uid] = true
 			born += 1
 	if born > 0:
-		b._log("寄字菌：繁殖出 %d 枚临时【%s】" % [born, b.board.cells[parents[0]].glyph() if b.board.cells[parents[0]] != null else ""])
+		b._log("蔓生墨：繁殖出 %d 枚临时【%s】" % [born, b.board.cells[parents[0]].glyph() if b.board.cells[parents[0]] != null else ""])
 
 
 ## 一次出字是否带【击】（单字【击】或词里含【击】）
@@ -377,8 +383,8 @@ static func on_wash_heat(b: BattleState, target: Combatant) -> Array:
 	if e == null:
 		return []
 	var real := b.deal_damage(e, BattleBalance.i("skyfire_damage", 50), false)
-	b._log("天火遗诏：对%s造成 %d 伤害" % [e.display_name, real])
-	return ["天火遗诏：造成 %d 伤害" % real]
+	b._log("天火：对%s造成 %d 伤害" % [e.display_name, real])
+	return ["天火：造成 %d 伤害" % real]
 
 
 # ---------------------------------------------------------------- 战外钩子
@@ -396,7 +402,7 @@ static func on_pickup(id: String) -> void:
 				return
 			GameState.relic_counters["fireman_claimed"] = true
 			for i in BattleBalance.i("fireman_count", 4):
-				_grant_glyph("火", "余烬匣")
+				_grant_glyph("火", "火种")
 		"chaos_dice":
 			_rebuild_deck_chaos()
 		"death":
@@ -447,7 +453,7 @@ static func on_battle_won() -> void:
 			if not pool.is_empty():
 				g = pool[GameState.rng.randi_range(0, pool.size() - 1)].glyph
 		if not g.is_empty():
-			_grant_glyph(g, "孕字卵")
+			_grant_glyph(g, "字种")
 
 
 static func _grant_glyph(g: String, why: String) -> void:
@@ -477,7 +483,7 @@ static func _battle_start_batch2(b: BattleState) -> void:
 			var amount := BattleBalance.i("wish_life_heal", 99)
 			var healed := b.heal_player(amount)
 			var overflow := amount - healed
-			# 血珀已经把溢出转成盾；没有血珀才反噬
+			# 朱砂印泥已经把溢出转成盾；没有朱砂印泥才反噬
 			if overflow > 0 and not b.relics.has("amber"):
 				var lost := b.player.take_damage(overflow)
 				b._log(WISHES.endless_life[0] + "：回复 %d，溢出 %d 反噬，实际失去 %d 生命" % [healed, overflow, lost])
@@ -526,14 +532,14 @@ static func on_turn_start(b: BattleState) -> void:
 	b.moon_uid = -1
 
 
-## 金缕衣：本场累计收入达到 20 金币就化为金像
+## 金字碑：本场累计收入达到 20 金币就化为金像
 static func on_gold_earned(b: BattleState) -> void:
 	if b.relics.has("midas") and b.player.is_alive() and b.gold_earned >= BattleBalance.i("midas_gold", 20):
 		b.player.hp = 0
 		b._log(name_of("midas") + "：本场已赚 %d 金币，你化为了金像" % b.gold_earned)
 
 
-## 辟邪尺：本场每净化 2 枚污染字，随机补 1 字
+## 校勘尺：本场每净化 2 枚污染字，随机补 1 字
 static func on_cleansed(b: BattleState, count: int) -> void:
 	if count <= 0 or not b.relics.has("proof"):
 		return
@@ -545,7 +551,7 @@ static func on_cleansed(b: BattleState, count: int) -> void:
 			b._log(name_of("proof") + "：净化满 %d 枚，补 1 字" % need)
 
 
-## 查不到词时的遗物补充：阴阳镜（二字倒连）、三生石（三枚相同字）
+## 查不到词时的遗物补充：反字模（二字倒连）、叠字钱（三枚相同字）
 static func fallback_word(b: BattleState, glyphs: Array) -> WordData:
 	if glyphs.size() == 2 and b.relics.has("palindrome"):
 		var reversed := Database.get_word_by_glyphs([glyphs[1], glyphs[0]])
@@ -605,7 +611,7 @@ static func moon_pos(b: BattleState) -> Vector2i:
 	return Vector2i(-1, -1)
 
 
-# ---- 问冥签
+# ---- 问字签
 
 ## 三枚候选：优先能和盘上字组成二字词的字
 static func question_options(b: BattleState) -> Array:
@@ -651,7 +657,7 @@ static func take_question(b: BattleState, glyph: String) -> bool:
 	return true
 
 
-# ---- 九连环
+# ---- 连字环
 
 ## 开局自动出词：长词优先，同长按左上起点；每打一个，补回腾空的格子再找
 static func run_chain(b: BattleState) -> void:
@@ -734,7 +740,7 @@ static func pick_spec(id: String) -> Array:
 	return PICK.get(id, [])
 
 
-## 贴金纸 / 替身草人：对字袋里一枚该字形的永久实体执行动作；镀金跳过已镀金的
+## 泥金笔 / 复字拓片：对字袋里一枚该字形的永久实体执行动作；镀金跳过已镀金的
 static func apply_pick(id: String, glyph_id: String) -> bool:
 	var spec := pick_spec(id)
 	if spec.is_empty():
@@ -770,7 +776,7 @@ static func pick_candidates(id: String) -> Dictionary:
 	return out
 
 
-## 阴司愿帖：可许的愿望（已有金缕衣就不出「点石成金」），随机给 3 个
+## 许愿笺：可许的愿望（已有金字碑就不出「点石成金」），随机给 3 个
 static func wish_options(rng: RandomNumberGenerator) -> Array:
 	var pool: Array = WISHES.keys().filter(func(w): return w != "endless_gold" or not GameState.has_relic("midas"))
 	for i in range(pool.size() - 1, 0, -1):

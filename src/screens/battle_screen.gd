@@ -131,7 +131,6 @@ func build(root: Control) -> void:
 		if enemy_datas.is_empty():
 			enemy_datas = [Database.get_enemy("ink_spirit")]
 		battle.start(GameState.make_battle_deck(), enemy_datas, int(params.get("seed", -1)))
-		if _room_run: GameState.room_run.apply_battle_setup(battle)
 		if _expedition:
 			GameState.expedition.apply_battle_setup(battle)
 	_topbar = _build_topbar()

@@ -28,6 +28,20 @@ static func build(w, m: Dictionary, id: String) -> void:
 		"palindrome": _mirror(w, m)
 		"binding": _rope(w, m)
 		"proof": _ruler(w, m)
+		"vial": _vial(w, m)
+
+
+static func _vial(w, m: Dictionary) -> void:
+	# A sealed bronze ink vial, distinct from the cracked and gourd bottles.
+	w.lathe([Vector2(0, 0.03), Vector2(0.20, 0.03), Vector2(0.25, 0.10), Vector2(0.25, 0.57), Vector2(0.19, 0.68), Vector2(0.11, 0.73), Vector2(0.11, 0.93), Vector2(0.14, 0.93), Vector2(0.14, 0.99), Vector2(0, 0.99)], m.bronze)
+	w.rounded(Vector3(0, 1.035, 0), Vector3(0.20, 0.13, 0.20), 0.025, m.wood)
+	for y in [0.12, 0.58]: w.ring(Vector3(0, y, 0), 0.25, 0.015, m.edge)
+	for y in [0.80, 0.84]: w.ring(Vector3(0, y, 0), 0.12, 0.015, m.red)
+	_path(w, [Vector3(0.10, 0.83, 0.06), Vector3(0.29, 0.70, 0.14), Vector3(0.34, 0.48, 0.20)], 0.014, m.red)
+	w.rounded(Vector3(0.34, 0.40, 0.20), Vector3(0.15, 0.25, 0.025), 0.012, m.paper, Vector3(0, 0, -0.15))
+	_glyph(w, "回", Vector3(0.34, 0.36, 0.218), 0.12, m.red)
+	w.rounded(Vector3(0, 0.36, 0.247), Vector3(0.27, 0.30, 0.03), 0.035, m.jade)
+	_glyph(w, "墨", Vector3(0, 0.30, 0.267), 0.19, m.edge)
 
 
 static func _glyph(w, text: String, at: Vector3, size: float, material: Material, rotation := Vector3.ZERO) -> void:

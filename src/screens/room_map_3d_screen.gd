@@ -12,7 +12,6 @@ var inventory: PanelContainer
 var inventory_layer: Control
 var inventory_box: VBoxContainer
 var navigation: HBoxContainer
-var _selected := -1
 var _routing := false
 var _show_routes := false
 var _art_textures := {}
@@ -338,7 +337,6 @@ func _set_inventory_open(value: bool) -> void:
 	inventory.visible = value
 	map_view.set_interaction_blocked(value)
 	if value: _refresh_inventory()
-	else: _selected = -1
 	_layout.call_deferred()
 
 
@@ -354,26 +352,6 @@ func _refresh_inventory() -> void:
 	inventory_box.add_child(Ink.h2("行囊"))
 	inventory_box.add_child(Ink.body("气血 %d / %d　金币 %d\n第%d幕 · 已过%d庭" % [GameState.player_hp,GameState.player_max_hp,GameState.gold,GameState.act_index,run.resolved.size()]))
 	inventory_box.add_child(_button("查看字袋 · %d枚" % GameState.deck_size(),_open_deck))
-	inventory_box.add_child(Ink.label("字匣 · 选择一枚，再点版面空格"))
-	var row := HFlowContainer.new(); inventory_box.add_child(row)
-	for i in run.tray.size():
-		var button := _button(("「%s」" if i==_selected else " %s ") % run.tray[i],func(): _selected = i; _refresh_inventory())
-		row.add_child(button)
-	if _selected>=0 and _selected<run.tray.size():
-		inventory_box.add_child(_button("收入字袋",func(): run.apply({"type":"tray_to_deck","index":_selected}); _selected = -1; _refresh_inventory()))
-	var grid := GridContainer.new(); grid.columns = 2; inventory_box.add_child(grid)
-	for r in 2:
-		for c in 2:
-			var glyph: String = run.plate[r][c]
-			var button := _button(glyph if not glyph.is_empty() else "·",func():
-				if not str(run.plate[r][c]).is_empty(): run.take_plate(r,c)
-				elif _selected>=0: run.apply({"type":"plate","index":_selected,"row":r,"col":c}); _selected = -1
-				_refresh_inventory())
-			button.custom_minimum_size = Vector2(56,52); grid.add_child(button)
-	for word: String in run.active:
-		inventory_box.add_child(Ink.caption(word+"："+str(Lexicon.WORDS[word][1])))
-	for word: String in Lexicon.scan(run.plate).words:
-		if not run.active.has(word): inventory_box.add_child(Ink.caption(word+"：此程没有对应效果，可取回收入字袋用于战斗。"))
 	inventory_box.add_child(_button("收起行囊",func(): _set_inventory_open(false)))
 
 

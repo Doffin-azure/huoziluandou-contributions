@@ -12,13 +12,10 @@ var _progress: Label
 var _detail_title: Label
 var _detail: Label
 var _action: Button
-var _plan_button: Button
+var _planner_button: Button
 var _selected := ""
 var _routing := false
 var _receipt_open := false
-var _inventory: Control
-var _inventory_box: VBoxContainer
-var _tray_selected := -1
 
 
 func build(root: Control) -> void:
@@ -34,7 +31,6 @@ func build(root: Control) -> void:
 	header.add_child(Ink.expander())
 	_stats = JourneyStyle.label("", "Stat"); header.add_child(_stats)
 	header.add_child(_button("字袋",_open_deck))
-	header.add_child(_button("字匣 · 版面",_open_inventory))
 	header.add_child(_button("菜单",func(): PauseMenu.open()))
 	page.add_child(header)
 	var strip := Ink.hbox(12)
@@ -62,8 +58,8 @@ func build(root: Control) -> void:
 	text.add_child(_detail_title); text.add_child(_detail); row.add_child(text)
 	var actions := Ink.vbox(6)
 	_action = _button("选择下一站",_confirm_selected,true)
-	_plan_button = _button("预选此节点",_plan_selected)
-	actions.add_child(_action); actions.add_child(_plan_button); row.add_child(actions)
+	_planner_button = _button("预选模式",_toggle_planning)
+	actions.add_child(_action); actions.add_child(_planner_button); row.add_child(actions)
 	page.add_child(panel)
 	EventBus.gold_changed.connect(_on_gold); EventBus.hp_changed.connect(_on_hp)
 	_selected = run.current_room
@@ -103,6 +99,10 @@ func refresh() -> void:
 	map_view.selected = _selected; map_view.refresh()
 	_progress.text = "已行 %d / %d 站 · %d 个候选节点   /   向右择路，点击查看，拖动浏览" % [maxi(0,run.visited_rooms.size()-1),int(run.layout.rooms[run.graph.boss].column)+1,run.graph.rooms.size()]
 	if not run.planned_route.is_empty(): _progress.text = "预选 %d 站 · 本幕 %d 个候选节点 · 预选可随时修改，前进后不能回头" % [run.planned_route.size(),run.graph.rooms.size()]
+	if map_view.planning and run.phase!="map": _toggle_planning(); return
+	if map_view.planning:
+		_progress.text = "预选中 · 已选 %d 站 · 从左往右点亮着的候选格，点最后一站撤回" % run.planned_route.size()
+		if run.plan_choices().is_empty(): _progress.text = "预选中 · 已选 %d 站，路线已排到首领" % run.planned_route.size()
 	_update_detail()
 	if run.phase=="treasure" and not _receipt_open: _treasure_receipt.call_deferred()
 
@@ -119,7 +119,32 @@ func _update_stats() -> void:
 
 
 func _select_node(id: String) -> void:
+	if map_view.planning: _plan_click(id); return
 	_selected = id; map_view.selected = id; map_view.queue_redraw(); _update_detail()
+
+
+## 预选模式开关：开启后直接点格子排路线
+func _toggle_planning() -> void:
+	map_view.set_planning(not map_view.planning and run.phase=="map")
+	_planner_button.text = "完成预选" if map_view.planning else "预选模式"
+	refresh()
+
+
+## 预选模式点格：只能从最左（当前所在之后）一格格往右接；点最后一站撤回一步，点更早的站从那里截断
+func _plan_click(id: String) -> void:
+	if run.phase!="map": return
+	var index: int = run.planned_route.find(id)
+	var result: Dictionary
+	if index>=0 and index==run.planned_route.size()-1: result = run.apply({"type":"undo_plan"})
+	elif index>=0 or run.plan_choices().has(id): result = run.plan_room(id)
+	elif id==run.current_room: result = run.apply({"type":"clear_plan"})
+	else:
+		_detail_title.text = "%s · 不能接在这里" % run.layout.rooms[id].name
+		_detail.text = "预选要从左往右一格格接：只能点亮着的候选格。点已预选的最后一站撤回一步，点当前所在清空重来。"
+		return
+	if not result.get("ok",false): _detail.text = str(result.get("reason","不能预选到这里")); return
+	_selected = run.planned_route[-1] if not run.planned_route.is_empty() else run.current_room
+	refresh()
 
 
 func _update_detail() -> void:
@@ -136,8 +161,7 @@ func _update_detail() -> void:
 		_action.disabled = not run.next_rooms().has(_selected)
 		if _action.disabled and not run.planned_route.is_empty():
 			_action.text = "前往预选下一站"; _action.disabled = false
-	_plan_button.disabled = run.phase!="map" or not (run.plan_choices().has(_selected) or run.planned_route.has(_selected) or run.next_rooms().has(_selected))
-	_plan_button.text = "预选到此" if not run.planned_route.has(_selected) else "保留预选到此"
+	_planner_button.disabled = run.phase!="map" and not map_view.planning
 
 
 func _description(id: String) -> String:
@@ -154,7 +178,7 @@ func _description(id: String) -> String:
 		if kind=="elite": prize += " 另获一件遗物。"
 		if kind=="boss" and GameState.act_index<3: prize += " 回血 30%，遗物二选一。"
 		result = "%s · 气血 %d　%s" % [enemy.name,enemy.max_hp,prize]
-	if run.phase=="act_end": return "本幕已完成。保留字袋、字匣、版面与遗物，继续下一幕。"
+	if run.phase=="act_end": return "本幕已完成。保留字袋与遗物，继续下一幕。"
 	if run.phase in ["victory","defeat"]: return "三幕已尽，炼字破狱。" if run.phase=="victory" else "此程止步，可以返回标题开始新的冒险。"
 	var following: Array = run.graph.rooms[id].next.map(func(target):return LABELS[run.graph.rooms[target].kind])
 	var unique: Array = []
@@ -187,11 +211,6 @@ func _start_battle() -> void:
 	goto("res://src/screens/battle_screen.gd",{"room_run":true,"node":run.node,"seed":run.battle_seed()})
 
 
-func _plan_selected() -> void:
-	var result: Dictionary = run.plan_room(_selected)
-	if result.get("ok",false): refresh()
-
-
 func _clear_plan() -> void:
 	run.apply({"type":"clear_plan"}); refresh()
 
@@ -221,56 +240,4 @@ func _open_deck() -> void:
 		if character!=null: chars.append(character)
 	var overlay := CollectionOverlay.new()
 	overlay.setup({"title":"字袋", "subtitle":"%d 枚实体字" % GameState.deck_size(), "characters":chars, "counts":counts})
-	add_child(overlay)
-
-
-func _open_inventory() -> void:
-	if is_instance_valid(_inventory): return
-	_inventory = Control.new(); _inventory.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_inventory.mouse_filter = Control.MOUSE_FILTER_STOP; add_child(_inventory)
-	var shade := ColorRect.new(); shade.color = Color(0,0,0,.72)
-	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); _inventory.add_child(shade)
-	shade.gui_input.connect(func(event):
-		if event is InputEventMouseButton and event.pressed: shade.accept_event(); _close_inventory())
-	var center := CenterContainer.new(); center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	center.mouse_filter = Control.MOUSE_FILTER_IGNORE; _inventory.add_child(center)
-	var panel := Ink.panel("PanelInset")
-	panel.custom_minimum_size.x = minf(size.x-40,480*JourneyStyle.touch_scale(self)); center.add_child(panel)
-	_inventory_box = Ink.vbox(10); panel.add_child(_inventory_box); _refresh_inventory()
-
-
-func _close_inventory() -> void:
-	if is_instance_valid(_inventory): remove_child(_inventory); _inventory.queue_free()
-	_inventory = null; _tray_selected = -1; refresh()
-
-
-func _refresh_inventory() -> void:
-	for child in _inventory_box.get_children(): _inventory_box.remove_child(child); child.queue_free()
-	_inventory_box.add_child(JourneyStyle.label("字匣与版面","Subheading",JourneyStyle.GOLD))
-	_inventory_box.add_child(JourneyStyle.label("字匣 %d / 6 · 选字后收入字袋或放入版面" % run.tray.size(),"Muted"))
-	var enabled: bool = run.phase in ["map","rest","shop"]
-	var tray := HFlowContainer.new(); _inventory_box.add_child(tray)
-	for i in run.tray.size():
-		var button := _button(("「%s」" if i==_tray_selected else " %s ") % run.tray[i],func(): _tray_selected = i; _refresh_inventory())
-		button.disabled = not enabled; tray.add_child(button)
-	if _tray_selected>=0 and _tray_selected<run.tray.size():
-		_inventory_box.add_child(_button("收入字袋",func(): run.apply({"type":"tray_to_deck","index":_tray_selected}); _tray_selected = -1; _refresh_inventory()))
-	var grid := GridContainer.new(); grid.columns = 2; _inventory_box.add_child(grid)
-	for row in 2:
-		for col in 2:
-			var glyph: String = run.plate[row][col]
-			var button := _button(glyph if not glyph.is_empty() else "·",func():
-				if not str(run.plate[row][col]).is_empty(): run.apply({"type":"take_plate","row":row,"col":col})
-				elif _tray_selected>=0: run.apply({"type":"plate","index":_tray_selected,"row":row,"col":col}); _tray_selected = -1
-				_refresh_inventory())
-			button.custom_minimum_size.x = 64*JourneyStyle.touch_scale(self)
-			button.disabled = not enabled; grid.add_child(button)
-	for word: String in run.active: _inventory_box.add_child(JourneyStyle.label(word+"："+str(Lexicon.WORDS[word][1]),"Muted"))
-	_inventory_box.add_child(_button("遗物 · %d 件" % GameState.relics.size(), _open_relics))
-	_inventory_box.add_child(_button("收起",_close_inventory))
-
-
-func _open_relics() -> void:
-	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title":"当前遗物", "body":"\n\n".join(GameState.relics.map(func(id): return Relics.text(id))) if not GameState.relics.is_empty() else "暂无遗物。", "relics":GameState.relics.duplicate(), "hud_details":true,"scroll_body":true,"dismissible":true,"options":[{"text":"关闭","primary":true}]})
 	add_child(overlay)

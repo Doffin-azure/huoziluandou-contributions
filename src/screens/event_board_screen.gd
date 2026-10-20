@@ -3,6 +3,7 @@ extends ScreenBase
 
 const BOARD_VIEW := preload("res://src/board/board_view.gd")
 var _run: RefCounted
+var _room_session: RefCounted
 var _board: BoardState
 var _view
 var _preview: Label
@@ -17,6 +18,7 @@ func build(root: Control) -> void:
 	if _run == null or _run.phase != "event_board" or _run.event_board.is_empty():
 		goto.call_deferred("res://src/screens/room_map_screen.gd")
 		return
+	_room_session = preload("res://src/screens/room_node_session.gd").new(_run)
 	var scroll := ScrollContainer.new()
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -98,7 +100,7 @@ func _on_confirm() -> void:
 		_hint.text = "先连出至少两枚字。"
 		return
 	_done = true
-	var result: Dictionary = _run.apply({"type": "event_word", "path": _view.path.duplicate()})
+	var result: Dictionary = _room_session.apply({"type": "event_word", "path": _view.path.duplicate()})
 	if not result.get("ok", false):
 		_done = false
 		_hint.text = str(result.get("reason", "锦线未成词。"))
@@ -111,7 +113,7 @@ func _on_leave() -> void:
 	if _done:
 		return
 	_done = true
-	var result: Dictionary = _run.apply({"type": "event_board_leave"})
+	var result: Dictionary = _room_session.apply({"type": "event_board_leave"})
 	if not result.get("ok", false):
 		_done = false
 		_hint.text = str(result.get("reason", "现在不能收起字盘。"))

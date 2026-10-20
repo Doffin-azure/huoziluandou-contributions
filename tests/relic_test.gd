@@ -21,6 +21,7 @@ func _ready() -> void:
 	_test_press()
 	_test_strike_breach()
 	_test_opening_defense()
+	_test_vial_and_combo()
 	_test_empty_case()
 	_test_chaos_dice()
 	_test_batch_two()
@@ -233,32 +234,62 @@ func _test_opening_defense() -> void:
 	GameState.expedition = null
 
 
+# ---------------------------------------------------------------- 还魂墨 / 连击接回防
+func _test_vial_and_combo() -> void:
+	_reset(["vial"])
+	GameState.player_hp = 50
+	var b := BattleState.new(_rules())
+	b.start([], [_enemy_data()], 7)
+	_ok(b.player.hp == 52, "还魂墨：开局回复 2 气血（%d）" % b.player.hp)
+	_reset(["vial"])
+	b = BattleState.new(_rules())
+	b.start([], [_enemy_data()], 7)
+	_ok(b.player.hp == 60, "还魂墨：满血开局不溢出")
+	_ok(Relics.TIER.get("vial", 0) == 1 and Relics.normal_pool().has("vial"), "还魂墨：常见档，进普通池")
+
+	var deck: Array = []
+	for i in 10:
+		deck.append(_inst("火"))
+	b = _battle([], deck)
+	var e: Combatant = b.enemies[0]
+	_ok(_play_word(b, "回击", 0).ok, "连击：上回合先打出攻击词【回击】")
+	b.end_player_turn()
+	_clear_board(b)
+	_ok(b.attack_words_this_turn == 0, "连击：新回合攻击词计数清零")
+	var hp := e.hp
+	_ok(_play_word(b, "连击", 1).ok and e.hp < hp, "连击：重演上回合的【回击】造成伤害（%d）" % (hp - e.hp))
+	_ok(b.attack_words_this_turn == 1, "连击：重演的攻击词算进本回合（%d）" % b.attack_words_this_turn)
+	_ok(b.last_attack_word != null and b.last_attack_word.word == "回击", "连击：不改写上一个攻击词，下次连击仍重演【回击】")
+	var bag := b.bag.size()
+	_ok(_play_word(b, "回防", 2).ok and bag - b.bag.size() == 1, "连击后接【回防】：满足本回合打出过攻击词，补 1 字（%d）" % (bag - b.bag.size()))
+
+
 # ---------------------------------------------------------------- 第二批
 func _test_batch_two() -> void:
-	# 血珀：溢出的治疗转持久盾
+	# 朱砂印泥：溢出的治疗转持久盾
 	var b := _battle(["amber"], [], 0)
 	b.player.hp = 50
-	_ok(b.heal_player(20) == 10 and b.player.hp == 60 and b.player.persistent_block == 10, "血珀：治疗 20，溢出的 10 转为持久盾（%d / %d）" % [b.player.hp, b.player.persistent_block])
+	_ok(b.heal_player(20) == 10 and b.player.hp == 60 and b.player.persistent_block == 10, "朱砂印泥：治疗 20，溢出的 10 转为持久盾（%d / %d）" % [b.player.hp, b.player.persistent_block])
 	b.player.persistent_block = 0
 	b.player.hp = 60
 	b.heal_player(7)
-	_ok(b.player.persistent_block == 7, "血珀：满血治疗全部转盾（%d）" % b.player.persistent_block)
+	_ok(b.player.persistent_block == 7, "朱砂印泥：满血治疗全部转盾（%d）" % b.player.persistent_block)
 
-	# 裂雷瓶：获得储能翻倍，回合结束清空
+	# 裂墨瓶：获得储能翻倍，回合结束清空
 	b = _battle(["cracked_bottle"], [], 0)
 	b.add_energy(3)
-	_ok(b.player.energy == 6, "裂雷瓶：获得 3 储能变为 6（%d）" % b.player.energy)
+	_ok(b.player.energy == 6, "裂墨瓶：获得 3 储能变为 6（%d）" % b.player.energy)
 	b.end_player_turn()
-	_ok(b.player.energy == 0, "裂雷瓶：回合结束清空储能（%d）" % b.player.energy)
+	_ok(b.player.energy == 0, "裂墨瓶：回合结束清空储能（%d）" % b.player.energy)
 
-	# 将腐供果：开局随机一枚字换成本场临时副本，永久字不变
+	# 褪墨：开局随机一枚字换成本场临时副本，永久字不变
 	_reset(["rotting_fruit"])
 	var deck_before: int = GameState.deck.size()
 	var permanent_uid: int = GameState.deck[0].uid
 	b = _battle(["rotting_fruit"], GameState.make_battle_deck(), 0)
 	var temps: Array = b.bag.filter(func(c): return c.temporary)
-	_ok(temps.size() == 1 and GameState.deck.size() == deck_before, "将腐供果：开局一枚临时副本，永久字袋不变（%d）" % temps.size())
-	_ok(GameState.deck.all(func(c): return not c.temporary), "将腐供果：不会把永久实体改成临时")
+	_ok(temps.size() == 1 and GameState.deck.size() == deck_before, "褪墨：开局一枚临时副本，永久字袋不变（%d）" % temps.size())
+	_ok(GameState.deck.all(func(c): return not c.temporary), "褪墨：不会把永久实体改成临时")
 
 	# 留字蜡：5% 留场判定，固定种子下会命中但不会必然
 	b = _battle(["stay_wax"], [], 0)
@@ -526,7 +557,7 @@ func _test_clean() -> void:
 	_ok(b.board.cells.filter(func(c): return c != null).size() == before + 3, "光洁：盘上有污染字（敌方注入）也算不干净")
 
 
-# ---------------------------------------------------------------- 天火遗诏
+# ---------------------------------------------------------------- 天火
 func _test_skyfire() -> void:
 	for has_relic in [false, true]:
 		var b := _battle(["skyfire"] if has_relic else [])
@@ -535,17 +566,17 @@ func _test_skyfire() -> void:
 		b.player.heat = 5
 		var r := _play_word(b, "流火")
 		if has_relic:
-			_ok(r.ok and e.hp == 150, "天火遗诏：流火追加 50 伤害（%d）" % (200 - e.hp))
-			_ok(b.player.heat == 3 and b.bag.any(func(c): return c.glyph() == "热"), "天火遗诏：流火原效果保留（热回袋、热度 -2）")
+			_ok(r.ok and e.hp == 150, "天火：流火追加 50 伤害（%d）" % (200 - e.hp))
+			_ok(b.player.heat == 3 and b.bag.any(func(c): return c.glyph() == "热"), "天火：流火原效果保留（热回袋、热度 -2）")
 		else:
-			_ok(r.ok and e.hp == 200 and b.player.heat == 3, "没有天火遗诏：流火只洗热、降热")
+			_ok(r.ok and e.hp == 200 and b.player.heat == 3, "没有天火：流火只洗热、降热")
 	var b2 := _battle(["skyfire", "breach"])
 	_play_word(b2, "流火")
-	_ok(b2.enemies[0].hp == 200 - 75, "天火遗诏 + 破防：50 也吃易伤（75）")
+	_ok(b2.enemies[0].hp == 200 - 75, "天火 + 破防：50 也吃易伤（75）")
 	var b3 := _battle(["skyfire", "strike"])
 	b3.player.add_status("strength", 3)
 	_play_word(b3, "流火")
-	_ok(b3.enemies[0].hp == 150, "天火遗诏：算法术伤害，不吃力量、打击增强")
+	_ok(b3.enemies[0].hp == 150, "天火：算法术伤害，不吃力量、打击增强")
 
 
 # ---------------------------------------------------------------- 战外：好好睡 / 火人 / 发明蛋
@@ -562,17 +593,17 @@ func _test_out_of_battle() -> void:
 	_reset()
 	var n := GameState.deck_size()
 	GameState.add_relic("fireman")
-	_ok(GameState.deck_size() == n + 4 and GameState.glyph_counts().get("火", 0) >= 4, "余烬匣（主线）：字袋 +4 枚【火】")
+	_ok(GameState.deck_size() == n + 4 and GameState.glyph_counts().get("火", 0) >= 4, "火种（主线）：字袋 +4 枚【火】")
 	_reset()
 	ex = Expedition.start(4)
 	GameState.add_relic("fireman")
-	_ok(ex.tray.count("火") == 4, "余烬匣（远征）：4 枚【火】先进字匣")
+	_ok(ex.tray.count("火") == 4, "火种（远征）：4 枚【火】先进字匣")
 	ex.tray = ["一", "二", "三", "四", "五"]
 	GameState.relics.clear()
 	GameState.relic_counters.clear()
 	var deck_n := GameState.deck_size()
 	GameState.add_relic("fireman")
-	_ok(ex.tray.size() == 6 and GameState.deck_size() == deck_n + 3, "余烬匣（远征）：字匣满了按原规则进字袋")
+	_ok(ex.tray.size() == 6 and GameState.deck_size() == deck_n + 3, "火种（远征）：字匣满了按原规则进字袋")
 	GameState.expedition = null
 	_reset(["egg"])
 	n = GameState.deck_size()
@@ -704,7 +735,7 @@ func _test_all_relics_smoke() -> void:
 
 # ---------------------------------------------------------------- 审查修复
 func _test_review_fixes() -> void:
-	# 刑卒护指：【连击】重演不加 +2
+	# 刻刀：【连击】重演不加 +2
 	var hits: Array = []
 	for has_strike in [false, true]:
 		var b := _battle(["strike"] if has_strike else [])
@@ -712,23 +743,23 @@ func _test_review_fixes() -> void:
 		var hp: int = b.enemies[0].hp
 		_play_word(b, "连击", 1)
 		hits.append(hp - b.enemies[0].hp)
-	_ok(hits[0] == hits[1], "刑卒护指：【连击】重演不吃 +2（%d / %d）" % hits)
-	# 孕字卵：用遗物随机数，不动远征主随机数
+	_ok(hits[0] == hits[1], "刻刀：【连击】重演不吃 +2（%d / %d）" % hits)
+	# 字种：用遗物随机数，不动远征主随机数
 	_reset(["egg"])
 	var ex := Expedition.start(41)
 	GameState.relics.append("egg")
 	GameState.relic_counters["egg"] = 3
 	var st := ex.rng.state
 	Relics.on_battle_won()
-	_ok(ex.rng.state == st, "孕字卵：发字用遗物随机数，不改远征主随机数")
+	_ok(ex.rng.state == st, "字种：发字用遗物随机数，不改远征主随机数")
 	GameState.expedition = null
-	# 余烬匣：卖掉再拿不重复给火
+	# 火种：卖掉再拿不重复给火
 	_reset()
 	GameState.add_relic("fireman")
 	var n := GameState.deck_size()
 	GameState.remove_relic("fireman")
 	GameState.add_relic("fireman")
-	_ok(GameState.deck_size() == n, "余烬匣：卖掉再拿到，不再给 4 枚【火】")
+	_ok(GameState.deck_size() == n, "火种：卖掉再拿到，不再给 4 枚【火】")
 	# 删字：同字形先删没被绑定的
 	_reset(["slab"])
 	var gid: String = GameState.deck[0].id()
@@ -736,6 +767,6 @@ func _test_review_fixes() -> void:
 	GameState.relic_binds["slab"] = copies[0].uid
 	if copies.size() > 1:
 		GameState.remove_character_id(gid)
-		_ok(GameState.relic_bound_inst("slab") != null, "删字：同字形有多枚时先删没被绑定的，坠字石不失效")
+		_ok(GameState.relic_bound_inst("slab") != null, "删字：同字形有多枚时先删没被绑定的，压字石不失效")
 	else:
 		_ok(true, "（起始字袋第一枚没有重复，跳过）")

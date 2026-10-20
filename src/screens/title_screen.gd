@@ -206,7 +206,7 @@ func _on_custom() -> void:
 func _on_library() -> void:
 	if not _can_interact(): return
 	var viewer := CollectionOverlay.new()
-	viewer.setup({"title": "字库图鉴", "subtitle": "%d 种实体字 · %d 个词" % [Database.characters.size() - 1, Database.words.size()], "words": Database.words.values()})
+	viewer.setup({"title": "字库图鉴", "subtitle": "%d 种实体字 · %d 个词" % [Database.characters.size() - 1, Database.words.size()], "words": Database.words.values(), "show_relics": true})
 	_mount_overlay(viewer)
 
 
