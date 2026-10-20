@@ -41,7 +41,7 @@ func _ready() -> void:
 			ex.seals = ["拓本"]
 			var extra := ex.loot_options(tier)
 			extra_valid = extra_valid and extra.size() == (3 if tier == "小" else 4)
-		check(all_valid, tier + "赏保证金币/字、数量、去重和大赏特色")
+		check(all_valid, tier + "赏保证铜钱/字、数量、去重和大赏特色")
 		check(extra_valid, tier + "赏拓本额外选项完整")
 		check(different.size() > 1, tier + "赏跨种子有变化")
 	check(diversity.has("intel") and not diversity.has("plate4") and diversity.has("seal"), "情报与印章可达，没有无效扩版奖励")
@@ -65,7 +65,7 @@ func _ready() -> void:
 	var gold_before := GameState.gold
 	var index: int = a.top_panel().options.map(func(o): return o.kind).find("gold")
 	a.choose_loot(index)
-	check(GameState.gold == gold_before + 8 and a.taken.has(loot_cell), "实际可选金币并正确结算8")
+	check(GameState.gold == gold_before + 8 and a.taken.has(loot_cell), "实际可选铜钱并正确结算8")
 	for act in [1,2,3]:
 		a = fresh(19); a.act = act
 		for kind in ["foe","elite","boss","ambush"]:
@@ -83,14 +83,14 @@ func _ready() -> void:
 	a.seals = ["朱笔","镇纸","蒲团"]
 	var boss := {"kind":"boss","k":a.boss,"name":"旧首领","g":"旧","debuff":"热度"}
 	var info := a.encounter_info(boss)
-	check(info.hp == 82 and info.rewards.contains("金币+6") and info.rewards.contains("墨+1"), "首领朱笔生命与胜利额外收益")
+	check(info.hp == 82 and info.rewards.contains("铜钱+6") and info.rewards.contains("墨+1"), "首领朱笔生命与胜利额外收益")
 	check(info.rewards.contains("印章位已满") and not info.rewards.contains("战利品"), "首领满印章提示替换且不虚报三选一")
 	check(a.encounter_info({"kind":"elite","k":12}).rewards.contains("3选1"), "战利品三选一")
 	b = fresh(34); b.fight = boss.duplicate()
 	var old_gold := GameState.gold; var old_ink := b.ink
 	var payout := b.encounter_rewards(b.fight)
 	b.finish_battle(true)
-	check(GameState.gold == old_gold + int(payout.gold) and b.ink == old_ink + int(payout.ink), "预告额外金币与回墨等于实际胜利结算")
+	check(GameState.gold == old_gold + int(payout.gold) and b.ink == old_ink + int(payout.ink), "预告额外铜钱与回墨等于实际胜利结算")
 	check(b.boss_down and b.busy() and b.panels.any(func(panel): return panel.kind == "act_end"), "首领胜利直接封层结算")
 	# Real map and encounter panel exercise all three visual states.
 	Router.host = self
@@ -132,7 +132,7 @@ func _ready() -> void:
 	a.push_panel({"kind":"loot","tier":"小","options":a.loot_options("小")})
 	screen.refresh(); await frames()
 	body = labels(screen._event_box)
-	check(body.contains("+8") and body.contains("字："), "奖励真界面同时展示字和金币")
+	check(body.contains("+8") and body.contains("字："), "奖励真界面同时展示字和铜钱")
 	if OS.get_cmdline_user_args().has("--capture"):
 		RenderingServer.force_draw(false)
 		check(get_viewport().get_texture().get_image().save_png("/private/tmp/huozi-options-loot.png") == OK, "保存奖励截图")

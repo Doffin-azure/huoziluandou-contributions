@@ -193,7 +193,7 @@ static func legacy_preview(e: EffectData, b: BattleState, path: Array, target: D
 			var low := b.player.hp * BattleBalance.i("hp_half_divisor", 2) < b.player.max_hp
 			return "生命%d/%d，本次补%d字。" % [b.player.hp, b.player.max_hp, int(e.args.get("low", e.amount)) if low else int(e.args.get("high", 1))]
 		"profit_if_earned":
-			return "本回合已获得%d金币，满足额外获得%d金币的条件。" % [b.gold_earned_this_turn, e.amount] if b.gold_earned_this_turn > 0 else "本回合此前未获得金币，本次无金币收益。"
+			return "本回合已获得%d铜钱，满足额外获得%d铜钱的条件。" % [b.gold_earned_this_turn, e.amount] if b.gold_earned_this_turn > 0 else "本回合此前未获得铜钱，本次无铜钱收益。"
 		"rest_cool":
 			return "本回合尚未使敌人掉血，本次可回复%d生命。" % BattleBalance.i("rest_heal", 1) if b.damage_dealt_this_turn <= 0 else "本回合已使敌人掉血，本次只降温、不回复生命。"
 		"heat_to_energy_solo":

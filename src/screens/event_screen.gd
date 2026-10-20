@@ -30,6 +30,7 @@ const RELIC_CHANCE := 0.4
 const EventEffects := preload("res://src/core/event_effects.gd")
 const LANTERN := preload("res://src/data/lantern_riddles.gd")
 const SHEFU := preload("res://src/data/shefu_rewards.gd")
+const EventArt := preload("res://src/core/event_art.gd")
 const EVENTS: Array = preload("res://src/data/event_catalog.gd").EVENTS
 
 
@@ -63,9 +64,6 @@ func build(root: Control) -> void:
 	_page.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_scroll.add_child(_page)
 	_art = TextureRect.new()
-	var illustration_path := str(_event.get("illustration", ""))
-	_art.texture = load(illustration_path) if not illustration_path.is_empty() else null
-	_art.visible = _art.texture != null
 	_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -99,8 +97,21 @@ func _render_event() -> void:
 	if is_instance_valid(_leave_button):
 		_copy.remove_child(_leave_button); _leave_button.queue_free()
 	_leave_button = null
-	var path := str(_event.get("illustration",""))
+	# Saved story/options stay intact; newly added art is resolved from the current catalog.
+	var event_id := str(_event.get("id",""))
+	var definition: Dictionary = EventEffects.get_event(event_id)
+	var path := str(_event.get("illustration",definition.get("illustration","")))
+	if path.is_empty():
+		path = EventArt.path_for(event_id)
 	_art.texture = load(path) if not path.is_empty() else null; _art.visible = _art.texture!=null
+	var art_style := str(_event.get("illustration_style",definition.get("illustration_style","")))
+	if art_style.is_empty() and not path.is_empty():
+		art_style = EventArt.style_for(event_id)
+	if art_style=="scene":
+		var edge := ShaderMaterial.new()
+		edge.shader = preload("res://src/shaders/event_illustration.gdshader")
+		_art.material = edge
+	else: _art.material = null
 	_title.text = _event.title; _body.text = _event.body
 	for i in _event.options.size():
 		var opt: Dictionary = _event.options[i]

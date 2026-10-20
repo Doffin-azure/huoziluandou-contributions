@@ -23,7 +23,7 @@ static func add_gold(b: BattleState, amount: int) -> void:
 	b.earn_gold(amount)
 
 
-## 可用支付额 = 普通金币 + 合资可抵扣的储能
+## 可用支付额 = 普通铜钱 + 合资可抵扣的储能
 
 static func available(b: BattleState) -> int:
 	var avail: int = GameState.gold
@@ -35,7 +35,7 @@ static func available(b: BattleState) -> int:
 static func discounted_cost(b: BattleState, cost: int) -> int:
 	return maxi(0, cost - b.ability_value("payment_discount_once")) if cost >= 0 else cost
 
-## 先兑现币的费用优惠，再花合资储能和普通金币。失败时保留优惠。
+## 先兑现币的费用优惠，再花合资储能和普通铜钱。失败时保留优惠。
 
 static func pay(b: BattleState, cost: int) -> bool:
 	var due := discounted_cost(b, cost)

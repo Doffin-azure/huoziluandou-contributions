@@ -48,7 +48,7 @@ func _ready() -> void:
 		c.gilded = true
 		var gold := GameState.gold
 		b.try_play([Vector2i.ZERO])
-		check(GameState.gold == gold + 3, "镀金收益来自Excel的3金币")
+		check(GameState.gold == gold + 3, "镀金收益来自Excel的3铜钱")
 		b.enemies[0].add_status("vulnerable", 1)
 		c = put(b, "击", 0)
 		hp = b.enemies[0].hp

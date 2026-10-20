@@ -111,7 +111,7 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 				elif id == "energy_next_turn":
 					description = "下回合开始获得 %d 储能，仅一次。" % value
 				elif id == "payment_discount_once":
-					description = "本回合下一次字或词的金币费用 -%d，最低 0。支付成功后清除，免费或失败的支付不消耗。" % value
+					description = "本回合下一次字或词的铜钱费用 -%d，最低 0。支付成功后清除，免费或失败的支付不消耗。" % value
 				elif id == "combine_word_once":
 					description = "本回合下一次成功组词后获得 %d 临时格挡、%d 储能；仅一次。" % [BattleBalance.i("combine_block", 2) * value, BattleBalance.i("combine_energy", 1) * value]
 				elif id == "speed_word_once":
@@ -161,7 +161,7 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 			if not battle.empowered_glyphs.is_empty():
 				result.append(entry("empowered", "强化", "强", 1, "本场【%s】单独打出或参与成词时，都额外触发单字效果。" % "、".join(battle.empowered_glyphs.keys()), Palette.GOLD))
 			if battle.bounty_paid:
-				result.append(entry("bounty", "重金", "赏", 1, "本回合击败所有敌人后获得%d金币；尚余%d名敌人。" % [battle.bounty_reward, battle.alive_enemies().size()], Palette.GOLD))
+				result.append(entry("bounty", "重金", "赏", 1, "本回合击败所有敌人后获得%d铜钱；尚余%d名敌人。" % [battle.bounty_reward, battle.alive_enemies().size()], Palette.GOLD))
 	result.sort_custom(func(a: Dictionary, b: Dictionary):
 		var priority_a := _priority(a)
 		var priority_b := _priority(b)

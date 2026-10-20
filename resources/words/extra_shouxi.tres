@@ -7,18 +7,18 @@
 script = ExtResource("1_1vnd3")
 kind = 29
 handler = "gold_to_shield"
-note = "本回合花金币附等额持久盾"
+note = "本回合花铜钱附等额持久盾"
 
 [resource]
 script = ExtResource("2_jb4k0")
 id = "extra_shouxi"
 word = "收息"
 glyphs = Array[String](["收", "息"])
-description = "本回合花金币附等额持久盾"
+description = "本回合花铜钱附等额持久盾"
 effects = Array[ExtResource("1_1vnd3")]([SubResource("Resource_q07qu")])
 group = "经济"
 design_stage = "设计负责人新增"
-effect_summary = "本回合花金币附等额持久盾"
+effect_summary = "本回合花铜钱附等额持久盾"
 effect_handler_id = "gold_to_shield"
 priority = "经济"
 implemented = true

@@ -1,0 +1,173 @@
+{
+  "b92b535b-0431-47f9-867f-517209f4e26b": {
+    "prompt": [
+      1,
+      "b92b535b-0431-47f9-867f-517209f4e26b",
+      {
+        "1": {
+          "class_type": "UNETLoader",
+          "inputs": {
+            "unet_name": "anima-aesthetic-v1.1.safetensors",
+            "weight_dtype": "default"
+          }
+        },
+        "2": {
+          "class_type": "CLIPLoader",
+          "inputs": {
+            "clip_name": "qwen_3_06b_base.safetensors",
+            "type": "stable_diffusion",
+            "device": "default"
+          }
+        },
+        "3": {
+          "class_type": "VAELoader",
+          "inputs": {
+            "vae_name": "qwen_image_vae.safetensors"
+          }
+        },
+        "4": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "2",
+              0
+            ],
+            "text": "A refined hand-drawn 2D game story illustration of a Chinese underworld garden at night. The entire image shows EXACTLY THREE RED PAPER LANTERNS and nothing else hanging from the roof. Three cinnabar red lanterns, three blank vermilion lanterns. Each red lantern has a clearly shaped rounded body with three broad dark-red rib divisions, heavy dark teal oxidized bronze caps and tiny old gold fasteners, one simple red tassel. A medium-sized red lantern hangs in the center, another red lantern hangs a little higher on the right, a smaller red lantern hangs lower on the left. All three are fully visible and clearly separated. Their red paper shades are dark vermilion and deep orange-red, with restrained warm red illumination, NOT white, NOT ivory, NOT cream. Paper is completely blank, absolutely no writing or markings. Exactly three hanging objects in the whole picture, no hanging mirrors, no bells, no pendants, no tiny extra lamps.\nAn old simple garden eave above, a shadowed wooden pillar and one carved geometric window behind, still dark teal ink pond below, irregular dark stone bank. A small pale ice-blue ghost flame floating above the water and a few scattered cinnabar maple leaves on the stones. Quiet mysterious solemn Chinese underworld, not a festival. The lantern group occupies the central two thirds of the square; breathing room around all edges, readable at a small size.\nSTYLE: strong visible black ink outlines, crisp flat color masses, confident contour variation, controlled two or three plane cel shading, elegant simplified shapes, sparse precise bronze engraving only on the lantern caps, subtle old printed paper grain, mature original occult fantasy illustration. Broad dark desaturated blue-teal and charcoal shapes, a clear rich cinnabar red focal group, restrained antique ochre gold fittings. Deep shadows, enough midtone separation to read the black contours, no muddy haze. Darkness and a little pale blue ghost fire create the lighting. Hand-drawn graphic painting with clean dark contours, not a 3D render, not a photograph. No people, no readable text, no title, no UI, no frame."
+          }
+        },
+        "5": {
+          "class_type": "CLIPTextEncode",
+          "inputs": {
+            "clip": [
+              "2",
+              0
+            ],
+            "text": "worst quality, low quality, blurry, jpeg artifacts, watercolor, ink wash painting, grey wash, washed out, sepia, loose sketch, photorealistic, photo, realistic, 3d render, CGI, glossy plastic, neon, rainbow, purple lighting, overexposed, saturated green, clutter, excessive ornament, crowded city, people, person, girl, chibi, cute, readable text, Chinese characters, calligraphy, watermark, signature, logo, title, user interface, poster, collage, ivory lanterns, cream lanterns, white lanterns, white paper panels, huge glowing white rectangle, extra lanterns, four lanterns, five lanterns, hanging mirror, pendant, hanging bell, tiny lamps, bright white backgrounds"
+          }
+        },
+        "6": {
+          "class_type": "EmptyLatentImage",
+          "inputs": {
+            "width": 1024,
+            "height": 1024,
+            "batch_size": 1
+          }
+        },
+        "7": {
+          "class_type": "KSampler",
+          "inputs": {
+            "model": [
+              "1",
+              0
+            ],
+            "positive": [
+              "4",
+              0
+            ],
+            "negative": [
+              "5",
+              0
+            ],
+            "latent_image": [
+              "6",
+              0
+            ],
+            "seed": 2026101901,
+            "steps": 30,
+            "cfg": 4.0,
+            "sampler_name": "euler",
+            "scheduler": "simple",
+            "denoise": 1.0
+          }
+        },
+        "8": {
+          "class_type": "VAEDecode",
+          "inputs": {
+            "samples": [
+              "7",
+              0
+            ],
+            "vae": [
+              "3",
+              0
+            ]
+          }
+        },
+        "9": {
+          "class_type": "SaveImage",
+          "inputs": {
+            "images": [
+              "8",
+              0
+            ],
+            "filename_prefix": "lianziyu/lantern_riddle_anima_v2"
+          }
+        }
+      },
+      {
+        "client_id": "lianziyu-event-art-sample",
+        "create_time": 1792416150628
+      },
+      [
+        "9"
+      ]
+    ],
+    "outputs": {
+      "9": {
+        "images": [
+          {
+            "filename": "lantern_riddle_anima_v2_00001_.png",
+            "subfolder": "lianziyu",
+            "type": "output",
+            "metadata": {
+              "kind": "image",
+              "width": 1024,
+              "height": 1024
+            }
+          }
+        ]
+      }
+    },
+    "status": {
+      "status_str": "success",
+      "completed": true,
+      "messages": [
+        [
+          "execution_start",
+          {
+            "prompt_id": "b92b535b-0431-47f9-867f-517209f4e26b",
+            "timestamp": 1792416150630
+          }
+        ],
+        [
+          "execution_cached",
+          {
+            "nodes": [
+              "1",
+              "2",
+              "3",
+              "6"
+            ],
+            "prompt_id": "b92b535b-0431-47f9-867f-517209f4e26b",
+            "timestamp": 1792416150631
+          }
+        ],
+        [
+          "execution_success",
+          {
+            "prompt_id": "b92b535b-0431-47f9-867f-517209f4e26b",
+            "timestamp": 1792416226788
+          }
+        ]
+      ]
+    },
+    "meta": {
+      "9": {
+        "node_id": "9",
+        "display_node": "9",
+        "parent_node": null,
+        "real_node_id": "9"
+      }
+    }
+  }
+}

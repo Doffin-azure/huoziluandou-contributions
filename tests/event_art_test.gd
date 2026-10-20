@@ -86,7 +86,10 @@ func _run() -> void:
 		else:
 			_ok(_screen._art.texture != null and _screen._art.texture.resource_path == illustration, data.title + " 加载自己的插图")
 			var image: Image = _screen._art.texture.get_image()
-			_ok(image.get_pixel(0, 0).a < 0.01 and image.get_width() >= 1024, data.title + " 保留原始透明边缘与高清尺寸")
+			if str(data.get("illustration_style",""))=="scene":
+				_ok(image.get_width()>=1024 and _screen._art.material is ShaderMaterial,data.title+" 场景插画保留高清尺寸并由显示层柔化边缘")
+			else:
+				_ok(image.get_pixel(0, 0).a < 0.01 and image.get_width() >= 1024, data.title + " 保留原始透明边缘与高清尺寸")
 		_ok(_screen._art.mouse_filter == Control.MOUSE_FILTER_IGNORE and _screen._art.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "插图保持完整比例，也不阻挡点击")
 		_ok(_screen._choice_labels.size() == _screen._event.options.size() and _screen._choice_labels[0].text == _screen._event.options[0].text, "事件取舍沿用当前展示文案")
 		_check_layout()
@@ -110,7 +113,7 @@ func _run() -> void:
 	var node_index: int = GameState.node_index
 	_screen._choose(1)
 	_screen._choose(1)
-	_ok(GameState.gold == gold + 18 and GameState.node_index == node_index + 1, "墨池金币选项只结算一次，并推进一个节点")
+	_ok(GameState.gold == gold + 18 and GameState.node_index == node_index + 1, "墨池铜钱选项只结算一次，并推进一个节点")
 	await _open(0)
 	var hp: int = GameState.player_hp
 	var deck: int = GameState.deck_size()
@@ -120,7 +123,7 @@ func _run() -> void:
 	hp = GameState.player_hp
 	gold = GameState.gold
 	_screen._choose(1)
-	_ok(GameState.player_hp == hp - 5 and GameState.gold == gold + 25, "断碑敲角仍扣 5 生命并获得 25 金币")
+	_ok(GameState.player_hp == hp - 5 and GameState.gold == gold + 25, "断碑敲角仍扣 5 生命并获得 25 铜钱")
 	await _open(1)
 	deck = GameState.deck_size()
 	_screen._choose(0)

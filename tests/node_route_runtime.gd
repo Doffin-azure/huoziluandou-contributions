@@ -22,10 +22,21 @@ func run_checks() -> void:
 	var map: Control = Router.current
 	check(map.find_children("*","SubViewport",true,false).is_empty(),"2D map has no 3D viewport")
 	var before: int = GameState.rng.state
-	map._select_node(run.plan_choices()[0]); map._plan_selected()
-	map._select_node(run.plan_choices()[0]); map._plan_selected()
-	map._select_node(run.plan_choices()[0]); map._plan_selected()
-	check(GameState.rng.state==before and run.current_room=="start","planning three stops never enters a node or consumes RNG")
+	var geometry: Dictionary = map.map_view.points.duplicate()
+	check(not map._action.visible and map.map_view.size.y>map.size.y*.8,"initial map fills the screen without a detail footer or unavailable travel action")
+	var far: String = run.graph.boss
+	map._select_node(far)
+	check(run.planned_route.is_empty() and not map._action.visible,"inspecting a distant node does not invent a route or enable travel")
+	for i in 3: map._select_node(run.plan_choices()[0])
+	check(run.planned_route.size()==3 and GameState.rng.state==before and run.current_room=="start","three map clicks plan three stops without entering a node or consuming RNG")
+	var planned: Array = run.planned_route.duplicate()
+	map._select_node(planned[0])
+	check(run.planned_route==planned,"inspecting an already planned stop preserves the rest of the route")
+	var enemy_name: String = run.battle_node(planned[0]).enemies[0].name
+	var labels := map.find_children("*","Label",true,false)
+	check(labels.all(func(label):return not enemy_name in label.text),"selecting a battle node does not reveal its enemy in the map UI")
+	await frames(4)
+	check(map.map_view.points==geometry,"selecting a route keeps the map geometry stable")
 	await frames(4); await snap("node-map-1920.png")
 	get_window().size = Vector2i(1280,720); await frames(10)
 	check(Rect2(Vector2.ZERO,map.size).encloses(map._action.get_global_rect()),"720p action fits viewport")
@@ -33,6 +44,12 @@ func run_checks() -> void:
 	get_window().size = Vector2i(1600,720); await frames(10)
 	check(Rect2(Vector2.ZERO,map.size).encloses(map._action.get_global_rect()),"wide landscape action fits viewport")
 	await snap("node-map-landscape.png")
+	get_window().size = Vector2i(844,390); await frames(12)
+	check(map.map_view.get_global_rect().encloses(map._tools.get_global_rect()),"phone landscape keeps floating controls inside the map")
+	check(Rect2(Vector2.ZERO,map.size).encloses(map._stats.get_global_rect()),"phone landscape keeps the player stats inside the viewport")
+	var physical_scale := float(get_window().size.y)/map.get_viewport_rect().size.y
+	check(map._action.size.y*physical_scale>=47.9 and map._view_button.size.y*physical_scale>=47.9,"resized phone actions retain physical touch target height")
+	await snap("node-map-phone.png")
 	get_window().size = Vector2i(1280,720); await frames(8)
 	map.map_view.focus_current(); await frames(2)
 	var points: Dictionary = map.map_view.points.duplicate()

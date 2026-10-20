@@ -325,7 +325,7 @@ func _apply_shop(t: String, action: Dictionary) -> Dictionary:
 		return {"ok": false, "reason": "无效商品"}
 	var o: Dictionary = shop_offers[i]
 	if GameState.gold < int(o.price):
-		return {"ok": false, "reason": "金币不足"}
+		return {"ok": false, "reason": "铜钱不足"}
 	if o.kind == "remove" or o.kind == "copy":
 		if GameState.deck_size() == 0: return {"ok": false, "reason": "字袋中没有可选择的字"}
 		GameState.spend_gold(int(o.price))

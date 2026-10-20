@@ -412,7 +412,7 @@ func _refresh_player() -> void:
 	_show_player_hp(battle.player.hp, battle.player.max_hp)
 	_player_status.set_entries(StatusDisplay.collect(battle.player, battle))
 	_show_defense(battle.player.block, battle.player.persistent_block)
-	var wallet: Array = [{"id": "gold", "title": "金币", "value": GameState.gold, "color": Palette.GOLD_DK, "description": "可用金币 %d，本战获得 %d。" % [GameState.gold, battle.gold_earned]}]
+	var wallet: Array = [{"id": "gold", "title": "铜钱", "value": GameState.gold, "color": Palette.GOLD_DK, "description": "可用铜钱 %d，本战获得 %d。" % [GameState.gold, battle.gold_earned]}]
 
 	_gold_strip.set_entries(wallet)
 
@@ -1198,7 +1198,7 @@ func _choose_solo_throw(path: Array, target: Dictionary) -> bool:
 		return false
 	var due := EffectUtil.discounted_cost(battle, BattleBalance.i("throw_cost", 1))
 	if EffectUtil.available(battle) < due or battle.solo_throw_destinations(inst, path[0]).is_empty():
-		_bubble.set_error("投：需要可用空格与 %d 金币支付额" % due)
+		_bubble.set_error("投：需要可用空格与 %d 铜钱支付额" % due)
 		return true
 	_pending_path = path
 	_solo_throw_active = true
@@ -1223,7 +1223,7 @@ func _choose_word_transfer(path: Array, target: Dictionary) -> bool:
 		_on_commit(path, {"skip_transfer": true})
 		return true
 	if EffectUtil.available(battle) < EffectUtil.discounted_cost(battle, BattleBalance.i("buy_cost", 2)):
-		_bubble.set_error("%s：需要 2 金币支付额" % word.word)
+		_bubble.set_error("%s：需要 2 铜钱支付额" % word.word)
 		return true
 	var spaces: Array = request.cells
 	if spaces.is_empty():
@@ -1259,7 +1259,7 @@ func _choose_solo_bag(path: Array, target: Dictionary) -> bool:
 	var buying := source.data.solo_handler == "buy_bag_solo"
 	var due := EffectUtil.discounted_cost(battle, BattleBalance.i("buy_cost", 2)) if buying else 0
 	if buying and EffectUtil.available(battle) < due:
-		_bubble.set_error("购：支付额不足（需要 %d 金币支付额）" % due)
+		_bubble.set_error("购：支付额不足（需要 %d 铜钱支付额）" % due)
 		return true
 	if not buying and cards.size() == 1:
 		var chosen := target.duplicate()
@@ -1696,7 +1696,7 @@ func _open_gild_picker(path: Array) -> void:
 		options.append({"text": "【%s】#%d（只强化这一枚）" % [card.glyph(), card.uid]})
 	options.append({"text": "取消"})
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "永久镀金：选择一枚实体字", "body": "镀金后每次单字或组词打出+1金币。同字形的其他实体不受影响。", "options": options})
+	overlay.setup({"title": "永久镀金：选择一枚实体字", "body": "镀金后每次单字或组词打出+1铜钱。同字形的其他实体不受影响。", "options": options})
 	overlay.chose.connect(func(index):
 		if index >= cards.size(): return
 		_on_commit(path, {"gild_uid": cards[index].uid}))
@@ -1973,7 +1973,7 @@ func _inspect_tile(pos: Vector2i) -> void:
 	var lines: Array[String] = ["当前字 · 第%d行%d列" % [pos.y + 1, pos.x + 1]]
 	if inst != null:
 		lines[0] += "【%s】" % "".join(inst.glyph_list())
-		if inst.gilded: lines.append("金：此实体已永久镀金；每次有效单字或组词+%d金币，弃字不触发。" % BattleBalance.i("gild_gold", 1))
+		if inst.gilded: lines.append("金：此实体已永久镀金；每次有效单字或组词+%d铜钱，弃字不触发。" % BattleBalance.i("gild_gold", 1))
 		if inst.temporary: lines.append("临：临时字，用后移除，战后消失。")
 		if inst.word_only: lines.append("词：仅组词触发效果，单打只弃掉。")
 		if inst.is_fused(): lines.append("融合：一格包含多个字形，作为一个实体共同使用。")
@@ -2008,7 +2008,7 @@ func _selection_context(path: Array) -> String:
 		if glyphs.size() == 1 or _current_word != null:
 			var focus: String = GlyphVfxProfile.for_play(glyphs, _current_word).focus
 			var labels := {"shield": "自身护盾", "heal": "自身气血", "heat": "热度", "energy": "储能",
-				"gold": "金币", "board": "字盘", "ability": "自身能力"}
+				"gold": "铜钱", "board": "字盘", "ability": "自身能力"}
 			target = labels.get(focus, target)
 	var cost := _pollution_cost_text(path).strip_edges()
 	var context := "目标：%s\n%s" % [target, "污染代价：无" if cost.is_empty() else cost]

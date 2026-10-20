@@ -55,13 +55,17 @@ func _layout() -> void:
 	_span = last * _pitch + margin * 2
 	_clamp_offset()
 	points.clear()
-	var top := 64.0 * _unit
-	var height := maxf(120 * _unit, size.y - top - 64 * _unit)
+	var compact := _unit>1.1
+	var top := (40.0 if compact else 64.0)*_unit
+	# Reserve a clear corner for the floating actions, without a separate footer.
+	var bottom := 104.0*_unit
+	var height := maxf(120 * _unit, size.y - top - bottom)
 	for id: String in run.graph.rooms:
 		var data: Dictionary = run.layout.rooms[id]
 		var spec: Dictionary = run.graph.rooms[id]
 		var lane: float = clampf(float(data.lane), 0, 3)
 		var jitter: float = float(spec.get("jitter",0)) if id not in [run.graph.start,run.graph.boss] else 0
+		if compact: jitter *= .4
 		points[id] = Vector2(margin + (data.column + 1) * _pitch - _offset, top + (lane + jitter) / 3 * height)
 	queue_redraw()
 
@@ -81,17 +85,17 @@ func _hit(at: Vector2) -> String:
 
 func _get_tooltip(at_position: Vector2) -> String:
 	var id := _hit(at_position)
-	if id.is_empty(): return "向右推进 · 点击节点查看 · 拖动卷轴浏览"
-	var kind: String = run.graph.rooms[id].kind
-	return "%s · %s\n%s" % [run.layout.rooms[id].name,LABELS[kind],_status(id)]
+	if id.is_empty(): return ""
+	var status := _status(id)
+	return LABELS[run.graph.rooms[id].kind]+(" · "+status if not status.is_empty() else "")
 
 
 func _status(id: String) -> String:
-	if id==run.current_room: return "当前所在"
-	if run.visited_rooms.has(id): return "已走过 · 不能返回"
+	if id==run.current_room: return "当前"
+	if run.visited_rooms.has(id): return "已过"
 	if run.sealed.has(id): return "已放弃"
-	if run.next_rooms().has(id): return "下一站可选"
-	return "后续节点 · 可提前查看路线"
+	if run.next_rooms().has(id): return "可前往"
+	return ""
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -141,7 +145,7 @@ func _draw() -> void:
 	if run==null or points.is_empty(): return
 	draw_rect(Rect2(Vector2.ZERO,size),Color("10262f"))
 	var margin := 22.0 * _unit
-	for y in [18.0*_unit,size.y-18.0*_unit]:
+	for y in [(3.0 if _unit>1.1 else 18.0)*_unit,size.y-8.0*_unit]:
 		draw_line(Vector2(0,y),Vector2(size.x,y),Color(JourneyStyle.GOLD,.28),1,true)
 	var last_column := -100
 	for id: String in run.graph.rooms:
@@ -149,7 +153,7 @@ func _draw() -> void:
 		if data.column==last_column or id==run.graph.start: continue
 		last_column = data.column
 		var x: float = points[id].x
-		_text("首领" if id==run.graph.boss else "%02d" % (data.column+1),Vector2(x,32*_unit),13,Color(JourneyStyle.GOLD,.5))
+		_text("首领" if id==run.graph.boss else "%02d" % (data.column+1),Vector2(x,(14 if _unit>1.1 else 32)*_unit),13,Color(JourneyStyle.GOLD,.5))
 	for edge: Dictionary in run.graph.edges:
 		var a: Vector2 = points[edge.from]
 		var b: Vector2 = points[edge.to]
@@ -211,12 +215,10 @@ func _draw_node(id: String) -> void:
 		draw_arc(center,radius+5*_unit,PI*1.15,PI*1.85,12,line,1.2*_unit,true)
 	_text(GLYPHS.get(spec.kind,"？"),center+Vector2(0,9*_unit),26,text)
 	var caption: String = "当前" if current else ("已行" if past else LABELS[spec.kind])
-	if current or past or marked:
+	if current or marked and _unit<=1.1:
 		_text(caption,center+Vector2(0,43*_unit),14,JourneyStyle.GOLD if current or available else text)
 	if abandoned:
 		draw_line(center+Vector2(-14,13)*_unit,center+Vector2(14,-13)*_unit,Color(JourneyStyle.EDGE,.8),1.5*_unit,true)
-	if planned:
-		_text(str(run.planned_route.find(id)+1),center+Vector2(24,-22)*_unit,12,JourneyStyle.GOLD)
 
 
 func _text(caption: String, at: Vector2, font_size: int, color: Color) -> void:

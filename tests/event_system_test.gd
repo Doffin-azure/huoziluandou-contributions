@@ -84,12 +84,12 @@ func _run() -> void:
 	GameState.relics.clear(); GameState.relic_binds.clear(); GameState.relic_counters.clear()
 	GameState.gold = 3
 	var poor_spend: Dictionary = EFFECTS.resolve([{"type": "spend_gold", "amount": 5}], rng)
-	_check(not poor_spend.ok and GameState.gold == 3, "金币不足时事件投入失败")
+	_check(not poor_spend.ok and GameState.gold == 3, "铜钱不足时事件投入失败")
 	GameState.gold = 20
 	var spend: Dictionary = EFFECTS.resolve([{"type": "spend_gold", "amount": 8}], rng)
-	_check(spend.ok and GameState.gold == 12, "事件可以投入金币")
+	_check(spend.ok and GameState.gold == 12, "事件可以投入铜钱")
 	var miss: Dictionary = EFFECTS.resolve([{"type": "gain_relic", "relic": "random", "chance": 0.0, "fallback_gold": 7}], rng)
-	_check(miss.ok and GameState.relics.is_empty() and GameState.gold == 19, "概率失败时只拿保底金币")
+	_check(miss.ok and GameState.relics.is_empty() and GameState.gold == 19, "概率失败时只拿保底铜钱")
 	var hit: Dictionary = EFFECTS.resolve([{"type": "gain_relic", "relic": "random", "chance": 1.0}], rng)
 	_check(hit.ok and GameState.relics.size() == 1 and not Relics.is_event_relic(str(GameState.relics[0])), "概率成功时只发普通遗物：%s" % [GameState.relics])
 	var jade: Dictionary = EFFECTS.get_event("jade_case")
@@ -104,7 +104,7 @@ func _run() -> void:
 		for effect: Dictionary in opt.effects:
 			if str(effect.get("type", "")) == "gain_character": answer = str(effect.get("glyph", ""))
 		answers.append(answer)
-		_check(not answer.is_empty() and not str(opt.text).contains(answer) and not str(opt.text).contains("气血") and not str(opt.text).contains("金币"), "灯谜选项只显示谜面：%s" % opt.text)
+		_check(not answer.is_empty() and not str(opt.text).contains(answer) and not str(opt.text).contains("气血") and not str(opt.text).contains("铜钱"), "灯谜选项只显示谜面：%s" % opt.text)
 	_check(answers.size() == 3 and answers[0] != answers[1] and answers[1] != answers[2] and answers[0] != answers[2], "无字灯三题答案不重复：%s" % [answers])
 	GameState.start_new_run("v03")
 	GameState.player_max_hp = 60; GameState.player_hp = 50; GameState.gold = 0
@@ -116,7 +116,7 @@ func _run() -> void:
 	_check(shefu_a.size() == 3 and shefu_a[0].effects == shefu_b[0].effects, "射覆用固定种子生成同一组奖励")
 	var shefu_character_count := 0
 	for opt: Dictionary in shefu_a:
-		_check(not str(opt.text).contains("金币") and not str(opt.text).contains("气血") and not str(opt.text).contains("遗物"), "射覆选项不显示奖励内容：%s" % opt.text)
+		_check(not str(opt.text).contains("铜钱") and not str(opt.text).contains("气血") and not str(opt.text).contains("遗物"), "射覆选项不显示奖励内容：%s" % opt.text)
 		for effect: Dictionary in opt.effects:
 			if str(effect.type) == "gain_character": shefu_character_count += 1
 	_check(shefu_character_count == 1, "射覆三只碗只有一只藏稀有字")
@@ -170,7 +170,7 @@ func _run() -> void:
 	jade_room.event_data = jade.duplicate(true)
 	GameState.gold = 100
 	var invest: Dictionary = jade_room.apply({"type": "event", "index": 0})
-	_check(invest.ok and jade_room.phase == "event" and jade_room.event_node == "one" and GameState.gold == 92, "韫椟待贾投钱后进入下一节点并扣 8 金币")
+	_check(invest.ok and jade_room.phase == "event" and jade_room.event_node == "one" and GameState.gold == 92, "韫椟待贾投钱后进入下一节点并扣 8 铜钱")
 	# 删字与净化：条件、稀有度过滤、连续删两枚
 	GameState.start_new_run("v03")
 	GameState.player_max_hp = 60
@@ -214,7 +214,7 @@ func _run() -> void:
 	var invalid: Dictionary = harness.apply({"type": "event", "index": 99})
 	_check(not invalid.ok and GameState.gold == gold and GameState.node_index == node_index, "无效事件选择被拒绝且不改变状态")
 	var valid: Dictionary = harness.apply({"type": "event", "index": 1})
-	_check(valid.ok and GameState.gold == gold + 18 and harness.phase == "map" and GameState.node_index == node_index + 1, "自动化流程按目录结算金币并推进")
+	_check(valid.ok and GameState.gold == gold + 18 and harness.phase == "map" and GameState.node_index == node_index + 1, "自动化流程按目录结算铜钱并推进")
 
 	harness.reset({"seed": 7302})
 	harness.phase = "event"

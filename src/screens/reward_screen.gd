@@ -1,5 +1,5 @@
 extends ScreenBase
-## 战后奖励：三选一增字，或跳过换金币。
+## 战后奖励：三选一增字，或跳过换铜钱。
 ## 经典模式：精英先给 1 件遗物；首领（最后一幕除外）先回血，再二选一遗物。
 
 ## 首领战后回复最大气血的比例
@@ -50,10 +50,10 @@ func build(root: Control) -> void:
 	_hud.heading = "幕末 · 馈赠" if is_boss else "战后 · 择字"
 	if _room_run and GameState.room_run.graph.rooms[GameState.room_run.current_room].kind=="treasure": _hud.heading = "荷池 · 藏字"
 	_hud.instruction = "选择一枚活字收入字匣，满时收入字袋。" if _expedition else "选择一枚活字收入字袋。"
-	_hud.status = "气血 %d / %d    金币 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
+	_hud.status = "气血 %d / %d    铜钱 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
 	_hud.action_text = "收入字匣" if _expedition else "收入字袋"
-	_hud.secondary_text = "收下这幕的馈赠" if is_boss else "跳过 · 获得 %d 金币" % Expedition.SKIP_GOLD
-	if _room_run: _hud.secondary_text = "跳过 · 获得 %d 金币" % Expedition.SKIP_GOLD
+	_hud.secondary_text = "收下这幕的馈赠" if is_boss else "跳过 · 获得 %d 铜钱" % Expedition.SKIP_GOLD
+	if _room_run: _hud.secondary_text = "跳过 · 获得 %d 铜钱" % Expedition.SKIP_GOLD
 	_hud.on_action = _accept_pick
 	_hud.on_secondary = _on_skip
 	root.add_child(_hud)
@@ -116,7 +116,7 @@ func _offer_relics(step: String) -> void:
 
 func _on_relic_taken(_id: String) -> void:
 	if is_inside_tree():
-		_hud.status_label.text = "气血 %d / %d    金币 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
+		_hud.status_label.text = "气血 %d / %d    铜钱 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
 
 
 func _layout_cards() -> void:

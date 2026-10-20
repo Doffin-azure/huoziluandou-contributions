@@ -2,6 +2,7 @@ extends ScreenBase
 ## Live courtyard mode. All actions go through RoomRunState, including headless parity.
 const RUN = preload("res://src/expedition/room_run_state.gd")
 const VIEW = preload("res://src/map/garden_room_map_view.gd")
+const EventArt = preload("res://src/core/event_art.gd")
 const SHOP_PORTRAIT := "res://assets/characters/shopkeeper/portrait.png"
 var run: RefCounted
 var map_view: Control
@@ -145,7 +146,9 @@ func refresh() -> void:
 		elif run.phase=="event":
 			var current_event: Dictionary = run.current_event()
 			choices_box.add_child(Ink.h2(current_event.get("title",run.event_data.get("title","庭中奇遇"))))
-			var event_art := _art_card(str(current_event.get("illustration",run.event_data.get("illustration",""))),150.0)
+			var art_path := str(current_event.get("illustration",run.event_data.get("illustration","")))
+			if art_path.is_empty(): art_path = EventArt.path_for(str(current_event.get("id","")))
+			var event_art := _art_card(art_path,150.0)
 			if event_art!=null: choices_box.add_child(event_art)
 			if GameState.event_temp_hp>0: choices_box.add_child(Ink.caption("借寿余火：%d" % GameState.event_temp_hp))
 			choices_box.add_child(Ink.body(current_event.get("body",run.event_data.get("body",""))))
@@ -216,7 +219,7 @@ func _walk_exit(id: String) -> void:
 
 func _build_planner() -> void:
 	choices_box.add_child(Ink.h2("前路预选"))
-	choices_box.add_child(Ink.caption("气血 %d/%d　金币 %d · 第%d幕" % [GameState.player_hp,GameState.player_max_hp,GameState.gold,GameState.act_index]))
+	choices_box.add_child(Ink.caption("气血 %d/%d　铜钱 %d · 第%d幕" % [GameState.player_hp,GameState.player_max_hp,GameState.gold,GameState.act_index]))
 	if not _planning_selected.is_empty():
 		var spec: Dictionary = run.graph.rooms[_planning_selected]
 		choices_box.add_child(Ink.label("%02d · %s · %s" % [spec.number,run.LABELS[spec.kind],spec.role]))
@@ -350,7 +353,7 @@ func _inventory_backdrop_input(event: InputEvent) -> void:
 func _refresh_inventory() -> void:
 	_clear(inventory_box)
 	inventory_box.add_child(Ink.h2("行囊"))
-	inventory_box.add_child(Ink.body("气血 %d / %d　金币 %d\n第%d幕 · 已过%d庭" % [GameState.player_hp,GameState.player_max_hp,GameState.gold,GameState.act_index,run.resolved.size()]))
+	inventory_box.add_child(Ink.body("气血 %d / %d　铜钱 %d\n第%d幕 · 已过%d庭" % [GameState.player_hp,GameState.player_max_hp,GameState.gold,GameState.act_index,run.resolved.size()]))
 	inventory_box.add_child(_button("查看字袋 · %d枚" % GameState.deck_size(),_open_deck))
 	inventory_box.add_child(_button("收起行囊",func(): _set_inventory_open(false)))
 

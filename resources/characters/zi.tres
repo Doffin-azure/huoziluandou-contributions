@@ -8,14 +8,14 @@ script = ExtResource("2_kkpoa")
 kind = 5
 handler = "gold"
 amount = 2
-note = "获得 2 点金币"
+note = "获得 2 点铜钱"
 
 [resource]
 script = ExtResource("1_upul8")
 id = "zi"
 glyph = "资"
 pinyin = "zi"
-description = "获得 2 点金币"
+description = "获得 2 点铜钱"
 tags = Array[String](["economy"])
 solo_effects = Array[ExtResource("2_kkpoa")]([SubResource("Resource_7seq2")])
 solo_handler = "gold"

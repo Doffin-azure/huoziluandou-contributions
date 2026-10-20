@@ -1,0 +1,41 @@
+{
+  "event_id": "lantern_riddle",
+  "title": "无字灯",
+  "route": "local ComfyUI, installed Anima aesthetic v1.1",
+  "seed": 2026101901,
+  "size": [
+    1024,
+    1024
+  ],
+  "reference_assets": [
+    "D:/Downloads/taopunk/ritual_courtyard.png",
+    "assets/ui/journey/courtyard_backdrop.png"
+  ],
+  "reference_usage": "palette/linework brief; this first local run is text-conditioned, not reference image-conditioned",
+  "positive": "A refined hand-drawn 2D game story illustration of a Chinese underworld garden at night. The entire image shows EXACTLY THREE RED PAPER LANTERNS and nothing else hanging from the roof. Three cinnabar red lanterns, three blank vermilion lanterns. Each red lantern has a clearly shaped rounded body with three broad dark-red rib divisions, heavy dark teal oxidized bronze caps and tiny old gold fasteners, one simple red tassel. A medium-sized red lantern hangs in the center, another red lantern hangs a little higher on the right, a smaller red lantern hangs lower on the left. All three are fully visible and clearly separated. Their red paper shades are dark vermilion and deep orange-red, with restrained warm red illumination, NOT white, NOT ivory, NOT cream. Paper is completely blank, absolutely no writing or markings. Exactly three hanging objects in the whole picture, no hanging mirrors, no bells, no pendants, no tiny extra lamps.\nAn old simple garden eave above, a shadowed wooden pillar and one carved geometric window behind, still dark teal ink pond below, irregular dark stone bank. A small pale ice-blue ghost flame floating above the water and a few scattered cinnabar maple leaves on the stones. Quiet mysterious solemn Chinese underworld, not a festival. The lantern group occupies the central two thirds of the square; breathing room around all edges, readable at a small size.\nSTYLE: strong visible black ink outlines, crisp flat color masses, confident contour variation, controlled two or three plane cel shading, elegant simplified shapes, sparse precise bronze engraving only on the lantern caps, subtle old printed paper grain, mature original occult fantasy illustration. Broad dark desaturated blue-teal and charcoal shapes, a clear rich cinnabar red focal group, restrained antique ochre gold fittings. Deep shadows, enough midtone separation to read the black contours, no muddy haze. Darkness and a little pale blue ghost fire create the lighting. Hand-drawn graphic painting with clean dark contours, not a 3D render, not a photograph. No people, no readable text, no title, no UI, no frame.",
+  "negative": "worst quality, low quality, blurry, jpeg artifacts, watercolor, ink wash painting, grey wash, washed out, sepia, loose sketch, photorealistic, photo, realistic, 3d render, CGI, glossy plastic, neon, rainbow, purple lighting, overexposed, saturated green, clutter, excessive ornament, crowded city, people, person, girl, chibi, cute, readable text, Chinese characters, calligraphy, watermark, signature, logo, title, user interface, poster, collage, ivory lanterns, cream lanterns, white lanterns, white paper panels, huge glowing white rectangle, extra lanterns, four lanterns, five lanterns, hanging mirror, pendant, hanging bell, tiny lamps, bright white backgrounds",
+  "selected_run": "lantern_riddle_anima_v2.api.json",
+  "asset": "assets/events/lantern_riddle_v1.png",
+  "asset_sha256": "81c1189d29858a471f0823bfbbd475d05afe48338ac089953da0c089f4e2e5f7",
+  "review_status": "single-event style sample, awaiting user review; not a batch approval",
+  "variants": [
+    {
+      "version": 1,
+      "file": "drafts/lantern_riddle_anima_v1.png",
+      "notes": "ivory paper too bright; extra hanging ornaments"
+    },
+    {
+      "version": 2,
+      "file": "drafts/lantern_riddle_anima_v2.png",
+      "notes": "selected for in-game review: three red lanterns, dark teal garden, ghost fire"
+    }
+  ],
+  "postprocess": "ComfyUI BiRefNet_toonout, Alpha, no foreground colour re-estimation",
+  "postprocess_seconds": 5.06,
+  "runtime": {
+    "comfyui_version": "0.40.0",
+    "pytorch_version": "2.11.0+cu128",
+    "python_version": "3.12.15 (main, Oct  9 2026, 15:21:55) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "generation_seconds": 76.16
+}

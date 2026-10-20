@@ -8,14 +8,14 @@ script = ExtResource("2_ye3ls")
 kind = 29
 handler = "profit_if_earned"
 amount = 2
-note = "若本回合此前已获得过金币，再获得 2 金币；否则无收益"
+note = "若本回合此前已获得过铜钱，再获得 2 铜钱；否则无收益"
 
 [resource]
 script = ExtResource("1_qs8ub")
 id = "li2"
 glyph = "利"
 pinyin = "li"
-description = "若本回合此前已获得过金币，再获得 2 金币；否则无收益"
+description = "若本回合此前已获得过铜钱，再获得 2 铜钱；否则无收益"
 tags = Array[String](["economy"])
 solo_effects = Array[ExtResource("2_ye3ls")]([SubResource("Effect")])
 solo_handler = "profit_if_earned"

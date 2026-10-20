@@ -12,7 +12,7 @@ func _ready() -> void:
 	var matchups := _matchups()
 	var report: Array = []
 	print("=== 批量对局（每格 %d 种子，上限 %d 回合）===" % [SEEDS, MAX_TURNS])
-	print("%-16s %-14s %7s %8s %8s %9s %8s" % ["字袋", "敌人", "胜率", "平均回合", "词/回合", "单字占比", "金币"])
+	print("%-16s %-14s %7s %8s %8s %9s %8s" % ["字袋", "敌人", "胜率", "平均回合", "词/回合", "单字占比", "铜钱"])
 	for deck in decks:
 		for mu in matchups:
 			var agg := _run_matchup(deck, mu)
