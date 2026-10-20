@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+[ClusterGeometry] seed=1 members=5 bounds=[P: (-11.0, -32.0), S: (22.0, 26.5)] wet=0 wall_crossings=0
+[ClusterGeometry] seed=17 members=5 bounds=[P: (-11.0, -32.0), S: (22.0, 26.5)] wet=0 wall_crossings=0
+[ClusterGeometry] seed=29 members=6 bounds=[P: (-11.0, -32.0), S: (22.0, 26.5)] wet=0 wall_crossings=0
+[ClusterGeometry] seed=2026 members=5 bounds=[P: (-11.0, -32.0), S: (22.0, 26.5)] wet=0 wall_crossings=0
+[ClusterGeometry] seed=818 members=5 bounds=[P: (-11.0, -32.0), S: (22.0, 26.5)] wet=0 wall_crossings=0
+[GardenCluster] checks=90 failures=[]

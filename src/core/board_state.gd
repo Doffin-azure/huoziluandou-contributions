@@ -7,6 +7,7 @@ var cells: Array = []   ## Array[CharInstance | null]，长度 size*size
 var diagonal_steps_allowed: int = 0
 var gap_steps_allowed: int = 0 ## 超：下次组词最多跨过一个四方向空格。
 var free_word_link: bool = false ## 流利：下一次组词无需相邻，仍逐枚按字序选择。
+var wrap_rows: bool = false ## 装订线：同一行最左和最右两格视作相邻。
 
 
 func _init(p_size: int = 4) -> void:
@@ -87,6 +88,8 @@ func neighbors(v: Vector2i) -> Array:
 
 
 func is_adjacent(a: Vector2i, b: Vector2i) -> bool:
+	if wrap_rows and a.y == b.y and size > 2 and absi(a.x - b.x) == size - 1:
+		return true
 	return absi(a.x - b.x) + absi(a.y - b.y) == 1
 
 
@@ -134,6 +137,8 @@ func path_extensions(path: Array) -> Array:
 		return []
 	var tail: Vector2i = path.back()
 	var candidates := neighbors(tail)
+	if wrap_rows and size > 2 and (tail.x == 0 or tail.x == size - 1):
+		candidates.append(Vector2i(size - 1 - tail.x, tail.y))
 	if free_word_link:
 		candidates.clear()
 		for i in cells.size():

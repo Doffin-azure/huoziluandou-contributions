@@ -41,16 +41,22 @@ func _build() -> void:
 	pad.add_child(col)
 
 	if not str(cfg.get("title", "")).is_empty():
-		var heading := Ink.h2(str(cfg["title"]))
+		var heading := Ink.h2(BattleText.clean(str(cfg["title"])))
 		if cfg.get("hud_details", false):
 			heading.add_theme_font_size_override("font_size", int(24 * hud_scale))
 			heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		col.add_child(heading)
 	if not str(cfg.get("body", "")).is_empty():
-		var b := Ink.body(str(cfg["body"]))
-		b.custom_minimum_size.x = 380
+		var b: Control
 		if cfg.get("hud_details", false):
-			b.add_theme_font_size_override("font_size", int(18 * hud_scale))
+			var effects := EffectText.new()
+			effects.name = "EffectDetails"
+			effects.set_effect_text(str(cfg["body"]))
+			effects.add_theme_font_size_override("normal_font_size", int(18 * hud_scale))
+			b = effects
+		else:
+			b = Ink.body(BattleText.clean(str(cfg["body"])))
+		b.custom_minimum_size.x = 380
 		if cfg.get("scroll_body", false):
 			var scroll := ScrollContainer.new()
 			scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -65,7 +71,7 @@ func _build() -> void:
 	var options: Array = cfg.get("options", [])
 	for i in options.size():
 		var opt: Dictionary = options[i]
-		var btn := Ink.button(str(opt.get("text", "选项 %d" % (i + 1))), bool(opt.get("primary", false)))
+		var btn := Ink.button(BattleText.clean(str(opt.get("text", "选项 %d" % (i + 1)))), bool(opt.get("primary", false)))
 		btn.focus_mode = Control.FOCUS_ALL
 		btn.custom_minimum_size.y = 48 * hud_scale
 		btn.add_theme_font_size_override("font_size", int(20 * hud_scale))
@@ -74,7 +80,7 @@ func _build() -> void:
 		btn.pressed.connect(_on_choose.bind(i))
 		col.add_child(btn)
 		if not str(opt.get("hint", "")).is_empty():
-			var h := Ink.label(str(opt["hint"]), "Muted")
+			var h := Ink.label(BattleText.clean(str(opt["hint"])), "Muted")
 			h.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			col.add_child(h)
 

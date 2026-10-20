@@ -1,0 +1,21 @@
+{
+  "android_device_tested": false,
+  "checks": 76,
+  "failures": [],
+  "foreground_light_rgb_difference": 0.0111313045973028,
+  "renderer": "forward_plus",
+  "screens": [
+    {
+      "memory_bytes": 315353476.0,
+      "size": "(1280, 720)"
+    },
+    {
+      "memory_bytes": 316013364.0,
+      "size": "(1920, 1080)"
+    },
+    {
+      "memory_bytes": 316160200.0,
+      "size": "(960, 432)"
+    }
+  ]
+}

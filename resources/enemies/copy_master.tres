@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_efv1e"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_gcrwe"]
+
+[sub_resource type="Resource" id="Resource_e6ipt"]
+script = ExtResource("1_efv1e")
+title = "笔击"
+description = "循环行动：笔击 → 拓 → 笔击"
+damage = 10
+
+[sub_resource type="Resource" id="Resource_onaxo"]
+script = ExtResource("1_efv1e")
+kind = 7
+title = "拓"
+description = "循环行动：笔击 → 拓 → 笔击"
+damage = 0
+mechanic_action = "copy"
+
+[sub_resource type="Resource" id="Resource_tl6ci"]
+script = ExtResource("1_efv1e")
+title = "笔击"
+description = "循环行动：笔击 → 拓 → 笔击"
+damage = 10
+
+[resource]
+script = ExtResource("2_gcrwe")
+id = "copy_master"
+name = "拓印师"
+glyph = "拓"
+description = "拓读取其前一个玩家阶段最后成功的多字词，按固定优先级执行：攻击类→攻击10；防御类→得盾8；补字／空间类→向空格注1枚堵塞【重】（可组重击、重力，打出后下次正常补字-1）；经济类→得盾6；其余或没出词→得盾3。同一词多类取前者；不复制玩家实际爆发数值。单字不改记录。"
+max_hp = 62
+mechanic = "copy"
+act = 2
+moves = Array[ExtResource("1_efv1e")]([SubResource("Resource_e6ipt"), SubResource("Resource_onaxo"), SubResource("Resource_tl6ci")])
+is_elite = true

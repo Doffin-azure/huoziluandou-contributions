@@ -1,0 +1,81 @@
+{
+  "asset": "terrain-materials-v2.png",
+  "kind": "opaque_top_down_terrain_albedo_atlas",
+  "width": 1254,
+  "height": 1254,
+  "generation": {
+    "tool": "native image_gen.imagegen",
+    "attempts": 1,
+    "original": "C:/Users/Think/.codex/generated_images/01a14225-9c2c-7b92-83cc-2d8bae67e752/exec-d0e54fcd-89ee-467f-9f61-60a958be0d29.png",
+    "copied_unmodified": true,
+    "prompt": "terrain-materials-v2.prompt.txt"
+  },
+  "quadrants": [
+    {
+      "name": "worn_stone",
+      "region": [
+        0,
+        0,
+        627,
+        627
+      ],
+      "uv_rect": [
+        0,
+        0,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "name": "cracked_stone",
+      "region": [
+        627,
+        0,
+        627,
+        627
+      ],
+      "uv_rect": [
+        0.5,
+        0,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "name": "damp_stone",
+      "region": [
+        0,
+        627,
+        627,
+        627
+      ],
+      "uv_rect": [
+        0,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "name": "ink_water",
+      "region": [
+        627,
+        627,
+        627,
+        627
+      ],
+      "uv_rect": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    }
+  ],
+  "sampling": "Use each subregion with an inset of at least one source pixel to avoid cross-quadrant bleed. Apply continuous world-space material mapping, not one atlas quadrant per gameplay cell.",
+  "quality_notes": "Full-bleed hand-painted material swatches with no perspective or cast shadows. Texture edges are generated, not a mathematically certified seamless wrap; blend/stagger repeated sampling in shader to avoid visible repeat boundaries.",
+  "references": [
+    "docs/art-concepts/2026-10-16-mochi/reference-battle-style.png",
+    "docs/art-concepts/2026-10-16-mochi/02-mochi-environment.png"
+  ]
+}

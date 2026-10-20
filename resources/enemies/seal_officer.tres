@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_7jexq"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_3uh7v"]
+
+[sub_resource type="Resource" id="Resource_o0r0o"]
+script = ExtResource("1_7jexq")
+kind = 7
+title = "钤印"
+description = "循环行动：钤印 → 朱批 → 笔击"
+damage = 0
+mechanic_action = "seal_mark"
+
+[sub_resource type="Resource" id="Resource_bko4t"]
+script = ExtResource("1_7jexq")
+title = "朱批"
+description = "循环行动：钤印 → 朱批 → 笔击"
+damage = 8
+mechanic_action = "seal"
+
+[sub_resource type="Resource" id="Resource_324ld"]
+script = ExtResource("1_7jexq")
+title = "笔击"
+description = "循环行动：钤印 → 朱批 → 笔击"
+damage = 10
+
+[resource]
+script = ExtResource("2_3uh7v")
+id = "seal_officer"
+name = "钤印官"
+glyph = "钤"
+description = "印区按坐标固定，朱批伤害=8+2×区域内剩余占用格数，最高16；只检查一次，不改变字的归属。流速补回的新字也算占格；区域内原地旋转不减少占格。新一次标记替换旧区域。"
+max_hp = 60
+mechanic = "seal"
+act = 2
+moves = Array[ExtResource("1_7jexq")]([SubResource("Resource_o0r0o"), SubResource("Resource_bko4t"), SubResource("Resource_324ld")])
+is_elite = true

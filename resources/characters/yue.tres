@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_f0jvw"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_hxg18"]
+
+[sub_resource type="Resource" id="Resource_xmri1"]
+script = ExtResource("2_hxg18")
+kind = 29
+handler = "moon_pull"
+note = "其他字向【月】原位聚拢"
+
+[resource]
+script = ExtResource("1_f0jvw")
+id = "yue"
+glyph = "月"
+pinyin = "yue"
+description = "其他字向【月】原位聚拢"
+tags = Array[String](["彩蛋"])
+solo_effects = Array[ExtResource("2_hxg18")]([SubResource("Resource_xmri1")])
+solo_handler = "moon_pull"
+rarity = 3

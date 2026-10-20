@@ -1,0 +1,1210 @@
+[
+  {
+    "description": "四面同款院墙，照壁对景；字柜、箱匣与灯收在两侧，中央整备。",
+    "enclosure": "walled",
+    "floor_size": [
+      4,
+      4
+    ],
+    "id": "start_gatehouse",
+    "kind": "start",
+    "lanes": [
+      [
+        [
+          2.0,
+          4.0
+        ],
+        [
+          2.0,
+          1.5
+        ]
+      ]
+    ],
+    "mark": "始",
+    "mark_at": [
+      2.0,
+      3.09999990463257
+    ],
+    "name": "起点 · 照壁门院",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_exit",
+        "offset": 2.0,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "screen",
+        "at": [
+          2.0,
+          0.0,
+          0.479999989271164
+        ],
+        "scale": 0.6,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "type_cabinet",
+        "at": [
+          0.649999976158142,
+          0.0,
+          1.64999997615814
+        ],
+        "scale": 0.8,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "chest",
+        "at": [
+          0.699999988079071,
+          0.0,
+          2.79999995231628
+        ],
+        "scale": 0.4,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          3.25,
+          0.0,
+          0.800000011920929
+        ],
+        "scale": 0.75,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "pine",
+        "at": [
+          3.25,
+          0.0,
+          0.800000011920929
+        ],
+        "scale": 0.35,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          3.34999990463257,
+          0.0,
+          2.0
+        ],
+        "scale": 0.43,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "rail_sides": [],
+    "route_id": "start_gatehouse",
+    "stand": [
+      2.0,
+      2.40000009536743
+    ],
+    "transform": "[X: (1.0, 0.0), Y: (0.0, 1.0), O: (0.0, 0.0)]",
+    "variant": 0,
+    "variants": [
+      "标准单出口",
+      "可整体旋转，仍仅一扇通路门"
+    ],
+    "water_sides": []
+  },
+  {
+    "description": "完整漏窗墙院；碑龛靠后墙、松石落在植床内，月门形成折景。",
+    "enclosure": "walled",
+    "floor_size": [
+      5,
+      4
+    ],
+    "id": "event_bent_court",
+    "kind": "event",
+    "lanes": [
+      [
+        [
+          2.5,
+          4.0
+        ],
+        [
+          2.5,
+          2.5
+        ],
+        [
+          5.0,
+          2.5
+        ]
+      ],
+      [
+        [
+          2.5,
+          2.09999990463257
+        ],
+        [
+          1.35000002384186,
+          2.09999990463257
+        ]
+      ]
+    ],
+    "mark": "谜",
+    "mark_at": [
+      1.35000002384186,
+      2.09999990463257
+    ],
+    "name": "事件 · 问碑小院",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_entry",
+        "offset": 2.5,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "e_exit",
+        "offset": 2.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "E",
+        "span": 2.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "stele_plinth",
+        "at": [
+          1.35000002384186,
+          0.0,
+          0.819999992847443
+        ],
+        "scale": 1.1,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "shrine",
+        "at": [
+          1.35000002384186,
+          0.0,
+          0.819999992847443
+        ],
+        "scale": 0.66,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          4.05000019073486,
+          0.0,
+          0.800000011920929
+        ],
+        "scale": 1.0,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "pine",
+        "at": [
+          4.05000019073486,
+          0.0,
+          0.800000011920929
+        ],
+        "scale": 0.48,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          3.45000004768372,
+          0.0,
+          0.779999971389771
+        ],
+        "scale": 0.31,
+        "state": "",
+        "turn": 0.0,
+        "variant": 2
+      }
+    ],
+    "rail_sides": [],
+    "route_id": "event_bent_court",
+    "stand": [
+      1.35000002384186,
+      2.09999990463257
+    ],
+    "transform": "[X: (1.0, 0.0), Y: (0.0, 1.0), O: (0.0, 0.0)]",
+    "variant": 0,
+    "variants": [
+      "东折门",
+      "直通门：出门转到北侧，碑龛移至西侧"
+    ],
+    "water_sides": [
+      "E"
+    ]
+  },
+  {
+    "description": "整座临水石台统一用栏杆围合；开放水榭、石凳与鬼火组成休整区，不混用院墙。",
+    "enclosure": "terrace",
+    "floor_size": [
+      5,
+      5
+    ],
+    "id": "rest_lantern_court",
+    "kind": "rest",
+    "lanes": [
+      [
+        [
+          2.5,
+          5.0
+        ],
+        [
+          2.5,
+          0.0
+        ]
+      ],
+      [
+        [
+          2.5,
+          3.5
+        ],
+        [
+          5.0,
+          3.5
+        ]
+      ]
+    ],
+    "mark": "息",
+    "mark_at": [
+      2.65000009536743,
+      3.0
+    ],
+    "name": "火堆 · 息灯水榭",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "open",
+        "id": "s_entry",
+        "offset": 2.5,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 1.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "open",
+        "id": "n_exit",
+        "offset": 2.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "N",
+        "span": 1.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "open",
+        "id": "e_exit",
+        "offset": 3.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "E",
+        "span": 1.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "water_pavilion",
+        "at": [
+          1.54999995231628,
+          0.0,
+          1.35000002384186
+        ],
+        "scale": 0.92,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          3.54999995231628,
+          0.0,
+          3.0
+        ],
+        "scale": 0.67,
+        "state": "fire",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          4.09999990463257,
+          0.0,
+          0.800000011920929
+        ],
+        "scale": 0.83,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "pine",
+        "at": [
+          4.09999990463257,
+          0.0,
+          0.800000011920929
+        ],
+        "scale": 0.48,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "rail_sides": [
+      "N",
+      "E",
+      "S",
+      "W"
+    ],
+    "route_id": "rest_lantern_court",
+    "stand": [
+      2.65000009536743,
+      3.0
+    ],
+    "transform": "[X: (1.0, 0.0), Y: (0.0, 1.0), O: (0.0, 0.0)]",
+    "variant": 0,
+    "variants": [
+      "三门休整庭",
+      "两门：关闭侧门并补齐同款栏杆"
+    ],
+    "water_sides": [
+      "N",
+      "E",
+      "W"
+    ]
+  },
+  {
+    "arena": [
+      2.0,
+      1.29999995231628,
+      3.0,
+      2.70000004768372
+    ],
+    "description": "同款墙体围合四周，游廊依西墙；松石集中在角落，中央空庭保持可通行。",
+    "enclosure": "walled",
+    "floor_size": [
+      6,
+      5
+    ],
+    "id": "battle_side_gallery",
+    "kind": "battle",
+    "lanes": [
+      [
+        [
+          3.0,
+          5.0
+        ],
+        [
+          3.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          3.0,
+          2.5
+        ],
+        [
+          6.0,
+          2.5
+        ]
+      ]
+    ],
+    "mark": "战",
+    "mark_at": [
+      3.0,
+      3.29999995231628
+    ],
+    "name": "普通战 · 廊围石庭",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_entry",
+        "offset": 3.0,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "n_exit",
+        "offset": 3.0,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "N",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "e_exit",
+        "offset": 2.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "E",
+        "span": 2.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "covered_walk",
+        "at": [
+          0.819999992847443,
+          0.0,
+          2.5
+        ],
+        "scale": 0.6,
+        "state": "",
+        "turn": 1.5707963267949,
+        "variant": 0
+      },
+      {
+        "asset": "foe",
+        "at": [
+          3.0,
+          0.0,
+          2.34999990463257
+        ],
+        "scale": 0.92,
+        "state": "enemy",
+        "turn": 0.0,
+        "variant": 1
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          5.15000009536743,
+          0.0,
+          0.850000023841858
+        ],
+        "scale": 0.92,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "pine",
+        "at": [
+          5.15000009536743,
+          0.0,
+          0.850000023841858
+        ],
+        "scale": 0.48,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "rail_sides": [],
+    "route_id": "battle_side_gallery",
+    "stand": [
+      3.0,
+      3.90000009536743
+    ],
+    "transform": "[X: (1.0, 0.0), Y: (0.0, 1.0), O: (0.0, 0.0)]",
+    "variant": 0,
+    "variants": [
+      "侧廊三门",
+      "素庭四门：去掉西廊，打开西门"
+    ],
+    "water_sides": [
+      "E"
+    ]
+  },
+  {
+    "arena": [
+      2.0,
+      1.5,
+      3.0,
+      3.0
+    ],
+    "description": "北面镇门、两翼高低碑，中间留宽阔交战庭。清理后北门开启。",
+    "enclosure": "walled",
+    "floor_size": [
+      7,
+      6
+    ],
+    "id": "elite_stele_court",
+    "kind": "elite",
+    "lanes": [
+      [
+        [
+          3.5,
+          6.0
+        ],
+        [
+          3.5,
+          0.0
+        ]
+      ]
+    ],
+    "mark": "镇",
+    "mark_at": [
+      3.5,
+      4.09999990463257
+    ],
+    "name": "精英 · 镇碑夹庭",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_entry",
+        "offset": 3.5,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "beast",
+        "id": "n_exit",
+        "offset": 3.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "N",
+        "span": 2.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "stele_plinth",
+        "at": [
+          1.14999997615814,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 1.15,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          1.14999997615814,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 0.58,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stele_plinth",
+        "at": [
+          5.80000019073486,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 1.15,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          5.80000019073486,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 0.49,
+        "state": "",
+        "turn": 0.0,
+        "variant": 3
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          1.10000002384186,
+          0.0,
+          2.29999995231628
+        ],
+        "scale": 0.39,
+        "state": "",
+        "turn": 0.0,
+        "variant": 2
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          5.94999980926514,
+          0.0,
+          2.5
+        ],
+        "scale": 1.05,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "pine",
+        "at": [
+          5.94999980926514,
+          0.0,
+          2.5
+        ],
+        "scale": 0.58,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          1.10000002384186,
+          0.0,
+          4.5
+        ],
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "elite",
+        "at": [
+          3.5,
+          0.0,
+          3.04999995231628
+        ],
+        "scale": 1.2,
+        "state": "enemy",
+        "turn": 0.0,
+        "variant": 2
+      }
+    ],
+    "rail_sides": [],
+    "route_id": "elite_stele_court",
+    "stand": [
+      3.5,
+      4.69999980926514
+    ],
+    "transform": "[X: (1.0, 0.0), Y: (0.0, 1.0), O: (0.0, 0.0)]",
+    "variant": 0,
+    "variants": [
+      "前后夹庭",
+      "镜像碑群；入口可旋转到侧面"
+    ],
+    "water_sides": [
+      "W"
+    ]
+  },
+  {
+    "arena": [
+      2.0,
+      1.60000002384186,
+      5.0,
+      3.79999995231628
+    ],
+    "description": "兽面大门在后，两翼碑灯夹景。中央仪式庭留白，通关出口不与入口混用。",
+    "enclosure": "walled",
+    "floor_size": [
+      9,
+      7
+    ],
+    "id": "boss_terminal_court",
+    "kind": "boss",
+    "lanes": [
+      [
+        [
+          4.5,
+          7.0
+        ],
+        [
+          4.5,
+          0.0
+        ]
+      ]
+    ],
+    "mark": "渊",
+    "mark_at": [
+      4.5,
+      5.0
+    ],
+    "name": "首领 · 墨渊终庭",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_entry",
+        "offset": 4.5,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "beast",
+        "id": "n_exit",
+        "offset": 4.5,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "N",
+        "span": 3.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "stele_plinth",
+        "at": [
+          1.39999997615814,
+          0.0,
+          1.20000004768372
+        ],
+        "scale": 1.45,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          1.39999997615814,
+          0.0,
+          1.20000004768372
+        ],
+        "scale": 0.72,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "stele_plinth",
+        "at": [
+          7.59999990463257,
+          0.0,
+          1.20000004768372
+        ],
+        "scale": 1.45,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "tomb",
+        "at": [
+          7.59999990463257,
+          0.0,
+          1.20000004768372
+        ],
+        "scale": 0.64,
+        "state": "",
+        "turn": 0.0,
+        "variant": 3
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          0.850000023841858,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 1.05,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "pine",
+        "at": [
+          0.850000023841858,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 0.62,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          8.14999961853027,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 1.05,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "pine",
+        "at": [
+          8.14999961853027,
+          0.0,
+          3.29999995231628
+        ],
+        "scale": 0.62,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          2.09999990463257,
+          0.0,
+          2.29999995231628
+        ],
+        "scale": 0.7,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "ghost_fire",
+        "at": [
+          6.90000009536743,
+          0.0,
+          2.29999995231628
+        ],
+        "scale": 0.7,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "boss",
+        "at": [
+          4.5,
+          0.0,
+          3.65000009536743
+        ],
+        "scale": 1.65,
+        "state": "enemy",
+        "turn": 0.0,
+        "variant": 3
+      }
+    ],
+    "rail_sides": [],
+    "route_id": "boss_terminal_court",
+    "stand": [
+      4.5,
+      5.80000019073486
+    ],
+    "transform": "[X: (1.0, 0.0), Y: (0.0, 1.0), O: (0.0, 0.0)]",
+    "variant": 0,
+    "variants": [
+      "水岸终庭",
+      "后门仅在通关后开放；不参与普通随机中转"
+    ],
+    "water_sides": [
+      "E",
+      "W"
+    ]
+  },
+  {
+    "description": "四边连续栏杆的荷池水榭，宝匣置于同一屋顶下；两侧留绕行通道，开口只设栏端柱。",
+    "enclosure": "terrace",
+    "floor_size": [
+      4,
+      4
+    ],
+    "id": "treasure_water_pavilion",
+    "kind": "treasure",
+    "lanes": [
+      [
+        [
+          2.0,
+          4.0
+        ],
+        [
+          2.0,
+          2.70000004768372
+        ],
+        [
+          2.75,
+          2.70000004768372
+        ],
+        [
+          2.75,
+          0.400000005960464
+        ],
+        [
+          2.0,
+          0.400000005960464
+        ],
+        [
+          2.0,
+          0.0
+        ]
+      ]
+    ],
+    "mark": "藏",
+    "mark_at": [
+      2.0,
+      2.70000004768372
+    ],
+    "name": "宝藏 · 荷池藏榭",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "open",
+        "id": "s_entry",
+        "offset": 2.0,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 1.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "open",
+        "id": "n_exit",
+        "offset": 2.0,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "N",
+        "span": 1.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "water_pavilion",
+        "at": [
+          2.0,
+          0.0,
+          1.35000002384186
+        ],
+        "scale": 1.0,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "chest",
+        "at": [
+          2.0,
+          0.0,
+          1.5
+        ],
+        "scale": 0.7,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 1
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          0.5,
+          0.0,
+          3.34999990463257
+        ],
+        "scale": 0.38,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "rail_sides": [
+      "N",
+      "E",
+      "S",
+      "W"
+    ],
+    "route_id": "treasure_water_pavilion",
+    "stand": [
+      2.0,
+      2.70000004768372
+    ],
+    "transform": "[X: (1.0, 0.0), Y: (0.0, 1.0), O: (0.0, 0.0)]",
+    "variant": 0,
+    "variants": [
+      "前后双门",
+      "汇合四门：补两侧门，关闭短桥展示，保持绕匣通行"
+    ],
+    "water_sides": [
+      "N",
+      "S",
+      "E",
+      "W"
+    ]
+  },
+  {
+    "description": "字摊靠后墙，箱柜偏左；前方两格整备区连到东侧出口。",
+    "enclosure": "walled",
+    "floor_size": [
+      6,
+      5
+    ],
+    "id": "shop_bronze_court",
+    "kind": "shop",
+    "lanes": [
+      [
+        [
+          3.0,
+          5.0
+        ],
+        [
+          3.0,
+          3.0
+        ],
+        [
+          6.0,
+          3.0
+        ]
+      ]
+    ],
+    "mark": "市",
+    "mark_at": [
+      3.0,
+      2.70000004768372
+    ],
+    "name": "商店 · 青铜字肆",
+    "ports": [
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "s_entry",
+        "offset": 3.0,
+        "role": "entry",
+        "role_mutable": true,
+        "side": "S",
+        "span": 2.0
+      },
+      {
+        "clear_width": 0.95,
+        "frame": "moon",
+        "id": "e_exit",
+        "offset": 3.0,
+        "role": "exit",
+        "role_mutable": true,
+        "side": "E",
+        "span": 2.0
+      }
+    ],
+    "props": [
+      {
+        "asset": "stall",
+        "at": [
+          3.0,
+          0.0,
+          1.10000002384186
+        ],
+        "scale": 0.82,
+        "state": "service",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "type_cabinet",
+        "at": [
+          0.800000011920929,
+          0.0,
+          1.04999995231628
+        ],
+        "scale": 1.0,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "chest",
+        "at": [
+          0.800000011920929,
+          0.0,
+          2.15000009536743
+        ],
+        "scale": 0.42,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "rock_bed",
+        "at": [
+          5.0,
+          0.0,
+          0.899999976158142
+        ],
+        "scale": 0.9,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "pine",
+        "at": [
+          5.0,
+          0.0,
+          0.899999976158142
+        ],
+        "scale": 0.46,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      },
+      {
+        "asset": "lamp",
+        "at": [
+          0.649999976158142,
+          0.0,
+          3.15000009536743
+        ],
+        "scale": 0.4,
+        "state": "",
+        "turn": 0.0,
+        "variant": 0
+      }
+    ],
+    "rail_sides": [],
+    "route_id": "shop_bronze_court",
+    "stand": [
+      3.0,
+      2.70000004768372
+    ],
+    "transform": "[X: (1.0, 0.0), Y: (0.0, 1.0), O: (0.0, 0.0)]",
+    "variant": 0,
+    "variants": [
+      "东折离店",
+      "镜像到西侧；库存与主物件位置共同迁移"
+    ],
+    "water_sides": [
+      "E"
+    ]
+  }
+]

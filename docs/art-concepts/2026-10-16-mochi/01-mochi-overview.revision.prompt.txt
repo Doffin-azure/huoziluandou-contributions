@@ -1,0 +1,10 @@
+Use the supplied generated overworld image as the EDIT TARGET. Make one focused art-direction correction: change the ground-plane projection to a screen-axis-aligned oblique overhead view, while preserving the drawing style, color palette, scene content, player scale and sidebar arrangement.
+
+CRITICAL CAMERA CHANGE:
+The current ground paths drift diagonally and look slightly isometric. Redraw the map layout so all east-west grid rows run exactly horizontally across the picture and all north-south grid columns run exactly vertically in the picture. A ground cell should project to an axis-aligned 128 by 80 rectangle, not a diamond or diagonal parallelogram. This is a top-down tactical game with shallow south-facing facades and visible roofs, not a perspective/isometric diorama. All walkable ground remains at one shared height. Eliminate diagonal world axes. Rooftops and short architectural facades must respect the same screen-axis-aligned projection.
+
+Keep the entire right sidebar and narrow top bar, the warm-lantern gray-cloaked small traveler near left-middle, the beast-mask bronze boss gate at map upper-right and independent small patrol beast, the ink river, connected stone routes, ink spring basin, paper ink absorber, bronze type stall, lamp pavilion, inscription niche, sealed treasure boxes, and paper-white letter tokens. Reposition structures only as needed to make the orthogonal layout work.
+Four neighboring movement markers must be axis-aligned thin old-gold rectangles around the traveler (up/down/left/right). The boss path must be a thin muted cinnabar dashed path with screen-horizontal and screen-vertical segments meeting at clean right angles, never diagonals.
+Maintain mature hand-drawn irregular black outlines, flat teal/black colors, old gold and verdigris bronze, paper white, cinnabar seals and edge foliage, fine carved ornament lines, old print grain. No glossy 3D, no photographic light, no oil painting, no chibi, no full-map bright grid. Keep playable ground quiet and readable.
+
+One polished cohesive 16:9 full-screen concept art image at 1920 by 1080 if supported.

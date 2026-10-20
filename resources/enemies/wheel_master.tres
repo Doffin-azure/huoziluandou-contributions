@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_d4tdc"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_pptf5"]
+
+[sub_resource type="Resource" id="Resource_nweqh"]
+script = ExtResource("1_d4tdc")
+kind = 1
+title = "轮铸"
+description = "循环行动：轮铸 → 压印 → 双印"
+damage = 0
+block = 8
+
+[sub_resource type="Resource" id="Resource_iyuic"]
+script = ExtResource("1_d4tdc")
+title = "压印"
+description = "循环行动：轮铸 → 压印 → 双印"
+damage = 14
+mechanic_action = "wheel"
+
+[sub_resource type="Resource" id="Resource_6hehn"]
+script = ExtResource("1_d4tdc")
+kind = 5
+title = "双印"
+description = "循环行动：轮铸 → 压印 → 双印"
+damage = 5
+hits = 2
+
+[resource]
+script = ExtResource("2_pptf5")
+id = "wheel_master"
+name = "轮印师"
+glyph = "轮"
+description = "压印前阶段内，同一枚己方原实体参加两次成功多字词，即造成8机制伤害、压印降至8。只看原实体身份；相同字形的新复制不替代。合击中共享原实体参加两个实际结算词可完成；词效重演不增加次数。每题一次。"
+max_hp = 66
+mechanic = "wheel"
+act = 2
+moves = Array[ExtResource("1_d4tdc")]([SubResource("Resource_nweqh"), SubResource("Resource_iyuic"), SubResource("Resource_6hehn")])
+is_elite = true

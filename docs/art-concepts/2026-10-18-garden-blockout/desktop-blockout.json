@@ -1,0 +1,72 @@
+{
+  "android_device_tested": false,
+  "checks": 385,
+  "failures": [],
+  "geometry_only": true,
+  "renderer": "forward_plus",
+  "seeds": [
+    {
+      "active_chunks": 24,
+      "assembly_cpu_ms": 101.516,
+      "cache_limit": 49,
+      "cached_chunks": 49,
+      "draw_calls": 19,
+      "frame_p95_ms": 17.103,
+      "generation_ms": 16.603,
+      "geometry_only": true,
+      "max_cached_chunks": 49,
+      "memory_bytes": 181586376.0,
+      "nodes": 55,
+      "render_cpu_ms": 0.133000001311302,
+      "render_gpu_ms": 3.3989999294281,
+      "seed": 17,
+      "total_chunks": 112,
+      "viewport_pixels": [
+        1280,
+        720
+      ]
+    },
+    {
+      "active_chunks": 20,
+      "assembly_cpu_ms": 108.507000000001,
+      "cache_limit": 49,
+      "cached_chunks": 49,
+      "draw_calls": 20,
+      "frame_p95_ms": 17.493,
+      "generation_ms": 15.827,
+      "geometry_only": true,
+      "max_cached_chunks": 49,
+      "memory_bytes": 181844082.0,
+      "nodes": 55,
+      "render_cpu_ms": 0.136999994516373,
+      "render_gpu_ms": 4.03499984741211,
+      "seed": 29,
+      "total_chunks": 114,
+      "viewport_pixels": [
+        1280,
+        720
+      ]
+    },
+    {
+      "active_chunks": 25,
+      "assembly_cpu_ms": 127.134,
+      "cache_limit": 49,
+      "cached_chunks": 49,
+      "draw_calls": 21,
+      "frame_p95_ms": 17.373,
+      "generation_ms": 15.6,
+      "geometry_only": true,
+      "max_cached_chunks": 49,
+      "memory_bytes": 181878934.0,
+      "nodes": 55,
+      "render_cpu_ms": 0.128000006079674,
+      "render_gpu_ms": 3.72300004959106,
+      "seed": 67,
+      "total_chunks": 108,
+      "viewport_pixels": [
+        1280,
+        720
+      ]
+    }
+  ]
+}

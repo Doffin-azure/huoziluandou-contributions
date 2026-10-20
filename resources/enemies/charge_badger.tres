@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_ev6cj"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_8url8"]
+
+[sub_resource type="Resource" id="Resource_a3dc0"]
+script = ExtResource("1_ev6cj")
+kind = 1
+title = "聚电"
+description = "循环行动：聚电 → 放弧 → 扑击"
+damage = 0
+block = 6
+
+[sub_resource type="Resource" id="Resource_uqlfq"]
+script = ExtResource("1_ev6cj")
+title = "放弧"
+description = "循环行动：聚电 → 放弧 → 扑击"
+damage = 10
+mechanic_action = "arc"
+
+[sub_resource type="Resource" id="Resource_n5wl8"]
+script = ExtResource("1_ev6cj")
+title = "扑击"
+description = "循环行动：聚电 → 放弧 → 扑击"
+damage = 10
+
+[resource]
+script = ExtResource("2_8url8")
+id = "charge_badger"
+name = "余电獾"
+glyph = "余"
+description = "只统计放弧前这一玩家阶段：实际储能消费减去对应这些消费的实际退款≥2，放弧前移除怪物最多6普通盾，攻击降为6；不足2则攻击10。阶段外旧消费的退款不反扣当前任务，储能正常获得不抵消消费。"
+max_hp = 48
+mechanic = "charge"
+act = 2
+moves = Array[ExtResource("1_ev6cj")]([SubResource("Resource_a3dc0"), SubResource("Resource_uqlfq"), SubResource("Resource_n5wl8")])

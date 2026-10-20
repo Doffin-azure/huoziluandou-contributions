@@ -13,13 +13,14 @@ const GLYPHS := {
 	"转": ["flow", "rotate", "swirl"], "流": ["flow", "flow", "ripple"], "速": ["flow", "accel", "dash"],
 	"急": ["flow", "next_rapid", "dash"], "再": ["flow", "repeat", "echo"], "复": ["flow", "next_copy_layer", "echo"],
 	"连": ["flow", "serial", "thread"], "放": ["flow", "next_draw_bonus", "outward"], "金": ["gold", "gold", "coins"],
-	"币": ["gold", "gold", "coins"], "资": ["gold", "temp_funds", "orbit"], "利": ["gold", "compound_equity", "rise"],
-	"投": ["gold", "equity", "rise"], "购": ["gold", "gold_to_shield", "outward"], "收": ["draw", "manual_draw", "gather"],
+	"币": ["gold", "gold", "coins"], "资": ["gold", "gold", "orbit"], "利": ["gold", "gold", "rise"],
+	"投": ["gold", "gold", "rise"], "购": ["gold", "gold_to_shield", "outward"], "收": ["draw", "manual_draw", "gather"],
 	"能": ["draw", "longword_draw", "cards"], "合": ["ability", "shared_attack", "merge"], "分": ["draw", "profit_share", "split"],
 	"加": ["draw", "next_draw_bonus", "cards"], "过": ["flow", "next_diagonal", "bridge"], "超": ["ability", "empowered", "star"],
 	"力": ["ability", "strength", "pulse"], "强": ["ability", "strong_heart", "star"], "精": ["ability", "manual_draw", "star"],
 	"化": ["ability", "next_compound", "merge"], "炼": ["clean", "cleanse", "dissolve"], "铸": ["shield", "armor_plating", "stamp"],
 	"清": ["clean", "cleanse", "wash"], "洗": ["clean", "cleanse", "wash"], "开": ["ability", "unlock", "outward"],
+	"死": ["hit", "hit", "slash"], "亡": ["ink", "vulnerable", "dust"], "月": ["flow", "unknown", "glow"],
 	"灯": ["ability", "lantern", "glow"], "停": ["flow", "ceasefire", "stop"], "息": ["electric", "energy_idle", "settle"],
 	"载": ["draw", "reload", "cards"], "灰": ["ink", "unknown", "dust"], "骨": ["shield", "armor_plating", "dust"],
 	"碍": ["shield", "no_block", "barrier"]
@@ -63,9 +64,9 @@ static func for_play(glyphs: Array, word: WordData = null, effects: Array = []) 
 			EffectData.Kind.GAIN_GOLD:
 				if profile.focus == "ability": profile.focus = "gold"
 			EffectData.Kind.TEMP_FUNDS:
-				if profile.focus == "ability": profile.focus = "temp_funds"
+				if profile.focus == "ability": profile.focus = "gold"
 			EffectData.Kind.EQUITY:
-				if profile.focus == "ability": profile.focus = "equity"
+				if profile.focus == "ability": profile.focus = "gold"
 		if effect.handler.begins_with("rotate"):
 			profile.merge(_family("flow", "rotate", "swirl"), true)
 		elif effect.handler.begins_with("gravity"):

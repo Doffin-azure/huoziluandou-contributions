@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.4.351 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+[CourtyardBounds] 月洞院门 body=[P: (1.0, -0.085, 4.8575), S: (2.0, 1.445, 0.384)] roof=[P: (0.955, 1.36, 4.82), S: (2.09, 0.17625, 0.36)]
+[CourtyardBounds] 折景照壁 body=[P: (1.13, 0.0, 3.4225), S: (1.74, 1.11, 0.6625)] roof=[P: (1.0875, 1.09, 3.42), S: (1.825, 0.20625, 0.46)]
+[CourtyardBounds] 后侧游廊 body=[P: (3.655, -0.085, 0.445), S: (2.19, 1.08625, 0.81)] roof=[P: (3.58, 0.995, 0.3425), S: (2.34, 0.24625, 1.015)]
+[CourtyardBounds] 临水息灯亭 body=[P: (6.256, 0.0, 0.514), S: (1.188, 1.386, 1.1088)] roof=[P: (6.1372, 1.0656, 0.4204), S: (1.4256, 0.297, 1.1592)]
+[CourtyardStudy] PASS=11 FAIL=0

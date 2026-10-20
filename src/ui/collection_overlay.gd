@@ -12,6 +12,9 @@ var _mode := "chars"
 var _word_grid: GridContainer
 var _scroll: ScrollContainer
 var _counts: Dictionary = {}
+var _relic_page: RelicCompendiumOverlay
+var _closing := false
+var _picked := false
 
 
 func setup(p_cfg: Dictionary) -> void:
@@ -57,9 +60,11 @@ func _build() -> void:
 	if not str(cfg.get("subtitle", "")).is_empty():
 		var st := Ink.label(str(cfg["subtitle"]), "Muted")
 		st.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		st.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		st.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		head.add_child(st)
 	head.add_child(Ink.expander())
-	var close := Ink.button("关闭")
+	var close := Ink.button(str(cfg.get("close_text", "关闭")))
 	close.theme_type_variation = "GhostButton"
 	close.custom_minimum_size = Vector2(90, 48 * JourneyStyle.touch_scale(self))
 	close.pressed.connect(_close)
@@ -70,6 +75,9 @@ func _build() -> void:
 	_add_tab("实体字", "chars")
 	if not (cfg.get("words", []) as Array).is_empty():
 		_add_tab("词", "words")
+
+	if cfg.get("show_relics", false) and not cfg.get("pick_on_click", false):
+		_add_tab("遗物", "relics")
 
 	col.add_child(Ink.hline())
 
@@ -95,6 +103,11 @@ func _build() -> void:
 	_word_grid.visible = false
 	wrap.add_child(_word_grid)
 
+	if cfg.get("show_relics", false) and not cfg.get("pick_on_click", false):
+		_relic_page = RelicCompendiumOverlay.new()
+		_relic_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		col.add_child(_relic_page)
+
 	_populate_chars()
 	_populate_words()
 	_scroll.resized.connect(_layout_columns)
@@ -111,8 +124,14 @@ func _add_tab(text: String, mode: String) -> void:
 
 func _show_tab(mode: String) -> void:
 	_mode = mode
+	_scroll.visible = mode != "relics"
+	if is_instance_valid(_relic_page):
+		_relic_page.visible = mode == "relics"
 	_grid.visible = mode == "chars"
 	_word_grid.visible = mode == "words"
+	_scroll.scroll_vertical = 0
+	for effect in find_children("*", "RichTextLabel", true, false):
+		if effect is EffectText: effect.close_help()
 	for button in _tab_bar.get_children():
 		button.theme_type_variation = "PrimaryButton" if button.get_meta("tab") == mode else "GhostButton"
 
@@ -139,11 +158,14 @@ func _populate_chars() -> void:
 
 
 func _on_dim_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		accept_event()
 		_close()
 
 
 func _on_card_clicked(ch: CharacterData) -> void:
+	if _closing or _picked: return
+	if cfg.get("pick_on_click", false): _picked = true
 	picked.emit(ch)
 	if cfg.get("pick_on_click", false):
 		_close()
@@ -174,14 +196,16 @@ func _populate_words() -> void:
 
 
 func _close() -> void:
+	if _closing: return
+	_closing = true
 	closed.emit()
 	queue_free()
 
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("cancel_selection"):
-		_close()
 		get_viewport().set_input_as_handled()
+		_close()
 
 
 func _layout_columns() -> void:

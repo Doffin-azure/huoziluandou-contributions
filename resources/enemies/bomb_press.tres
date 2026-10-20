@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_move_data.gd" id="1_r2vdr"]
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="2_d2w8w"]
+
+[sub_resource type="Resource" id="Resource_fghfq"]
+script = ExtResource("1_r2vdr")
+kind = 7
+title = "布印"
+description = "循环行动：布印 → 引爆"
+damage = 0
+mechanic_action = "bomb_mark"
+
+[sub_resource type="Resource" id="Resource_dp4kl"]
+script = ExtResource("1_r2vdr")
+title = "引爆"
+description = "循环行动：布印 → 引爆"
+damage = 8
+mechanic_action = "bomb"
+
+[resource]
+script = ExtResource("2_d2w8w")
+id = "bomb_press"
+name = "爆印机"
+glyph = "爆"
+description = "两格选在同一2×2内，提前显示；标记绑定坐标，不跟随原字。引爆只摧毁仍在标记格的非固定字：己方原实体进弃字，敌方／临时字移除；防爆生效时原实体改回字袋，每救回1枚得1持久盾。叠层按一个格位处理，但其中原实体逐枚按规则回收。"
+max_hp = 48
+mechanic = "bomb"
+act = 2
+moves = Array[ExtResource("1_r2vdr")]([SubResource("Resource_fghfq"), SubResource("Resource_dp4kl")])

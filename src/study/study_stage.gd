@@ -41,7 +41,7 @@ func _ready() -> void:
 	viewport.size = Vector2i(1280, 720)
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	viewport.msaa_3d = Viewport.MSAA_2X
-	viewport.use_taa = true
+	viewport.use_taa = RenderingServer.get_current_rendering_method() == "forward_plus"
 	viewport.positional_shadow_atlas_size = 1024
 	add_child(viewport)
 	var display := TextureRect.new()
@@ -332,7 +332,7 @@ func _build_lighting() -> void:
 	environment.ambient_light_color = Color("bcc7cb")
 	environment.ambient_light_energy = 0.45
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	environment.ssao_enabled = true
+	environment.ssao_enabled = RenderingServer.get_current_rendering_method() == "forward_plus"
 	environment.ssao_radius = 0.32
 	environment.ssao_intensity = 1.4
 	var world_environment := WorldEnvironment.new()

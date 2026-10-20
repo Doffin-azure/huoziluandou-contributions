@@ -11,35 +11,9 @@ class_name RunHarness
 ##
 ## phase 流程：map → (enter) → battle/event/shop/rest/fork → … → complete_node → map … → victory/defeat
 
-const Ev := [
-	{
-		"id": "ink_pool", "title": "墨池遗字",
-		"body": "林间有一方墨池，字迹在池底幽幽浮动。伸手可取，却要付出代价。",
-		"options": [
-			{"text": "探手取字（失去 8 生命，获得一枚字）", "primary": true},
-			{"text": "掬一捧墨（获得 18 金币）"},
-			{"text": "静观而退"},
-		],
-	},
-	{
-		"id": "broken_stele", "title": "断碑",
-		"body": "半截石碑立在荒径，碑上刻字已被岁月磨平，唯余一道深痕。",
-		"options": [
-			{"text": "拓下残字（获得一枚稀有字）", "primary": true},
-			{"text": "敲下碑角（获得 25 金币，失去 5 生命）"},
-			{"text": "绕道而行"},
-		],
-	},
-	{
-		"id": "old_bookshop", "title": "旧书肆",
-		"body": "无人看管的书肆里堆满残页，老板的位置只剩一盏将熄的灯。",
-		"options": [
-			{"text": "撕下一页（删掉字袋中一枚字）", "primary": true},
-			{"text": "诵读静心（回复 18 点气血）"},
-			{"text": "顺手牵金（获得 14 金币）"},
-		],
-	},
-]
+const EventEffects := preload("res://src/core/event_effects.gd")
+const LANTERN := preload("res://src/data/lantern_riddles.gd")
+const SHEFU := preload("res://src/data/shefu_rewards.gd")
 
 var phase := "map"
 var node: MapNodeData = null
@@ -47,9 +21,12 @@ var battle_h: BattleHarness = null
 var reward_options: Array = []
 var shop_offers: Array = []
 var event_data: Dictionary = {}
+var event_node := "start"
+var pending_event_next := ""
 var pending_glyphs: Array = []
 var pending_kind := ""
 var pending_index := -1
+var pending_event_effect: Dictionary = {}
 var seed := 1
 var log_lines: Array = []
 
@@ -59,9 +36,12 @@ func reset(cfg: Dictionary = {}) -> void:
 	reward_options.clear()
 	shop_offers.clear()
 	event_data = {}
+	event_node = "start"
+	pending_event_next = ""
 	pending_glyphs.clear()
 	pending_kind = ""
 	pending_index = -1
+	pending_event_effect.clear()
 	log_lines.clear()
 	GameState.rng.seed = seed
 	GameState.start_new_run(str(cfg.get("starter", "v03")), cfg.get("deck", []))
@@ -125,7 +105,7 @@ func _deck_cfg() -> Array:
 func _pool(min_r: int, max_r: int) -> Array:
 	var pool: Array = []
 	for c in Database.characters.values():
-		if c.is_pollution or c.pending_design or c.tags.has("enemy") or c.tags.has("彩蛋"):
+		if c.is_pollution or c.pending_design or c.tags.has("enemy") or c.tags.has("彩蛋") or c.tags.has("event"):
 			continue
 		if c.rarity >= min_r and c.rarity <= max_r:
 			pool.append(c)
@@ -161,6 +141,7 @@ func observe() -> Dictionary:
 		"hp": (battle_h.battle.player.hp if (phase == "battle" and battle_h != null) else GameState.player_hp),
 		"max_hp": GameState.player_max_hp,
 		"gold": GameState.gold, "deck_size": GameState.deck_size(),
+		"event_temp_hp": GameState.event_temp_hp,
 		"deck": GameState.glyph_counts(), "done": is_done(),
 		"log": log_lines.slice(max(0, log_lines.size() - 6)),
 	}
@@ -170,8 +151,23 @@ func observe() -> Dictionary:
 		d["reward"] = reward_options.map(func(c): return {"glyph": c.glyph, "rarity": c.rarity})
 	if phase == "shop":
 		d["shop"] = shop_offers.map(func(o): return {"kind": o.kind, "price": o.price, "glyph": (o.character.glyph if o.character != null else "")})
-	if phase == "event":
-		d["event"] = {"title": event_data.get("title", ""), "options": (event_data.get("options", []) as Array).map(func(o): return o.text)}
+	if phase in ["event", "event_choose"]:
+		var current: Dictionary = current_event()
+		var options: Array = current.get("options", [])
+		d["event"] = {
+			"id": event_data.get("id", ""),
+			"node": event_node,
+			"title": current.get("title", event_data.get("title", "")),
+			"body": current.get("body", event_data.get("body", "")),
+			"illustration": current.get("illustration", event_data.get("illustration", "")),
+			"options": options.map(func(option): return str(option.get("text", ""))),
+			"option_effects": options.map(func(option): return option.get("effects", []).duplicate(true)),
+		}
+		if phase == "event_choose":
+			d["event"]["pending_removal"] = {
+				"remaining": int(pending_event_effect.get("remaining", 0)),
+				"glyphs": pending_event_effect.get("glyphs", []).duplicate(),
+			}
 	return d
 
 
@@ -186,7 +182,7 @@ func legal_actions() -> Array:
 			var out: Array = []
 			for i in reward_options.size():
 				out.append({"type": "reward", "index": i, "glyph": reward_options[i].glyph})
-			out.append({"type": "skip", "gold": 8})
+			out.append({"type": "skip", "gold": Expedition.SKIP_GOLD})
 			return out
 		"shop":
 			var out2: Array = []
@@ -199,12 +195,15 @@ func legal_actions() -> Array:
 			var out3: Array = []
 			for g in pending_glyphs:
 				out3.append({"type": "pick", "glyph": g})
+			out3.append({"type": "cancel_pick"})
 			return out3
 		"event":
-			var opts: Array = event_data.get("options", [])
+			var opts: Array = current_event().get("options", [])
 			var out4: Array = []
 			for i in opts.size():
-				out4.append({"type": "event", "index": i, "text": opts[i].text})
+				if not EventEffects.option_available(opts[i]): continue
+				out4.append({"type": "event", "index": i, "text": opts[i].text, "primary": bool(opts[i].get("primary", false))})
+			if bool(current_event().get("allow_leave", true)): out4.append({"type": "event_leave"})
 			return out4
 		"rest":
 			return [
@@ -221,7 +220,9 @@ func legal_actions() -> Array:
 func apply(action: Dictionary) -> Dictionary:
 	var t := str(action.get("type", ""))
 	match phase:
-		"map": return _apply_enter()
+		"map":
+			if t != "enter": return {"ok": false, "reason": "此时不能执行这个动作"}
+			return _apply_enter()
 		"battle": return _apply_battle(action)
 		"reward": return _apply_reward(t, action)
 		"shop": return _apply_shop(t, action)
@@ -251,7 +252,7 @@ func _apply_enter() -> Dictionary:
 
 func _start_battle(n: MapNodeData) -> void:
 	var ids: Array = []
-	for e in n.enemies:
+	for e in n.select_enemies(seed * 997 + GameState.act_index * 100 + GameState.node_index):
 		ids.append(e.id)
 	if ids.is_empty():
 		ids = ["ink_spirit"]
@@ -278,8 +279,6 @@ func _end_battle() -> void:
 	GameState.player_hp = b.player.hp
 	if b.is_victory():
 		GameState.add_captured(b.captured_chars)
-		if b.player.equity > 0:
-			GameState.add_gold(b.player.equity)
 		GameState.settle_victory_economy()
 		_log("胜利：HP %d/%d，金 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold])
 		if node != null and node.type == MapNodeData.Type.BOSS:
@@ -328,6 +327,7 @@ func _apply_shop(t: String, action: Dictionary) -> Dictionary:
 	if GameState.gold < int(o.price):
 		return {"ok": false, "reason": "金币不足"}
 	if o.kind == "remove" or o.kind == "copy":
+		if GameState.deck_size() == 0: return {"ok": false, "reason": "字袋中没有可选择的字"}
 		GameState.spend_gold(int(o.price))
 		pending_kind = o.kind
 		pending_index = i
@@ -348,10 +348,14 @@ func _apply_shop(t: String, action: Dictionary) -> Dictionary:
 
 
 func _apply_pick(action: Dictionary) -> Dictionary:
+	if str(action.get("type", "")) == "cancel_pick": return _cancel_pick()
+	if str(action.get("type", "")) != "pick": return {"ok": false, "reason": "此时不能执行这个动作"}
 	var g := str(action.get("glyph", ""))
 	if not pending_glyphs.has(g):
 		return {"ok": false, "reason": "无效字 %s" % g}
 	var cd: CharacterData = Database.get_character_by_glyph(g)
+	if cd == null or not GameState.glyph_counts().has(g):
+		return {"ok": false, "reason": "所选字已不存在，请取消后重新选择"}
 	if phase == "shop_choose":
 		if pending_kind == "remove":
 			GameState.remove_character_id(cd.id)
@@ -365,10 +369,15 @@ func _apply_pick(action: Dictionary) -> Dictionary:
 		pending_glyphs.clear()
 		phase = "shop"
 	elif phase == "event_choose":
-		GameState.remove_character_id(cd.id)
+		var result: Dictionary = EventEffects.resume(pending_event_effect, g, GameState.rng)
+		if not result.get("ok", false): return {"ok": false, "reason": str(result.get("reason", "事件选择失败"))}
+		pending_event_effect = result.get("pending", {})
 		_log("事件删字：%s" % g)
-		pending_glyphs.clear()
-		_complete_node()
+		if pending_event_effect.is_empty():
+			pending_glyphs.clear()
+			_advance_event()
+		else:
+			pending_glyphs = pending_event_effect.get("glyphs", [])
 	elif phase == "rest_choose":
 		if pending_kind == "remove":
 			GameState.remove_character_id(cd.id)
@@ -379,6 +388,27 @@ func _apply_pick(action: Dictionary) -> Dictionary:
 		pending_kind = ""
 		pending_glyphs.clear()
 		_complete_node()
+	return {"ok": true, "phase": phase}
+
+
+func _cancel_pick() -> Dictionary:
+	match phase:
+		"event_choose":
+			# Until all targets are chosen, none of the option's effects have run.
+			pending_event_effect.clear()
+			pending_event_next = ""
+			phase = "event"
+		"shop_choose":
+			if pending_index < 0 or pending_index >= shop_offers.size():
+				return {"ok": false, "reason": "待选商品已不存在"}
+			# The service was prepaid on entry; leave its stock intact and refund once.
+			GameState.add_gold(int(shop_offers[pending_index].price))
+			phase = "shop"
+		"rest_choose": phase = "rest"
+		_: return {"ok": false, "reason": "此时没有待取消的选择"}
+	pending_glyphs.clear()
+	pending_kind = ""
+	pending_index = -1
 	return {"ok": true, "phase": phase}
 
 
@@ -395,46 +425,41 @@ func _apply_upgrade(ch: CharacterData) -> void:
 			inst.data = copy
 
 
+func current_event() -> Dictionary:
+	return EventEffects.node(event_data, event_node)
+
+
 func _start_event() -> void:
-	event_data = Ev[GameState.rng.randi_range(0, Ev.size() - 1)]
+	event_data = EventEffects.roll(GameState.act_index, GameState.rng)
+	event_data = LANTERN.fill(event_data, GameState.rng)
+	event_data = SHEFU.fill(event_data, GameState.rng)
+	event_node = "start"
+	pending_event_next = ""
+	pending_event_effect.clear()
+	pending_glyphs.clear()
 	phase = "event"
 
 
 func _apply_event(action: Dictionary) -> Dictionary:
-	var i := int(action.get("index", -1))
-	match str(event_data.get("id", "")):
-		"ink_pool":
-			if i == 0:
-				GameState.damage(8)
-				GameState.add_character(_random_char(0, 2), 1)
-				_complete_node()
-			elif i == 1:
-				GameState.add_gold(18)
-				_complete_node()
-			else:
-				_complete_node()
-		"broken_stele":
-			if i == 0:
-				GameState.add_character(_random_char(2, 4), 1)
-				_complete_node()
-			elif i == 1:
-				GameState.add_gold(25)
-				GameState.damage(5)
-				_complete_node()
-			else:
-				_complete_node()
-		"old_bookshop":
-			if i == 0:
-				pending_kind = "event_remove"
-				pending_glyphs = GameState.glyph_counts().keys()
-				phase = "event_choose"
-				return {"ok": true, "phase": phase}
-			elif i == 1:
-				GameState.heal(18)
-				_complete_node()
-			else:
-				GameState.add_gold(14)
-				_complete_node()
+	if str(action.get("type", "")) == "event_leave":
+		if not bool(current_event().get("allow_leave", true)): return {"ok": false, "reason": "这场遭遇需要作出选择"}
+		_complete_node()
+		return {"ok": true, "phase": phase}
+	if str(action.get("type", "")) != "event": return {"ok": false, "reason": "此时不能执行这个动作"}
+	var current := current_event()
+	var index := int(action.get("index", -1))
+	var options: Array = current.get("options", [])
+	if index < 0 or index >= options.size() or not EventEffects.option_available(options[index]): return {"ok": false, "reason": "无效事件选项"}
+	var option: Dictionary = options[index]
+	var result: Dictionary = EventEffects.resolve(option.get("effects", []), GameState.rng)
+	if not result.get("ok", false): return {"ok": false, "reason": str(result.get("reason", "事件结算失败"))}
+	pending_event_effect = result.get("pending", {})
+	pending_event_next = str(option.get("goto", ""))
+	if pending_event_effect.is_empty():
+		_advance_event()
+	else:
+		pending_glyphs = pending_event_effect.get("glyphs", [])
+		phase = "event_choose"
 	return {"ok": true, "phase": phase}
 
 
@@ -445,6 +470,7 @@ func _apply_rest(t: String, action: Dictionary) -> Dictionary:
 		_log("休整治疗 +%d" % _heal_amount())
 		_complete_node()
 	elif kind == "remove" or kind == "upgrade":
+		if GameState.deck_size() == 0: return {"ok": false, "reason": "字袋中没有可选择的字"}
 		pending_kind = kind
 		pending_glyphs = GameState.glyph_counts().keys()
 		phase = "rest_choose"
@@ -461,7 +487,25 @@ func _apply_fork(action: Dictionary) -> Dictionary:
 	return {"ok": true, "phase": phase}
 
 
+func _advance_event() -> void:
+	pending_event_effect.clear()
+	pending_glyphs.clear()
+	var next := pending_event_next
+	pending_event_next = ""
+	if not next.is_empty():
+		event_node = next
+		phase = "event"
+		_log("事件继续：" + str(current_event().get("title", event_data.get("title", ""))))
+	else:
+		_complete_node()
+
+
 func _complete_node() -> void:
+	pending_event_effect.clear()
+	pending_event_next = ""
+	pending_glyphs.clear()
+	event_node = "start"
+	GameState.clear_event_temp_hp()
 	GameState.complete_current_node()
 	if GameState.run_complete():
 		phase = "victory"

@@ -57,8 +57,8 @@ func _title(id: String) -> String:
 
 
 func _description(id: String) -> String:
-	if id == "persistent_block": return "临挡耗尽后抵挡伤害，跨回合保留。双边盾形表示持久盾。"
-	return "优先于持久盾抵挡伤害。" + ("敌方行动后清除。" if is_player else "")
+	if id == "persistent_block": return "临时格挡用完后继续抵挡伤害，剩余值保留到下回合。"
+	return "先于持久盾抵挡伤害。" + ("所有敌人行动后清空。" if is_player else "剩余值保留到下回合。")
 
 
 func _show_details(id: String) -> void:

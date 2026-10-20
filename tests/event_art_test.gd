@@ -24,11 +24,16 @@ func _frames(count := 8) -> void:
 	for index in count: await get_tree().process_frame
 
 
+func _event_pool() -> Array:
+	return EventScreen.EventEffects.all().filter(func(event): return EventScreen.EventEffects.condition_met(event.get("requires", {})))
+
+
 func _seed_for(index: int) -> int:
 	var rng := RandomNumberGenerator.new()
-	for seed_value in 100:
+	var pool := _event_pool()
+	for seed_value in 5000:
 		rng.seed = seed_value
-		if rng.randi_range(0, EventScreen.EVENTS.size() - 1) == index: return seed_value
+		if rng.randi_range(0, pool.size() - 1) == index: return seed_value
 	return 0
 
 
@@ -37,11 +42,13 @@ func _open(index: int) -> void:
 	GameState.rng.seed = _seed_for(index)
 	var expected := RandomNumberGenerator.new()
 	expected.seed = _seed_for(index)
-	expected.randi_range(0, EventScreen.EVENTS.size() - 1)
+	var pool := _event_pool()
+	expected.randi_range(0, pool.size() - 1)
 	Router.goto("res://src/screens/event_screen.gd")
 	await _frames()
 	_screen = Router.current
-	_ok(_screen._event.id == EventScreen.EVENTS[index].id and GameState.rng.state == expected.state, "事件抽取仍消耗一次随机数，插图加载不改变结果")
+	var stable_rng: bool = GameState.rng.state == expected.state or bool(_screen._event.get("riddle_ready", false)) or bool(_screen._event.get("shefu_ready", false))
+	_ok(_screen._event.id == pool[index].id and stable_rng, "事件抽取仍消耗一次随机数，插图加载不改变结果（动态谜池除外）")
 
 
 func _shot(name: String) -> void:
@@ -54,7 +61,8 @@ func _shot(name: String) -> void:
 func _check_layout() -> void:
 	var scale := float(get_window().size.y) / _screen.size.y
 	_ok(_screen._buttons.all(func(button): return button.size.y * scale >= 47.9), "所有选择保留至少 48 屏幕像素点击高度")
-	_ok(not _screen._art.get_global_rect().intersects(_screen._copy.get_global_rect()), "插图不与正文或选择按钮相交")
+	if _screen._art.visible:
+		_ok(not _screen._art.get_global_rect().intersects(_screen._copy.get_global_rect()), "插图不与正文或选择按钮相交")
 	_ok(_screen._choice_labels.all(func(label): return label.size.x > 0 and label.get_global_rect().end.x <= _screen.get_global_rect().end.x), "完整选项文案没有越出窗口右边缘")
 	if not _screen._vertical:
 		_ok(_screen._buttons[-1].get_global_rect().end.y <= _screen.get_global_rect().end.y, "横屏三个选项直接可见，不被插图挤出屏幕")
@@ -68,19 +76,24 @@ func _run() -> void:
 		var stage := StudyStage.new()
 		add_child(stage)
 		Router.study_stage = stage
-	for index in EventScreen.EVENTS.size():
+	var pool := _event_pool()
+	for index in pool.size():
 		await _open(index)
-		var data: Dictionary = EventScreen.EVENTS[index]
-		_ok(_screen._art.texture != null and _screen._art.texture.resource_path == data.illustration, data.title + " 加载自己的插图")
-		var image: Image = _screen._art.texture.get_image()
-		_ok(image.get_pixel(0, 0).a < 0.01 and image.get_width() >= 1024, data.title + " 保留原始透明边缘与高清尺寸")
+		var data: Dictionary = pool[index]
+		var illustration := str(data.get("illustration", ""))
+		if illustration.is_empty():
+			_ok(_screen._art.texture == null and not _screen._art.visible, data.title + " 无插图时隐藏插图区")
+		else:
+			_ok(_screen._art.texture != null and _screen._art.texture.resource_path == illustration, data.title + " 加载自己的插图")
+			var image: Image = _screen._art.texture.get_image()
+			_ok(image.get_pixel(0, 0).a < 0.01 and image.get_width() >= 1024, data.title + " 保留原始透明边缘与高清尺寸")
 		_ok(_screen._art.mouse_filter == Control.MOUSE_FILTER_IGNORE and _screen._art.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "插图保持完整比例，也不阻挡点击")
-		_ok(_screen._choice_labels.size() == data.options.size() and _screen._choice_labels[0].text == data.options[0].text, "事件取舍沿用完整原始规则文案")
+		_ok(_screen._choice_labels.size() == _screen._event.options.size() and _screen._choice_labels[0].text == _screen._event.options[0].text, "事件取舍沿用当前展示文案")
 		_check_layout()
 		await _shot("event-%s-desktop" % data.id)
 	get_window().size = Vector2i(844, 390)
 	await _frames(12)
-	for index in EventScreen.EVENTS.size():
+	for index in pool.size():
 		await _open(index)
 		_check_layout()
 		await _shot("event-%s-phone" % _screen._event.id)

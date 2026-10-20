@@ -4,6 +4,10 @@ class_name EffectHandlers
 ## 复杂实现见 EffectHandlersActions；共享工具见 EffectUtil。
 
 static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
+	return EffectRegistry.execute(handler, eff, ctx)
+
+
+static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 	var b: BattleState = ctx.get("battle")
 	if b == null:
 		return []
@@ -22,6 +26,12 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["加强：本场第 %d 次打出，获得 %d 层力量" % [b.strengthen_plays, gained]]
 		"damage":
 			return EffectUtil.damage(b, enemy, amount)
+		"self_hp_loss":
+			var lost := src.take_damage(amount) if src != null else 0
+			return ["失去 %d 生命" % lost]
+		"self_draw_penalty":
+			b.next_draw_penalty += amount
+			return ["下一次正常补字 -%d" % amount]
 		"chip_shield_damage":
 			if enemy == null:
 				return ["破：没有目标"]
@@ -40,7 +50,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["蓄：下回合开始获得 %d 储能" % amount]
 		"payment_discount_once":
 			b.enable_ability("payment_discount_once", b.ability_value("payment_discount_once") + amount)
-			return ["币：本回合下一次金币费用 -%d，最低 0（仅一次）" % amount]
+			return [BattleBalance.fixed_text("币：本回合下一次金币费用 -%d，最低 0（仅一次）", "payment_discount_once", eff) % amount]
 		"profit_if_earned":
 			if b.gold_earned_this_turn <= 0:
 				return ["利：本回合此前没有获得金币，未获利"]
@@ -48,20 +58,20 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"rest_cool":
 			b.add_heat(-amount)
 			if b.damage_dealt_this_turn <= 0:
-				var rested := 1 + b.take_solo_gain_bonus(ctx)
-				src.heal(rested)
+				var rested := BattleBalance.i("rest_heal", 1) + b.take_solo_gain_bonus(ctx)
+				b.heal_player(rested) if src == b.player else src.heal(rested)
 				return ["息：热度 -%d，本回合未造成伤害，回复 %d 生命" % [amount, rested]]
 			return ["息：热度 -%d" % amount]
 		"throw_neighbor":
 			return EffectHandlersActions._throw_neighbor(b, ctx)
 		"solo_release":
 			var release := ctx.get("word") == null and bool((ctx.get("target", {}) as Dictionary).get("release_energy", false))
-			if release and b.player.energy < 1:
+			if release and b.player.energy < BattleBalance.i("release_cost", 1):
 				return ["放：储能不足，未释放"]
 			if release:
-				b.spend_energy(1)
-			var release_damage: int = (8 if release else amount) + b.take_solo_gain_bonus(ctx)
-			return EffectUtil.damage(b, enemy, release_damage) + ["放：消耗 1 储能" if release else "放：未消耗储能"]
+				b.spend_energy(BattleBalance.i("release_cost", 1))
+			var release_damage: int = (BattleBalance.i("release_damage", 8) if release else amount) + b.take_solo_gain_bonus(ctx)
+			return EffectUtil.damage(b, enemy, release_damage) + [BattleBalance.fixed_text("放：消耗 1 储能", "solo_release", eff) if release else "放：未消耗储能"]
 		"force_once":
 			b.enable_ability("force_once", b.ability_value("force_once") + amount)
 			return ["力：下一次攻击总伤害 +%d（仅一次）" % amount]
@@ -92,13 +102,13 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["连：本回合下一次成功组词后补 %d 字（仅一次）" % amount]
 		"combine_next_word":
 			b.enable_ability("combine_word_once", b.ability_value("combine_word_once") + amount)
-			return ["合：本回合下一次成功组词后获得 2 临时格挡、1 储能（仅一次）"]
+			return [BattleBalance.fixed_text("合：本回合下一次成功组词后获得 2 临时格挡、1 储能（仅一次）", "combine_next_word", eff)]
 		"speed_next_word":
 			b.enable_ability("speed_word_once", b.ability_value("speed_word_once") + amount)
-			return ["速：本回合下一次成功组词后补 2 字、热度 +1（仅一次）"]
+			return [BattleBalance.fixed_text("速：本回合下一次成功组词后补 2 字、热度 +1（仅一次）", "speed_next_word", eff)]
 		"energy_refund_once":
 			b.enable_ability("energy_refund_once", b.ability_value("energy_refund_once") + amount)
-			return ["复：本回合下一次实际消耗储能时返还 1 点（仅一次，不超过消耗量）"]
+			return [BattleBalance.fixed_text("复：本回合下一次实际消耗储能时返还 1 点（仅一次，不超过消耗量）", "energy_refund_once", eff)]
 		"stop_cool":
 			b.add_heat(-amount)
 			b.end_turn_requested = true
@@ -149,18 +159,18 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["甲：下回合开始获得 %d 点格挡（仅一次）" % amount]
 		"guard_halve":
 			src.turn_damage_halve = true
-			return ["放心：本回合受到伤害减半（向上取整，再 -1）"]
+			return [BattleBalance.fixed_text("放心：本回合受到伤害减半（向上取整，再 -1）", "guard_halve", eff)]
 		"ability_warm_heart":
 			b.enable_ability("warm_heart", 1)
-			return ["热心：本场持续——每获得 1 热度回复 1 生命，每失去 1 热度扣 1 生命"]
+			return [BattleBalance.fixed_text("热心：本场持续——每获得 1 热度回复 1 生命，每失去 1 热度扣 1 生命", "ability_warm_heart", eff)]
 		"ability_strong_heart":
 			b.enable_ability("strong_heart", 1)
-			return ["强心：本场每回合开始回复 2 + 已触发心力层数的生命"]
+			return [BattleBalance.fixed_text("强心：本场每回合开始回复 2 + 已触发心力层数的生命", "ability_strong_heart", eff)]
 		"collect_own":
 			return EffectHandlersActions._collect_own(b, ctx)
 		"cold_heart":
 			src.turn_damage_double = true
-			src.no_block_turns = 2
+			src.no_block_turns = BattleBalance.i("cold_no_block", 2)
 			return ["冷心：本回合攻击伤害翻倍；本回合及下一回合不能获得新格挡或持久盾，已有护盾仍生效"]
 		"cleanse_status":
 			var removed: Array = []
@@ -174,12 +184,12 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["清心：清除了 %s" % ", ".join(removed)]
 		"ability_armor_plating":
 			b.enable_ability("armor_plating", 1)
-			return ["甲：每回合获得 1 点格挡，格挡被击穿则碎裂"]
+			return [BattleBalance.fixed_text("甲：每回合获得 1 点格挡，格挡被击穿则碎裂", "ability_armor_plating", eff)]
 		"ability_guard_inject":
 			b.enable_ability("guard_inject", b.ability_value("guard_inject") + amount)
 			return ["护：下次敌方塞字减少 %d 个" % amount]
 		"heal":
-			src.heal(amount)
+			b.heal_player(amount) if src == b.player else src.heal(amount)
 			return ["回复 %d 点生命" % amount]
 		"draw_random":
 			var n := b.draw_to_board(amount)
@@ -201,9 +211,6 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"gold":
 			EffectUtil.add_gold(b, amount)
 			return ["获得 %d 金币（本战累计 %d）" % [amount, b.gold_earned]]
-		"temp_funds":
-			src.temp_funds += amount
-			return ["获得 %d 临时资金（本回合有效）" % amount]
 		"energy":
 			b.add_energy(amount)
 			return ["储能 +%d（当前 %d）" % [amount, src.energy]]
@@ -231,11 +238,6 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 				GameState.permanent_damage_reduction = amount
 				return ["获得本局永久能力：从下一场战斗起，每次受到伤害减免%d" % amount]
 			return ["防御力已生效，不重复叠加"]
-		"permanent_gold_growth":
-			if GameState.gold_growth_percent <= 0:
-				GameState.gold_growth_percent = amount
-				return ["获得永久能力：每场胜利后金币 +%d%%" % amount]
-			return ["复利投资已生效"]
 
 		# --- 防反 ---
 		"ability_prevent_interference":
@@ -289,7 +291,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 				return ["连招奖励：补 %d 字" % n4]
 			return ["（此前无即时攻击，未补字）"]
 		"conditional_draw_half_hp":
-			var low: bool = src.hp * 2 < src.max_hp
+			var low: bool = src.hp * BattleBalance.i("hp_half_divisor", 2) < src.max_hp
 			var n5 := b.draw_to_board(int(eff.args.get("low", amount)) if low else int(eff.args.get("high", 1)))
 			return ["反超：%s，补 %d 字" % ["低血" if low else "常态", n5]]
 
@@ -318,11 +320,11 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"suspend_three":
 			return EffectHandlersActions._suspend_three(b, ctx)
 		"linger_chance":
-			b.enable_ability("linger_chance", 50)
-			return ["流连：本回合后续打出的每个字有 50% 概率留在原位（不叠加）"]
+			b.enable_ability("linger_chance", BattleBalance.i("linger_percent", 50))
+			return [BattleBalance.fixed_text("流连：本回合后续打出的每个字有 50% 概率留在原位（不叠加）", "linger_chance", eff)]
 		"energy_regen":
 			var gained := b.activate_energy_regen(maxi(1, amount))
-			return ["回能：本回合储能 +%d，后续 %d 回合开局各获得 2 点储能" % [gained, b.ability_value("energy_regen")]]
+			return [BattleBalance.fixed_text("回能：本回合储能 +%d，后续 %d 回合开局各获得 2 点储能", "energy_regen", eff) % [gained, b.ability_value("energy_regen")]]
 		"return_enemy":
 			return EffectHandlersActions._return_enemy(b, ctx)
 		"ability_shared_attack":
@@ -332,7 +334,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"rotate_2x2":
 			var tile := EffectUtil.tile(ctx)
 			b.rotate_2x2(tile)
-			return ["回转 2×2"]
+			return [BattleBalance.fixed_text("回转 2×2", "rotate_2x2", eff)]
 		"shift_row":
 			var row := int((ctx.get("target", {}) as Dictionary).get("row", -1))
 			var sdir := int(eff.args.get("dir", -1))
@@ -342,19 +344,19 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			var a3 := EffectUtil.tile(ctx)
 			var rdir := int(eff.args.get("dir", 1))
 			b.rotate_3x3(a3, rdir)
-			return ["3×3 区域%s旋转 90°" % ("顺时" if rdir > 0 else "逆时")]
+			return [BattleBalance.fixed_text("3×3 区域%s旋转 90°", "rotate_3x3", eff) % ("顺时" if rdir > 0 else "逆时")]
 		"swap_cells":
 			var tt: Dictionary = ctx.get("target", {})
 			b.swap_cells(tt.get("tile", Vector2i.ZERO), tt.get("tile2", Vector2i.ZERO))
 			return ["交换两格"]
 		"overcool":
 			b.clear_heat()
-			b.enable_ability("next_heat_to_block", 2)
-			return ["过冷：热量清零；下次获得的热度转为每点 +2 持久盾"]
+			b.enable_ability("next_heat_to_block", BattleBalance.i("overcool_mult", 2))
+			return [BattleBalance.fixed_text("过冷：热量清零；下次获得的热度转为每点 +2 持久盾", "overcool", eff)]
 		"rotate_repeat":
 			var rt := EffectUtil.tile(ctx)
 			b.start_repeat_rotate(rt)
-			return ["转速：旋转一次（可继续「发动」，最多 3 次）"]
+			return [BattleBalance.fixed_text("转速：旋转一次（可继续「发动」，最多 3 次）", "rotate_repeat", eff)]
 		"reshuffle_line":
 			return EffectHandlersActions._reshuffle_line(b, ctx)
 		"place_two":
@@ -362,11 +364,11 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"recover_two":
 			return EffectHandlersActions._recover_two(b, ctx)
 		"ability_longword_draw":
-			return EffectUtil.simple_ability(b, "longword_draw", "能力：本场持续——每打出 3 字及以上的词，额外补 1 字")
+			return EffectUtil.simple_ability(b, "longword_draw", BattleBalance.fixed_text("能力：本场持续——每打出 3 字及以上的词，额外补 1 字", "ability_longword_draw", eff))
 		"ability_electric_material":
-			return EffectUtil.simple_ability(b, "electric_material", "电能：本场持续——每消耗 2 储能，随机空格生成临时【电】")
+			return EffectUtil.simple_ability(b, "electric_material", BattleBalance.fixed_text("电能：本场持续——每消耗 2 储能，随机空格生成临时【电】", "ability_electric_material", eff))
 		"ability_heat_to_energy":
-			return EffectUtil.simple_ability(b, "heat_to_energy", "蓄热：本场持续——回合结束热度 -2，每点转 1 储能")
+			return EffectUtil.simple_ability(b, "heat_to_energy", BattleBalance.fixed_text("蓄热：本场持续——回合结束热度 -2，每点转 1 储能", "ability_heat_to_energy", eff))
 		"flow_speed":
 			var row := int((ctx.get("target", {}) as Dictionary).get("row", -1))
 			if row < 0 or row >= b.board.size:
@@ -375,36 +377,36 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["流速：第 %d 行本回合后续出词原地补回消耗字，增加 %d 词，剩余 %d 词" % [row + 1, amount, int(b.flow_speed_rows[row])]]
 		"fill_board_heat":
 			var placed := 0
-			while b.board.fill_count() < 12:
+			while b.board.fill_count() < BattleBalance.i("fill_board_target", 12):
 				if not b._draw_one():
 					break
 				placed += 1
 			placed = b.record_draw(placed)
 			if placed > 0:
 				b.add_heat(placed)
-			return ["火速：补至 %d 字（+%d 枚，热度 +%d）" % [12, placed, placed]]
+			return ["火速：补至 %d 字（+%d 枚，热度 +%d）" % [BattleBalance.i("fill_board_target", 12), placed, placed]]
 		"next_draw_bonus_two":
-			var nb2 := b.draw_to_board(2)
+			var nb2 := b.draw_to_board(BattleBalance.i("next_bonus_draw", 2))
 			return ["加急：立即多补 %d 字" % nb2]
 		"overheat_shield":
-			b.enable_ability("overheat_shield", 4)
-			return ["蓄冷：下次过热可抵消 4 点污染【热】"]
+			b.enable_ability("overheat_shield", BattleBalance.i("overheat_block_cap", 4))
+			return [BattleBalance.fixed_text("蓄冷：下次过热可抵消 4 点污染【热】", "overheat_shield", eff)]
 		"heat_to_persist_block":
 			var hb: int = src.heat
 			b.clear_heat()
-			src.add_persistent_block(hb * 2)
-			return ["冷热：消耗 %d 热度，获得 %d 持久盾" % [hb, hb * 2]]
+			src.add_persistent_block(hb * BattleBalance.i("heat_block_mult", 2))
+			return ["冷热：消耗 %d 热度，获得 %d 持久盾" % [hb, hb * BattleBalance.i("heat_block_mult", 2)]]
 		"energy_to_heat_block":
 			var e2: int = src.energy
 			b.spend_energy(e2)
 			b.add_heat(e2)
-			src.add_block(e2 * 3)
-			return ["电热：消耗 %d 储能，热度 +%d，临挡 +%d" % [e2, e2, e2 * 3]]
+			src.add_block(e2 * BattleBalance.i("energy_heat_block_mult", 3))
+			return ["电热：消耗 %d 储能，热度 +%d，临挡 +%d" % [e2, e2, e2 * BattleBalance.i("energy_heat_block_mult", 3)]]
 		"heat_to_energy_damage":
-			var h2: int = int(src.heat / 2)
+			var h2: int = int(src.heat / BattleBalance.i("fire_electric_divisor", 2))
 			b.clear_heat()
 			b.add_energy(h2)
-			return EffectUtil.damage(b, enemy, 5) + ["火电：热度转 %d 储能" % h2]
+			return EffectUtil.damage(b, enemy, BattleBalance.i("fire_electric_damage", 5)) + ["火电：热度转 %d 储能" % h2]
 		"refund_energy_half":
 			var half := b.refund_half_energy()
 			return ["复电：恢复 %d 储能" % half]
@@ -418,21 +420,21 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 					washed += 1
 			if washed > 0:
 				b._shuffle(b.bag)
-			b.add_heat(-2)
-			return ["流火：洗回 %d 枚【热】，热度 -2" % washed] + Relics.on_wash_heat(b, enemy)
+			b.add_heat(-BattleBalance.i("wash_heat", 2))
+			return [BattleBalance.fixed_text("流火：洗回 %d 枚【热】，热度 -2", "wash_heat", eff) % washed] + Relics.on_wash_heat(b, enemy)
 		"next_copy_layer":
-			return EffectUtil.simple_ability(b, "next_copy_layer", "超能：下一条 3+ 字词可消耗储能保留临时复制层")
+			return EffectUtil.simple_ability(b, "next_copy_layer", BattleBalance.fixed_text("超能：下一条 3+ 字词可消耗储能保留临时复制层", "next_copy_layer", eff))
 		"double_next_ability":
 			b.abilities["double_next"] = 1
 			return ["超能力：本回合下一次持续能力触发结算两遍"]
 		"gold_to_shield":
 			return EffectUtil.simple_ability(b, "gold_to_shield", "收息：本回合每次花金币发动词效，同时获得等额持久盾")
 		"inject_bounty":
-			return EffectUtil.simple_ability(b, "inject_bounty", "加收：本回合敌人每注入 1 枚污染字，获得 2 金币")
+			return EffectUtil.simple_ability(b, "inject_bounty", BattleBalance.fixed_text("加收：本回合敌人每注入 1 枚污染字，获得 2 金币", "inject_bounty", eff))
 		"instant_power":
-			return EffectUtil.simple_ability(b, "instant_power", "电力：本场持续——行列位移后可耗 1 储能额外位移一次")
+			return EffectUtil.simple_ability(b, "instant_power", BattleBalance.fixed_text("电力：本场持续——行列位移后可耗 1 储能额外位移一次", "instant_power", eff))
 		"heat_pollution_damage":
-			return EffectUtil.simple_ability(b, "heat_pollution_damage", "火热：本场持续——每枚污染【热】造成 5 伤")
+			return EffectUtil.simple_ability(b, "heat_pollution_damage", BattleBalance.fixed_text("火热：本场持续——每枚污染【热】造成 5 伤", "heat_pollution_damage", eff))
 		"recover_to_bag":
 			return EffectHandlersActions._recover_to_bag(b, ctx)
 		"move_cell":
@@ -464,11 +466,11 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"heart_link":
 			if enemy == null:
 				return ["（无目标）"]
-			var avg_max := int((src.max_hp + enemy.max_hp) / 2)
+			var avg_max := int((src.max_hp + enemy.max_hp) / BattleBalance.i("heart_average_divisor", 2))
 			src.max_hp = avg_max
 			enemy.max_hp = avg_max
 			GameState.player_max_hp = avg_max
-			var avg_hp := int((src.hp + enemy.hp) / 2)
+			var avg_hp := int((src.hp + enemy.hp) / BattleBalance.i("heart_average_divisor", 2))
 			src.hp = avg_hp
 			enemy.hp = avg_hp
 			GameState.player_hp = avg_hp
@@ -491,19 +493,19 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return EffectHandlersActions._move_neighbor(b, ctx)
 		"ability_flow":
 			b.enable_ability("flow", amount)
-			return ["流转：本回合每 2 种不同多字词补 %d 字" % amount]
+			return [BattleBalance.fixed_text("流转：本回合每 2 种不同多字词补 %d 字", "ability_flow", eff) % amount]
 		"ability_compound_next":
 			b.enable_ability("next_compound", amount)
-			return ["复合：下一次 3 字及以上的词保留一枚临时复制"]
+			return [BattleBalance.fixed_text("复合：下一次 3 字及以上的词保留一枚临时复制", "ability_compound_next", eff)]
 
 		# --- 蓄放 ---
 		"ability_energy_idle":
 			b.enable_ability("energy_idle", amount)
-			b.add_energy(1)
-			return ["蓄能：立即储能 +1；本场回合结束若有可用多字词，储能 +%d" % amount]
+			b.add_energy(BattleBalance.i("immediate_idle_energy", 1))
+			return [BattleBalance.fixed_text("蓄能：立即储能 +1；本场回合结束若有可用多字词，储能 +%d", "ability_energy_idle", eff) % amount]
 		"energy_around_tail":
 			var tail_n: int = int(ctx.get("tail_neighbors_own", 0))
-			var total: int = amount + tail_n
+			var total: int = amount + BattleBalance.i("tail_energy_mult", 1) * tail_n
 			b.add_energy(total)
 			return ["蓄电：储能 +%d（基础 %d + 词尾周围 %d）" % [total, amount, tail_n]]
 		"energy_discharge":
@@ -534,7 +536,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["过热：本场每回合首次溢热后，下一次多字词额外补 %d 字" % amount]
 		"ability_accel":
 			b.enable_ability("accel", amount)
-			return ["加速：本回合每次多字词补 1 字并升温 1"]
+			return [BattleBalance.fixed_text("加速：本回合每次多字词补 1 字并升温 1", "ability_accel", eff)]
 		"ability_rapid_next":
 			b.enable_ability("next_rapid", amount)
 			b.enable_ability("next_rapid_heat", int(eff.args.get("heat", 0)))
@@ -576,7 +578,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			var maxg: int = int(eff.args.get("max", 3))
 			var pay: int = min(EffectUtil.available(b), maxg)
 			EffectUtil.pay(b, pay)
-			return EffectUtil.damage(b, enemy, amount * pay) + ["投币：支付 %d（临时资金优先）" % pay]
+			return EffectUtil.damage(b, enemy, amount * pay) + ["投币：支付 %d金币" % pay]
 		"capture_glyph":
 			return EffectHandlersActions._capture_glyph(b, ctx, amount)
 		"reveal_place":
@@ -598,9 +600,11 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"refine_layer":
 			return EffectHandlersActions._refine_layer(b, ctx)
 		"gild_glyph":
-			return EffectHandlersActions._gild_glyph(b, ctx)
+			return EffectHandlersActions._gild_glyph(b, ctx, eff)
 		"pin_glyph":
 			return EffectHandlersActions._pin_glyph(b, ctx)
+		"anchor_self":
+			return EffectHandlersActions._anchor_self(b, ctx)
 		"precision_place":
 			return EffectHandlersActions._precision_place(b, ctx, eff)
 		"split_mind":
@@ -612,6 +616,19 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["停电了……（拖动连出「开灯」恢复）"]
 		"lights_on":
 			return ["来电了。"]
+		"moon_pull":
+			var at: Vector2i = (ctx.get("path", []) as Array)[0] if not (ctx.get("path", []) as Array).is_empty() else Vector2i.ZERO
+			var pulled := b.converge_to(at)
+			return ["月：%d 枚字向【月】原位聚拢" % pulled]
+		"death_word":
+			src.hp = 0
+			return ["死亡。"]
+		"anti_death":
+			if GameState.relic_counters.get("anti_death_granted", false):
+				return ["反死亡：这一局已经拿过复活机会"]
+			GameState.relic_counters["anti_death_granted"] = true
+			GameState.revive_charges += 1
+			return ["反死亡：本局获得一次满血复活"]
 		"charge_overheat":
 			return EffectHandlersActions._charge_overheat(b, eff)
 		"recast_board":
@@ -635,7 +652,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 		"blastproof":
 			return EffectUtil.simple_ability(b, "blastproof", "防爆：本场被摧毁的己方字改为回字袋并获得持久盾")
 		"joint_funding":
-			return EffectUtil.simple_ability(b, "joint_funding", "合资：本场支付金币时可用 2 储能抵 1 金币（可混合）")
+			return EffectUtil.simple_ability(b, "joint_funding", BattleBalance.fixed_text("合资：本场支付金币时可用 2 储能抵 1 金币（可混合）", "joint_funding", eff))
 		"profit_share":
 			return EffectUtil.simple_ability(b, "profit_share", "分利：本回合每当实际获得金币，同时获得等量储能")
 		"suspend":
@@ -672,38 +689,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			b.enable_ability("gravity_always", 1)
 			return ["重力：本战每次有效出字后自动全盘下落"]
 
-		# ---- 经济 / 股权 ----
-		"invest_equity":
-			if EffectUtil.available(b) < EffectUtil.discounted_cost(b, amount):
-				return ["投资：支付额不足（需 %d）" % amount]
-			EffectUtil.pay(b, amount)
-			var eq: int = amount
-			if b.has_ability("compound_equity") and not b.has_ability("_compound_claimed"):
-				eq += b.ability_value("compound_equity", 1) * b.passive_multiplier("复利")
-				b.enable_ability("_compound_claimed")
-			src.equity += eq
-			return ["投资：锁定 %d 金币为 %d 股权（当前 %d）" % [amount, eq, src.equity]]
-		"compound_equity":
-			b.enable_ability("compound_equity", amount)
-			return ["复利：本场每回合首次投资额外 +1 股权"]
-		"equity_interest":
-			if src.equity < 2:
-				return ["利息：需持有至少 2 股权（当前 %d）" % src.equity]
-			src.equity -= 1
-			EffectUtil.add_gold(b, 2)
-			var nint := b.draw_to_board(1)
-			return ["利息：消耗 1 股权，+2 金币，补 %d 字" % nint]
-		"alchemy":
-			var spent_eq: int = src.equity
-			src.equity = 0
-			EffectUtil.add_gold(b, spent_eq * int(eff.args.get("per", 3)))
-			var nalc := b.draw_to_board(spent_eq)
-			return ["炼金：消耗 %d 股权，+%d 金币，补 %d 字" % [spent_eq, spent_eq * int(eff.args.get("per", 3)), nalc]]
-		"pure_gold":
-			var tf: int = src.temp_funds
-			src.temp_funds = 0
-			EffectUtil.add_gold(b, tf)
-			return ["纯金：临时资金 %d 转为正式金币" % tf]
+		# ---- 普通金币 ----
 		"alloy":
 			src.add_persistent_block(amount)
 			EffectUtil.add_gold(b, int(eff.args.get("gold", 2)))
@@ -720,13 +706,6 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 					b.board.set_xy(pos_m, inst_m)
 					b.temp_chars.append(inst_m)
 			return ["铸币：+%d 金币并生成临时【币】" % amount]
-		"reinvest":
-			var lock: int = min(GameState.gold, int(eff.args.get("max", 6)))
-			if lock <= 0:
-				return ["再投资：没有可锁定的金币"]
-			GameState.add_gold(-lock)
-			GameState.lock_reinvestment(lock)
-			return ["再投资：锁定 %d 金币，下战胜利返还 %d" % [lock, lock * 2]]
 		"bounty":
 			var bcost: int = int(eff.args.get("cost", 5))
 			if not EffectUtil.pay(b, bcost):
@@ -745,10 +724,10 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["停火：本回合未造成敌伤则免疫敌方攻击"]
 		"ignite":
 			if enemy != null:
-				var burn_dmg: int = amount + src.heat
-				enemy.statuses["burn"] = 2
+				var burn_dmg: int = amount + BattleBalance.i("burn_heat_mult", 1) * src.heat
+				enemy.statuses["burn"] = BattleBalance.i("burn_actions", 2)
 				enemy.status_data["burn_damage"] = burn_dmg
-				return ["放火：敌方灼烧 2 次，每次 %d 伤" % burn_dmg]
+				return [BattleBalance.fixed_text("放火：敌方灼烧 2 次，每次 %d 伤", "ignite", eff) % burn_dmg]
 			return []
 
 		# ---- 连携 P3 ----
@@ -762,7 +741,7 @@ static func run(handler: String, eff: EffectData, ctx: Dictionary) -> Array:
 			return ["合力：获得 %d 临挡与 %d 储能" % [amount, int(eff.args.get("energy", 2))]]
 		"serial":
 			b.enable_ability("serial", int(eff.args.get("bonus", 6)))
-			return ["连载：本场每累计 3 次有效出词，下一次攻击每段 +6，待兑现奖励可叠加并跨回合保留"]
+			return [BattleBalance.fixed_text("连载：本场每累计 3 次有效出词，下一次攻击每段 +6，待兑现奖励可叠加并跨回合保留", "serial", eff)]
 		"repeat_zero":
 			b.enable_ability("repeat_zero", 1)
 			return ["反复：本回合下一次出词后，将整词的临时字复制分别放入随机空格"]

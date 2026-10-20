@@ -15,7 +15,7 @@ const ABILITY_NAMES := {
 	"heat_overload_bonus": "过热待触发",
 	"next_double_draw": "超速", "next_overfire": "过火", "electric_overload": "电流过载",
 	"fireproof": "防火", "blastproof": "防爆", "joint_funding": "合资", "profit_share": "分利",
-	"next_energy_bonus": "蓄力", "gravity_always": "重力", "compound_equity": "复利",
+	"next_energy_bonus": "蓄力", "gravity_always": "重力",
 	"ceasefire": "停火", "serial": "连载", "repeat_zero": "反复", "split_mind": "精分",
 	"vigor": "精力", "vigor_next": "精力待补", "auto_refill": "充电过热", "repeat": "重复",
 	"next_serial_bonus": "连载待发", "next_draw_bonus": "额外补字",
@@ -31,7 +31,7 @@ const LAYERED_ABILITIES := ["guard_inject", "counter", "next_energy_bonus", "nex
 const ABILITY_PARAMETERS := ["next_rapid_heat", "next_overfire_per", "heat_overload_bonus_armed"]
 
 static func entry(id: String, name: String, glyph: String, stacks: int, description: String, color: Color, kind := 0, unit_label := "层") -> Dictionary:
-	return {"id": id, "name": name, "glyph": glyph, "stacks": stacks, "description": description, "color": color, "kind": kind, "unit": unit_label}
+	return {"id": id, "name": name, "glyph": glyph, "stacks": stacks, "description": BattleText.clean(description), "color": color, "kind": kind, "unit": unit_label}
 
 static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 	var result: Array = []
@@ -48,15 +48,17 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 			continue
 		var data := Database.get_status(str(id))
 		if data != null:
-			var description := data.description
-			if id == "burn":
-				description = "该敌人接下来%d次行动后，各受到%d点灼烧伤害。" % [stacks, int(unit.status_data.get("burn_damage", 3))]
+			var description := EffectGlossary.status_description(str(id))
+			if id == "vulnerable":
+				description = EffectGlossary.vulnerable_damage_text()
+			elif id == "burn":
+				description = "该敌人接下来%d次行动后，各受到%d点灼烧伤害。" % [stacks, int(unit.status_data.get("burn_damage", BattleBalance.i("burn_default_damage", 3)))]
 			elif id == "heart_corrosion":
-				description = "该敌人每次行动后受到%d点非攻击伤害，可被护盾吸收；层数不衰减。" % stacks
-			if data.decay_per_turn > 0 and unit.is_player:
+				description = "该敌人每次行动后受到%d点非攻击伤害，可被护盾吸收；层数不衰减。" % (stacks * BattleBalance.i("corrosion_per_stack", 1))
+			if data.decay_per_turn > 0 and (id == "vulnerable" or (unit.is_player and id in ["poison", "regen"])):
 				description += "\n每回合衰减 %d 层。" % data.decay_per_turn
-			elif id == "vulnerable" and not unit.is_player:
-				description += "\n本场保留，不按回合衰减。"
+			elif id == "vulnerable":
+				description += "\n不按回合衰减。"
 			result.append(entry(str(id), data.name, data.glyph, stacks, description, data.color, data.kind))
 		else:
 			result.append(entry(str(id), str(id), "状", stacks, "未配置状态说明。", Palette.GOLD))
@@ -74,16 +76,16 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 		if unit.turn_strength > 0:
 			result.append(entry("turn_strength", "强", "强", unit.turn_strength, "本回合攻击每段伤害+%d，下回合开始清除。" % unit.turn_strength, Palette.GOLD))
 		if unit.turn_damage_halve:
-			result.append(entry("guard_halve", "放心", "心", 1, "本回合先用护盾吸收，剩余要扣生命的伤害减半向上取整，再减1，最低0。", Palette.BLOCK))
+			result.append(entry("guard_halve", "放心", "心", 1, "本回合先用护盾吸收，剩余要扣生命的伤害除以%s并向上取整，再减%d，最低0。" % [BattleBalance.f("guard_divisor", 2.0), BattleBalance.i("guard_flat", 1)], Palette.BLOCK))
 		if unit.turn_damage_double:
-			result.append(entry("turn_damage_double", "冷心", "冷", 1, "本回合攻击伤害翻倍。", Palette.GOLD))
+			result.append(entry("turn_damage_double", "冷心", "冷", 1, "本回合攻击的基础伤害、力量与热力加成乘%d。" % BattleBalance.i("cold_attack_mult", 2), Palette.GOLD))
 		if unit.no_block_turns > 0:
 			result.append(entry("no_block", "无法获得防御", "禁", unit.no_block_turns, "含本回合，剩余%d回合不能获得新格挡或持久盾；已有护盾仍可吸收伤害。" % unit.no_block_turns, Palette.PLUM, StatusData.Kind.DEBUFF))
 		var has_heart_ability := battle != null and battle.has_ability("heart_power")
 		if unit.heart_power > 0 or has_heart_ability:
 			var description := "每层可抵挡一次致命伤害。"
 			if has_heart_ability:
-				description += "\n本场每打出一颗【心】，获得一层。"
+				description += "\n本场每打出一颗【心】，获得%d层。" % BattleBalance.i("heart_per_use", 1)
 			result.append(entry("heart_layers", "心力", "心", unit.heart_power, description, Palette.VERMILION))
 		if battle != null:
 			for id in battle.abilities:
@@ -95,49 +97,49 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 				var character := Database.get_character_by_glyph(name) if name.length() == 1 else null
 				var description := word.describe() if word != null else (character.description if character != null else "持续能力已生效。")
 				if id == "armor_plating":
-					description = "每回合获得 1 点格挡；格挡被击穿时碎裂。"
+					description = "每回合获得 %d 点格挡；格挡被击穿时碎裂。" % BattleBalance.i("armor_turn_block", 1)
 				elif id == "guard_inject":
 					description = "下次敌方塞字减少 %d 个。" % value
 				elif id == "counter":
-					description = "已预留%d层反击；本回合所有敌人行动后，以剩余临时格挡+%d反击首个存活敌人一次。" % [value, value * 3]
+					description = "反击%d层。敌人全部行动后，攻击首个存活敌人一次，伤害=剩余临时格挡+%d。" % [value, value * BattleBalance.i("counter_per_stack", 3)]
 				elif id == "next_energy_bonus" or id == "next_serial_bonus":
-					description = "下一次攻击每段额外造成 %d 伤害，跨回合保留至兑现。" % value
+					description = "下一次攻击每段伤害+%d，可跨回合保留。" % value
 				elif id == "next_draw_bonus":
-					description = "本回合下一次多字词消耗材料后、结算词效前额外补%d字；回合结束到期。" % value
+					description = "本回合下一个词用掉字后，先补%d字再发动词效。" % value
 				elif id == "vigor_next":
-					description = "下回合基础补字额外+%d，在开局补字时兑现一次。" % value
+					description = "下回合开始时多补%d字。" % value
 				elif id == "energy_regen":
-					description = "后续 %d 回合开局各获得 2 点储能。重复施放刷新持续时间，同回合不重复发放。" % value
+					description = "之后%d回合开始时，各获得%d储能。同回合不重复发放。" % [value, BattleBalance.i("energy_regen", 2)]
 				elif id == "retaliate_once":
-					description = "本回合下一次受到敌方攻击后，向该攻击者反击 %d 伤（整次行动结束后，仅一次）。完全格挡也触发，污染掉血不触发。" % value
+					description = "本回合下次受敌人攻击后，对攻击者造成%d伤害。多段攻击只生效一次，被护盾全挡也生效。" % value
 				elif id == "energy_next_turn":
 					description = "下回合开始获得 %d 储能，仅一次。" % value
 				elif id == "payment_discount_once":
-					description = "本回合下一次字或词的金币费用 -%d，最低 0。支付成功后清除，免费或失败的支付不消耗。" % value
+					description = "本回合下次打出时金币费用-%d，最低0。付费成功后失效，免费或失败不消耗。" % value
 				elif id == "combine_word_once":
-					description = "本回合下一次成功组词后获得 %d 临时格挡、%d 储能；仅一次。" % [2 * value, value]
+					description = "本回合下一次成功组词后获得 %d 临时格挡、%d 储能；仅一次。" % [BattleBalance.i("combine_block", 2) * value, BattleBalance.i("combine_energy", 1) * value]
 				elif id == "speed_word_once":
-					description = "本回合下一次成功组词后补 %d 字、热度 +%d；仅一次。" % [2 * value, value]
+					description = "本回合下一次成功组词后补 %d 字、热度 +%d；仅一次。" % [BattleBalance.i("speed_draw", 2) * value, BattleBalance.i("speed_heat", 1) * value]
 				elif id == "energy_refund_once":
-					description = "本回合下一次实际消耗储能时返还最多 %d 点，不超过实际消耗；仅一次。" % value
+					description = "本回合下次消耗储能时，返还至多%d点，不超过消耗量。" % value
 				elif id == "solo_gain_once":
-					description = "本回合下一次单字的首项直接伤害、临时格挡、治疗或储能收益 +%d，仅一次；不增加费用、热度或持续标记。" % value
+					description = "本回合下一枚单打字的首项伤害、格挡、治疗或储能+%d，不增加费用或热度。" % value
 				elif id == "next_gap":
-					description = "本回合下一次成功组词，可横向或纵向跨过一个空格，最多一次；不能跨过有字的格子。"
+					description = "本回合下一个词可跨过1个横向或竖向空格，不能跨过有字的格子。"
 				elif id == "next_overfire":
 					description = "本回合下一次攻击按攻击时热度 × %d 追加伤害，仅整次追加一次。当前%d热度，对应追加%d伤害。" % [battle.ability_value("next_overfire_per", 3), unit.heat, unit.heat * battle.ability_value("next_overfire_per", 3)]
 				elif id == "next_rapid":
-					description = "本回合下一次多字词消耗材料后、结算词效前补至多%d字，优先急速原格；升温 %d。" % [value, battle.ability_value("next_rapid_heat")]
+					description = "本回合下一个词先补%d字再发动词效，热度+%d。" % [value, battle.ability_value("next_rapid_heat")]
 				elif id == "next_double_draw":
-					description = "本回合下一次补字最多额外补%d字，每额外1字升温1；触发后消耗。" % value
+					description = "本回合下一次补字最多额外补%d字，每额外1字升温%d；触发后消耗。" % [value, BattleBalance.i("double_draw_heat", 1)]
 				elif id == "heat_overload_bonus":
 					description = "本回合首次实际新增溢热污染后，下一次多字词额外补%d字。" % value
 				elif id == "strong_heart":
-					description = "本场心力已挡下%d次致命伤。每回合开始回复%d生命。" % [unit.heart_power_triggered, 2 + unit.heart_power_triggered]
+					description = "心力已挡下%d次致命伤；每回合开始回复%d生命。" % [unit.heart_power_triggered, BattleBalance.i("strong_heart_base", 2) + BattleBalance.i("heart_trigger_heal", 1) * unit.heart_power_triggered]
 				elif id == "serial":
-					description += "\n已累计%d次词，距离下次奖励还需%d次。" % [battle.serial_words, 3 - battle.serial_words % 3]
+					description += "\n已打出%d词，还需%d词获得奖励。" % [battle.serial_words, BattleBalance.i("serial_interval", 3) - battle.serial_words % BattleBalance.i("serial_interval", 3)]
 				elif id == "repeat":
-					description += "\n" + ("本回合首次重演机会可用。" if battle.repeat_armed else "本回合无可用重演机会，下回合恢复。")
+					description += "\n" + ("本回合重演可用。" if battle.repeat_armed else "本回合已用，下回合恢复。")
 				var layers := maxi(1, value) if id in LAYERED_ABILITIES else 1
 				var label_unit := "层"
 				if id in ["vigor_next", "next_draw_bonus", "next_double_draw", "next_rapid"]:
@@ -148,10 +150,10 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 				result.append(entry("temporary_heat_capacity", "载", "载", battle.temporary_heat_capacity, "本回合热容额外 +%d，下回合开始撤销；热度保持不变。" % battle.temporary_heat_capacity, Palette.GOLD))
 			if not battle.reconnect_pending.is_empty():
 				var glyphs: Array = battle.reconnect_pending.map(func(item): return "".join(item.inst.glyph_list()))
-				result.append(entry("reconnect_pending", "重连待回", "连", battle.reconnect_pending.size(), "暂时移出：【%s】。下回合原格优先返回；原格被占找空位，满盘等待空位。" % "、".join(glyphs), Palette.GOLD))
+				result.append(entry("reconnect_pending", "重连待回", "连", battle.reconnect_pending.size(), "【%s】下回合返回原位，被占则找空格，满盘时继续等待。" % "、".join(glyphs), Palette.GOLD))
 			for row in battle.flow_speed_rows:
 				var remaining := int(battle.flow_speed_rows[row])
-				result.append(entry("flow_speed:%d" % int(row), "流速·第 %d 行" % (int(row) + 1), "流", remaining, "本回合该行出词消耗的字原地补回；剩余 %d 词。重复施放每次增加 2 词，同名词再次出词也能触发。" % remaining, Palette.GOLD))
+				result.append(entry("flow_speed:%d" % int(row), "流速·第 %d 行" % (int(row) + 1), "流", remaining, "本回合此行组词后原位补字，还可生效%d次。" % remaining, Palette.GOLD))
 			if battle.base_draw_penalty > 0:
 				result.append(entry("reload", "重载", "载", 1, "本场热容 %d；每回合基础补字减少 %d。" % [unit.heat_capacity, battle.base_draw_penalty], Palette.GOLD))
 			if battle.next_draw_penalty > 0:

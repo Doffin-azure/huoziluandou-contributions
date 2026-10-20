@@ -115,18 +115,20 @@ static func take_revealed(b: BattleState, uid: int) -> CharInstance:
 
 ## 敌人注入：owner=ENEMY，带污染，可被玩家组词但打出要付代价；消耗后消失。
 
-static func inject_enemy_glyphs(b: BattleState, count: int, pollution_id: String) -> int:
+static func inject_enemy_glyphs(b: BattleState, count: int, pollution_id: String, fixed_glyph := "", source_id := -1) -> int:
 	var pool := ["蚀", "障", "灰", "碍", "秽"]
 	var added := 0
 	for i in count:
 		if b.board.free_count() <= 0:
 			break
-		var glyph: String = pool[b.rng.randi_range(0, pool.size() - 1)]
+		var glyph: String = fixed_glyph if not fixed_glyph.is_empty() else pool[b.rng.randi_range(0, pool.size() - 1)]
 		var cd: CharacterData = Database.get_character_by_glyph(glyph)
 		if cd == null:
 			continue
 		var ci := CharInstance.new(cd)
 		ci.owner = CharInstance.Owner.ENEMY
+		ci.statuses.injected_by = source_id
+		ci.statuses.injected_turn = b.turn
 		if not pollution_id.is_empty():
 			ci.add_pollution(pollution_id)
 		var empties := b.board.empty_indices()
@@ -209,7 +211,7 @@ static func apply_gravity(b: BattleState) -> void:
 				b.board.set_cell(x, y, null)
 
 
-## 向上重力：每列向上压缩（仓鼠轮用）；固定的字不动。
+## 向上重力：每列向上压缩（转轮架用）；固定的字不动。
 static func apply_gravity_up(b: BattleState) -> void:
 	for x in b.board.size:
 		var column: Array = []
@@ -363,7 +365,7 @@ static func destroy_2x2(b: BattleState, top_left: Vector2i) -> int:
 		if inst.is_player_owned() and not inst.temporary:
 			if b.has_ability("blastproof"):
 				b.bag.append(inst)
-				b.player.add_persistent_block(1)
+				b.player.add_persistent_block(BattleBalance.i("blastproof_block", 1))
 				b._log("防爆：救回【%s】回字袋，持久盾 +1" % inst.glyph())
 			else:
 				b.discard.append(inst)
@@ -384,7 +386,7 @@ static func clear_board(b: BattleState) -> int:
 		if inst.is_player_owned() and not inst.temporary:
 			if b.has_ability("blastproof"):
 				b.bag.append(inst)
-				b.player.add_persistent_block(1)
+				b.player.add_persistent_block(BattleBalance.i("blastproof_block", 1))
 				b._log("防爆：救回【%s】回字袋，持久盾 +1" % inst.glyph())
 			else:
 				b.discard.append(inst)
@@ -575,7 +577,7 @@ static func refine_pair(b: BattleState, p1: Vector2i, p2: Vector2i) -> Dictionar
 	if c1.glyph_list() != c2.glyph_list() or c1.temporary or c2.temporary:
 		return {"ok": false, "msg": "精炼：两个字必须相同"}
 	c1.refined = true
-	c1.temporary_uses = maxi(c1.temporary_uses, 2)
+	c1.temporary_uses = maxi(c1.temporary_uses, BattleBalance.i("refined_layers", 2))
 	if c2.temporary_uses < 0:
 		c2.temporary_uses = 0
 	b.board.clear_xy(p2)

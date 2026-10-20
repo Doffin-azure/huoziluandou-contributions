@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://src/data/character_data.gd" id="1_chu"]
+[ext_resource type="Script" path="res://src/data/effect_data.gd" id="2_chu"]
+
+[sub_resource type="Resource" id="Resource_chu_anchor"]
+script = ExtResource("2_chu")
+kind = 29
+handler = "anchor_self"
+target = 7
+pre_consume = true
+note = "选择任意空格安放；固定本场，不受重力/位移影响；每回合可使用一次。"
+
+[resource]
+script = ExtResource("1_chu")
+id = "chu"
+glyph = "础"
+pinyin = "chu"
+description = "打出后可选择任意空格安放。固定本场，不受重力/位移影响；每回合可使用一次。"
+tags = Array[String](["event", "space"])
+solo_effects = Array[ExtResource("2_chu")]([SubResource("Resource_chu_anchor")])
+solo_handler = "anchor_self"
+rarity = 3

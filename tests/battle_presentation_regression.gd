@@ -48,8 +48,6 @@ func _fresh(word: String) -> void:
 	battle.player.heat = 0
 	battle.player.energy = 0
 	battle.player.heat_capacity = 10
-	battle.player.temp_funds = 0
-	battle.player.equity = 0
 	battle.bag.clear()
 	battle.discard.clear()
 	for index in 16:
@@ -389,18 +387,14 @@ func _run() -> void:
 		_ok(close_height >= 47.5 and _screen._modal_count == 1, "手机单项能力详情有 48 像素关闭区域，并保持输入锁")
 		await _shot("battle-symbol-detail-phone")
 		await _choose_card()
-		battle.player.temp_funds = 456
-		battle.player.equity = 78
 		GameState.gold = 1234
 		battle.player.block = 128
 		battle.player.persistent_block = 256
 		_screen._refresh_all()
 		await _frames()
-		_ok(not _screen._gold_strip.get_global_rect().intersects(_screen._player_status.get_global_rect()) and not _screen._gold_strip.get_global_rect().intersects(_screen._turn_label.get_global_rect()), "手机同时显示金币、资金和股权，不与回合或状态挤在一起")
+		_ok(not _screen._gold_strip.get_global_rect().intersects(_screen._player_status.get_global_rect()) and not _screen._gold_strip.get_global_rect().intersects(_screen._turn_label.get_global_rect()), "手机只显示普通金币，不与回合或状态挤在一起")
 		_ok(not _screen._player_hp_value.get_global_rect().intersects(_screen._player_status.get_global_rect()), "三位数护盾不覆盖手机气血数值")
 		await _shot("battle-symbol-hud-phone-resources")
-		battle.player.temp_funds = 0
-		battle.player.equity = 0
 		battle.player.block = 0
 		battle.player.persistent_block = 0
 		GameState.gold = 6

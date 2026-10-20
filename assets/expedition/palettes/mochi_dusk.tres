@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ExpeditionFlatPalette" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/map/expedition_flat_palette.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+background = Color(0.1255, 0.2118, 0.2471, 1)
+ink = Color(0.0667, 0.1176, 0.1412, 1)
+stone_top = Color(0.4667, 0.4784, 0.4353, 1)
+stone_front = Color(0.2863, 0.3294, 0.3176, 1)
+stone_side = Color(0.2039, 0.2667, 0.2784, 1)
+bronze = Color(0.5686, 0.4863, 0.3451, 1)
+seal = Color(0.6471, 0.2471, 0.2353, 1)
+glyph_fill = Color(0.7608, 0.7294, 0.6118, 1)
+glyph_recess = Color(0.2157, 0.2667, 0.2510, 1)
+glyph_edge = Color(0.5490, 0.5608, 0.4902, 1)
+water = Color(0.1137, 0.2549, 0.2863, 1)
+architecture_top = Color(0.3176, 0.4118, 0.4235, 1)
+architecture_front = Color(0.1882, 0.2980, 0.3294, 1)
+architecture_side = Color(0.1333, 0.2235, 0.2667, 1)
+roof = Color(0.1333, 0.2392, 0.2824, 1)
+distant = Color(0.2275, 0.3647, 0.3922, 1)
+mist = Color(0.3412, 0.4784, 0.4863, 1)
+outline_pixels = 1.5

@@ -86,7 +86,7 @@ func _run() -> void:
 	shop._purchase_selected()
 	_ok(shop._busy and GameState.gold == gold, "purchase waits for the pickup and rejects duplicate presses")
 	await get_tree().create_timer(0.4).timeout
-	_ok(GameState.gold == gold - price and GameState.deck_size() == before + 1 and shop._offers.size() == 5, "purchase charges the exact original price once")
+	_ok(GameState.gold == gold - price and GameState.deck_size() == before + 1 and shop._offers.size() == 6, "purchase charges the exact original price once")
 	_ok(shop._showcase.stage.rests[0] == second_rest and shop._offers[0].display_slot == 1, "remaining goods retain their counter positions")
 	Settings.reduced_motion = true
 	Settings.changed.emit()

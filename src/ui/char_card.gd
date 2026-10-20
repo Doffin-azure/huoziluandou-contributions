@@ -8,7 +8,7 @@ var character: CharacterData
 var compact := false
 var selected := false
 var _glyph: Label
-var _desc: Label
+var _desc: EffectText
 var _title: Label
 var _tags: Label
 var _rank: Label
@@ -51,11 +51,11 @@ func _ready() -> void:
 	_rank = JourneyStyle.label("", "Muted", JourneyStyle.GOLD)
 	_rank.add_theme_font_size_override("font_size", 11)
 	row.add_child(_rank)
-	_desc = JourneyStyle.label("")
+	_desc = EffectText.new()
 	_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_desc.add_theme_font_size_override("font_size", int(17 * JourneyStyle.touch_scale(self)))
+	_desc.add_theme_font_size_override("normal_font_size", int(17 * JourneyStyle.touch_scale(self)))
 	_desc.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_desc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_desc.mouse_filter = Control.MOUSE_FILTER_PASS
 	col.add_child(_desc)
 	_tags = JourneyStyle.label("", "Muted", JourneyStyle.GOLD)
 	_tags.add_theme_font_size_override("font_size", int(14 * JourneyStyle.touch_scale(self)))
@@ -74,7 +74,7 @@ func _apply() -> void:
 	if character == null: return
 	_glyph.text = character.glyph
 	_title.text = character.pinyin if not character.pinyin.is_empty() else character.glyph
-	_desc.text = character.description
+	_desc.set_effect_text(character.description)
 	_rank.text = "◆".repeat(clampi(character.rarity + 1, 1, 4))
 	var tags: PackedStringArray = []
 	for tag in character.tags: tags.append({"energy": "储能", "flow": "流转"}.get(tag, Palette.tag_label(tag)))
