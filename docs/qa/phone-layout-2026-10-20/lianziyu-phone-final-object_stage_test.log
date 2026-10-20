@@ -1,0 +1,24 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 68 / 词 165 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS four-option reward creates four 3D glyphs and a physical coin pile
+PASS specimens use their own 3D world and camera
+PASS inspection retains complete rules without consuming RNG
+PASS inspection physically lifts the selected specimen
+PASS claim animation locks actions without premature or double settlement
+PASS claim pulls the specimen toward the player
+PASS claim settles once and returns to the existing route
+PASS leaving the reward releases its 3D stage
+PASS service seals explain the original shop services
+PASS purchase waits for the pickup and rejects duplicate presses
+PASS purchase charges the exact original price once
+PASS remaining goods retain their counter positions
+PASS live reduced motion stops the lantern
+PASS reduced motion preserves compact shop card scale
+PASS restoring motion resumes the lantern
+PASS reward physical picking bounds fit the phone and retain 48px targets
+PASS reward price labels do not overlap the primary action
+PASS shop physical picking bounds fit the phone and retain 48px targets
+PASS shop price labels do not overlap the primary action
+[object_stage_test] PASS=19 FAIL=0

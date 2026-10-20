@@ -25,6 +25,11 @@ AVD = "Huozi_API_35"
 PROFILES = {"phone-720": (1600, 720, 320), "phone-1080": (2400, 1080, 440),
             "phone-1440": (3200, 1440, 560), "user-screenshot": (2436, 1120, 480),
             "compact": (1280, 720, 320), "tablet": (1920, 1200, 240)}
+# Share the researched resolutions and synthetic display densities with UI checks.
+SCREEN_PROFILES = ROOT / "tests/fixtures/mobile_screen_profiles.json"
+if SCREEN_PROFILES.is_file():
+    PROFILES.update({p["id"]: (*p["pixels"], round(p["density"] * 160))
+                     for p in json.loads(SCREEN_PROFILES.read_text(encoding="utf-8"))["profiles"]})
 NO_WINDOW = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
 
 
@@ -74,7 +79,7 @@ name="Android Automatic Test"
 platform="Android"
 runnable=false
 export_filter="all_resources"
-include_filter="assets/fonts/*-OFL.txt,assets/fonts/sources.json"
+include_filter="data/*.json,data/balance/*.json,assets/taopunk/attacks/*.json,assets/events/art_manifest.json,assets/relics/icons/manifest.json,assets/fonts/*-OFL.txt,assets/fonts/sources.json"
 exclude_filter="docs/*,tests/*,shots/*,prototypes/*,build/*,tools/*,data/import/*"
 export_path="{apk.as_posix()}"
 script_export_mode=2
@@ -84,10 +89,10 @@ architectures/armeabi-v7a=false
 architectures/arm64-v8a={str(arch == 'arm64-v8a').lower()}
 architectures/x86=false
 architectures/x86_64={str(arch == 'x86_64').lower()}
-version/code=2026101806
-version/name="2026.10.18-responsive-battle"
+version/code=2026102001
+version/name="2026.10.20-phone-layout"
 package/unique_name="{PACKAGE}"
-package/name="活字战斗"
+package/name="炼字狱"
 package/signed=true
 screen/immersive_mode=true
 screen/edge_to_edge=false

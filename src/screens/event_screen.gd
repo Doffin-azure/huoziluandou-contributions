@@ -15,6 +15,7 @@ var _copy: VBoxContainer
 var _eyebrow: Label
 var _title: Label
 var _body: Label
+var _body_scroll: ScrollContainer
 var _notice: Label
 var _buttons: Array[Button] = []
 var _choice_labels: Array[Label] = []
@@ -88,7 +89,11 @@ func build(root: Control) -> void:
 	_copy.add_child(_title)
 	_copy.add_child(Ink.hline())
 	_body = Ink.body(_event.body)
-	_copy.add_child(_body)
+	_body_scroll = ScrollContainer.new()
+	_body_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_body_scroll.add_child(_body)
+	_copy.add_child(_body_scroll)
 	_notice = Ink.caption("")
 	_notice.add_theme_color_override("font_color", JourneyStyle.RED)
 	_notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -159,20 +164,23 @@ func _render_event() -> void:
 
 func _layout() -> void:
 	if _copy == null or size.x < 1: return
-	var key := str(size) + str(get_window().size)
+	var safe := ScreenLayout.safe_rect(self)
+	var key := str(safe) + str(ScreenLayout.window_size(self)) + str(JourneyStyle.touch_scale(self))
 	if key == _layout_key: return
 	_layout_key = key
-	_vertical = size.x / maxf(1, size.y) < 1.1
-	var compact := size.x / maxf(1, size.y) >= 1.95 or size.x < 1100
 	_ui_scale = JourneyStyle.touch_scale(self)
-	var margin := (8 if compact else 24) * _ui_scale
+	_scroll.position = safe.position
+	_scroll.size = safe.size
+	_vertical = safe.size.x / maxf(1, safe.size.y) < 1.1
+	var compact := safe.size.y/_ui_scale < 600 or safe.size.x/_ui_scale < 900
+	var margin := (8 if compact else 24)*_ui_scale
 	_page_margin = margin
-	var width := minf(size.x - margin * 2, 1080 * _ui_scale)
+	var width := minf(safe.size.x - margin * 2, 1080 * _ui_scale)
 	var art_width := (width if _vertical else width * (0.32 if compact else 0.40)) if _art.visible else 0.0
 	var gap := (18 * _ui_scale if compact else 56.0) if _art.visible and not _vertical else 0.0
 	var copy_width := width if _vertical or not _art.visible else width - art_width - gap
 	_art.size = Vector2(art_width, minf(art_width, 300 * _ui_scale) if _vertical else art_width)
-	_art.position.x = (size.x - width) * 0.5
+	_art.position.x = (safe.size.x - width) * 0.5
 	_copy.position.x = _art.position.x if _vertical else _art.position.x + art_width + gap
 	_copy.size.x = copy_width
 	_copy.add_theme_constant_override("separation", int(4 * _ui_scale if compact else 14))
@@ -194,6 +202,11 @@ func _layout() -> void:
 	if is_instance_valid(_leave_button):
 		_leave_button.custom_minimum_size.y = 48*_ui_scale
 		_leave_button.add_theme_font_size_override("font_size",int(18*_ui_scale))
+	_body_scroll.custom_minimum_size.y = 0
+	var body_font := _body.get_theme_font("font")
+	var body_size := body_font.get_multiline_string_size(_body.text,HORIZONTAL_ALIGNMENT_LEFT,copy_width,_body.get_theme_font_size("font_size"))
+	var body_budget := maxf(0,safe.size.y-margin*2-_copy.get_combined_minimum_size().y)
+	_body_scroll.custom_minimum_size.y = minf(body_size.y,body_budget) if not _vertical else body_size.y
 	_place.call_deferred()
 
 
@@ -203,7 +216,7 @@ func _place() -> void:
 	var art_height := _art.size.y if _art.visible else 0.0
 	var art_gap := 24 * _ui_scale if _art.visible and _vertical else 0.0
 	var height := art_height + art_gap + copy_height if _vertical else maxf(art_height, copy_height)
-	var top := maxf(_page_margin, (size.y - height) * 0.5)
+	var top := maxf(_page_margin, (_scroll.size.y - height) * 0.5)
 	_page.custom_minimum_size.y = height + _page_margin * 2
 	_art.position.y = top
 	_copy.position.y = top + art_height + art_gap if _vertical else top + (height - copy_height) * 0.5

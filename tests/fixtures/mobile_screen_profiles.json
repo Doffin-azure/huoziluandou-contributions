@@ -1,0 +1,16 @@
+{
+  "notes": "Landscape pixel dimensions are from manufacturer pages. density and insets are simulated stress cases, not claims about the phones' actual Android display settings.",
+  "profiles": [
+    {"id":"vivo-y33","name":"vivo Y33","pixels":[1280,720],"density":2.0,"insets":[0,0,0,0],"source":"https://www.vivo.com.cn/vivo/param/y33"},
+    {"id":"redmi-7a","name":"Redmi 7A","pixels":[1440,720],"density":2.0,"insets":[0,0,0,0],"source":"https://www.mi.com/redmi7a/specs"},
+    {"id":"vivo-y3","name":"vivo Y3","pixels":[1544,720],"density":2.0,"insets":[48,0,0,0],"source":"https://www.vivo.com.cn/vivo/param/y3"},
+    {"id":"iqoo-u1x","name":"iQOO U1x","pixels":[1600,720],"density":2.0,"insets":[48,0,0,24],"source":"https://www.vivo.com.cn/vivo/param/iqoou1x"},
+    {"id":"huawei-70s","name":"华为畅享 70S","pixels":[1600,720],"density":2.0,"insets":[56,0,0,24],"source":"https://consumer.huawei.com/cn/phones/changxiang-70s/specs/"},
+    {"id":"redmi-9a","name":"Redmi 9A","pixels":[1600,720],"density":2.25,"insets":[40,0,0,24],"source":"https://www.mi.com/global/support/faq/details/KA-07667/"},
+    {"id":"iqoo-10","name":"iQOO 10","pixels":[2400,1080],"density":3.0,"insets":[80,0,0,36],"source":"https://swsdl.vivo.com.cn/appstore/upload2/pdfFile/202209272/20220929171341660_14523852.pdf"},
+    {"id":"reference-2664","name":"用户截图比例","pixels":[2664,1200],"density":3.0,"insets":[90,0,0,40],"source":"user screenshot"},
+    {"id":"reference-large-ui","name":"用户截图比例／放大显示","pixels":[2664,1200],"density":3.5,"insets":[90,0,0,40],"source":"synthetic display-size stress case"},
+    {"id":"low-854","name":"854×480 低分辨率压力测试","pixels":[854,480],"density":1.5,"insets":[0,0,0,0],"source":"synthetic fallback"},
+    {"id":"desktop-720","name":"桌面 720p","pixels":[1280,720],"density":1.0,"insets":[0,0,0,0],"source":"desktop baseline"}
+  ]
+}

@@ -102,11 +102,10 @@ func _sync_ui_scale() -> void:
 	if not is_instance_valid(_tools): return
 	JourneyStyle.apply(self)
 	var unit := JourneyStyle.touch_scale(self)
-	var compact := unit>1.1
+	var compact := ScreenLayout.safe_rect(self).size.y / unit < 600
 	_page.add_theme_constant_override("separation",roundi((8 if compact else 20)*unit))
 	_header.add_theme_constant_override("separation",roundi((8 if compact else 18)*unit))
-	for side in ["margin_left","margin_top","margin_right","margin_bottom"]:
-		_page.get_parent().add_theme_constant_override(side,roundi((12 if compact else 28)*unit))
+	ScreenLayout.margins(_page.get_parent(),self,(12 if compact else 28)*unit)
 	_act_title.add_theme_font_size_override("font_size",roundi((22 if compact else 30)*unit))
 	_stats.add_theme_font_size_override("font_size",roundi((17 if compact else 23)*unit))
 	for button in find_children("*","Button",true,false):

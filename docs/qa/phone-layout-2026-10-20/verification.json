@@ -1,0 +1,89 @@
+{
+  "base": "d28dfa5a722fdca3733878fff9bbe9e76777cb4a",
+  "renderer": "Desktop Forward+ Vulkan / RTX 4060 Laptop; simulated phone density and cutouts",
+  "headless_matrix": {
+    "profiles": 11,
+    "checks": 264,
+    "failures": 0
+  },
+  "passed_suites": [
+    {
+      "test": "mobile_layout_matrix",
+      "summary": "[mobile_layout_matrix] CHECKS=264 FAIL=0"
+    },
+    {
+      "test": "title_menu_test",
+      "summary": "[title_menu_test] PASS=18 FAIL=0"
+    },
+    {
+      "test": "node_route_test",
+      "summary": "[node_route_test] PASS=196 FAIL=0 TOTAL=196"
+    },
+    {
+      "test": "node_route_runtime",
+      "summary": "[node_route_runtime] CHECKS=29 FAIL=0"
+    },
+    {
+      "test": "event_interaction_test",
+      "summary": "[event_interaction_test] CHECKS=43 FAIL=0"
+    },
+    {
+      "test": "event_art_test",
+      "summary": "[event_art_test] PASS=525 FAIL=0"
+    },
+    {
+      "test": "event_illustration_sample",
+      "summary": "[event_illustration_sample] PASS=21 FAIL=0"
+    },
+    {
+      "test": "room_inventory_ui_test",
+      "summary": "[InventoryUI] checks=15 failures=0"
+    },
+    {
+      "test": "object_stage_test",
+      "summary": "[object_stage_test] PASS=19 FAIL=0"
+    },
+    {
+      "test": "battle_responsive_layout_test",
+      "summary": "RESPONSIVE BATTLE: 211 passed / 0 failed"
+    },
+    {
+      "test": "reward_loot_3d_test",
+      "summary": "[reward_loot_3d_test] PASS=86 FAIL=0 TOTAL=86"
+    },
+    {
+      "test": "shop_actions_test",
+      "summary": "[shop_actions_test] PASS=162 FAIL=0 TOTAL=162"
+    }
+  ],
+  "native_profiles": [
+    {
+      "profile": "vivo-y33",
+      "checks": 24,
+      "failures": 0
+    },
+    {
+      "profile": "iqoo-u1x",
+      "checks": 24,
+      "failures": 0
+    },
+    {
+      "profile": "reference-2664",
+      "checks": 24,
+      "failures": 0
+    },
+    {
+      "profile": "desktop-720",
+      "checks": 24,
+      "failures": 0
+    }
+  ],
+  "legacy_tests_not_passed": {
+    "battle_ui_test": "References removed GameStyle.paper and StudyStage.viewport / battle_table.",
+    "frontend_feedback_test": "References removed Combatant.temp_funds.",
+    "mobile_density_layout_test": "References removed expedition_map_screen._open_guide.",
+    "autosave_test": "References missing title_screen._continue_button."
+  },
+  "android_device_tested": false,
+  "android_apk_built": false
+}
