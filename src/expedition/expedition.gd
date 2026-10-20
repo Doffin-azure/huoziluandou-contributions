@@ -1,6 +1,6 @@
 extends RefCounted
 class_name Expedition
-## 墨途远征：迷雾探索、分阶段敌人、首领追逐、字匣与战斗构筑。
+## 墨途远征：迷雾探索、分阶段敌人、首领追逐与字袋构筑。
 ## 印章 / 遗物 / 休息 / 商店 / 熔炉保留；首领击败即封层。
 ## 遭遇进入真正的 4×4 战斗（battle_screen），开场效果见 apply_battle_setup。格子用 MapGen 的整数 k。
 
@@ -22,8 +22,6 @@ const ENCOUNTER_STAGES := {
 	3: ["兑现·复合应对", "兑现·循环稳定", "兑现·终局考验"],
 }
 
-const TRAY_CAP := 6
-const DECK_CAP := 20
 const SEAL_CAP := 3
 const START_INK := 4
 const BARRIER_INK := 2
@@ -42,7 +40,7 @@ const SEALS := {
 	"镇纸": ["每场战斗少掉 4 点血", "精英"], "夜灯": ["视野 +1 格", "大赏"], "更漏": ["首领走路概率增长得更慢", "大赏"],
 	"拓本": ["打开任何赏都多一个选项", "大赏"], "印鉴": ["被「封」的奖励会显示伏兵的位置", "精英"],
 	"朱笔": ["首领战开场，新首领生命上限 −6；旧首领少一条词条", "首领"], "蒲团": ["休息点的治疗量翻倍", "精英"],
-	"活字盒": ["字匣 +2 格", "大赏"], "字印": ["每场战斗开场多抽 1 枚字", "首领"],
+	"字印": ["每场战斗开场多抽 1 枚字", "首领"],
 }
 ## 三幕首领使用精选机制资源；地图主题仍保留。
 const BOSS := EnemyRoster.BOSSES
@@ -84,7 +82,6 @@ var alarm := false
 var halt_done := false          ## 起身提示已触发
 var boss_down := false          ## 首领已败，本层封闭，只能处理首领奖励与幕间结算。
 var ink := START_INK
-var tray: Array = []
 var seals: Array = []
 var buyback: Array = []
 var panels: Array = []          ## 待处理的面板，顶上的先显示
@@ -153,8 +150,16 @@ func has_seal(s: String) -> bool:
 	return seals.has(s)
 
 
-func tray_cap() -> int:
-	return TRAY_CAP + (2 if has_seal("活字盒") else 0)
+func migrate_legacy_inventory() -> void:
+	# The codec keeps retired inventory data out of the live model. Consume it
+	# only after the saved deck and UID counter have been restored.
+	var glyphs: Array = get_meta("legacy_tray", [])
+	if has_meta("legacy_tray"): remove_meta("legacy_tray")
+	for glyph in glyphs:
+		GameState.add_character(Database.get_character_by_glyph(str(glyph)))
+	if seals.has("活字盒"):
+		if not seals.has("字印"): seals.append("字印")
+		seals.erase("活字盒")
 
 
 func vision() -> int:
@@ -475,32 +480,21 @@ func pickup() -> bool:
 	if not gd.is_empty():
 		_log("散字【%s】被%s看守着，拾不走" % [m.glyph[pos], gd])
 		return false
-	if tray.size() >= tray_cap():
-		_log("字匣满了（%d 格），拾不了【%s】" % [tray_cap(), m.glyph[pos]])
-		return false
 	taken[pos] = true
 	var g: String = m.glyph[pos]
-	tray.append(g)
-	_log("拾得【%s】" % g)
+	gain_glyph(g, "拾得")
 	return true
 
 
-## 发字：先进字匣；字匣满了进字袋；都满了折 8 铜钱
+## 所有新字直接收入字袋，不再经过独立库存或容量折现。
 func gain_glyph(g: String, why := "") -> void:
 	if Database.get_character_by_glyph(g) == null:
 		return
 	# 许愿笺·千字同文：之后拿到的字都变成许愿的字
 	g = Relics.redirect_glyph(Database.get_character_by_glyph(g)).glyph
 	var note := ("%s：" % why) if not why.is_empty() else ""
-	if tray.size() < tray_cap():
-		tray.append(g)
-		_log("%s【%s】进字匣" % [note, g])
-	elif GameState.deck_size() < DECK_CAP:
-		GameState.add_character(Database.get_character_by_glyph(g))
-		_log("%s字匣满了，【%s】直接进字袋" % [note, g])
-	else:
-		GameState.add_gold(8)
-		_log("%s字匣、字袋都满了，【%s】折成 8 铜钱" % [note, g])
+	GameState.add_character(Database.get_character_by_glyph(g))
+	_log("%s【%s】收入字袋" % [note, g])
 
 
 func push_panel(p: Dictionary) -> void:
@@ -531,8 +525,6 @@ func owned_glyphs() -> Dictionary:
 	var out := {}
 	for c in GameState.deck:
 		out[c.glyph()] = true
-	for g in tray:
-		out[g] = true
 	return out
 
 
@@ -922,9 +914,6 @@ func buy(index: int, glyph_id := "") -> bool:
 		"relic":
 			if GameState.has_relic(o.relic):
 				return false
-		"glyph", "buyback":
-			if tray.size() >= tray_cap() and GameState.deck_size() >= DECK_CAP:
-				return false
 		"remove":
 			if not GameState.remove_character_id(glyph_id):
 				return false
@@ -962,7 +951,7 @@ func leave_panel() -> void:
 
 
 # ---------------------------------------------------------------- 熔炉
-## 每个地图熔炉一次；投两个字匣里的字熔成一个稀有字。
+## 每个地图熔炉一次；从字袋选择两个实体，换一枚稀有字。
 func forge(a: int, b: int) -> bool:
 	var p := top_panel()
 	if p.get("kind", "") != "forge" or boss_down or over:
@@ -970,11 +959,13 @@ func forge(a: int, b: int) -> bool:
 	var cell := int(p.get("k", -1))
 	if cell != pos or mech_at(cell).get("g", "") != "炉" or int(used.get(cell, 0)) >= 1:
 		return false
-	if a == b or a < 0 or b < 0 or a >= tray.size() or b >= tray.size():
+	if a == b or a < 0 or b < 0 or a >= GameState.deck.size() or b >= GameState.deck.size():
 		return false
-	var gs: Array = [tray[a], tray[b]]
-	tray.remove_at(maxi(a, b))
-	tray.remove_at(mini(a, b))
+	if GameState.relic_binds.values().has(GameState.deck[a].uid) or GameState.relic_binds.values().has(GameState.deck[b].uid):
+		return false
+	var gs: Array = [GameState.deck[a].glyph(), GameState.deck[b].glyph()]
+	GameState.deck.remove_at(maxi(a, b))
+	GameState.deck.remove_at(mini(a, b))
 	used[cell] = 1
 	Achievements.node_completed()
 	pop_panel()
@@ -1016,27 +1007,6 @@ func choose_event(take: bool) -> void:
 					explored[k] = true
 			_log("雾中灯：迷雾散开")
 			advance(2)
-
-
-# ---------------------------------------------------------------- 字匣 / 字袋
-## 字匣 → 字袋（上限 20），探索获得的字用于战斗构筑
-func tray_to_deck(i: int) -> bool:
-	if busy() or i < 0 or i >= tray.size() or GameState.deck_size() >= DECK_CAP:
-		return false
-	var g: String = tray.pop_at(i)
-	GameState.add_character(Database.get_character_by_glyph(g))
-	_log("【%s】放进字袋" % g)
-	return true
-
-
-## 丢字进入回购清单
-func discard(i: int) -> bool:
-	if busy() or i < 0 or i >= tray.size():
-		return false
-	var g: String = tray.pop_at(i)
-	buyback.append(g)
-	_log("丢掉【%s】，可在商店回购" % g)
-	return true
 
 
 # ---------------------------------------------------------------- 首领：主动迎战 / 幕间

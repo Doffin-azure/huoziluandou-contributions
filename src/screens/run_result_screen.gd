@@ -30,7 +30,7 @@ func build(root: Control) -> void:
 	if not str(result.enemies).is_empty(): lines.append("本场敌人：" + str(result.enemies) + ("　·　%d回合" % int(result.turn) if int(result.turn) > 0 else ""))
 	elif int(result.turn) > 0: lines.append("本场战斗：%d回合" % int(result.turn))
 	lines.append("经历战斗：%d场　·　铜钱：%d" % [int(result.battles), int(result.gold)])
-	lines.append("牌库：%d枚　遗物：%d件　字匣：%d枚" % [int(result.deck_count), result.relics.size(), result.tray.size()])
+	lines.append("牌库：%d枚　遗物：%d件" % [int(result.deck_count), result.relics.size()])
 	var summary := EffectText.new()
 	summary.name = "RunSummary"
 	summary.add_theme_font_size_override("normal_font_size", int(20 * JourneyStyle.touch_scale(self)))
@@ -75,20 +75,17 @@ func _snapshot(won: bool) -> Dictionary:
 	var mode := "经典冒险"
 	var act := GameState.act_index
 	var location := str(params.get("location", ""))
-	var tray: Array = []
 	if GameState.room_run != null:
 		mode = "主线冒险"
-		tray = GameState.room_run.tray.duplicate()
 		if location.is_empty(): location = str(GameState.room_run.layout.rooms[GameState.room_run.current_room].name)
 	elif GameState.expedition != null:
 		mode = "墨途远征"
 		act = GameState.expedition.act
-		tray = GameState.expedition.tray.duplicate()
 	return {"victory":won, "achievements":Achievements.run_unlocks(), "achievement_total":Achievements.profile.unlocked.size(),
 		"mode":mode, "act":mini(3, act), "location":location,
 		"enemies":str(params.get("enemies", "")), "turn":int(params.get("turn", 0)),
 		"battles":GameState.battle_sequence, "gold":GameState.gold, "deck_count":GameState.deck_size(),
-		"relics":GameState.relics.map(func(id): return Relics.text(id)), "tray":tray}
+		"relics":GameState.relics.map(func(id): return Relics.text(id))}
 
 
 func _open_achievements() -> void:

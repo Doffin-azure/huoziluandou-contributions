@@ -9,18 +9,6 @@ var _was_paused := false
 var _previous_focus: Control
 
 
-static func tray() -> Array:
-	if GameState.room_run != null: return GameState.room_run.tray
-	if GameState.expedition != null: return GameState.expedition.tray
-	return []
-
-
-static func tray_capacity() -> int:
-	if GameState.room_run != null: return 6
-	if GameState.expedition != null: return GameState.expedition.tray_cap()
-	return 0
-
-
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_was_paused = get_tree().paused
@@ -50,12 +38,12 @@ func _ready() -> void:
 	var close := JourneyStyle.button("关闭", _close)
 	close.custom_minimum_size.y = 48 * JourneyStyle.touch_scale(self)
 	header.add_child(close)
-	_summary = JourneyStyle.label("牌库 %d 枚 · 遗物 %d 件 · 铜钱 %d · 字匣 %d 枚" % [GameState.deck_size(), GameState.relics.size(), GameState.gold, tray().size()], "Muted")
+	_summary = JourneyStyle.label("牌库 %d 枚 · 遗物 %d 件 · 铜钱 %d" % [GameState.deck_size(), GameState.relics.size(), GameState.gold], "Muted")
 	_summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_summary)
 	var tabs := HBoxContainer.new()
 	col.add_child(tabs)
-	for entry in [["deck", "牌库"], ["relics", "遗物"], ["gold", "铜钱"], ["tray", "字匣"]]:
+	for entry in [["deck", "牌库"], ["relics", "遗物"], ["gold", "铜钱"]]:
 		var button := JourneyStyle.button(entry[1], show_tab.bind(entry[0]))
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.custom_minimum_size.y = 48 * JourneyStyle.touch_scale(self)
@@ -68,11 +56,12 @@ func _ready() -> void:
 	_body = Ink.vbox(10)
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_body)
-	show_tab(initial_tab)
+	show_tab(initial_tab if _tabs.has(initial_tab) else "deck")
 	close.grab_focus()
 
 
 func show_tab(tab: String) -> void:
+	if not _tabs.has(tab): return
 	_tab = tab
 	for child in _body.get_children():
 		_body.remove_child(child); child.queue_free()
@@ -94,15 +83,6 @@ func show_tab(tab: String) -> void:
 					body += "\n获胜进度：%d / %d" % [int(GameState.relic_counters.get(id, 0)) % interval, interval]
 				_entry(Relics.name_of(id), body)
 		"gold": _entry("铜钱 %d" % GameState.gold, "本局当前持有的铜钱，可在商店和部分事件中使用。")
-		"tray":
-			var capacity := tray_capacity()
-			if capacity == 0: _entry("当前模式没有字匣", "获得的字直接收入牌库。")
-			else:
-				_entry("字匣 %d / %d" % [tray().size(), capacity], "这里可查看暂存的字；回到地图可整理字匣与版面。")
-				if tray().is_empty(): _entry("字匣为空", "尚未暂存任何字。")
-				for glyph: String in tray():
-					var data := Database.get_character_by_glyph(glyph)
-					_entry(glyph, data.description if data != null else "暂无说明。")
 
 
 func _entry(title: String, body: String) -> void:

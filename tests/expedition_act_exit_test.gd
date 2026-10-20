@@ -43,8 +43,9 @@ func _ready() -> void:
 	check(ex.top_panel().kind == "act_end" and ex.taken == taken and GameState.gold == original_gold, "不能用进入格子重新打开休息点或拿奖励")
 	for cell in ex.m.glyph: ex.pos = cell; break
 	check(not ex.pickup(), "不能直接拾取遗漏散字")
-	ex.tray = ["火"]
-	check(not ex.tray_to_deck(0) and not ex.discard(0), "结算期间不能调配字刷收益")
+	GameState.add_character(Database.get_character_by_glyph("火"))
+	var deck_before := GameState.deck.duplicate()
+	check(not ex.has_method("tray_to_deck") and not ex.has_method("discard"), "字匣调配与丢弃接口已移除")
 	ex.finish_battle(true)
 	check(ex.panels.size() == 1 and GameState.gold == original_gold, "重复胜利回调不重复奖励")
 	check(ex.act_supply() == {"gold":12,"heal":8,"ink":1}, "一幕有限补给数值")
@@ -53,7 +54,7 @@ func _ready() -> void:
 	ex.next_act()
 	check(ex.act == 2 and not ex.boss_down and ex.m.tn != old_theme and ex.t == 0, "结算进入二层、解除封层、换地图")
 	check(GameState.gold == 68 and GameState.player_hp == 28 and ex.ink == ink_before + 2, "首领铜钱6、回墨1与一幕补给各发放一次")
-	check(ex.tray == ["火"], "字匣跨层保留")
+	check(GameState.deck == deck_before, "字袋实体跨层保留")
 	var paid_gold := GameState.gold; var paid_hp := GameState.player_hp
 	ex.next_act()
 	check(ex.act == 2 and GameState.gold == paid_gold and GameState.player_hp == paid_hp, "双击进入下一幕不会重复补给")
@@ -74,7 +75,7 @@ func _ready() -> void:
 	ex.finish_battle(true); ex.next_act()
 	check(GameState.player_hp == GameState.player_max_hp, "幕间恢复不超过生命上限")
 	ex = fresh(3); ex.finish_battle(true)
-	check(ex.act_supply() == {"gold":0,"heal":0,"ink":0} and ex.top_panel().kind == "act_end", "第三幕没有无意义的下一层补给")
+	check(ex.act_supply() == {"gold":0,"heal":0,"ink":0} and ex.over and ex.won and ex.panels.is_empty(), "第三幕直接通关，没有下一层补给或幕间面板")
 	ex.next_act()
 	check(ex.over and ex.won and ex.act == 3 and GameState.gold == 56, "第三幕直接完成远征，无第四层或重复补给")
 	ex = fresh(); ex.finish_battle(false)

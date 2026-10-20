@@ -365,8 +365,8 @@ func _test_flows() -> void:
 	var other: int = 0 if wish_panel.options[0] != "endless_glyph" else 1
 	_ok(ex.choose_wish(other) and ex.top_panel().get("kind", "") != "relic_wish", "远征：许愿后面板关闭")
 	GameState.relic_counters["monkey"] = {"wish": "endless_glyph", "glyph": Database.get_character_by_glyph("防").id}
-	ex.tray.clear()
+	var before_gain := GameState.deck_size()
 	ex.gain_glyph("击", "测试")
-	_ok(ex.tray == ["防"], "远征：千字同文让进字匣的字也变成许愿的字")
+	_ok(GameState.deck_size() == before_gain + 1 and GameState.deck[-1].glyph() == "防", "远征：新字直接入字袋，仍遵循千字同文")
 	GameState.expedition = null
 	host.queue_free()

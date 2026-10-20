@@ -20,7 +20,7 @@ func _ready() -> void:
 	var ex := Expedition.start(91)
 	check(not ex.has_method("open_wish") and not ex.has_method("can_wish") and not ex.get_property_list().any(func(p): return p.name == "wish_used"), "许愿机接口、状态一并移除")
 	check(ex.loot_relic_pool("小").is_empty() and ex.loot_relic_pool("无效").is_empty(), "小赏与无效赏级不投放遗物")
-	check(ex.loot_relic_pool("中").all(func(id): return Relics.TIER[id] <= 2) and ex.loot_relic_pool("大").size() == Relics.DEFS.size(), "中赏常见/少见，大赏全部档次")
+	check(ex.loot_relic_pool("中").all(func(id): return Relics.TIER[id] <= 2) and ex.loot_relic_pool("大").size() == Relics.normal_pool().size(), "中赏常见/少见，大赏包含普通池全部档次")
 	var reached := {"中":{},"大":{}}
 	for bonus in [false,true]:
 		ex.seals = ["拓本"] if bonus else []
@@ -75,17 +75,20 @@ func _ready() -> void:
 	ex.choose_loot(1)
 	check(GameState.gold == gold + 25 and ex.panels.is_empty(), "过期遗物仍能改选其他奖励")
 	ex.panels = [{"kind":"loot","tier":"中","options":[{"kind":"relic","relic":"fireman"}]}]
+	var fire_before: int = GameState.glyph_counts().get("火", 0)
 	ex.choose_loot(0)
-	check(GameState.has_relic("fireman") and ex.tray.count("火") == 4, "开赏触发火种四枚火的拾取效果")
+	check(GameState.has_relic("fireman") and GameState.glyph_counts().get("火", 0) == fire_before + 4, "开赏触发火种，四枚火直接收入字袋")
 	# Only real on-map furnaces can convert two characters, and never grant a relic.
 	ex.m = MapGen.generate(17,"熔铸坊")
 	for k in ex.m.mech:
 		if ex.m.mech[k].g == "炉": ex.pos = k; break
 	var forge_cell := ex.pos
-	ex.tray = ["击","强","力"]; ex.panels = [{"kind":"forge","k":forge_cell}]
+	GameState.deck.clear()
+	for glyph in ["击","强","力"]: GameState.add_character(Database.get_character_by_glyph(glyph))
+	ex.panels = [{"kind":"forge","k":forge_cell}]
 	var before: Array = GameState.relics.duplicate()
-	check(not ex.forge(0,0) and not ex.forge(-1,1) and ex.tray == ["击","强","力"], "非法选择不消耗材料")
-	check(ex.forge(0,1) and ex.tray.size() == 2 and ex.tray[0] == "力" and GameState.relics == before and ex.used[forge_cell] == 1, "熔炉仅消耗两字，保留第三枚，不产遗物")
+	check(not ex.forge(0,0) and not ex.forge(-1,1) and GameState.deck.map(func(c):return c.glyph()) == ["击","强","力"], "非法选择不消耗材料")
+	check(ex.forge(0,1) and GameState.deck_size() == 2 and GameState.deck[0].glyph() == "力" and GameState.relics == before and ex.used[forge_cell] == 1, "熔炉仅消耗字袋两字，保留第三枚，不产遗物")
 	ex.panels = [{"kind":"forge","k":forge_cell}]
 	check(not ex.forge(0,1), "熔炉一次性且不可绕过")
 	ex.panels = [{"kind":"forge","k":-1}]

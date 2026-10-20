@@ -165,6 +165,7 @@ func resume_run() -> bool:
 	# New generated entities must never collide with relic-bound or battle-only UIDs.
 	CharInstance._next_uid = maxi(CharInstance._next_uid, int(saved.get("next_uid", 1)))
 	GameState.rules = Database.rules
+	if GameState.expedition != null: GameState.expedition.migrate_legacy_inventory()
 	_active = true
 	_last_payload.clear()
 	EventBus.deck_changed.emit()

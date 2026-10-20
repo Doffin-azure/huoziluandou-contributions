@@ -154,7 +154,7 @@ func _run() -> void:
 				screen._inspect(1)
 				screen._hud.action_button.pressed.emit()
 				await frames()
-				check(run.tray.size() == 1 and GameState.deck_size() == before and GameState.gold == gold, "glyph choice remains an alternative to the 3D gold pile")
+				check(GameState.deck_size() == before + 1 and GameState.gold == gold, "glyph goes straight into the deck as an alternative to the 3D gold pile")
 			else:
 				var before := GameState.deck_size()
 				await click(screen._gold_offer, resolution.x == 640)

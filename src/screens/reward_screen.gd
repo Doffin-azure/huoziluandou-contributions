@@ -9,7 +9,7 @@ const BOSS_HEAL_RATIO := 0.3
 var node: MapNodeData
 var _options: Array = []
 var _room_run := false
-var _expedition := false   ## 墨途远征：选中的字进字匣，回远征地图
+var _expedition := false   ## 墨途远征：选中的字直接入字袋，回远征地图
 var _cards: Array[GlyphOffer] = []
 var _showcase: Control
 var _hud: Control
@@ -87,9 +87,9 @@ func build(root: Control) -> void:
 	_hud = preload("res://src/ui/object_stage/object_hud.gd").new()
 	_hud.heading = "幕末 · 馈赠" if is_boss else "战后 · 馈赠"
 	if _room_run and GameState.room_run.graph.rooms[GameState.room_run.current_room].kind=="treasure": _hud.heading = "荷池 · 藏字"
-	_hud.instruction = "活字与铜钱择一；遗物候选中选一件。" if _relic_pending else ("活字收入字匣；也可不择字换铜钱。" if _expedition else "选择一枚活字收入字袋，或不择字换铜钱。")
+	_hud.instruction = "活字与铜钱择一；遗物候选中选一件。" if _relic_pending else "选择一枚活字收入字袋，或不择字换铜钱。"
 	_hud.status = "气血 %d / %d    铜钱 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
-	_hud.action_text = "收入字匣" if _expedition or _room_run else "收入字袋"
+	_hud.action_text = "收入字袋"
 	_hud.secondary_text = "收下这幕的馈赠" if is_boss else "跳过 · 获得 %d 铜钱" % Expedition.SKIP_GOLD
 	if _room_run: _hud.secondary_text = "跳过 · 获得 %d 铜钱" % Expedition.SKIP_GOLD
 	_hud.on_action = _accept_selected
@@ -185,7 +185,7 @@ func _update_reward_actions() -> void:
 	_hud.secondary_button.text = "比较遗物" if _relic_pending else "不择字 · +%d 铜钱" % Expedition.SKIP_GOLD
 	if _selected_kind == "relic": _hud.action_button.text = "领取遗物" if _relic_pending else "已领取"
 	elif _selected_kind == "gold": _hud.action_button.text = "换取 %d 铜钱" % Expedition.SKIP_GOLD
-	else: _hud.action_button.text = "收入字匣" if _expedition or (_room_run and _reward_owner.tray.size()<6) else "收入字袋"
+	else: _hud.action_button.text = "收入字袋"
 
 
 func _selected_object() -> int:

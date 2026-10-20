@@ -1745,7 +1745,7 @@ func _check_battle_over() -> void:
 			if GameState.room_run.phase=="reward": goto("res://src/screens/reward_screen.gd", {"node": node, "room_run": true})
 			else: goto("res://src/screens/room_map_screen.gd")
 		elif victory and _expedition and ex_result.get("reward", false):
-			# 战后奖励负责「深度」：按现有字袋三选一（分流：四选一），选中的字进字匣
+			# 战后按现有字袋提供三选一奖励，选中的字直接收入字袋。
 			goto("res://src/screens/reward_screen.gd", {"node": node, "expedition": true, "count": ex_result.count})
 		elif victory and _expedition:
 			goto("res://src/screens/expedition_map_screen.gd")

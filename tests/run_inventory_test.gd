@@ -33,12 +33,14 @@ func _run() -> void:
 		Router.goto("res://src/screens/%s_screen.gd" % page)
 		await frames(8)
 		var screen: Control = Router.current
+		if page == "room_map_3d":
+			while screen.map_view._building: await frames()
 		var bar: Control = screen.inventory_bar
-		check(bar.is_visible_in_tree() and bar.buttons.size() == 4, page + " exposes all four inventory entries")
+		check(bar.is_visible_in_tree() and bar.buttons.size() == 3 and not bar.buttons.has("tray"), page + " exposes deck, relics and coins without a tray entry")
 		check(screen.content.position.y >= bar.size.y - 1, page + " reserves space for inventory bar")
 		check(bar._relics.get_child_count() == 1 and bar._relics.get_child(0).text == Relics.name_of("strike"), page + " displays owned relics")
 		var before := [GameState.gold, GameState.deck.duplicate(), GameState.rng.state, CharInstance._next_uid]
-		for tab in ["deck", "relics", "gold", "tray"]:
+		for tab in ["deck", "relics", "gold"]:
 			bar.buttons[tab].pressed.emit()
 			await frames(2)
 			var overlay: Control = bar._overlay
@@ -54,14 +56,17 @@ func _run() -> void:
 		check(bar.buttons.gold.text == "铜钱 %d" % GameState.gold, page + " gold updates live")
 	var run = RoomRun.new()
 	run.reset({"seed":92, "layout":"node_graph"})
-	run.tray = ["火", "电"]
+	GameState.add_character(Database.get_character_by_glyph("火"))
+	GameState.add_character(Database.get_character_by_glyph("电"))
 	GameState.add_relic("strike")
 	Router.goto("res://src/screens/reward_screen.gd")
 	await frames(8)
 	var bar = Router.current.inventory_bar
-	check(bar.buttons.tray.text == "字匣 2", "courtyard tray is visible outside map")
+	check(not bar.buttons.has("tray") and bar.buttons.deck.text == "牌库 %d" % GameState.deck_size(), "courtyard exposes only the actual combat deck")
 	bar.open("tray"); await frames()
-	check(bar._overlay._body.get_child_count() == 3, "tray viewer shows both stored glyphs and capacity")
+	check(not is_instance_valid(bar._overlay), "retired tray route cannot open an empty viewer")
+	bar.open("deck"); await frames()
+	check(bar._overlay._body.get_child_count() == GameState.deck_size() and not bar._overlay._tabs.has("tray"), "deck viewer shows every owned instance and has no tray tab")
 	bar._overlay._close(); await frames()
 	get_window().size = Vector2i(960, 432)
 	await frames(12)
