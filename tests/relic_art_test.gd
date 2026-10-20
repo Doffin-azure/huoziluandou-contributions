@@ -45,6 +45,8 @@ func _ready() -> void:
 
 func _run() -> void:
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/relics/icons/manifest.json"))
+	for source in ["res://src/ui/object_stage/relic_specimen.gd", "res://src/ui/object_stage/relic_expansion.gd", "res://src/ui/object_stage/relic_mesh.gd", "res://src/ui/object_stage/relic_pigment.gdshader", "res://src/ui/relic_art.gd", "res://src/ui/relic_preview.gd", "res://src/tools/bake_relic_icons.gd"]:
+		check(manifest.get("sources", {}).get(source, "") == FileAccess.get_sha256(source), source.get_file() + " matches the current compendium render sources")
 	check(RelicArt.TEXTURES.size() == Relics.DEFS.size() and manifest.icons.size() == Relics.DEFS.size() and RelicArt.TEXTURES.keys().all(func(id): return Relics.DEFS.has(id)), "all current icons map to valid upstream relic IDs")
 	var hashes: Array = []
 	var provider := preload("res://src/ui/object_stage/object_stage.gd").new()

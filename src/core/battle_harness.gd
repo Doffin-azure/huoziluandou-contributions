@@ -63,18 +63,19 @@ func reset(cfg: Dictionary = {}) -> void:
 	GameState.gold = int(cfg.get("gold", rules.starting_gold))
 	if not persistent_run:
 		GameState.permanent_damage_reduction = 0
+	# 血量要在开战前定好：还魂墨等开局回血是在 start 里结算的，开战后再改会把它抹掉
+	if cfg.has("hp"):
+		GameState.player_hp = int(cfg["hp"])
 	battle.start(deck, enemies, seed)
 	if cfg.has("gold"):
 		GameState.gold = int(cfg["gold"])
-	if cfg.has("hp"):
-		battle.player.hp = int(cfg["hp"])
 
 	# 强制盘面：board = 16 个字形字符串（""=空），行优先
 	if cfg.has("board"):
 		var spec: Array = cfg["board"]
 		for i in battle.board.cells.size():
 			battle.board.cells[i] = null
-		for i in mini(16, spec.size()):
+		for i in mini(battle.board.cells.size(), spec.size()):
 			var g := str(spec[i])
 			if g.is_empty():
 				continue

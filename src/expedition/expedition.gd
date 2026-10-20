@@ -742,7 +742,7 @@ func _grant_relic(id: String, why: String) -> bool:
 		push_panel({"kind": "relic_bind", "relic": id})
 	elif not Relics.pick_spec(id).is_empty() and not Relics.pick_candidates(id).is_empty():
 		push_panel({"kind": "relic_pick", "relic": id, "left": int(Relics.pick_spec(id)[1])})
-	elif id == "monkey":
+	elif id == "monkey" and not GameState.relic_counters.has("monkey"):
 		push_panel({"kind": "relic_wish", "options": Relics.wish_options(relic_rng)})
 	return true
 

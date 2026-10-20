@@ -326,9 +326,12 @@ static func _execute(effects: Array, removal_counts: Array, selected: Array, rng
 				if relic_id.is_empty() or not GameState.add_relic(relic_id):
 					if effect.has("fallback_gold"): GameState.add_gold(int(effect.fallback_gold))
 					else: return {"ok": false, "reason": "没有可获得的遗物"}
-				elif Relics.needs_bind(relic_id):
-					for inst: CharInstance in GameState.deck:
-						if GameState.bind_relic(relic_id, inst.id()): break
+				else:
+					if Relics.needs_bind(relic_id):
+						for inst: CharInstance in GameState.deck:
+							if GameState.bind_relic(relic_id, inst.id()): break
+					# 泥金笔 / 复字拓片 / 许愿笺：事件里来不及弹窗，回到能弹窗的界面再补
+					Relics.queue_setup(relic_id)
 			"remove_relic":
 				if not GameState.remove_relic(str(effect.get("relic", ""))):
 					return {"ok": false, "reason": "没有这件可献出的遗物"}

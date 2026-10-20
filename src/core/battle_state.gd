@@ -360,7 +360,11 @@ func _add_heat_inner(amount: int) -> int:
 		abilities["_overflow_paid"] = mini(ability_value("_overflow_paid"), maxi(0, player.heat - player.heat_capacity))
 	return player.heat
 
-func add_energy(amount: int) -> void:
+## refund = 返还已花掉的储能：不吃裂墨瓶翻倍，免得返还比花掉的还多
+func add_energy(amount: int, refund := false) -> void:
+	if refund:
+		player.add_energy(amount)
+		return
 	if amount > 0 and has_ability("energy_gain_once"):
 		var bonus := ability_value("energy_gain_once")
 		abilities.erase("energy_gain_once")
@@ -380,9 +384,11 @@ func heal_player(amount: int) -> int:
 	player.heal(value)
 	var healed := player.hp - before
 	if relics.has("amber") and value > healed:
-		var overflow := value - healed
-		player.add_persistent_block(overflow)
-		_log("朱砂印泥：溢出治疗 %d 转为持久盾" % overflow)
+		var shield_before := player.persistent_block
+		player.add_persistent_block(value - healed)
+		var gained := player.persistent_block - shield_before
+		if gained > 0:  # 冷心等不能获得格挡时什么也不给，也不报
+			_log("朱砂印泥：溢出治疗 %d 转为持久盾" % gained)
 	return healed
 
 
@@ -406,7 +412,7 @@ func spend_energy(amount: int) -> void:
 	if has_ability("energy_refund_once"):
 		var refund := mini(spent, ability_value("energy_refund_once"))
 		abilities.erase("energy_refund_once")
-		add_energy(refund)
+		add_energy(refund, true)
 		last_energy_refunded += refund
 		if _energy_spend_turn == turn:
 			monster_net_energy -= refund
@@ -420,7 +426,7 @@ func refund_half_energy() -> int:
 	last_energy_refunded += refund
 	if _energy_spend_turn == turn:
 		monster_net_energy -= refund
-	add_energy(refund)
+	add_energy(refund, true)
 	return refund
 
 ## 只有离开盘面后重新补入才刷新精炼；普通移动始终使用 board.set_xy。
@@ -598,8 +604,11 @@ func _check_bounty() -> void:
 	if bounty_paid and first_alive_enemy() == null:
 		bounty_paid = false
 		GameState.add_gold(bounty_reward)
+		# 悬赏不受本场收入上限限制，但算本场收入（金字碑按它判定化金）
+		gold_earned += maxi(0, bounty_reward)
 		gold_earned_this_turn += maxi(0, bounty_reward)
 		_log("重金：悬赏达成，获得 %d 铜钱" % bounty_reward)
+		Relics.on_gold_earned(self)
 
 
 # ---------------------------------------------------------------- 出字
@@ -841,7 +850,6 @@ func _execute_play_inner(play: Dictionary, shared: Dictionary) -> Dictionary:
 
 	# 消耗
 	var consumed := _consume_path(path, path_insts, shared)
-	Relics.on_cards_consumed(self, consumed)
 
 	result.ok = true
 	result.word = word
@@ -856,6 +864,8 @@ func _execute_play_inner(play: Dictionary, shared: Dictionary) -> Dictionary:
 	result.messages.append_array(pollution_msgs)
 	if compound_armed:
 		_keep_compound_layer(consumed, target)
+	# 补字鬼手在【复合】留层之后再补，免得把腾出的格子先占掉
+	Relics.on_cards_consumed(self, consumed)
 
 	var ctx := {
 		"battle": self,
@@ -1506,6 +1516,11 @@ func end_player_turn() -> void:
 	if formation_mode and not formation_queue.is_empty():
 		resolve_formation()
 	end_turn_requested = false
+	# 裂墨瓶：先清空本回合剩下的储能，蓄能 / 蓄热这一刻新加的留到下回合
+	if relics.has("cracked_bottle") and player.energy > 0:
+		var cleared := player.energy
+		player.energy = 0
+		_log("裂墨瓶：回合结束清空 %d 储能" % cleared)
 	# 蓄能：回合结束若仍有可用多字词留在盘上
 	if has_ability("energy_idle") and _has_any_word_on_board():
 		var gained := ability_value("energy_idle", 2) * passive_multiplier("蓄能")
@@ -1526,21 +1541,13 @@ func end_player_turn() -> void:
 	# 蔓生墨：回合结束、敌人行动前繁殖
 	Relics.breed(self)
 	EnemyMechanics.replicate_glyphs(self)
-	if relics.has("cracked_bottle") and player.energy > 0:
-		var cleared := player.energy
-		player.energy = 0
-		_log("裂墨瓶：回合结束清空 %d 储能" % cleared)
 	_log("玩家结束回合")
 	var blitz := blitz_turn > 0 and turn == blitz_turn
 	for e in enemies:
 		if not e.is_alive():
 			continue
-		if blitz:
-			# 急就章：所有敌人跳过这一次行动（意图顺延，和停火一样推进招式）
-			e.move_index += 1
-			_log("急就章：%s 这一回合不行动" % e.display_name)
-			continue
-		_enemy_act(e)
+		# 急就章：所有敌人跳过这一次行动（意图顺延）；任务判定、灼烧等照常结算
+		_enemy_act(e, false, blitz)
 		if not player.is_alive():
 			break
 	EnemyMechanics.replicate_glyphs(self)
@@ -1584,11 +1591,12 @@ func _resolve_counter() -> void:
 	abilities.erase("counter")
 
 ## opening=true：开场突袭 / 首领先手，不消耗「停火」
-func _enemy_act(e: Combatant, opening := false) -> void:
+## skip_move=true（急就章）：只跳过这一招本身，行动前后的机制判定和灼烧 / 心蚀照常
+func _enemy_act(e: Combatant, opening := false, skip_move := false) -> void:
 	var ed: EnemyData = e.enemy_data
 	if ed == null or ed.moves.is_empty():
 		return
-	if not opening and enemy_skip_turns > 0:
+	if not opening and not skip_move and enemy_skip_turns > 0:  # 急就章那回合不消耗停火
 		enemy_skip_turns -= 1
 		e.move_index += 1
 		_log("停火：%s 这一回合不攻击" % e.display_name)
@@ -1597,6 +1605,12 @@ func _enemy_act(e: Combatant, opening := false) -> void:
 	EnemyMechanics.before_action(self, e, mv)
 	if not e.is_alive() or not player.is_alive():
 		EnemyMechanics.release_dead(self)
+		return
+	if skip_move:
+		e.move_index += 1
+		_log("急就章：%s 这一回合不行动" % e.display_name)
+		EnemyMechanics.after_action(self, e, mv)
+		_tick_after_action(e)
 		return
 	enemy_acting.emit(e, mv)
 	e.move_index += 1
@@ -1656,7 +1670,11 @@ func _enemy_act(e: Combatant, opening := false) -> void:
 		if e.is_alive():
 			var reflected := deal_damage(e, retaliation, false)
 			_log("反：%s 攻击行动结束，反击 %d 伤害" % [e.display_name, reflected])
+	_tick_after_action(e)
 
+
+## 敌方每次行动后的持续伤害（灼烧、心蚀）
+func _tick_after_action(e: Combatant) -> void:
 	# 灼烧：敌方每次行动后扣一层
 	if e.is_alive() and e.status_stacks("burn") > 0:
 		var bd: int = int(e.status_data.get("burn_damage", BattleBalance.i("burn_default_damage", 3)))
@@ -1928,14 +1946,21 @@ func clear_board() -> int:
 func converge_to(anchor: Vector2i) -> int:
 	return BattleOps.converge_to(self, anchor)
 
+## 盘上已经不带任何污染的字数（校勘尺按"洗干净了几枚"计）
+func _clean_count() -> int:
+	return board.cells.filter(func(c): return c != null and c.pollutions.is_empty()).size()
+
+
 func cleanse_board() -> int:
 	var n := BattleOps.cleanse_board(self)
 	Relics.on_cleansed(self, n)
 	return n
 
 func cleanse_scorch() -> int:
+	var before := _clean_count()
 	var n := BattleOps.cleanse_scorch(self)
-	Relics.on_cleansed(self, n)
+	# 校勘尺只算真正洗干净的字：还带着别的污染不算
+	Relics.on_cleansed(self, _clean_count() - before)
 	return n
 
 ## 问字签：玩家从三枚里挑一枚

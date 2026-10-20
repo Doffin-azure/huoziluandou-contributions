@@ -147,6 +147,17 @@ func refresh() -> void:
 	map_view.selected = _selected; map_view.refresh()
 	_update_controls()
 	if run.phase=="treasure" and not _receipt_open: _treasure_receipt.call_deferred()
+	elif not _receipt_open: _drain_relic_setup.call_deferred()
+
+
+## 事件、宝藏里拿到的泥金笔 / 复字拓片 / 许愿笺：回到地图时补上挑字、许愿
+func _drain_relic_setup() -> void:
+	if _receipt_open or _routing or not is_inside_tree() or Relics.next_pending_peek().is_empty(): return
+	_receipt_open = true
+	RelicRewardFlow.drain_pending(self, func():
+		_receipt_open = false
+		run._save_if_enabled()  # 挑完的结果落盘
+		refresh())
 
 
 func _on_gold(_amount: int) -> void: _update_stats()

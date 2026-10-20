@@ -2,8 +2,8 @@ extends RefCounted
 class_name EffectPreview
 ## 兼容旧 UI 调用；说明与只读预览统一由核心层提供。
 
-static func word_for(glyphs: Array) -> WordData:
-	return EffectDescriptions.word_for(glyphs)
+static func word_for(glyphs: Array, b: BattleState = null) -> WordData:
+	return EffectDescriptions.word_for(glyphs, b)
 
 
 static func word_text(word: WordData, b: BattleState, path: Array = [], target: Dictionary = {}, concise := false) -> String:
