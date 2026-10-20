@@ -28,6 +28,9 @@ func open_reward(type: MapNodeData.Type) -> Control:
 	node.type = type
 	Router.goto("res://src/screens/reward_screen.gd", {"node": node})
 	await frames()
+	if Router.current._relic_pending:
+		Router.current._secondary_action()
+		await frames()
 	return Router.current
 
 
@@ -36,6 +39,9 @@ func save_and_resume() -> void:
 	SaveManager.flush()
 	check(SaveManager.resume_run(), "checkpoint resumes through real save codec")
 	await frames()
+	if Router.current.get_script().resource_path.ends_with("reward_screen.gd") and Router.current._relic_pending:
+		Router.current._secondary_action()
+		await frames()
 
 
 func finish_binding() -> void:
@@ -129,6 +135,8 @@ func _run() -> void:
 	await frames()
 	check(overlay(CollectionOverlay) != null and not SaveManager.checkpoint(), "unfinished binding does not overwrite the whole transaction")
 	check(SaveManager.resume_run(), "interrupted binding resumes preceding offer")
+	await frames()
+	Router.current._secondary_action()
 	await frames()
 	check(not GameState.has_relic("slab") and overlay(ChoiceOverlay) != null, "interrupted relic pickup rolls back together")
 	choice = overlay(ChoiceOverlay)

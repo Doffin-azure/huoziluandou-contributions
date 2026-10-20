@@ -54,7 +54,7 @@ func _wait_screen_change(previous: Control) -> void:
 func _run() -> void:
 	Router.host = self
 	var reward := await _open("reward", 4)
-	_ok(reward._cards.size() == 4 and reward._showcase.stage.objects.size() == 4, "four-option reward creates four actual 3D specimens")
+	_ok(reward._cards.size() == 4 and reward._showcase.stage.objects.size() == 5 and reward._showcase.stage.objects[reward._gold_object].get_meta("gold_amount") == Expedition.SKIP_GOLD, "four-option reward creates four 3D glyphs and a physical coin pile")
 	_ok(reward._showcase.viewport.own_world_3d and reward._showcase.stage.camera.current, "specimens use their own 3D world and camera")
 	var rng: int = GameState.rng.state
 	reward._inspect(3)

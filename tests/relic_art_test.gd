@@ -91,6 +91,8 @@ func _run() -> void:
 		node.type = MapNodeData.Type.BOSS
 		Router.goto("res://src/screens/reward_screen.gd", {"node": node})
 		await frames(20)
+		Router.current._secondary_action()
+		await frames()
 		dialog = choice()
 		var buttons: Array = dialog.relic_choice_buttons()
 		check(buttons.size() == 3 and buttons.all(func(b): return b.icon == RelicArt.texture(str(b.get_meta("relic_id", ""))) and b.icon != null), str(window_size) + " reward art matches all three candidates")

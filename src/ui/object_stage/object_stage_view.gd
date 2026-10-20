@@ -6,6 +6,7 @@ var stage: Node3D
 var viewport: SubViewport
 var mode := "reward"
 var reward_count := 3
+var reward_loot_layout := false
 
 
 func _ready() -> void:
@@ -19,6 +20,7 @@ func _ready() -> void:
 	stage = Stage.new()
 	stage.mode = mode
 	stage.reward_count = reward_count
+	stage.reward_loot_layout = reward_loot_layout
 	viewport.add_child(stage)
 	var display := TextureRect.new()
 	display.texture = viewport.get_texture()
@@ -53,6 +55,7 @@ func _layout() -> void:
 
 func object_rect(index: int, service := false) -> Rect2:
 	if stage == null or index >= stage.rests.size(): return Rect2()
+	if reward_loot_layout: return loot_rect(index)
 	var origin: Vector3 = stage.rests[index]
 	var b := 0.53 if service else (0.78 if mode == "shop" else 1.0)
 	var low := Vector2(INF, INF)
@@ -68,6 +71,20 @@ func object_rect(index: int, service := false) -> Rect2:
 		var target_size := (high - low + Vector2.ONE * 2).max(Vector2.ONE * 48 * JourneyStyle.touch_scale(self))
 		return Rect2((low + high - target_size) * 0.5, target_size)
 	return Rect2(low, high - low).grow(6)
+
+
+func loot_rect(index: int) -> Rect2:
+	var node: Node3D = stage.objects[index]
+	var bounds: AABB = node.get_meta("reward_bounds")
+	var transform := Transform3D(Basis.IDENTITY.scaled(stage.object_scales[index]), stage.rests[index])
+	var low := Vector2(INF, INF)
+	var high := Vector2(-INF, -INF)
+	for corner in 8:
+		var at: Vector2 = stage.camera.unproject_position(transform * bounds.get_endpoint(corner)) * size / Vector2(viewport.size)
+		low = low.min(at)
+		high = high.max(at)
+	var target := (high - low + Vector2.ONE * 6).max(Vector2.ONE * 48 * JourneyStyle.touch_scale(self))
+	return Rect2((low + high - target) * 0.5, target)
 
 
 func action_rect(key: String) -> Rect2:

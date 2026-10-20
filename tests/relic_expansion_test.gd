@@ -41,6 +41,9 @@ func reward_run(kind: String) -> RefCounted:
 func open_reward(run: RefCounted) -> void:
 	Router.goto("res://src/screens/reward_screen.gd", {"room_run": true, "node": run.node})
 	await frames(22)
+	if Router.current._relic_pending:
+		Router.current._secondary_action()
+		await frames()
 
 
 func capture(name: String) -> void:

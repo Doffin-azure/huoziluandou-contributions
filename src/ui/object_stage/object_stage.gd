@@ -5,6 +5,7 @@ const PIGMENT := preload("res://src/ui/object_stage/pigment.gdshader")
 const OUTLINE := preload("res://src/title/courtyard/ink_outline.gdshader")
 var mode := "reward"
 var reward_count := 3
+var reward_loot_layout := false
 var camera: Camera3D
 var objects: Array[Node3D] = []
 var rests: Array[Vector3] = []
@@ -355,6 +356,30 @@ func add_relic(id: String, slot: int, price: int) -> int:
 	return objects.size() - 1
 
 
+func add_reward_relic(id: String, slot: int, count: int) -> int:
+	var index := add_relic(id, slot, 0)
+	var node: Node3D = objects[index]
+	var bounds := preload("res://src/ui/object_stage/relic_specimen.gd").bounds_of(node)
+	var factor := minf(1.35 / maxf(0.01, bounds.size.x), 1.45 / maxf(0.01, bounds.size.y))
+	node.scale = Vector3.ONE * factor
+	node.position = Vector3(1.5 + (slot - (count - 1) * 0.5) * 2.1, 0.68, 1.6)
+	node.set_meta("reward_bounds", bounds)
+	rests[index] = node.position
+	object_scales[index] = node.scale
+	return index
+
+
+func add_reward_gold(amount: int) -> int:
+	var node := preload("res://src/ui/object_stage/reward_coins.gd").build(self, amount)
+	node.position = Vector3(-3.25, 0.68, 1.65)
+	node.set_meta("reward_bounds", preload("res://src/ui/object_stage/relic_specimen.gd").bounds_of(node))
+	add_child(node)
+	objects.append(node)
+	rests.append(node.position)
+	object_scales.append(node.scale)
+	return objects.size() - 1
+
+
 func clear_objects() -> void:
 	for motion in _motions.values():
 		if motion.is_valid(): motion.kill()
@@ -371,6 +396,9 @@ func add_object(glyph: String, slot: int, rank := 0, service := false) -> int:
 	var node := Node3D.new()
 	var shop_slots := [Vector3(-4.6, 1.075, -0.30), Vector3(-2.85, 1.075, -0.30), Vector3(-1.1, 1.075, -0.30), Vector3(0.65, 1.075, -0.30), Vector3(2.4, 1.075, -0.30), Vector3(4.15, 0.65, 0.7), Vector3(5.6, 0.65, 0.7), Vector3(4.8, 1.75, -0.55)]
 	node.position = shop_slots[slot % shop_slots.size()] if mode == "shop" else Vector3((slot - (reward_count - 1) * 0.5) * minf(2.85, 8.8 / reward_count), 1.0, 0.1)
+	if mode == "reward" and reward_loot_layout:
+		node.position.z = -0.65
+		node.scale = Vector3.ONE * 0.84
 	if mode == "shop" and not service: node.scale = Vector3.ONE * 0.78
 	add_child(node)
 	var w := Workshop.new()
@@ -403,6 +431,8 @@ func add_object(glyph: String, slot: int, rank := 0, service := false) -> int:
 		for i in rank + 1:
 			w.box(Vector3((i - rank * 0.5) * 0.16, 2.43, 0.23), Vector3(0.055, 0.04, 0.05), pigment("gold"))
 	w.finish(node)
+	if mode == "reward" and reward_loot_layout:
+		node.set_meta("reward_bounds", AABB(Vector3(-1.07, 0, -0.23), Vector3(2.14, 2.55, 0.65)))
 	var text := _text(glyph, 200, Color("14272b") if not service else Color("e4cf9b"), 0.008 * b)
 	text.position = Vector3(0, 0.75, 0.24) if service else Vector3(0, 1.42, 0.35)
 	node.add_child(text)
@@ -453,7 +483,7 @@ func take(index: int) -> void:
 
 func restore_object(index: int) -> void:
 	if index<0 or index>=objects.size(): return
-	objects[index].scale = Vector3.ONE
+	objects[index].scale = object_scales[index]
 	select_object(index)
 
 
