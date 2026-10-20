@@ -279,6 +279,10 @@ func _end_battle() -> void:
 		GameState.add_captured(b.captured_chars)
 		GameState.settle_victory_economy()
 		_log("胜利：HP %d/%d，金 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold])
+		if node != null and node.type == MapNodeData.Type.BOSS and GameState.act_index >= 3:
+			reward_options.clear()
+			_complete_node()
+			return
 		if node != null and node.type == MapNodeData.Type.BOSS:
 			GameState.player_hp = GameState.player_max_hp
 			_log("首领已破：回满生命")
@@ -311,6 +315,7 @@ func _start_shop() -> void:
 	shop_offers.append({"kind": "copy", "character": null, "price": GameState.rng.randi_range(18, 22)})
 	shop_offers.append({"kind": "heal", "character": null, "price": GameState.rng.randi_range(10, 14)})
 	phase = "shop"
+	Achievements.register_offers(shop_offers)
 
 
 func _apply_shop(t: String, action: Dictionary) -> Dictionary:
@@ -341,6 +346,7 @@ func _apply_shop(t: String, action: Dictionary) -> Dictionary:
 		GameState.heal(shop_heal)
 		_log("治疗 +%d" % shop_heal)
 	shop_offers.remove_at(i)
+	Achievements.bought_offer(o)
 	return {"ok": true, "phase": phase}
 
 
@@ -349,6 +355,7 @@ func _apply_pick(action: Dictionary) -> Dictionary:
 	var g := str(action.get("glyph", ""))
 	if not pending_glyphs.has(g):
 		return {"ok": false, "reason": "无效字 %s" % g}
+	var modification := ""
 	var cd: CharacterData = Database.get_character_by_glyph(g)
 	if phase == "shop_choose":
 		if pending_kind == "remove":
@@ -357,6 +364,7 @@ func _apply_pick(action: Dictionary) -> Dictionary:
 			GameState.add_character(cd, 1)
 		_log("市集 %s：%s" % [pending_kind, g])
 		if pending_index >= 0 and pending_index < shop_offers.size():
+			Achievements.bought_offer(shop_offers[pending_index])
 			shop_offers.remove_at(pending_index)
 		pending_kind = ""
 		pending_index = -1
@@ -377,25 +385,28 @@ func _apply_pick(action: Dictionary) -> Dictionary:
 			GameState.remove_character_id(cd.id)
 			_log("休整删字：%s" % g)
 		elif pending_kind == "upgrade":
+			var before := {}
+			for inst: CharInstance in GameState.deck:
+				if inst.id() == cd.id: before[inst.uid] = inst.describe()
 			_apply_upgrade(cd)
-			_log("休整修饰：%s（单字 +2）" % g)
+			var changed := {}
+			for inst: CharInstance in GameState.deck:
+				if inst.id() != cd.id or before.get(inst.uid, "") == inst.describe(): continue
+				var description := inst.describe()
+				changed[description] = int(changed.get(description, 0)) + 1
+			var details: Array[String] = []
+			for description: String in changed:
+				details.append("【%s】×%d\n%s" % [g, changed[description], description])
+			modification = "\n\n".join(details)
+			_log("休整修饰完成：" + modification)
 		pending_kind = ""
 		pending_glyphs.clear()
 		_complete_node()
-	return {"ok": true, "phase": phase}
+	return {"ok": true, "phase": phase, "modification": modification}
 
 
 func _apply_upgrade(ch: CharacterData) -> void:
-	var copy: CharacterData = ch.duplicate()
-	var new_effects: Array[EffectData] = []
-	for eff in ch.solo_effects:
-		var e2: EffectData = eff.duplicate() as EffectData
-		e2.amount += 2
-		new_effects.append(e2)
-	copy.solo_effects = new_effects
-	for inst in GameState.deck:
-		if inst.id() == ch.id:
-			inst.data = copy
+	GameState.upgrade_character_type(ch.id)
 
 
 func current_event() -> Dictionary:
@@ -463,6 +474,7 @@ func _advance_event() -> void:
 		phase = "event"
 		_log("事件继续：" + str(current_event().get("title", event_data.get("title", ""))))
 	else:
+		Achievements.event_completed(str(event_data.get("id", "")))
 		_complete_node()
 
 

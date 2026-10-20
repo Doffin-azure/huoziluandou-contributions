@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "contract": "6496eda109ce0f4e994a0e8711b22dff268a185e2fe85e084e88df1cfd3c78af",
+  "contract": "4df93b3102d6e3a85934a052b9813ef5ceeb398384caf44f099b652798cbc4ec",
   "tables": {
     "单字数值": [
       [
@@ -2816,25 +2816,25 @@
       [
         "words/w072/e/0/amount",
         "利息",
-        "效果1·基础值",
-        2,
-        2,
+        "金币伤害比例",
+        10,
+        10,
         0,
-        9999,
-        "点",
-        "处理器 gold；立即获得2金币。",
+        100,
+        "%",
+        "处理器 gold_percent_damage；对目标造成当前总金币的10%基础伤害，向下取整。不消耗金币。",
         "res://resources/words/w072.tres"
       ],
       [
         "words/w072/e/0/amount_per_extra_glyph",
         "利息",
-        "效果1·超过2字后每多一字加成",
+        "长词比例加成（固定为0）",
         0,
         0,
-        -999,
-        9999,
-        "点",
-        "处理器 gold；立即获得2金币。",
+        0,
+        0,
+        "百分点",
+        "处理器 gold_percent_damage；对目标造成当前总金币的10%基础伤害，向下取整。不消耗金币。",
         "res://resources/words/w072.tres"
       ],
       [

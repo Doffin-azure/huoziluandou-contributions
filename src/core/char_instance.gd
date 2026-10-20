@@ -98,3 +98,30 @@ func clone() -> CharInstance:
 	c.statuses = statuses.duplicate(true)
 	c.upgrade_level = upgrade_level
 	return c
+
+
+## 实体的实际单字效果与修饰说明；只读取参数，不创建实体或执行效果。
+func describe() -> String:
+	if data == null: return ""
+	var lines: Array[String] = [BattleText.character(data)]
+	if gilded: lines.append("镀金：" + str(EffectGlossary.entry("term:gilded").text))
+	if refined: lines.append("精炼：" + str(EffectGlossary.entry("term:refined").text))
+	if pinned: lines.append("固定：" + str(EffectGlossary.entry("term:pinned").text))
+	if temporary: lines.append("临时字：用后消失，不进入字袋或弃字堆。")
+	if word_only: lines.append("仅供组词：单打只弃字，不发动单字效果。")
+	if temporary_uses > 0: lines.append("额外使用：剩余%d次，用后仍留在盘面。" % temporary_uses)
+	if upgrade_level > 0: lines.append("已强化%d次；上方单字效果已计入强化后的数值。" % upgrade_level)
+	if not fusion.is_empty(): lines.append("融合：" + "、".join(glyph_list()) + "，共同移动和使用。")
+	for pid in pollutions:
+		var pollution := Database.get_pollution(pid)
+		if pollution != null: lines.append(pollution.name + "污染：" + pollution.description)
+	for modifier in modifiers: lines.append("修饰：" + modifier)
+	return "\n".join(lines)
+
+
+func display_data() -> CharacterData:
+	if data == null: return null
+	var display: CharacterData = data.duplicate()
+	display.glyph = "·".join(glyph_list())
+	display.description = describe()
+	return display

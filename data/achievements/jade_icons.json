@@ -1,0 +1,437 @@
+{
+  "texture": "res://assets/achievements/previews/achievement_atlas_jade_unique_v6.png",
+  "icons": {
+    "seal_first_word": {
+      "title": "落下第一筆",
+      "region": [
+        169,
+        74,
+        111,
+        114
+      ]
+    },
+    "seal_words_100": {
+      "title": "百詞成篇",
+      "region": [
+        308,
+        83,
+        175,
+        105
+      ]
+    },
+    "seal_words_1000": {
+      "title": "千詞成卷",
+      "region": [
+        483,
+        94,
+        162,
+        91
+      ]
+    },
+    "seal_vocab_10": {
+      "title": "識得十詞",
+      "region": [
+        665,
+        102,
+        146,
+        82
+      ]
+    },
+    "seal_vocab_40": {
+      "title": "詞庫漸豐",
+      "region": [
+        837,
+        75,
+        140,
+        113
+      ]
+    },
+    "seal_vocab_80": {
+      "title": "腹有詞章",
+      "region": [
+        1022,
+        73,
+        163,
+        115
+      ]
+    },
+    "seal_first_battle": {
+      "title": "初戰告捷",
+      "region": [
+        1185,
+        75,
+        144,
+        113
+      ]
+    },
+    "seal_first_clear": {
+      "title": "印成一卷",
+      "region": [
+        1377,
+        79,
+        117,
+        109
+      ]
+    },
+    "seal_damage_20": {
+      "title": "鋒芒初現",
+      "region": [
+        158,
+        238,
+        103,
+        114
+      ]
+    },
+    "seal_damage_50": {
+      "title": "一擊破陣",
+      "region": [
+        320,
+        239,
+        163,
+        113
+      ]
+    },
+    "seal_damage_100": {
+      "title": "刻石成痕",
+      "region": [
+        509,
+        238,
+        149,
+        114
+      ]
+    },
+    "seal_turn_words_5": {
+      "title": "接字如流",
+      "region": [
+        658,
+        247,
+        159,
+        105
+      ]
+    },
+    "seal_turn_words_8": {
+      "title": "連篇不絕",
+      "region": [
+        834,
+        254,
+        153,
+        95
+      ]
+    },
+    "seal_shield_20": {
+      "title": "餘盾未散",
+      "region": [
+        1010,
+        253,
+        175,
+        97
+      ]
+    },
+    "seal_shield_50": {
+      "title": "銅牆留印",
+      "region": [
+        1185,
+        255,
+        144,
+        97
+      ]
+    },
+    "seal_flawless_win": {
+      "title": "毫髮無損",
+      "region": [
+        1360,
+        238,
+        143,
+        114
+      ]
+    },
+    "seal_energy_10": {
+      "title": "電光初蓄",
+      "region": [
+        157,
+        401,
+        122,
+        108
+      ]
+    },
+    "seal_energy_25": {
+      "title": "滿匣雷聲",
+      "region": [
+        320,
+        402,
+        131,
+        111
+      ]
+    },
+    "seal_spend_energy_10": {
+      "title": "一放驚雷",
+      "region": [
+        505,
+        399,
+        101,
+        114
+      ]
+    },
+    "seal_heat_10": {
+      "title": "爐心漸赤",
+      "region": [
+        666,
+        410,
+        134,
+        103
+      ]
+    },
+    "seal_overflow_3": {
+      "title": "熱字出爐",
+      "region": [
+        858,
+        399,
+        85,
+        114
+      ]
+    },
+    "seal_cool_10": {
+      "title": "驟冷成霜",
+      "region": [
+        1019,
+        399,
+        166,
+        114
+      ]
+    },
+    "seal_burn_kill": {
+      "title": "餘燼落字",
+      "region": [
+        1185,
+        401,
+        134,
+        112
+      ]
+    },
+    "seal_hits_10": {
+      "title": "十響連擊",
+      "region": [
+        1376,
+        401,
+        113,
+        112
+      ]
+    },
+    "seal_first_gild": {
+      "title": "字上生金",
+      "region": [
+        141,
+        565,
+        144,
+        105
+      ]
+    },
+    "seal_gild_3": {
+      "title": "三字鑲金",
+      "region": [
+        323,
+        563,
+        128,
+        106
+      ]
+    },
+    "seal_gild_gold_10": {
+      "title": "字字有價",
+      "region": [
+        513,
+        558,
+        82,
+        112
+      ]
+    },
+    "seal_first_refine": {
+      "title": "精工一字",
+      "region": [
+        658,
+        554,
+        131,
+        116
+      ]
+    },
+    "seal_pin_used": {
+      "title": "立字為礎",
+      "region": [
+        834,
+        573,
+        134,
+        97
+      ]
+    },
+    "seal_first_fusion": {
+      "title": "二字合印",
+      "region": [
+        1012,
+        568,
+        129,
+        102
+      ]
+    },
+    "seal_extra_use_5": {
+      "title": "反覆打磨",
+      "region": [
+        1186,
+        576,
+        140,
+        94
+      ]
+    },
+    "seal_temp_words_10": {
+      "title": "借字成章",
+      "region": [
+        1368,
+        572,
+        132,
+        97
+      ]
+    },
+    "seal_first_cleanse": {
+      "title": "拂去墨污",
+      "region": [
+        147,
+        718,
+        139,
+        111
+      ]
+    },
+    "seal_cleanse_5": {
+      "title": "淨字成行",
+      "region": [
+        308,
+        735,
+        156,
+        89
+      ]
+    },
+    "seal_polluted_words_20": {
+      "title": "污字亦成詞",
+      "region": [
+        483,
+        722,
+        144,
+        105
+      ]
+    },
+    "seal_replicate_stop_3": {
+      "title": "止於一字",
+      "region": [
+        664,
+        718,
+        146,
+        111
+      ]
+    },
+    "seal_fold_unseal": {
+      "title": "折頁解籤",
+      "region": [
+        836,
+        718,
+        137,
+        111
+      ]
+    },
+    "seal_proof_3": {
+      "title": "紅藍對校",
+      "region": [
+        1017,
+        716,
+        113,
+        113
+      ]
+    },
+    "seal_rail_clear": {
+      "title": "移字出軌",
+      "region": [
+        1185,
+        725,
+        149,
+        104
+      ]
+    },
+    "seal_cleanse_50": {
+      "title": "一紙無塵",
+      "region": [
+        1398,
+        720,
+        70,
+        109
+      ]
+    },
+    "seal_boss_plate": {
+      "title": "破開鉛版",
+      "region": [
+        149,
+        878,
+        138,
+        93
+      ]
+    },
+    "seal_boss_demon": {
+      "title": "字魔伏誅",
+      "region": [
+        318,
+        871,
+        165,
+        102
+      ]
+    },
+    "seal_boss_chaos": {
+      "title": "平定混鉛",
+      "region": [
+        483,
+        884,
+        148,
+        88
+      ]
+    },
+    "seal_nodes_20": {
+      "title": "沿途留印",
+      "region": [
+        658,
+        884,
+        176,
+        86
+      ]
+    },
+    "seal_nodes_100": {
+      "title": "百程入卷",
+      "region": [
+        834,
+        876,
+        162,
+        97
+      ]
+    },
+    "seal_events_10": {
+      "title": "奇聞十錄",
+      "region": [
+        1028,
+        871,
+        117,
+        105
+      ]
+    },
+    "seal_shop_5": {
+      "title": "行囊漸滿",
+      "region": [
+        1211,
+        871,
+        88,
+        105
+      ]
+    },
+    "seal_relics_5": {
+      "title": "舊物成藏",
+      "region": [
+        1381,
+        878,
+        107,
+        98
+      ]
+    }
+  }
+}

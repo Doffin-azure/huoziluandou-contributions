@@ -21,7 +21,7 @@ func build(root: Control) -> void:
 	center.add_child(row)
 	row.add_child(_option_card("息", "调息", "回复 %d 点气血。" % _heal_amount(), _do_heal))
 	row.add_child(_option_card("删", "删字", "永久移除一枚字，精炼字袋。", _do_remove))
-	row.add_child(_option_card("镌", "修饰", "强化一枚字的单字效果。", _do_upgrade))
+	row.add_child(_option_card("镌", "修饰", "为一枚未镀金的字镀金。每次打出额外获得%d金币，组词也生效。" % BattleBalance.i("gild_gold", 1) if _room_session != null else "所选字形的全部实体，单字效果数值 +2；组词效果不变。", _do_upgrade))
 	main.add_child(JourneyStyle.section("此处可歇脚", "三项整备，只选其一"))
 	if _room_session!=null:
 		main.add_child(JourneyStyle.button("不休整，继续前行",func(): _room_rest_action({"type":"leave_service"})))
@@ -90,6 +90,8 @@ func _choose_char(title: String, kind: String) -> void:
 		"title": title,
 		"characters": chars,
 		"counts": counts,
+		"instances": GameState.deck,
+		"modification_preview": "所选字形的全部实体，单字效果数值 +2；组词效果不变。" if kind == "upgrade" else "",
 		"pick_on_click": true,
 	})
 	overlay.picked.connect(_on_picked.bind(kind))
@@ -105,21 +107,14 @@ func _on_picked(ch: CharacterData, kind: String) -> void:
 	else:
 		_apply_upgrade(ch)
 	_done = true
-	_finish()
+	if kind == "upgrade":
+		_show_modification(GameState.character_type_description(ch.id))
+	else:
+		_finish()
 
 
 func _apply_upgrade(ch: CharacterData) -> void:
-	var copy: CharacterData = ch.duplicate()
-	var new_effects: Array[EffectData] = []
-	for eff in ch.solo_effects:
-		var e2: EffectData = eff.duplicate() as EffectData
-		e2.amount += 2
-		new_effects.append(e2)
-	copy.solo_effects = new_effects
-	# 把字袋中同种字全部替换为强化版
-	for inst in GameState.deck:
-		if inst.id() == ch.id:
-			inst.data = copy
+	GameState.upgrade_character_type(ch.id)
 
 
 func _finish() -> void:
@@ -134,10 +129,24 @@ func _room_rest_action(action: Dictionary) -> void:
 
 
 func _room_rest_result(result: Dictionary) -> void:
-	if not result.ok: push_error(str(result.reason)); return
+	if not result.ok:
+		var notice := ChoiceOverlay.new()
+		notice.z_index = 71
+		notice.setup({"title":"未能修饰", "body":str(result.reason), "options":[{"text":"返回休整"}]})
+		add_child(notice)
+		return
 	_done = true
 	if _room_session.run.phase=="rest_choose": _resume_room_choice()
+	elif not str(result.get("modification", "")).is_empty(): _show_modification(str(result.modification))
 	else: _finish()
+
+
+func _show_modification(body: String) -> void:
+	var notice := ChoiceOverlay.new()
+	notice.z_index = 71
+	notice.setup({"title":"修饰完成", "body":body, "hud_details":true, "scroll_body":true, "options":[{"text":"继续前行", "primary":true}]})
+	notice.chose.connect(func(_index: int): _finish())
+	add_child(notice)
 
 
 func _resume_room_choice() -> void:

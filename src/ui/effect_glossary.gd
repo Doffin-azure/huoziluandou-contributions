@@ -103,6 +103,10 @@ const ENTRIES := {
 		"储能",
 		"供字词效果消耗，本场可跨回合积累；只有写明消耗时才会扣除。"
 	],
+	"heat": [
+		"热度",
+		"本场战斗中的资源，可被字词增加、降低或消耗，部分词效按当前热度计算收益。热容是安全上限；升温超过热容时，新增溢热会向字袋加入带灼热污染的【热】。"
+	],
 	"capacity": [
 		"热容",
 		"热度的安全上限。超过后会生成灼热【热】；提高热容不会降低现有热度。"
@@ -136,10 +140,23 @@ const TERMS := {
 	"效果重演": "replay", "原格返回": "return", "返回原位": "return", "易伤": "vulnerable", "心蚀": "corrosion",
 	"心力": "heart", "爆金": "bounty", "灼烧": "burn", "灼热污染": "scorch",
 	"再生": "regen",
-	"溢热": "overflow", "储能": "energy", "热容": "capacity",
+	"溢热": "overflow", "储能": "energy", "热度": "heat", "热容": "capacity",
 	"非攻击伤害": "non_attack", "超强翻倍": "double_attack", "超强增幅": "double_attack", "被动收益": "double_passive", "可翻倍收益": "double_passive", "能力收益": "double_passive",
 	"结阵": "formation"
 }
+
+static func words_for_glyph(glyph: String) -> Array:
+	var words: Array = []
+	for word: WordData in Database.words.values():
+		if word.glyphs.has(glyph): words.append(word.word)
+	return words
+
+
+static func character_hint(character: CharacterData) -> String:
+	var words := words_for_glyph(character.glyph).slice(0, 4)
+	if words.is_empty(): return character.description
+	return character.description + "\n可组：" + " / ".join(words.map(func(word): return "【%s】" % word))
+
 
 static func brief(word: WordData) -> String:
 	return WordDescriptions.brief(word)

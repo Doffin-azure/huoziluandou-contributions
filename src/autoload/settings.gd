@@ -5,6 +5,9 @@ extends Node
 signal changed
 signal board_font_changed(path: String)
 
+const MUSIC_BUS := &"BGM"
+const SFX_BUS := &"SFX"
+
 const PATH := "user://settings.cfg"
 var storage_path := PATH
 
@@ -32,6 +35,24 @@ func _ready() -> void:
 		reduced_motion = bool(_cfg.get_value("visual", "reduced_motion", false))
 		sfx_volume = clampf(float(_cfg.get_value("audio", "sfx_volume", 0.65)), 0.0, 1.0)
 		music_volume = clampf(float(_cfg.get_value("audio", "music_volume", 0.6)), 0.0, 1.0)
+
+	_apply_audio_volumes()
+
+
+func _apply_audio_volumes() -> void:
+	_set_bus_volume(MUSIC_BUS, music_volume)
+	_set_bus_volume(SFX_BUS, sfx_volume)
+
+
+func _set_bus_volume(bus_name: StringName, volume: float) -> void:
+	var index := AudioServer.get_bus_index(bus_name)
+	if index < 0:
+		AudioServer.add_bus()
+		index = AudioServer.bus_count - 1
+		AudioServer.set_bus_name(index, bus_name)
+		AudioServer.set_bus_send(index, &"Master")
+	AudioServer.set_bus_mute(index, volume <= 0.0)
+	AudioServer.set_bus_volume_db(index, linear_to_db(maxf(volume, 0.001)))
 
 
 func set_drag_release_play(value: bool) -> void:
@@ -69,12 +90,14 @@ func set_reduced_motion(value: bool) -> void:
 
 func set_sfx_volume(value: float) -> void:
 	sfx_volume = clampf(value, 0.0, 1.0)
+	_set_bus_volume(SFX_BUS, sfx_volume)
 	_save()
 	changed.emit()
 
 
 func set_music_volume(value: float) -> void:
 	music_volume = clampf(value, 0.0, 1.0)
+	_set_bus_volume(MUSIC_BUS, music_volume)
 	_save()
 	changed.emit()
 

@@ -90,6 +90,10 @@ func resume_session() -> void:
 
 func refresh() -> void:
 	if _routing: return
+	if run.phase in ["defeat", "victory"]:
+		_routing = true
+		goto.call_deferred("res://src/screens/run_result_screen.gd")
+		return
 	_update_stats()
 	if run.phase=="battle": return
 	var node_screen: String = {"reward":"reward_screen.gd", "event":"event_screen.gd", "event_choose":"event_screen.gd",
@@ -220,7 +224,7 @@ func _open_deck() -> void:
 		var character := Database.get_character_by_glyph(glyph)
 		if character!=null: chars.append(character)
 	var overlay := CollectionOverlay.new()
-	overlay.setup({"title":"字袋", "subtitle":"%d 枚实体字" % GameState.deck_size(), "characters":chars, "counts":counts})
+	overlay.setup({"title":"字袋", "instances":GameState.deck, "subtitle":"%d 枚实体字" % GameState.deck_size(), "characters":chars, "counts":counts})
 	add_child(overlay)
 
 

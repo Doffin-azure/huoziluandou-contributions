@@ -23,7 +23,7 @@ static func solo_text(inst: CharInstance, b: BattleState, path: Array = [], targ
 		return ""
 	if inst.word_only:
 		return "仅供组词的临时复制；单独打出只弃掉，不触发单字效果。"
-	var lines: Array[String] = [inst.data.description]
+	var lines: Array[String] = [inst.describe()]
 	var current := _current(inst.data.solo_effects, b, path, target)
 	if not current.is_empty():
 		lines.append("当前：" + current)
@@ -115,6 +115,8 @@ static func legacy_preview(e: EffectData, b: BattleState, path: Array, target: D
 	var energy := b.player.energy
 	var heat := b.player.heat
 	match e.handler:
+		"gold_percent_damage":
+			return "当前%d金币，对应%d基础伤害（%d%%，向下取整），不消耗金币。" % [GameState.gold, floori(maxi(0, GameState.gold) * maxi(0, e.amount) / 100.0), e.amount]
 		"repeat_last":
 			if b.last_played_glyphs.is_empty():
 				return "尚未打出任何字，无法复制；本次只弃掉【再】。"

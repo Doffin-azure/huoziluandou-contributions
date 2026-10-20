@@ -27,6 +27,9 @@ const ABILITY_NAMES := {
 }
 
 const LAYERED_ABILITIES := ["guard_inject", "counter", "next_energy_bonus", "next_serial_bonus", "vigor_next", "next_draw_bonus", "energy_regen", "force_once", "block_next_turn", "energy_gain_once", "link_draw_once", "retaliate_once", "energy_next_turn", "payment_discount_once", "combine_word_once", "speed_word_once", "energy_refund_once", "solo_gain_once"]
+## 按层累计的能力与按收益数量累计的能力分别标注，不能统一显示为1层。
+const STACKED_PASSIVES := ["heat_pollution_damage", "electric_overload", "electric_material", "longword_draw"]
+const QUANTITY_PASSIVES := {"flow":"字", "energy_idle":"点", "serial":"点"}
 ## 主能力的参数由主能力详情承接，不另占图标。
 const ABILITY_PARAMETERS := ["next_rapid_heat", "next_overfire_per", "heat_overload_bonus_armed"]
 
@@ -136,12 +139,27 @@ static func collect(unit: Combatant, battle: BattleState = null) -> Array:
 					description = "本回合首次实际新增溢热污染后，下一次多字词额外补%d字。" % value
 				elif id == "strong_heart":
 					description = "心力已挡下%d次致命伤；每回合开始回复%d生命。" % [unit.heart_power_triggered, BattleBalance.i("strong_heart_base", 2) + BattleBalance.i("heart_trigger_heal", 1) * unit.heart_power_triggered]
+				elif id == "heat_pollution_damage":
+					description = "本场持续，当前%d层。每因溢热实际新增1枚灼热【热】，对首个存活敌人造成%d点非攻击伤害。抽到或移动旧【热】不触发。" % [value, value * BattleBalance.i("overheat_damage", 5)]
+				elif id == "electric_overload":
+					description = "本场持续，当前%d层。每因溢热实际新增1枚灼热【热】，获得%d储能，对首个存活敌人造成%d点非攻击伤害。" % [value, value * BattleBalance.i("overload_energy", 1), value * BattleBalance.i("overload_damage", 3)]
+				elif id == "electric_material":
+					description = "本场持续，当前%d层。每累计消耗%d储能，在空格生成至多%d枚临时【电】。没有空格则不生成。" % [value, BattleBalance.i("energy_spawn_step", 2), value]
+				elif id == "longword_draw":
+					description = "本场持续，当前%d层。每打出至少%d字的词，额外补%d字。" % [value, BattleBalance.i("long_word_threshold", 3), value * BattleBalance.i("longword_draw", 1)]
+				elif id == "flow":
+					description = "本回合每打出%d种不同的词，补%d字。【流转】也计数，重复词不计。重复施放累计补字数。" % [BattleBalance.i("flow_interval", 2), value]
+				elif id == "energy_idle":
+					description = "本场回合结束时，盘面还有可打出的词则获得%d储能。重复施放累计回合末收益。" % value
 				elif id == "serial":
-					description += "\n已打出%d词，还需%d词获得奖励。" % [battle.serial_words, BattleBalance.i("serial_interval", 3) - battle.serial_words % BattleBalance.i("serial_interval", 3)]
+					description = "本场每打出%d个词，下一次攻击每段伤害+%d。重复施放累计奖励数值，奖励可跨回合保留。\n已打出%d词，还需%d词获得奖励。" % [BattleBalance.i("serial_interval", 3), value, battle.serial_words, BattleBalance.i("serial_interval", 3) - battle.serial_words % BattleBalance.i("serial_interval", 3)]
 				elif id == "repeat":
 					description += "\n" + ("本回合重演可用。" if battle.repeat_armed else "本回合已用，下回合恢复。")
-				var layers := maxi(1, value) if id in LAYERED_ABILITIES else 1
+				var layers := maxi(1, value) if id in LAYERED_ABILITIES or id in STACKED_PASSIVES else 1
 				var label_unit := "层"
+				if id in QUANTITY_PASSIVES:
+					layers = value
+					label_unit = QUANTITY_PASSIVES[id]
 				if id in ["vigor_next", "next_draw_bonus", "next_double_draw", "next_rapid"]:
 					layers = value
 					label_unit = "字"

@@ -27,6 +27,7 @@ func reward_screen(room_mode := true) -> RewardProbe:
 	var screen := RewardProbe.new()
 	screen.setup({"room_run":room_mode})
 	add_child(screen)
+	screen._cards[0].clicked.emit() # These settlement cases start with a deliberate selection.
 	return screen
 
 

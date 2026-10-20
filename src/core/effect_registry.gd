@@ -6,7 +6,7 @@ class_name EffectRegistry
 const KIND_GROUPS := {
 	EffectData.Kind.DAMAGE: ["damage", "overdo", "gravity_damage", "shield_smash", "break_shield_damage",
 		"energy_discharge", "heat_burst", "destroy_2x2", "clear_board", "heat_to_damage_flow", "spend_gold_damage",
-		"electric_strike", "fire_power", "energy_to_heat_damage", "cold_snap", "damage_multi", "solo_release", "chip_shield_damage"],
+		"electric_strike", "fire_power", "energy_to_heat_damage", "cold_snap", "damage_multi", "solo_release", "chip_shield_damage", "gold_percent_damage"],
 	EffectData.Kind.DAMAGE_ALL: ["damage_all"],
 	EffectData.Kind.BLOCK: ["block_temp", "joint_force"],
 	EffectData.Kind.PERSISTENT_BLOCK: ["block_persist", "alloy"],

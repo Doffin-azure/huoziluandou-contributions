@@ -95,12 +95,13 @@ var monster_net_energy := 0
 var monster_paid := false
 var monster_entered: Dictionary = {}
 var _energy_spend_turn := -1
+var achievement: RefCounted = null
 
 func _init(p_rules: BattleRules) -> void:
 	rules = p_rules
 	board = BoardState.new(p_rules.board_size)
 
-func start(deck: Array, enemy_datas: Array, seed_value: int = -1) -> void:
+func start(deck: Array, enemy_datas: Array, seed_value: int = -1, track_achievements := false) -> void:
 	GameState.battle_sequence += 1
 	if seed_value >= 0:
 		rng.seed = seed_value
@@ -187,6 +188,7 @@ func start(deck: Array, enemy_datas: Array, seed_value: int = -1) -> void:
 		e.add_block(ed.initial_block)
 		enemies.append(e)
 	turn = 0
+	achievement = Achievements.watch_battle(self) if track_achievements else null
 	draw_to_board(Relics.opening_draw(rules, relics))
 	begin_player_turn(false, false)
 	Relics.on_battle_start(self)
@@ -294,6 +296,9 @@ func add_heat(amount: int) -> int:
 	var old_heat := player.heat
 	var ret := _add_heat_inner(amount)
 	_warm_heart_sync(old_heat)
+	if achievement != null:
+		achievement.cooled(maxi(0, old_heat - player.heat))
+		achievement.sample()
 	return ret
 
 
@@ -321,14 +326,14 @@ func _add_heat_inner(amount: int) -> int:
 		if new_overflow > 0:
 			spawn_scorch_into_bag(new_overflow)
 			if has_ability("heat_pollution_damage"):
-				var fire_damage := BattleBalance.i("overheat_damage", 5) * new_overflow * passive_multiplier("火热", first_alive_enemy() != null)
+				var fire_damage := BattleBalance.i("overheat_damage", 5) * ability_value("heat_pollution_damage") * new_overflow * passive_multiplier("火热", first_alive_enemy() != null)
 				deal_damage(first_alive_enemy(), fire_damage, false)
 				_log("火热：%d 枚污染【热】造成 %d 伤" % [new_overflow, fire_damage])
 			if has_ability("electric_overload"):
-				var overload_mult := passive_multiplier("电流过载")
+				var overload_mult := ability_value("electric_overload") * passive_multiplier("电流过载")
 				add_energy(BattleBalance.i("overload_energy", 1) * new_overflow * overload_mult)
 				deal_damage(first_alive_enemy(), BattleBalance.i("overload_damage", 3) * new_overflow * overload_mult, false)
-				_log("电流过载：溢热 %d，储能 +%d，造成 %d 伤" % [new_overflow, new_overflow * overload_mult, BattleBalance.i("overload_damage", 3) * new_overflow * overload_mult])
+				_log("电流过载：溢热 %d，储能 +%d，造成 %d 伤" % [new_overflow, BattleBalance.i("overload_energy", 1) * new_overflow * overload_mult, BattleBalance.i("overload_damage", 3) * new_overflow * overload_mult])
 			if has_ability("heat_overload_bonus"):
 				abilities["next_draw_bonus"] = int(abilities.get("next_draw_bonus", 0)) + ability_value("heat_overload_bonus", 2) * passive_multiplier("过热")
 				abilities.erase("heat_overload_bonus")  # 每回合首次
@@ -347,6 +352,7 @@ func add_energy(amount: int) -> void:
 		amount *= 2
 		_log("裂雷瓶：本次储能翻倍（+%d）" % amount)
 	player.add_energy(amount)
+	if achievement != null: achievement.sample()
 
 
 ## 玩家治疗；血珀把溢出部分转成持久盾。
@@ -368,6 +374,7 @@ func spend_energy(amount: int) -> void:
 	if spent <= 0:
 		return
 	player.energy -= spent
+	if achievement != null: achievement.spent_energy(spent)
 	monster_net_energy += spent
 	_energy_spend_turn = turn
 	last_energy_spent = spent
@@ -423,7 +430,7 @@ func _spawn_temp_dian() -> void:
 	var cd: CharacterData = Database.get_character_by_glyph("电")
 	if cd == null:
 		return
-	var count := passive_multiplier("电能")
+	var count := ability_value("electric_material") * passive_multiplier("电能")
 	for i in count:
 		empties = board.empty_indices()
 		if empties.is_empty():
@@ -467,6 +474,10 @@ func enable_ability(id: String, value: int = 1) -> void:
 	elif id == "next_free_word":
 		board.free_word_link = true
 
+## 累计收益与启用开关分开处理，避免重复施放覆盖，也避免已累加值再次翻倍。
+func add_ability(id: String, amount: int = 1) -> void:
+	enable_ability(id, ability_value(id) + amount)
+
 func ability_value(id: String, default_value: int = 0) -> int:
 	return int(abilities.get(id, default_value))
 
@@ -487,12 +498,14 @@ func take_solo_gain_bonus(ctx: Dictionary) -> int:
 
 ## 多段/群体攻击共享“下一次攻击”强化，按段应用，整次攻击只消费一次。
 func begin_attack_sequence() -> void:
+	if _attack_sequence_depth == 0 and achievement != null: achievement.attack_begin()
 	_attack_sequence_depth += 1
 
 
 func end_attack_sequence() -> void:
 	_attack_sequence_depth = maxi(0, _attack_sequence_depth - 1)
 	if _attack_sequence_depth == 0:
+		if achievement != null: achievement.attack_end()
 		_attack_sequence_bonus.clear()
 
 
@@ -537,6 +550,8 @@ func deal_damage(target: Combatant, amount: int, is_attack: bool = true) -> int:
 			dmg *= BattleBalance.i("cold_attack_mult", 2)  # 冷心：本回合伤害翻倍
 		if has_ability("split_mind") and not target.is_player:
 			target = player   # 精分：自己的攻击也打自己
+	var before_hp := target.hp
+	var before_shield := target.block + target.persistent_block
 	var real := 0
 	if is_attack and pierce_once and not target.is_player:
 		# 重击（墨途远征词谱）：本场第一次攻击无视护盾
@@ -550,6 +565,7 @@ func deal_damage(target: Combatant, amount: int, is_attack: bool = true) -> int:
 		_log("重击：这一击无视护盾")
 	else:
 		real = target.take_damage(dmg)
+	if is_attack and achievement != null: achievement.attack_hit(target, before_hp, before_shield, _attack_sequence_depth > 0)
 	if not target.is_player:
 		damage_dealt_this_turn += real
 		# 爆金：敌方每受到一次「攻击」获得 1 金币（被格挡/护甲吸收也算，故不看 real）
@@ -609,10 +625,12 @@ func try_play(path: Array, target: Dictionary = {}) -> Dictionary:
 
 ## 遗物包一层：打击增强按本次出字是否带【击】；出字后坠字石下落
 func _execute_prepared_play(play: Dictionary, shared: Dictionary) -> Dictionary:
+	if achievement != null: achievement.begin_play(play)
 	var prev := strike_active
 	strike_active = Relics.play_has_strike(play.glyphs)
 	var result := _execute_prepared_play_core(play, shared)
 	strike_active = prev
+	if achievement != null: achievement.finish_play(bool(result.get("ok", false)))
 	if result.get("ok", false) and relics.has("slab"):
 		Relics.slab_fall(self)
 		for e in alive_enemies():
@@ -893,9 +911,11 @@ func _execute_play_inner(play: Dictionary, shared: Dictionary) -> Dictionary:
 	if not discard_only:
 		for c in consumed:
 			var inst_g: CharInstance = c.inst
-			if inst_g.gilded and earn_gold(BattleBalance.i("gild_gold", 1)) > 0:
-				result.messages.append("镀金：【%s】+%d 金币" % [inst_g.glyph(), BattleBalance.i("gild_gold", 1)])
-				_log("镀金：【%s】+%d 金币" % [inst_g.glyph(), BattleBalance.i("gild_gold", 1)])
+			var gild_gain := earn_gold(BattleBalance.i("gild_gold", 1)) if inst_g.gilded else 0
+			if gild_gain > 0:
+				if achievement != null: achievement.emit_metrics([{"metric": "gild_gold", "amount": gild_gain}])
+				result.messages.append("镀金：【%s】+%d 金币" % [inst_g.glyph(), gild_gain])
+				_log("镀金：【%s】+%d 金币" % [inst_g.glyph(), gild_gain])
 
 	# 心力：每打出一颗【心】，叠加一层心力
 	if has_ability("heart_power") and not discard_only:
@@ -1186,6 +1206,7 @@ func _consume_path(path: Array, expected: Array, shared: Dictionary) -> Array:
 			item.kind = "pinned"
 		elif inst.temporary_uses > 0:
 			inst.temporary_uses -= 1
+			if achievement != null: achievement.extra_use()
 			item.kind = "layer"
 		elif inst.uid == slab_uid:
 			slab_kind = Relics.consume_slab(self, inst)
@@ -1603,6 +1624,7 @@ func _enemy_act(e: Combatant, opening := false) -> void:
 	if e.is_alive() and e.status_stacks("burn") > 0:
 		var bd: int = int(e.status_data.get("burn_damage", BattleBalance.i("burn_default_damage", 3)))
 		var real_b := e.take_damage(bd)
+		if achievement != null and not e.is_alive(): achievement.emit_metrics([{"metric": "burn_kills", "amount": 1}])
 		e.add_status("burn", -1)
 		if e.status_stacks("burn") <= 0:
 			e.status_data.erase("burn_damage")
@@ -1887,10 +1909,14 @@ func _spawn_pool_pick() -> String:
 	return BattleOps._spawn_pool_pick(self)
 
 func fuse_cards(p1: Vector2i, p2: Vector2i) -> Dictionary:
-	return BattleOps.fuse_cards(self, p1, p2)
+	var result := BattleOps.fuse_cards(self, p1, p2)
+	if achievement != null and result.ok: achievement.emit_metrics([{"metric": "fusion_success", "amount": 1}])
+	return result
 
 func refine_pair(p1: Vector2i, p2: Vector2i) -> Dictionary:
-	return BattleOps.refine_pair(self, p1, p2)
+	var result := BattleOps.refine_pair(self, p1, p2)
+	if achievement != null and result.ok: achievement.emit_metrics([{"metric": "refine_uses", "amount": 1}])
+	return result
 
 func remove_scorch_in_circulation() -> int:
 	return BattleOps.remove_scorch_in_circulation(self)

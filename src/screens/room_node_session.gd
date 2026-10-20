@@ -28,8 +28,11 @@ func pick(screen: Control, title: String, completed: Callable) -> void:
 	for glyph: String in run.pending_glyphs:
 		var character: CharacterData = Database.get_character_by_glyph(glyph)
 		if character!=null: chars.append(character)
+	var instances: Array = GameState.deck
+	if run.phase=="rest_choose" and run.pending_kind=="upgrade":
+		instances = instances.filter(func(inst): return not inst.gilded)
 	var overlay := CollectionOverlay.new()
-	overlay.setup({"title":title,"characters":chars,"counts":GameState.glyph_counts(),"pick_on_click":true})
+	overlay.setup({"title":title,"characters":chars,"instances":instances,"counts":GameState.glyph_counts(),"modification_preview": "镀金：每次有效打出额外获得%d金币，组词也生效，永久保留。" % BattleBalance.i("gild_gold", 1) if run.phase=="rest_choose" and run.pending_kind=="upgrade" else "","pick_on_click":true})
 	overlay.picked.connect(func(character: CharacterData):
 		if generation!=_picker_generation or not _picker_open: return
 		_picker_open = false; _picker_generation += 1

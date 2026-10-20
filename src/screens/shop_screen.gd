@@ -25,6 +25,7 @@ func build(root: Control) -> void:
 	if params.get("room_run",false) and GameState.room_run!=null:
 		_room_session = preload("res://src/screens/room_node_session.gd").new(GameState.room_run)
 	_offers = _room_session.run.shop_offers.duplicate(true) if _room_session!=null else _roll_offers()
+	Achievements.register_offers(_offers)
 	for i in _offers.size(): _offers[i]["display_slot"] = i
 	_showcase = preload("res://src/ui/object_stage/object_stage_view.gd").new()
 	_showcase.mode = "shop"
@@ -40,6 +41,7 @@ func build(root: Control) -> void:
 	_hud.on_tertiary = _refresh_stock
 	root.add_child(_hud)
 	_showcase.layout_changed.connect(_layout_offers)
+	_hud.action_button.item_rect_changed.connect(_layout_price_labels.call_deferred)
 	_refresh()
 	if _room_session!=null and _room_session.run.phase=="shop_choose": _resume_room_choice.call_deferred()
 
@@ -92,6 +94,7 @@ func _refresh_stock() -> void:
 	var chars := _roll_chars()
 	for i in chars.size(): chars[i]["display_slot"] = i
 	_offers = chars + _offers.filter(func(o): return o.kind != "buy_char" and o.kind != "relic") + _roll_relic()
+	Achievements.register_offers(_offers)
 	_selected = 0
 	_refresh()
 
@@ -128,6 +131,20 @@ func _layout_offers() -> void:
 		_cards[i].position = rect.position
 		_cards[i].size = rect.size
 
+	_layout_price_labels.call_deferred()
+
+
+func _layout_price_labels() -> void:
+	if not is_inside_tree(): return
+	var limit: float = _hud.action_button.global_position.y - 8
+	for card in _cards:
+		var caption: Label = card._caption
+		if caption == null: continue
+		# 价签留在柜台上，并避开底部购买按钮。
+		var top := minf(6, limit - card.global_position.y - card.size.y - 36)
+		caption.offset_top = top
+		caption.offset_bottom = top + 36
+
 
 func _inspect(index: int) -> void:
 	if _busy or _offers.is_empty(): return
@@ -143,7 +160,7 @@ func _inspect(index: int) -> void:
 		body = Relics.desc_of(item.relic)
 	else:
 		title = ch.glyph if ch != null else {"remove": "删字", "copy": "复制", "heal": "调息"}[item.kind]
-		body = ch.description if ch != null else {"remove": "从字袋中永久移除一枚字。", "copy": "复制字袋中的一枚字。", "heal": "回复 %d 点气血。" % _heal_amount()}[item.kind]
+		body = EffectGlossary.character_hint(ch) if ch != null else {"remove": "从字袋中永久移除一枚字。", "copy": "复制字袋中的一枚字。", "heal": "回复 %d 点气血。" % _heal_amount()}[item.kind]
 	_hud.set_detail(title + "  ·  " + str(item.price) + " 金币", body)
 	_hud.action_button.text = "金币不足" if GameState.gold < int(item.price) else "购入 · %d 金币" % item.price
 	_hud.action_button.disabled = GameState.gold < int(item.price)
@@ -213,6 +230,7 @@ func _on_char_chosen(ch: CharacterData) -> void:
 
 
 func _finish_offer(index: int) -> void:
+	Achievements.bought_offer(_offers[index])
 	_offers.remove_at(index)
 	_refresh()
 
@@ -229,7 +247,7 @@ func _choose_char(title: String) -> void:
 		"title": title,
 		"subtitle": "点击一枚字",
 		"characters": chars,
-		"counts": counts,
+		"counts": counts, "instances": GameState.deck,
 		"pick_on_click": true,
 	})
 	overlay.picked.connect(_on_char_chosen)

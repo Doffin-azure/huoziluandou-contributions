@@ -61,3 +61,9 @@ static func pay(b: BattleState, cost: int) -> bool:
 static func simple_ability(b: BattleState, id: String, msg: String) -> Array:
 	b.enable_ability(id, 1)
 	return [msg]
+
+
+## 有数量收益的持续能力可累计；防火等开关仍使用 simple_ability。
+static func stack_ability(b: BattleState, id: String, msg: String) -> Array:
+	b.add_ability(id)
+	return [msg + "（当前%d层）" % b.ability_value(id)]

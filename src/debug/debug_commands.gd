@@ -25,6 +25,8 @@ static func execute(line: String) -> Array:
 		return _help()
 	if not _cmds.has(name):
 		return ["未知命令：/%s（用 /help 查看）" % name]
+	if name not in ["cls", "refresh", "style", "word", "char", "words-of"]:
+		Achievements.invalidate_run()
 	var args: Array = []
 	for i in range(1, parts.size()):
 		args.append(parts[i])

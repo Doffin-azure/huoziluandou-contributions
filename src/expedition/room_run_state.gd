@@ -40,6 +40,7 @@ static func start(seed_value := -1):
 	if seed_value<0: seed_value = int(Time.get_unix_time_from_system()) ^ int(Time.get_ticks_usec())
 	run.reset({"seed":seed_value,"layout":"node_graph"})
 	run.autosave = not bool(GameState.get_meta("courtyard_preview",false))
+	if run.phase != "generation_error": Achievements.start_run("courtyard")
 	if run.autosave: run.save_run()
 	return run
 
@@ -82,6 +83,7 @@ func _load_act(number: int) -> void:
 	current_room = graph.start
 	resolved = {current_room:true}; visited_rooms = {current_room:true}
 	choices.clear(); sealed.clear(); contents.clear()
+	graph["enemy_history"] = []
 	planned_route.clear()
 	position = layout.rooms[current_room].stand_cell
 	phase = "map"; node = null; battle_h = null; spawned_battle = false
@@ -205,6 +207,7 @@ func _resolve_event_board(path: Array) -> Dictionary:
 			unique.append(str(glyph))
 			GameState.add_character(cd)
 	_log("璇玑图：读出「%s」，收入 %s" % [word.word, "、".join(unique)])
+	Achievements.event_completed(str(event_data.get("id", "")))
 	_complete_node()
 	return {"ok": true, "phase": phase, "glyphs": unique}
 
@@ -218,6 +221,7 @@ func _leave_event_board() -> Dictionary:
 
 ## 事件可以附带一次即时遭遇：宝箱直接发普通遗物，战斗在事件房间结束后打开。
 func _spawn_after_event(kind: String) -> void:
+	Achievements.event_completed(str(event_data.get("id", "")))
 	pending_spawn = ""
 	pending_event_effect.clear()
 	pending_event_next = ""
@@ -232,7 +236,7 @@ func _spawn_after_event(kind: String) -> void:
 			spawned_battle = true
 			spawn_battle_relic = pending_spawn_relic
 			pending_spawn_relic = ""
-			node = _event_battle_node()
+			node = _event_battle_node(true)
 			phase = "encounter"
 			_log("奇遇：拦路的字影扑了上来")
 		_:
@@ -253,14 +257,12 @@ func _grant_treasure_relic() -> String:
 	return id
 
 
-func _event_battle_node() -> MapNodeData:
+func _event_battle_node(commit := false) -> MapNodeData:
 	var result := MapNodeData.new()
 	result.type = MapNodeData.Type.BATTLE
 	result.title = "奇遇 · 拦路"
-	var enemy_id: String = Expedition.FOE_ENEMY[int(graph.rooms[current_room].content_seed) % Expedition.FOE_ENEMY.size()]
-	if layout_kind=="node_graph":
-		var pool: Array = EnemyRoster.NORMAL[GameState.act_index]
-		enemy_id = str(pool[int(graph.rooms[current_room].content_seed)%pool.size()])
+	var pool: Array = EnemyRoster.NORMAL[GameState.act_index] if layout_kind=="node_graph" else Expedition.FOE_ENEMY
+	var enemy_id := _select_encounter(current_room, pool, pool, commit, "event_enemy_id")
 	var enemy: EnemyData = Database.get_enemy(enemy_id).duplicate(true)
 	if layout_kind!="node_graph": enemy.max_hp = roundi(enemy.max_hp * (1 + .25 * (GameState.act_index - 1)))
 	result.enemies.append(enemy)
@@ -358,7 +360,7 @@ func _arrive(id: String) -> void:
 	GameState.rng.seed = spec.content_seed
 	_log("进入"+layout.rooms[id].name)
 	match spec.kind:
-		"battle","elite","boss": node = battle_node(); phase = "encounter"
+		"battle","elite","boss": node = battle_node("", true); phase = "encounter"
 		"event": _start_event()
 		"rest": phase = "rest"
 		"shop": _start_shop()
@@ -422,21 +424,65 @@ func plan_room(id: String) -> Dictionary:
 	return {"ok":true,"planned_route":planned_route.duplicate()}
 
 
-func battle_node(room_id := "") -> MapNodeData:
+func _encounter_pools(room_id: String) -> Dictionary:
+	var spec: Dictionary = graph.rooms[room_id]
+	if spec.kind == "boss":
+		return {"preferred":[EnemyRoster.BOSSES[GameState.act_index]], "available":[EnemyRoster.BOSSES[GameState.act_index]]}
+	if layout_kind == "node_graph":
+		var stage := clampi(floori(float(layout.rooms[room_id].column)/5),0,2)
+		return {"preferred": Expedition.ELITE_STAGES[GameState.act_index][stage] if spec.kind=="elite" else Expedition.NORMAL_STAGES[GameState.act_index][stage],
+			"available": EnemyRoster.ELITES[GameState.act_index] if spec.kind=="elite" else EnemyRoster.NORMAL[GameState.act_index]}
+	var preferred := Expedition.ELITE if spec.kind=="elite" else "ink_spirit"
+	if spec.kind != "elite":
+		if room_id=="opening_2" or travel!=null and int(spec.row)==1: preferred = "paper_guard"
+		elif room_id!="opening_1" and not (travel!=null and int(spec.row)==0): preferred = Expedition.FOE_ENEMY[int(spec.content_seed)%Expedition.FOE_ENEMY.size()]
+	return {"preferred":[preferred], "available":[Expedition.ELITE] if spec.kind=="elite" else Expedition.FOE_ENEMY}
+
+
+func _select_encounter(room_id: String, preferred: Array, available: Array, commit: bool, key := "enemy_id") -> String:
+	var cached: Dictionary = contents.get(room_id, {})
+	if cached.has(key): return str(cached[key])
+	var history: Array = graph.get("enemy_history", [])
+	var id := EnemyRoster.pick_encounter(preferred, available, history, int(graph.rooms[room_id].content_seed))
+	if commit:
+		cached[key] = id
+		contents[room_id] = cached
+		history.append(id)
+		graph["enemy_history"] = history
+	return id
+
+
+## 旧存档保留已走过房间的原选怪结果，后续遭遇才使用去重规则。
+func _restore_encounters() -> void:
+	if graph.has("enemy_history"): return
+	var history: Array = []
+	for room_id: String in visited_rooms:
+		if not graph.rooms.has(room_id): continue
+		var spec: Dictionary = graph.rooms[room_id]
+		if spec.kind not in ["battle", "elite", "boss"]: continue
+		var pool: Array = _encounter_pools(room_id).preferred
+		var id: String = pool[int(spec.content_seed)%pool.size()] if layout_kind=="node_graph" else pool[0]
+		var cached: Dictionary = contents.get(room_id, {})
+		cached["enemy_id"] = id
+		contents[room_id] = cached
+		history.append(id)
+	if spawned_battle:
+		var pool: Array = EnemyRoster.NORMAL[GameState.act_index] if layout_kind=="node_graph" else Expedition.FOE_ENEMY
+		var id: String = pool[int(graph.rooms[current_room].content_seed)%pool.size()]
+		var cached: Dictionary = contents.get(current_room, {})
+		cached["event_enemy_id"] = id
+		contents[current_room] = cached
+		history.append(id)
+	graph["enemy_history"] = history
+
+
+func battle_node(room_id := "", commit := false) -> MapNodeData:
 	if room_id.is_empty(): room_id = current_room
 	var spec: Dictionary = graph.rooms[room_id]
 	var result := MapNodeData.new()
 	result.type = {"battle":MapNodeData.Type.BATTLE,"elite":MapNodeData.Type.ELITE,"boss":MapNodeData.Type.BOSS}[spec.kind]
-	var enemy_id := "ink_spirit"
-	if layout_kind=="node_graph":
-		var stage := clampi(floori(float(layout.rooms[room_id].column)/5),0,2)
-		var pool: Array = Expedition.ELITE_STAGES[GameState.act_index][stage] if spec.kind=="elite" else Expedition.NORMAL_STAGES[GameState.act_index][stage]
-		enemy_id = EnemyRoster.BOSSES[GameState.act_index] if spec.kind=="boss" else str(pool[int(spec.content_seed)%pool.size()])
-	else:
-		if spec.kind=="boss": enemy_id = Expedition.BOSS[GameState.act_index]
-		elif spec.kind=="elite": enemy_id = Expedition.ELITE
-		elif current_room=="opening_2" or travel!=null and int(spec.row)==1: enemy_id = "paper_guard"
-		elif current_room!="opening_1" and not (travel!=null and int(spec.row)==0): enemy_id = Expedition.FOE_ENEMY[int(spec.content_seed)%Expedition.FOE_ENEMY.size()]
+	var pool := _encounter_pools(room_id)
+	var enemy_id := _select_encounter(room_id, pool.preferred, pool.available, commit)
 	var enemy: EnemyData = Database.get_enemy(enemy_id).duplicate(true)
 	if layout_kind!="node_graph" and spec.kind!="boss": enemy.max_hp = roundi(enemy.max_hp*(1+.25*(GameState.act_index-1)))
 	result.title = layout.rooms[room_id].name
@@ -476,7 +522,11 @@ func _grant_battle_relic(mode: String) -> void:
 
 func finish_live_battle(victory: bool) -> void:
 	if phase!="battle": return
-	if not victory: phase = "defeat"; _save_if_enabled(); return
+	if not victory:
+		Achievements.finish_run(false)
+		phase = "defeat"
+		_save_if_enabled()
+		return
 	# 事件战斗的遗物奖励替代普通战后三选一。
 	if spawned_battle and not spawn_battle_relic.is_empty():
 		_grant_battle_relic(spawn_battle_relic)
@@ -488,6 +538,9 @@ func finish_live_battle(victory: bool) -> void:
 	GameState.add_gold(20 if kind=="elite" else (30 if kind=="boss" else 10))
 	if active.has("金币"): GameState.add_gold(2)
 	if kind in ["elite","boss"] and active.has("铸币"): GameState.add_gold(5)
+	if kind == "boss" and GameState.act_index >= 3:
+		_finish_final_boss()
+		return
 	GameState.rng.seed = int(graph.rooms[current_room].content_seed)^0xA11CE
 	reward_options = _pick_from_db(1 if kind in ["elite","boss"] else 0,4 if kind=="boss" else 2,4 if active.has("分流") else 3)
 	phase = "reward"
@@ -495,6 +548,18 @@ func finish_live_battle(victory: bool) -> void:
 	if kind=="elite" or kind=="boss" and GameState.act_index<3:
 		contents[current_room]["battle_relics"] = Relics.roll_choices(GameState.relics,GameState.rng,2 if kind=="boss" else 1)
 		if kind=="boss": GameState.heal(roundi(GameState.player_max_hp*.3))
+	_save_if_enabled()
+
+
+func _finish_final_boss() -> void:
+	if phase == "victory": return
+	_complete_node()
+	reward_options.clear()
+	if contents.has(current_room):
+		contents[current_room]["reward"] = []
+		contents[current_room]["battle_relics"] = []
+	phase = "victory"
+	Achievements.finish_run(true)
 	_save_if_enabled()
 
 
@@ -549,7 +614,11 @@ func _apply_reward(t: String, action: Dictionary) -> Dictionary:
 
 
 func _complete_node() -> void:
-	if GameState.player_hp<=0: phase = "defeat"; return
+	if GameState.player_hp<=0:
+		Achievements.finish_run(false)
+		phase = "defeat"
+		return
+	Achievements.node_completed()
 	resolved[current_room] = true
 	_sync_content()
 	reward_options.clear(); shop_offers.clear(); event_data = {}; pending_glyphs.clear(); pending_event_effect.clear(); pending_event_next = ""; event_node = "start"
@@ -598,7 +667,9 @@ func apply(action: Dictionary) -> Dictionary:
 	if type=="enter_room": return enter_room(str(action.get("room","")))
 	if type=="interact" and phase=="encounter": _start_battle(node); result = {"ok":true,"phase":phase}
 	elif type=="next_act" and phase=="act_end":
-		if GameState.act_index>=3: phase = "victory"
+		if GameState.act_index>=3:
+			phase = "victory"
+			Achievements.finish_run(true)
 		else: _load_act(GameState.act_index+1)
 		result = {"ok":true,"phase":phase}
 	elif type=="treasure_ack" and phase=="treasure": _complete_node(); result = {"ok":true,"phase":phase}
@@ -660,9 +731,22 @@ func _refresh_active() -> void:
 		if word not in supported: active.erase(word)
 
 
+func _apply_rest(t: String, action: Dictionary) -> Dictionary:
+	var result: Dictionary = super._apply_rest(t, action)
+	if result.ok and phase == "rest_choose" and pending_kind == "upgrade":
+		pending_glyphs.clear()
+		for inst: CharInstance in GameState.deck:
+			if not inst.gilded and not pending_glyphs.has(inst.glyph()): pending_glyphs.append(inst.glyph())
+		if pending_glyphs.is_empty():
+			phase = "rest"
+			pending_kind = ""
+			return _fail("所有字都已镀金，请选择其他整备。")
+	return result
+
+
 func _apply_upgrade(ch: CharacterData) -> void:
 	for inst in GameState.deck:
-		if inst.id()==ch.id and not inst.gilded: inst.gilded = true; return
+		if inst.id()==ch.id and not inst.gilded: GameState.gild_character(inst); return
 
 
 func observe() -> Dictionary:
@@ -723,12 +807,22 @@ func save_run(path := SAVE_PATH) -> Error:
 	_sync_content()
 	var data := SAVE.new()
 	data.run = {"seed":seed,"act":GameState.act_index,"graph":graph,"current_room":current_room,"resolved":resolved,"visited":visited_rooms,"choices":choices,"sealed":sealed,"contents":contents,"seen_events":seen_events,"event_bags":event_bags,"last_event_id":last_event_id,"event_node":event_node,"pending_event_next":pending_event_next,"event_temp_hp":GameState.event_temp_hp,"position":position,"phase":phase,"plate":plate,"tray":tray,"active":active,"pending_glyphs":pending_glyphs,"pending_kind":pending_kind,"pending_index":pending_index,"pending_event_effect":pending_event_effect,"pending_spawn":pending_spawn,"pending_spawn_relic":pending_spawn_relic,"spawned_battle":spawned_battle,"spawn_battle_relic":spawn_battle_relic,"event_board":event_board.duplicate(true),"log":log_lines,"rng":GameState.rng.state}
+	data.run["achievements"] = Achievements.export_run()
 	if travel!=null: data.run["forward"] = {"history":travel.history.duplicate(),"departed":travel.departed}
 	data.run["planned_route"] = planned_route.duplicate()
 	data.player = {"hp":GameState.player_hp,"max_hp":GameState.player_max_hp,"gold":GameState.gold,"sequence":GameState.battle_sequence,"relics":GameState.relics,"binds":GameState.relic_binds,"counters":GameState.relic_counters,"reduction":GameState.permanent_damage_reduction,"deck":[]}
 	for inst in GameState.deck:
 		data.player.deck.append({"uid":inst.uid,"data":inst.data,"gilded":inst.gilded,"upgrade":inst.upgrade_level,"modifiers":inst.modifiers.duplicate(),"pollutions":inst.pollutions.duplicate(),"fusion":inst.fusion.duplicate()})
 	return ResourceSaver.save(data,path)
+
+
+static func has_continuable_save(path := SAVE_PATH) -> bool:
+	if not FileAccess.file_exists(path): return false
+	var data = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+	if data == null or not data is Resource or data.get("schema") != 1: return false
+	var saved: Variant = data.get("run")
+	var player: Variant = data.get("player")
+	return saved is Dictionary and player is Dictionary and saved.get("phase", "") not in ["defeat", "victory", "generation_error"] and int(player.get("hp", 0)) > 0
 
 
 static func restore(path := SAVE_PATH, as_nodes := false):
@@ -768,6 +862,7 @@ static func restore(path := SAVE_PATH, as_nodes := false):
 	run.pending_glyphs = state.pending_glyphs; run.pending_kind = state.pending_kind; run.pending_index = state.pending_index; run.pending_event_effect = state.get("pending_event_effect",{}); run.pending_spawn = str(state.get("pending_spawn","")); run.pending_spawn_relic = str(state.get("pending_spawn_relic","")); run.spawned_battle = bool(state.get("spawned_battle",false)); run.spawn_battle_relic = str(state.get("spawn_battle_relic","")); run.event_board = state.get("event_board",{}); run.log_lines = state.log
 	var cached: Dictionary = run.contents.get(run.current_room,{})
 	run.reward_options = cached.get("reward",[]); run.shop_offers = cached.get("shop",[]); run.event_data = cached.get("event",{})
+	run._restore_encounters()
 	if run.phase in ["encounter","reward"] and (run.graph.rooms[run.current_room].kind in ["battle","elite","boss"] or run.spawned_battle): run.node = run.battle_node() if not run.spawned_battle else run._event_battle_node()
 	var player: Dictionary = data.player
 	GameState.deck.clear()
@@ -781,9 +876,17 @@ static func restore(path := SAVE_PATH, as_nodes := false):
 	GameState.battle_sequence = player.sequence; GameState.relics = player.relics; GameState.relic_binds = player.binds; GameState.relic_counters = player.counters
 	GameState.permanent_damage_reduction = player.reduction
 	GameState.rng.state = state.rng
+	Achievements.resume_run(state.get("achievements", {}))
+	# 旧版本没有成就快照；从恢复后的实际操作开始记录，不补算历史。
+	var migrated_achievements: bool = state.get("achievements", {}).is_empty() and run.phase not in ["victory", "defeat"]
+	if migrated_achievements: Achievements.start_run("courtyard")
+	Achievements.register_offers(run.shop_offers)
 	if run.layout_kind=="node_graph":
 		run._seal_abandoned()
 	run.autosave = not bool(GameState.get_meta("courtyard_preview",false))
+	if run.phase in ["reward", "act_end"] and run.current_room == run.graph.boss and GameState.act_index >= 3:
+		run._finish_final_boss()
+	if migrated_achievements and run.autosave and not Achievements.run_id.is_empty(): run.save_run(path)
 	return run
 
 
@@ -804,6 +907,7 @@ func _start_shop() -> void:
 	super._start_shop()
 	var ids: Array = RelicRewardFlow.roll(1,RelicRewardFlow.side_rng("shop"))
 	if not ids.is_empty(): shop_offers.append({"kind":"relic","character":null,"relic":ids[0],"price":RelicRewardFlow.SHOP_PRICE})
+	Achievements.register_offers(shop_offers)
 
 
 func _apply_shop(type: String, action: Dictionary) -> Dictionary:
@@ -818,6 +922,7 @@ func _apply_shop(type: String, action: Dictionary) -> Dictionary:
 		var item: Dictionary = shop_offers[index]
 		if not GameState.spend_gold(int(item.price)): return _fail("金币不足")
 		_grant_battle_relic(str(item.relic))
+		Achievements.bought_offer(item)
 		shop_offers.remove_at(index)
 		return {"ok":true,"phase":phase,"relic":item.relic}
 	return super._apply_shop(type,action)

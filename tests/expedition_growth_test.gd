@@ -19,6 +19,7 @@ func signature(ed: EnemyData) -> String:
 	return ed.id + ":" + str(ed.max_hp) + ":" + str(ed.initial_block) + ":" + ",".join(ed.moves.map(func(m): return str(m.damage) + "/" + str(m.hits)))
 
 func _ready() -> void:
+	get_window().size = Vector2i(1280, 720)
 	await frames()
 	var source_hp := {}
 	for ed in Database.enemies.values(): source_hp[ed.id] = ed.max_hp
@@ -47,7 +48,10 @@ func _ready() -> void:
 				var stage := ex.encounter_stage(kind, k)
 				var pool: Array = Expedition.ELITE_STAGES[act_no][stage] if kind == "elite" else Expedition.NORMAL_STAGES[act_no][stage]
 				var source: EnemyData = Database.get_enemy(ed.id)
-				check(pool.has(ed.id), "怪物来自对应幕/阶段的候选池")
+				var available: Array = EnemyRoster.ELITES[act_no] if kind == "elite" else EnemyRoster.NORMAL[act_no]
+				check(available.has(ed.id), "怪物来自对应幕和战斗类型的候选池")
+				if pool.any(func(id): return not (ex.m.get("enemy_history", []) as Array).has(id)):
+					check(pool.has(ed.id), "阶段有未见怪物时仍优先当前阶段")
 				var expected := ceili(source_hp[ed.id] * (100 + 4 * stage + (12 if act_no == 3 else 0)) / 100.0)
 				check(ed.max_hp == expected and ed.max_hp >= source_hp[ed.id], "生命倍率为前0%、中4%、深8%，三幕再加12%")
 				check(ed.moves.size() == source.moves.size() and ed.moves.map(func(m): return m.damage) == source.moves.map(func(m): return m.damage), "原始招式伤害不暗增")

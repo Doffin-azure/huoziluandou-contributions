@@ -1,0 +1,114 @@
+Tool: built-in image_gen.
+Outputs: eight-design natural jade study and complete48-achievement jade atlas.
+Direction: poetic nature/ritual-jade associations replace literal inventory props; flat hand-painted contour and jade shading, organic asymmetry, selective wear, no text on jade objects. Names remain Traditional Chinese.
+Status: visual review only; does not alter achievement IDs, gameplay conditions, workbook or runtime icons.
+
+EIGHT-DESIGN STUDY
++Use case: stylized-concept.
+Create an art-direction STUDY of EIGHT small jade achievement charms for a hand-drawn Chinese Taoist science-fiction game with Nine Sols / 九日 sensitivity. This is a NEW conceptual redesign, not a minor re-render of the old inventory icons.
+The reference image is ONLY the game-world palette and painted drawing style: ink teal, muted celadon, old parchment, vermilion maple accents. Do not recreate its UI.
+
+ART DIRECTION — NATURAL AND AUTHORED:
+The previous icons felt too literal, uniform, glossy and machine-generated. These eight must feel like a human illustrator thoughtfully designed them: poetic associations instead of illustrating the achievement name word-for-word; purposeful irregular silhouettes; graceful negative spaces; gently uneven carved edges; distinctive proportions; slight asymmetry and a sense of living movement. Think modest old Chinese jade carvings of shoots, fish, leaves, clouds and worn ritual fragments, interpreted through an economical 2D game art hand. Give each design a real compositional idea and leave unnecessary detail out.
+MATERIAL AND DRAWING:
+Opaque satin nephrite, muted dusty celadon and warm ivory, a little deep moss jade. Mostly flat hand-painted shapes, dark ink contour with gentle line-weight variation, only two or three shaded color planes. Very small edge highlights where structurally necessary. Sparse selective chisel marks and natural inclusions, NOT mottled noise pasted onto every item. A few soft worn corners, not distressed chips everywhere.
+NO photorealism, studio lighting, glossy waxy material, repeated white specular bevels, translucent glass, plastic, 3D render, isometric cubes, jewels, batteries, generic shields, literally modeled books, literal tools, coin icons, big gold mounts, ornate frames, decorative texture overload, neon light, or colored magical emissions.
+No words or glyphs inside the jade at all. All text is the achievement name beneath it. There must be no rectangular jade plaques with the name's character carved in the middle.
+Colors: low-saturation jade #91AA95 / #B9C5AD / #507063 / ivory #D6D0B3. Ink outlines #263E37. Hairline old gold or dull mineral ochre in only one or two places. No red cords, no red bars, no bright flames.
+Small UI objects that would read at 40px, each with an individual silhouette.
+
+EIGHT DESIGNS — exactly 4 columns by2 rows:
+1 “落下第一筆” — one young bamboo shoot with a slightly curled tip and a single slender leaf, carved as a small pale jade openwork. Suggest the first living stroke and beginning, WITHOUT a pen, written character, or writing tablet. A quiet diagonal, not a perfect symmetric plant.
+2 “紅藍對校” — two small complementary FISH-shaped jade pendants, one pale ivory and one moss-celadon, gently turning toward each other. Their inner contours visually fit, their tails differ slightly. Matching and dialogue rather than literal colored tags. No full yin-yang disc, no enclosing ring, no red/blue paint.
+3 “止於一字” — one compact curled FERN SHOOT holding just a single unfurled leaf; the spiral tip stops before branching further. A beautiful small asymmetrical jade carving, not a prohibition sign or a plant plus a crossbar.
+4 “沿途留印” — a slender, gently bent worn CLOUD-SHAPED jade fragment with three discreet shallow notch traces along one edge. Evokes passage and traces. Neither feet, literal footprints, road map nor a flat path plaque.
+5 “字上生金” — a modest leaf-shaped jade sliver with a tiny fine old-gold repaired tip along one edge. Jade remains dominant; the gold feels like a precious later addition. No text tile or coin.
+6 “接字如流” — one long, fluid fish-like jade openwork with a relaxed S-shaped body and a tail that dissolves into a water-curve. Airy negative space, no repeated five-stroke logo.
+7 “餘燼落字” — a small irregular fallen leaf of pale old jade, one warm ochre mineral vein near its curled edge and an elegant quiet notch. Suggest residual warmth. No literal burning paper, red fire, or ember particles.
+8 “舊物成藏” — a small time-worn jade CONG fragment with rounded corners and a single quiet incised band, visibly an old keepsake; front-facing slightly irregular silhouette. It must feel ancient and personal, not a cube stack, display case or jewelry product photo.
+
+PRESENTATION:
+A very simple unframed deep desaturated ink-teal background, no giant game UI, ornamental border, moons or maple tree props. These are the designs, not a fancy marketing sheet. Sparse, airy 4×2 grid. Every item has a consistent modest display size with lots of empty space; tiny faint contact shadow only.
+Names in clear delicate warm-gray Traditional Chinese Song typography beneath each, exact strings above. The only title is small “玉器意象草案”.
+Emphasize a cohesive HAND-DRAWN 2D art style and natural artistic silhouettes. Understated, tactile, poetic, not sleek or diagrammatic.
+
+COMPLETE ATLAS
++Use case: stylized-concept.
+Create a COMPLETE 48-item achievement icon atlas, extending the approved direction of image1's eight jade carvings to the entire set.
+Image1 is the PRIMARY DRAWING STYLE AND MATERIAL reference: thoughtfully shaped poetic jade carvings, muted green and ivory, irregular organic silhouettes, economical hand-painted dark contours and flat shading. Image2 only supplies the game's teal-and-parchment world palette.
+The user wants a more natural and artist-authored appearance, with a loose conceptual connection between icon and achievement name. The subject does NOT have to literally illustrate the name. Avoid repetitive name-character plaques, inventory prop illustrations, and uniform shiny generated material.
+
+STYLE RULES:
+Natural small Chinese jade carvings and ritual keepsakes with graceful negative space and individual proportions. Vary curves and asymmetry intentionally. Mainly matte opaque satin celadon nephrite and old ivory jade; minimal edge light, two or three broad painted value planes, selective dark contour variation. QUIETER texture than image1: fewer cracks and chips, sparse mineral inclusions on only selected pieces. Most jade surfaces should be calm. Old-gold repair appears only on the specific gilding motifs, a tiny ochre vein elsewhere at most.
+No repeated white bevel outline, polished waxy glare, glass, 3D render, studio lighting, extruded inventory icons, isometric cubes, batteries, generic shields, literal books and pens, money bags, trophies, coins, rendered flames, excessive damage, regular big medals, hexagonal frames, enclosing sockets, neon, red ribbons, or rune letters carved on plaques. No Chinese characters INSIDE the objects. Visible text is only the labels beneath and row headings.
+Use original poetic visual associations: bamboo, fronds, feathers, fish, small birds, rounded old jade fragments, cloud curves, knot forms and occasional understated ritual animal shapes. It must feel like a coherent set drawn by an illustrator, not 48 copies of one generated material or a collection of disconnected museum product photos.
+Every icon should read at small UI size. Airy silhouette, leave irrelevant small decoration out. Most must be largely front-facing flat carvings, not a dramatically lit sculpture standing on a pedestal.
+
+LAYOUT:
+ONE high resolution landscape atlas, exactly8 columns by6 rows =48 DISTINCT icons. All same modest footprint with generous breathing room. Simple deep muted ink-teal background, very faint paper/stone grain, NO giant decorative frame, moon, maple trees, or copied screenshot UI.
+Small understated title “玉符成就總覽”. Six small row headings on left, no framed plaques.
+One exact Traditional Chinese name centered directly BELOW EACH icon, legible warm gray-ivory Song font. All names intact. No extra captions or English.
+The first reference is an 8-design study only; reposition its subjects correctly according to the full list below. Do not repeat the study's 4×2 layout or add a study inset. No extra sample strip is needed.
+
+EXACT ORDER — each title followed by its loose POETIC JADE MOTIF:
+ROW1 heading “組詞入門”
+1 落下第一筆 — young bamboo shoot with curled tip and slender leaf; use the natural asymmetric first design in reference1, simplify its surface texture.
+2 百詞成篇 — three overlapping lingzhi-like leaf lobes in one small airy jade carving.
+3 千詞成卷 — curled fiddlehead/scroll-like cloud form with a single openwork hollow, not a literal paper scroll.
+4 識得十詞 — tiny alert owl-like jade carving with asymmetric tilted head and very simple eyes.
+5 詞庫漸豐 — a little cluster of varied bamboo segments, tall slim contours rather than block stacks.
+6 腹有詞章 — round-bellied little songbird with incised wing, quiet curved negative space.
+7 初戰告捷 — swift small jade bird with a slightly lifted wing and decisive long tail.
+8 印成一卷 — loosely coiled ancient chi-dragon / cloud-tail jade fragment with open center, not a full circular medal.
+
+ROW2 heading “戰鬥技巧”
+9 鋒芒初現 — a single pointed bamboo-leaf jade sliver, softly curved and sharpened at tip.
+10 一擊破陣 — openwork ram-horn fragment with a purposeful gap and strong diagonal.
+11 刻石成痕 — worn small mountain-shaped jade arch, one spare natural cleft.
+12 接字如流 — the fluid fish with water-curve tail from reference1, more economical lines.
+13 連篇不絕 — continuous irregular cloud-scroll jade with three rhythms, not a repeated geometric logo.
+14 餘盾未散 — curled protective ginkgo-like leaf carving.
+15 銅牆留印 — small resting tortoise-shaped jade, shell pattern only two incised lines.
+16 毫髮無損 — slender whole ivory-jade feather, gentle undulating edge.
+
+ROW3 heading “儲能熱度”
+17 電光初蓄 — folded dragonfly-wing jade with one subtly forked vein.
+18 滿匣雷聲 — compact spiral ram-horn shape, rounded swollen root and narrow tip.
+19 一放驚雷 — long jade bird wing with a sharp branching flight silhouette.
+20 爐心漸赤 — small cicada/chrysalis jade carving, one tiny dull ochre inset, no flame.
+21 熱字出爐 — closed little magnolia-bud jade with a warm mineral seam, no letters.
+22 驟冷成霜 — asymmetrical five-petal plum-blossom white-jade fragment, not a machine-perfect snowflake.
+23 餘燼落字 — curled irregular fallen leaf with a single muted ochre vein, like reference1's leaf, no fire.
+24 十響連擊 — flowing fish-scale / water-ripple jade form with three staggered curves and airy openings.
+
+ROW4 heading “字塊養成”
+25 字上生金 — modest leaf-shaped jade sliver with a tiny repaired old-gold edge, like reference1, jade dominates.
+26 三字鑲金 — three small rounded seed-pods joined naturally, a hairline gold repair crossing only one.
+27 字字有價 — pierced lotus-seedpod jade with three naturally spaced holes, no coins.
+28 精工一字 — delicate half-finished bird-shaped jade, a few intentional chisel lines near wing, no literal tools.
+29 立字為礎 — squat grounding mountain-root jade carving with one low openwork arch.
+30 二字合印 — two complementary fish-shaped pieces gently fitted nose-to-tail, not enclosed in a disc.
+31 反覆打磨 — small smoothed river-pebble jade with one eccentric openwork hole.
+32 借字成章 — two overlapping thin willow leaves, one solid and one mostly openwork.
+
+ROW5 heading “污染解籤”
+33 拂去墨污 — small white-jade egret with an elegant bent neck and one quiet dark inclusion.
+34 淨字成行 — fresh willow sprig with three lightly varied leaves, mostly pale jade.
+35 污字亦成詞 — moss-jade fragment with a naturally dark mineral stratum that becomes part of an elegant water-cloud contour.
+36 止於一字 — compact curled fern shoot holding a single unfurled leaf, like reference1; no crossbar, no stop sign.
+37 折頁解籤 — small moth-wing jade fragment, one folded wing beginning to open, no paper tag.
+38 紅藍對校 — the two complementary ivory and moss-jade fish from reference1; slightly different tails; no red or blue paint.
+39 移字出軌 — forked reed jade carving with one leaf bending away from the stem.
+40 一紙無塵 — very thin smooth ivory-jade leaf, unmarked calm face and gently lifted tip.
+
+ROW6 heading “首領旅途”
+41 破開鉛版 — open mountain-arch jade fragment split into two complementary edges, quiet and sturdy.
+42 字魔伏誅 — small ancient beast-mask jade with CALM restrained facial incisions, no aggressive cartoon face or red markings.
+43 平定混鉛 — reclining fish with relaxed fins and three quiet waterlike contours.
+44 沿途留印 — worn elongated cloud-shaped jade fragment with three discreet edge notch traces, like reference1; no feet or map.
+45 百程入卷 — long curling tail of an ancient cloud-beast jade with two simple mountainlike lobes.
+46 奇聞十錄 — small attentive fox-like jade with one tilted ear and a restrained curved tail.
+47 行囊漸滿 — rounded closed pomegranate-shaped jade with a small natural three-lobed crown.
+48 舊物成藏 — small old jade cong fragment with softly rounded corners and one incised band, like reference1 but flatter and less cubic.
+
+Keep ALL48 names exactly as given, in Traditional Chinese, no omissions, duplicates or other labels. Maintain the handmade 2D illustrator sensibility, sparse texture, restrained jade colors, poetic subjects and compact art.

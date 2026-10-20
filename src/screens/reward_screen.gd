@@ -12,7 +12,7 @@ var _expedition := false   ## 墨途远征：选中的字进字匣，回远征�
 var _cards: Array[GlyphOffer] = []
 var _showcase: Control
 var _hud: Control
-var _selected := 0
+var _selected := -1
 var _busy := false
 var _boss_heal := 0
 var _settled := false
@@ -29,6 +29,14 @@ func build(root: Control) -> void:
 	node = params.get("node", null)
 	_expedition = params.get("expedition", false) and GameState.expedition != null
 	var is_boss := node != null and node.type == MapNodeData.Type.BOSS
+	var reward_act: int = GameState.expedition.act if _expedition else GameState.act_index
+	if is_boss and reward_act >= 3:
+		if params.get("room_run", false) and GameState.room_run != null:
+			GameState.room_run._finish_final_boss()
+		elif not _expedition and not GameState.run_complete():
+			GameState.complete_current_node()
+		goto.call_deferred("res://src/screens/run_result_screen.gd", {"victory":true, "location":node.title})
+		return
 	_room_run = params.get("room_run", false) and GameState.room_run != null
 	if _room_run:
 		_reward_owner = GameState.room_run
@@ -69,12 +77,12 @@ func build(root: Control) -> void:
 		offer.character = ch
 		offer.caption = "%02d   %s" % [i + 1, ch.glyph]
 		offer.clicked.connect(_inspect.bind(i))
-		offer.hovered.connect(_inspect.bind(i))
 		root.add_child(offer)
 		_cards.append(offer)
 	_showcase.layout_changed.connect(_layout_cards)
 	_layout_cards.call_deferred()
-	_inspect(0)
+	_hud.set_detail("点击活字选中", "左键点击一枚活字查看效果并选中，再点击领取按钮确认。")
+	_set_busy(false)
 	_showcase.stage.open_case()
 	if not relic_step.is_empty():
 		_offer_relics.call_deferred(relic_step)
@@ -134,6 +142,7 @@ func _layout_cards() -> void:
 func _inspect(index: int) -> void:
 	if _busy or index < 0 or index >= _options.size(): return
 	_selected = index
+	_hud.action_button.disabled = false
 	for i in _cards.size(): _cards[i].set_selected(i == index)
 	_showcase.stage.select_object(index)
 	var ch: CharacterData = _options[index]
@@ -153,7 +162,7 @@ func _accept_pick() -> void:
 
 func _set_busy(value: bool) -> void:
 	_busy = value
-	_hud.action_button.disabled = value
+	_hud.action_button.disabled = value or _selected < 0
 	_hud.secondary_button.disabled = value
 
 
@@ -207,21 +216,12 @@ func _reward_pool(is_boss: bool) -> Array:
 
 func _with_hint(c: CharacterData) -> CharacterData:
 	var copy: CharacterData = c.duplicate()
-	var words := _words_for(c.glyph)
-	var hint := c.description
-	if not words.is_empty():
-		var shown := words.slice(0, 4)
-		hint += "\n可组：" + " / ".join(shown)
-	copy.description = hint
+	copy.description = EffectGlossary.character_hint(c)
 	return copy
 
 
 func _words_for(glyph: String) -> Array:
-	var out: Array = []
-	for w in Database.words.values():
-		if w.glyphs.has(glyph):
-			out.append(w.word)
-	return out
+	return EffectGlossary.words_for_glyph(glyph)
 
 
 func _on_pick(c: CharacterData) -> void:
@@ -266,20 +266,4 @@ func _leave() -> void:
 
 
 func _try_victory() -> void:
-	var overlay := ChoiceOverlay.new()
-	overlay.setup({
-		"title": "通关",
-		"body": "三幕已尽，字阵大成。你的字袋共 %d 枚实体字。" % GameState.deck_size(),
-		"options": [{"text": "再走一遍", "primary": true}, {"text": "返回标题"}],
-	})
-	overlay.chose.connect(_on_victory_choice)
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(overlay)
-
-
-func _on_victory_choice(index: int) -> void:
-	if index == 0:
-		GameState.start_new_run("v03")
-		goto("res://src/screens/map_screen.gd")
-	else:
-		goto("res://src/screens/title_screen.gd")
+	goto("res://src/screens/run_result_screen.gd", {"victory":true})

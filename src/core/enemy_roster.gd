@@ -70,6 +70,23 @@ const NORMAL := {1: ["paper_shell", "needle_bee", "tilting_inkwell", "fold_moth"
 const ELITES := {1: ["iron_seal"], 2: ["copy_master", "seal_officer", "wheel_master", "leech"], 3: ["copy_master", "seal_officer", "wheel_master", "leech"]}
 const BOSSES := {1: "proof_boss", 2: "rail_boss", 3: "compiler_boss"}
 
+## 优先未见过的阶段怪，再选本层未见怪；全见过后均匀轮换，避免连遇同种。
+## 使用独立随机源，预览不会消耗冒险或战斗随机数。
+static func pick_encounter(preferred: Array, available: Array, history: Array, seed_value: int) -> String:
+	var candidates := preferred.filter(func(id): return not history.has(id))
+	if candidates.is_empty(): candidates = available.filter(func(id): return not history.has(id))
+	if candidates.is_empty():
+		candidates = available.duplicate()
+		if candidates.size() > 1 and not history.is_empty(): candidates.erase(history.back())
+		var fewest := 2147483647
+		for id in candidates: fewest = mini(fewest, history.count(id))
+		candidates = candidates.filter(func(id): return history.count(id) == fewest)
+	if candidates.is_empty(): return ""
+	var pick := RandomNumberGenerator.new()
+	pick.seed = seed_value
+	return str(candidates[pick.randi_range(0, candidates.size() - 1)])
+
+
 static func save_enemies() -> void:
 	for spec in DEFINITIONS:
 		var ed := EnemyData.new()

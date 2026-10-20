@@ -74,6 +74,8 @@ static func reward(b: BattleState, e: Combatant, key: String, amount: int) -> vo
 	var d := data(e)
 	if d.rewarded.has(key): return
 	d.rewarded.append(key)
+	if b.achievement != null and e.enemy_data.mechanic == "fold" and key.begins_with("sign"):
+		b.achievement.emit_metrics([{"metric": "fold_tasks", "amount": 1}])
 	if e.is_alive():
 		var before := e.hp
 		e.take_damage(amount) # 机制伤害仍正常扣盾，不吃攻击增幅、不被精分重定向。
@@ -95,6 +97,9 @@ static func update_targets(b: BattleState, e: Combatant, word: WordData = null, 
 		if (used or left or moved) and not d.used.has(c.uid):
 			d.used[c.uid] = true
 			if used and multi: reward(b, e, "sign%d" % i, parameter(e, "reward"))
+	if action == "proof" and d.targets.size() >= 2 and unresolved(b, e, action) == 0 and not bool(d.get("achievement_proof", false)):
+		d.achievement_proof = true
+		if b.achievement != null: b.achievement.emit_metrics([{"metric": "proof_tasks", "amount": 1}])
 	if action == "pair" and d.targets.size() == 2 and not d.done:
 		var a: CharInstance = d.targets[0]
 		var c: CharInstance = d.targets[1]
@@ -289,7 +294,8 @@ static func replicate_glyphs(b: BattleState) -> void:
 		if int(c.statuses.get("replicated_turn", -1)) == b.turn: continue
 		c.statuses.replicated_turn = b.turn
 		var source_id: int = c.statuses.get("injected_by", -1)
-		var wave: Dictionary = waves.get(source_id, {"count": 0, "parent": c})
+		var wave: Dictionary = waves.get(source_id, {"count": 0, "parent": c, "parents": []})
+		wave.parents.append(c)
 		wave.count += int(c.statuses.get("replicate_count", 1))
 		waves[source_id] = wave
 	for source_id in waves:
@@ -299,6 +305,8 @@ static func replicate_glyphs(b: BattleState) -> void:
 		if count <= 0 or b.board.free_count() <= 0: continue
 		var before := b.temp_chars.size()
 		var added := b.inject_enemy_glyphs(count, "replicate", parent.glyph(), source_id)
+		if added > 0:
+			for original in waves[source_id].parents: original.statuses.achievement_replicated = true
 		for c in b.temp_chars.slice(before):
 			for key in ["inject_cap", "replicate_count", "replicate_delay"]:
 				c.statuses[key] = parent.statuses.get(key, 1)
@@ -331,7 +339,11 @@ static func after_action(b: BattleState, e: Combatant, mv: EnemyMoveData) -> voi
 				else: b.discard.append(c)
 			else: b.temp_chars.erase(c)
 			b.board.clear_xy(cell)
-	if action == "rail" and e.is_alive() and not data(e).get("targets", []).is_empty() and unresolved(b, e, "rail") == 0: e.remove_block(parameter(e, "clear_break"))
+	if action == "rail" and e.is_alive() and not data(e).get("targets", []).is_empty() and unresolved(b, e, "rail") == 0:
+		e.remove_block(parameter(e, "clear_break"))
+		if b.achievement != null and not bool(data(e).get("achievement_rail", false)):
+			data(e).achievement_rail = true
+			b.achievement.emit_metrics([{"metric": "rail_tasks", "amount": 1}])
 	if action in ["different", "repeat"] and e.is_alive() and b.player.is_alive() and not task_done(b, e, action): e.add_block(parameter(e, "phase2_fail_block") if phase(e) == 2 else parameter(e, "fail_block"))
 
 static func release_dead(b: BattleState) -> void:

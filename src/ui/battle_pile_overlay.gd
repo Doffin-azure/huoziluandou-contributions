@@ -25,19 +25,7 @@ func setup(p_title: String, instances: Array) -> void:
 	for inst: CharInstance in instances:
 		if inst == null or inst.data == null:
 			continue
-		var display: CharacterData = inst.data.duplicate()
-		display.glyph = "·".join(inst.glyph_list())
-		var notes: Array[String] = []
-		for pid in inst.pollutions:
-			var pollution: PollutionData = Database.get_pollution(pid)
-			notes.append(pollution.name + "污染" if pollution != null else "污染：" + pid)
-		if inst.gilded: notes.append("镀金")
-		if inst.is_fused(): notes.append("融合字")
-		if inst.temporary: notes.append("临时字")
-		if inst.upgrade_level > 0: notes.append("强化 +%d" % inst.upgrade_level)
-		for modifier in inst.modifiers: notes.append(modifier)
-		notes.sort()
-		if not notes.is_empty(): display.description += "\n" + " · ".join(notes)
+		var display := inst.display_data()
 		# 不含 uid / 牌堆位置；相同字的不同污染、融合等状态独立展示。
 		var key := display.glyph + "|" + display.id + "|" + display.description
 		if not grouped.has(key): grouped[key] = {"character": display, "count": 0}

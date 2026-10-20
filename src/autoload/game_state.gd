@@ -3,6 +3,8 @@ extends Node
 ## 所有“构筑”操作（加字/删字/复制/换字）都通过这里改动 deck。
 
 var rules: BattleRules = null
+var last_run_result: Dictionary = {}
+var _run_end_emitted := false
 
 var deck: Array = []          ## Array[CharInstance] 永久字袋
 var player_max_hp: int = 60
@@ -41,6 +43,9 @@ func _ready() -> void:
 
 
 func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> void:
+	Achievements.suspend_run()
+	last_run_result = {}
+	_run_end_emitted = false
 	if Database.rules == null:
 		Database.reload()
 	rules = Database.rules
@@ -100,6 +105,7 @@ func add_relic(id: String) -> bool:
 		return false
 	relics.append(id)
 	Relics.on_pickup(id)
+	Achievements.observe_inventory()
 	return true
 
 
@@ -110,6 +116,7 @@ func remove_relic(id: String) -> bool:
 	relics.erase(id)
 	relic_binds.erase(id)
 	relic_counters.erase(id)   # 「fireman_claimed」这类一局一次的标记不清
+	Achievements.observe_inventory()
 	return true
 
 
@@ -247,14 +254,61 @@ func is_visited(act: int, node: int) -> bool:
 
 ## 完成当前节点，推进到下一个；幕末则进入下一幕。
 func complete_current_node() -> void:
+	Achievements.node_completed()
 	mark_visited(act_index, node_index)
 	node_index += 1
 	if node_index > 8:
 		act_index += 1
 		node_index = 1
 	if act_index > 3:
-		EventBus.run_ended.emit(true)
+		end_run(true)
+
+
+func gild_character(inst: CharInstance) -> bool:
+	if inst == null or inst.gilded or inst.temporary or not inst.is_player_owned() or not deck.has(inst): return false
+	inst.gilded = true
+	Achievements.gilded(inst)
+	EventBus.deck_changed.emit()
+	return true
 
 
 func run_complete() -> bool:
 	return act_index > 3
+
+
+func upgrade_character_type(character_id: String) -> void:
+	var base := Database.get_character(character_id)
+	if base == null: return
+	for inst: CharInstance in deck:
+		if inst.id() != character_id: continue
+		var copy: CharacterData = base.duplicate()
+		var effects: Array[EffectData] = []
+		for effect in base.solo_effects:
+			var upgraded: EffectData = effect.duplicate()
+			upgraded.amount += 2
+			effects.append(upgraded)
+		copy.solo_effects = effects
+		copy.description = BattleText.character(copy)
+		inst.data = copy
+		inst.upgrade_level = 1
+	EventBus.deck_changed.emit()
+
+
+func character_type_description(character_id: String) -> String:
+	var groups := {}
+	var glyph := ""
+	for inst: CharInstance in deck:
+		if inst.id() != character_id: continue
+		glyph = inst.glyph()
+		var description := inst.describe()
+		groups[description] = int(groups.get(description, 0)) + 1
+	var lines: Array[String] = []
+	for description: String in groups:
+		lines.append("【%s】×%d\n%s" % [glyph, groups[description], description])
+	return "\n\n".join(lines)
+
+
+func end_run(victory: bool) -> void:
+	if _run_end_emitted: return
+	_run_end_emitted = true
+	EventBus.run_ended.emit(victory)

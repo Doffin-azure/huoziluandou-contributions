@@ -12,7 +12,7 @@ var tertiary_text := ""
 var on_tertiary: Callable
 var tertiary_button: Button
 var detail_title: Label
-var description: Label
+var description: EffectText
 var action_button: Button
 var secondary_button: Button
 var status_label: Label
@@ -66,8 +66,8 @@ func _ready() -> void:
 	_body_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_body_scroll.custom_minimum_size.y = 78 * factor
 	_column.add_child(_body_scroll)
-	description = JourneyStyle.label("")
-	description.add_theme_font_size_override("font_size", int(17 * factor))
+	description = EffectText.new()
+	description.add_theme_font_size_override("normal_font_size", int(17 * factor))
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body_scroll.add_child(description)
@@ -95,7 +95,7 @@ func _ready() -> void:
 
 func set_detail(title: String, body: String) -> void:
 	detail_title.text = title
-	description.text = body
+	description.set_effect_text(body)
 	_body_scroll.scroll_vertical = 0
 
 

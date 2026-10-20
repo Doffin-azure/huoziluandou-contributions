@@ -12,6 +12,9 @@ var _deck_btn: Button
 
 
 func build(root: Control) -> void:
+	if GameState.player_hp <= 0 or GameState.run_complete():
+		goto.call_deferred("res://src/screens/run_result_screen.gd")
+		return
 	act = Database.get_act(GameState.act_index)
 	if act == null:
 		# 没有幕数据时给一个占位
@@ -210,7 +213,7 @@ func _open_deck() -> void:
 			chars.append(cd)
 	var overlay := CollectionOverlay.new()
 	overlay.setup({
-		"title": "字袋",
+		"title": "字袋", "instances": GameState.deck,
 		"subtitle": "%d 枚实体字" % GameState.deck_size(),
 		"characters": chars,
 		"counts": counts,

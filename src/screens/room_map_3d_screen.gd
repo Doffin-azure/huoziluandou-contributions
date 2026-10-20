@@ -108,6 +108,10 @@ func _clear(box: Control) -> void:
 
 func refresh() -> void:
 	if _routing: return
+	if run.phase in ["defeat", "victory"]:
+		_routing = true
+		goto.call_deferred("res://src/screens/run_result_screen.gd")
+		return
 	if map_view._building:
 		drawer.visible = false
 		return
@@ -384,24 +388,24 @@ func _open_deck() -> void:
 	for glyph in counts:
 		var character := Database.get_character_by_glyph(glyph)
 		if character!=null: characters.append(character)
-	overlay.setup({"title":"字袋","characters":characters,"counts":counts})
+	overlay.setup({"title":"字袋", "instances":GameState.deck,"characters":characters,"counts":counts})
 	add_child(overlay)
 
 
 func _layout() -> void:
 	if drawer==null: return
 	var margin := 16.0
-	var usable := Rect2(Vector2(margin,margin),size-Vector2.ONE*margin*2)
+	var usable := Rect2(Vector2(margin,margin),content.size-Vector2.ONE*margin*2)
 	if OS.has_feature("mobile"):
 		var pixels := DisplayServer.get_display_safe_area()
 		var display_size := Vector2(DisplayServer.screen_get_size())
 		if pixels.has_area() and display_size.x>0 and display_size.y>0:
-			usable = Rect2(Vector2(pixels.position)*size/display_size,Vector2(pixels.size)*size/display_size).grow(-margin)
+			usable = Rect2(Vector2(pixels.position)*content.size/display_size,Vector2(pixels.size)*content.size/display_size).grow(-margin)
 	navigation.position = Vector2(usable.position.x,usable.end.y-48)
-	var narrow := size.x<760 or size.x/maxf(1,size.y)<1.15
+	var narrow := content.size.x<760 or content.size.x/maxf(1,content.size.y)<1.15
 	var width := usable.size.x if narrow else clampf(usable.size.x*.25,250,minf(340,usable.size.x))
 	drawer.custom_minimum_size = Vector2(width,0)
-	var panel_height := minf(choices_box.get_combined_minimum_size().y+36,size.y*(.36 if narrow else .60))
+	var panel_height := minf(choices_box.get_combined_minimum_size().y+36,content.size.y*(.36 if narrow else .60))
 	drawer.size = Vector2(width,panel_height)
 	var planning: bool = run.travel!=null and map_view._overview and not map_view._building
 	if planning:
@@ -415,8 +419,8 @@ func _layout() -> void:
 		var foot: Vector2 = map_view.screen_point(map_view.walker.position)
 		if foot.x>usable.get_center().x: drawer.position.x = usable.position.x
 	drawer.visible = planning or not map_view._building and not map_view._overview and not map_view._moving and (run.phase!="map" or _show_routes or not map_view.selected_exit.is_empty() or (run.travel==null and run.next_rooms().size()>1))
-	inventory.custom_minimum_size = Vector2(minf(340,size.x-36),0)
-	inventory.size = Vector2(inventory.custom_minimum_size.x,minf(inventory_box.get_combined_minimum_size().y+36,size.y-margin*2))
+	inventory.custom_minimum_size = Vector2(minf(340,content.size.x-36),0)
+	inventory.size = Vector2(inventory.custom_minimum_size.x,minf(inventory_box.get_combined_minimum_size().y+36,content.size.y-margin*2))
 	inventory.position = usable.get_center()-inventory.size*.5 if narrow else usable.position
 	# Panels overlay the world. A service opening never changes the camera.
 	var safe := Rect2(usable.position,usable.size-Vector2(0,64))

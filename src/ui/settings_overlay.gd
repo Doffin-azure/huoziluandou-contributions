@@ -56,6 +56,13 @@ func _build() -> void:
 
 	col.add_child(Ink.hline())
 
+	# 音量优先显示，窄屏也能直接访问。
+	col.add_child(Ink.label("音量", "Subheading"))
+	_add_volume_control(col, "BGMVolume", "背景音乐（BGM）", Settings.music_volume, Settings.set_music_volume)
+	_add_volume_control(col, "SFXVolume", "音效", Settings.sfx_volume, Settings.set_sfx_volume)
+	col.add_child(Ink.caption("分别调节，实时生效并自动保存；调至 0% 静音。"))
+	col.add_child(Ink.hline())
+
 	# ---- 战斗字盘 ----
 	col.add_child(Ink.label("战斗字盘", "Subheading"))
 	col.add_child(Ink.caption("切换战斗字盘的显示风格，下场战斗生效。行旅界面保持墨青与朱砂配色。"))
@@ -92,32 +99,32 @@ func _build() -> void:
 		motion.text = "开" if Settings.reduced_motion else "关")
 	motion_row.add_child(motion)
 	col.add_child(motion_row)
-	var audio_row := Ink.hbox(12)
-	audio_row.add_child(Ink.label("音效音量", "Subheading"))
-	var volume := HSlider.new()
-	volume.min_value = 0
-	volume.max_value = 100
-	volume.step = 1
-	volume.value = Settings.sfx_volume * 100
-	volume.custom_minimum_size = Vector2(160, 48)
-	volume.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	volume.value_changed.connect(func(value: float): Settings.set_sfx_volume(value / 100.0))
-	audio_row.add_child(volume)
-	col.add_child(audio_row)
 
-	var music_row := Ink.hbox(12)
-	music_row.add_child(Ink.label("音乐音量", "Subheading"))
-	var music := HSlider.new()
-	music.min_value = 0
-	music.max_value = 100
-	music.step = 1
-	music.value = Settings.music_volume * 100
-	music.custom_minimum_size = Vector2(160, 48)
-	music.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	music.value_changed.connect(func(value: float): Settings.set_music_volume(value / 100.0))
-	music_row.add_child(music)
-	col.add_child(music_row)
 
+func _add_volume_control(parent: Control, control_name: String, title: String, initial: float, setter: Callable) -> void:
+	var group := Ink.vbox(0)
+	group.name = control_name
+	parent.add_child(group)
+	var row := Ink.hbox(12)
+	group.add_child(row)
+	row.add_child(Ink.label(title, "Subheading"))
+	row.add_child(Ink.expander())
+	var percent := Ink.label("%d%%" % roundi(initial * 100), "Subheading")
+	percent.name = "Percent"
+	row.add_child(percent)
+	var slider := HSlider.new()
+	slider.name = "Slider"
+	slider.min_value = 0
+	slider.max_value = 100
+	slider.step = 1
+	slider.value = initial * 100
+	slider.custom_minimum_size = Vector2(0, 48 * JourneyStyle.touch_scale(self))
+	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	slider.accessibility_name = title
+	slider.value_changed.connect(func(value: float):
+		setter.call(value / 100.0)
+		percent.text = "%d%%" % roundi(value))
+	group.add_child(slider)
 
 
 func _build_style_buttons() -> void:

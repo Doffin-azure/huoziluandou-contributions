@@ -65,8 +65,8 @@ func _run() -> void:
 	_ok(Router.current_path.ends_with("/title_screen.gd") and title.has_scene_background(), "normal project entry opens the courtyard title")
 	var names: Array = []
 	for button in title._buttons: names.append(button.text)
-	var expected: Array = ["开始新冒险","字库图鉴","设置","离开","自定义构筑","字网图谱","旧版远征"]
-	if FileAccess.file_exists("user://courtyard-run.tres"): expected.insert(1,"继续冒险")
+	var expected: Array = ["开始新冒险","字库图鉴","成就总览","设置","离开","自定义构筑","字网图谱","旧版远征"]
+	if load("res://src/expedition/room_run_state.gd").has_continuable_save(): expected.insert(1,"继续冒险")
 	_ok(names == expected, "all existing title actions retained in the branded menu")
 	_ok(GameState.rng.state == rng_before, "title rendering leaves gameplay RNG untouched")
 	_ok(title._buttons[0].has_focus(), "keyboard focus starts on the primary action")
@@ -80,6 +80,11 @@ func _run() -> void:
 	_ok(not title._starting and Router.current == title and title._modal_count == 1, "modal prevents underlying start, settings and custom actions")
 	await _escape()
 	_ok(title._modal_count == 0 and not title._buttons[0].disabled, "ESC closes collection and unlocks the menu")
+	_press(title, "成就总览")
+	await _frames()
+	_ok(title._modal_count == 1 and title.find_children("*", "AchievementOverlay", true, false).size() == 1, "achievement button opens the production overview")
+	await _escape()
+	_ok(title._modal_count == 0 and not title._buttons[0].disabled, "ESC closes achievements and restores title controls")
 	_press(title, "设置")
 	await _frames()
 	_ok(title.find_children("*", "SettingsOverlay", true, false).size() == 1, "settings button opens shared production settings")

@@ -26,6 +26,10 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 			return ["加强：本场第 %d 次打出，获得 %d 层力量" % [b.strengthen_plays, gained]]
 		"damage":
 			return EffectUtil.damage(b, enemy, amount)
+		"gold_percent_damage":
+			# Snapshot the wallet at resolution time; this attack never spends coins.
+			var gold_damage := floori(maxi(0, GameState.gold) * maxi(0, amount) / 100.0)
+			return EffectUtil.damage(b, enemy, gold_damage)
 		"self_hp_loss":
 			var lost := src.take_damage(amount) if src != null else 0
 			return ["失去 %d 生命" % lost]
@@ -364,9 +368,9 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 		"recover_two":
 			return EffectHandlersActions._recover_two(b, ctx)
 		"ability_longword_draw":
-			return EffectUtil.simple_ability(b, "longword_draw", BattleBalance.fixed_text("能力：本场持续——每打出 3 字及以上的词，额外补 1 字", "ability_longword_draw", eff))
+			return EffectUtil.stack_ability(b, "longword_draw", BattleBalance.fixed_text("能力：本场持续——每打出 3 字及以上的词，额外补 1 字", "ability_longword_draw", eff))
 		"ability_electric_material":
-			return EffectUtil.simple_ability(b, "electric_material", BattleBalance.fixed_text("电能：本场持续——每消耗 2 储能，随机空格生成临时【电】", "ability_electric_material", eff))
+			return EffectUtil.stack_ability(b, "electric_material", BattleBalance.fixed_text("电能：本场持续——每消耗 2 储能，随机空格生成临时【电】", "ability_electric_material", eff))
 		"ability_heat_to_energy":
 			return EffectUtil.simple_ability(b, "heat_to_energy", BattleBalance.fixed_text("蓄热：本场持续——回合结束热度 -2，每点转 1 储能", "ability_heat_to_energy", eff))
 		"flow_speed":
@@ -434,7 +438,7 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 		"instant_power":
 			return EffectUtil.simple_ability(b, "instant_power", BattleBalance.fixed_text("电力：本场持续——行列位移后可耗 1 储能额外位移一次", "instant_power", eff))
 		"heat_pollution_damage":
-			return EffectUtil.simple_ability(b, "heat_pollution_damage", BattleBalance.fixed_text("火热：本场持续——每枚污染【热】造成 5 伤", "heat_pollution_damage", eff))
+			return EffectUtil.stack_ability(b, "heat_pollution_damage", BattleBalance.fixed_text("火热：本场持续——每枚污染【热】造成 5 伤", "heat_pollution_damage", eff))
 		"recover_to_bag":
 			return EffectHandlersActions._recover_to_bag(b, ctx)
 		"move_cell":
@@ -492,7 +496,7 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 		"move_neighbor":
 			return EffectHandlersActions._move_neighbor(b, ctx)
 		"ability_flow":
-			b.enable_ability("flow", amount)
+			b.add_ability("flow", amount)
 			return [BattleBalance.fixed_text("流转：本回合每 2 种不同多字词补 %d 字", "ability_flow", eff) % amount]
 		"ability_compound_next":
 			b.enable_ability("next_compound", amount)
@@ -500,7 +504,7 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 
 		# --- 蓄放 ---
 		"ability_energy_idle":
-			b.enable_ability("energy_idle", amount)
+			b.add_ability("energy_idle", amount)
 			b.add_energy(BattleBalance.i("immediate_idle_energy", 1))
 			return [BattleBalance.fixed_text("蓄能：立即储能 +1；本场回合结束若有可用多字词，储能 +%d", "ability_energy_idle", eff) % amount]
 		"energy_around_tail":
@@ -570,7 +574,7 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 			b.enable_ability("next_overfire_per", int(eff.args.get("per", 3)))
 			return ["过火：本回合下一次攻击整次追加热度×%d伤害，仅一次；当前热度%d" % [int(eff.args.get("per", 3)), src.heat]]
 		"ability_electric_overload":
-			b.enable_ability("electric_overload", amount)
+			b.add_ability("electric_overload")
 			return ["电流过载：本战每次溢热生成热字并 +储能/+伤害"]
 
 		# --- 经济 ---
@@ -727,7 +731,7 @@ static func run_builtin(handler: String, eff: EffectData, ctx: Dictionary) -> Ar
 			b.add_energy(int(eff.args.get("energy", 2)))
 			return ["合力：获得 %d 临挡与 %d 储能" % [amount, int(eff.args.get("energy", 2))]]
 		"serial":
-			b.enable_ability("serial", int(eff.args.get("bonus", 6)))
+			b.add_ability("serial", int(eff.args.get("bonus", 6)))
 			return [BattleBalance.fixed_text("连载：本场每累计 3 次有效出词，下一次攻击每段 +6，待兑现奖励可叠加并跨回合保留", "serial", eff)]
 		"repeat_zero":
 			b.enable_ability("repeat_zero", 1)

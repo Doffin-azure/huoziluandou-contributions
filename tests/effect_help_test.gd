@@ -189,7 +189,7 @@ func _run() -> void:
 	_check(pollution_body.get_parsed_text() == Database.get_pollution("replicate").description, "蔓生完整复制规则仍可查看")
 	frame.close_help()
 	screen._bubble.set_context(screen._selection_context([Vector2i.ZERO]))
-	_check(screen._bubble._context.text.contains("url=pollution:replicate"), "选字污染提示同样使用词条链接")
+	_check(not screen._bubble._context.visible and not screen._bubble._context_rule.visible and frame.text.contains("url=pollution:replicate"), "移除目标和污染摘要行及分隔线，字块污染词条仍可查看")
 	# Excel 已改数值也保持短说明；每个数字绑定自己的参数，避免相同默认数字串位。
 	var resource_values := BattleBalance.values.duplicate(true)
 	BattleBalance.values["words/extra_fangfan/e/0/amount"] = 19

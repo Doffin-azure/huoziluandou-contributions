@@ -164,7 +164,7 @@ func _run() -> void:
 		await _frames(20)
 	await _shot("battle-desktop-live")
 	if _capture:
-		_ok(not _screen._bubble._scroll.get_v_scroll_bar().visible, "桌面击破预览完整显示词效、目标和污染代价，无需滚动")
+		_ok(not _screen._bubble._scroll.get_v_scroll_bar().visible, "桌面击破预览完整显示词效，无需滚动")
 		var stage: StudyStage = Router.study_stage
 		var shadowed := _paper_luminance(stage)
 		stage._sun.shadow_enabled = false
@@ -289,7 +289,7 @@ func _run() -> void:
 		_ok(_screen._end_btn.size.y * factor >= 47.5, "小手机结束回合按钮至少 48 屏幕像素")
 		await _shot("battle-phone-small-live")
 		_ok(get_viewport().get_texture().get_image().get_size() == Vector2i(844, 390), "小手机验证使用真实 844×390 渲染尺寸")
-		_ok(not _screen._bubble._scroll.get_v_scroll_bar().visible, "小手机击破预览完整显示词效、目标和污染，无需滚动")
+		_ok(not _screen._bubble._scroll.get_v_scroll_bar().visible, "小手机击破预览完整显示词效，无需滚动")
 		_ok(_screen._menu_btn.size.y * factor >= 48, "小手机右上菜单入口至少 48 屏幕像素")
 		_screen._open_menu()
 		await _frames()

@@ -49,6 +49,7 @@ func build(root: Control) -> void:
 	ex = GameState.expedition
 	if ex == null:
 		ex = Expedition.start()
+		Achievements.start_run("expedition")
 	_mobile = JourneyStyle.touch_scale(self) > 1.1
 	if _mobile:
 		_map_cell_size = int(ceil(48 * JourneyStyle.touch_scale(self)))
@@ -253,7 +254,7 @@ func _open_deck() -> void:
 		var cd: CharacterData = Database.get_character_by_glyph(id)
 		if cd != null:
 			chars.append(cd)
-	viewer.setup({"title": "字袋", "subtitle": "%d / %d 枚 · 战斗时从这里抽字" % [GameState.deck_size(), Expedition.DECK_CAP], "characters": chars, "counts": counts})
+	viewer.setup({"title": "字袋", "instances": GameState.deck, "subtitle": "%d / %d 枚 · 战斗时从这里抽字" % [GameState.deck_size(), Expedition.DECK_CAP], "characters": chars, "counts": counts})
 	viewer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(viewer)
 
@@ -633,6 +634,13 @@ func _event_shop() -> void:
 				b = _ghost("%s　❖ %d" % [label, cost], func(): ex.buy(i))
 		b.disabled = GameState.gold < cost or (o.kind == "relic" and GameState.has_relic(o.relic))
 		_add(b)
+		if o.has("glyph"):
+			var character := Database.get_character_by_glyph(str(o.glyph))
+			if character != null:
+				var description := EffectText.new()
+				description.add_theme_font_size_override("normal_font_size", 17)
+				description.set_effect_text(EffectGlossary.character_hint(character))
+				_add(description)
 		if o.kind == "relic":
 			var cap := Ink.caption(Relics.desc_of(o.relic))
 			cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -702,26 +710,7 @@ func _event_act_end() -> void:
 
 
 func _event_over() -> void:
-	_add(Ink.h2("远征完成" if ex.won else "远征中止"))
-	_add(Ink.body("三幕已尽，字阵大成。" if ex.won else "字散墨枯，这一程到此为止。"))
-	_add(Ink.caption("字袋 %d 枚 · 印章 %d 个" % [GameState.deck_size(), ex.seals.size()]))
-	_add(_ghost("再走一程", func(): ex = Expedition.start(), true))
-	_add(_ghost("返回标题", func(): goto("res://src/screens/title_screen.gd")))
-
-
-## 从字袋里挑一枚（删字 / 修饰）
-func _pick_deck(title: String, done: Callable) -> void:
-	var counts := GameState.glyph_counts()
-	var chars: Array = []
-	for id in counts:
-		var cd: CharacterData = Database.get_character_by_glyph(id)
-		if cd != null:
-			chars.append(cd)
-	var overlay := CollectionOverlay.new()
-	overlay.setup({"title": title, "subtitle": "点一枚字", "characters": chars, "counts": counts, "pick_on_click": true})
-	overlay.picked.connect(func(cd: CharacterData): done.call(cd.id); refresh())
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(overlay)
+	goto.call_deferred("res://src/screens/run_result_screen.gd", {"victory":ex.won})
 
 
 # ---------------------------------------------------------------- 首领棋子

@@ -32,9 +32,10 @@ func build(root: Control) -> void:
 	_menu = GridContainer.new(); _menu.columns = 1
 	root.add_child(_menu)
 	_menu.add_child(_button("开始新冒险", _on_start, true))
-	if FileAccess.file_exists("user://courtyard-run.tres"):
+	if load("res://src/expedition/room_run_state.gd").has_continuable_save():
 		_menu.add_child(_button("继续冒险", _on_continue_rooms))
 	_menu.add_child(_button("字库图鉴",_on_library))
+	_menu.add_child(_button("成就总览",_on_achievements))
 	_menu.add_child(_button("设置",_open_settings))
 	_menu.add_child(_button("离开",_quit))
 	_main_buttons.assign(_buttons)
@@ -86,10 +87,10 @@ func _button(text: String, callback: Callable, primary := false) -> Button:
 
 
 func _layout() -> void:
-	if _menu == null or size.y < 1: return
+	if _menu == null or content.size.y < 1: return
 	# Reserve physical touch targets instead of scaling the entire menu down on phones.
 	var touch_scale := JourneyStyle.touch_scale(self)
-	var compact := size.y / touch_scale < 600
+	var compact := content.size.y / touch_scale < 600
 	_menu.columns = 2 if compact else 1
 	_menu.add_theme_constant_override("v_separation", int(6 * touch_scale))
 	_menu.add_theme_constant_override("h_separation", int(36 * touch_scale))
@@ -97,19 +98,19 @@ func _layout() -> void:
 		button.custom_minimum_size.y = 48 * touch_scale
 		var utility := button.get_parent()==_utilities
 		button.add_theme_font_size_override("font_size", int((14 if utility else 23) * touch_scale))
-	var width := minf(300 * touch_scale, size.x*.40) if not compact else size.x*.51
+	var width := minf(300 * touch_scale, content.size.x*.40) if not compact else content.size.x*.51
 	_menu.custom_minimum_size.x = width
 	_menu.size.x = width
 	_menu.reset_size()
 	var height := _menu.get_combined_minimum_size().y
 	var margin := 18*touch_scale
 	_utilities.add_theme_constant_override("separation",int(6*touch_scale))
-	_utilities.reset_size(); _utilities.position = Vector2(maxf(margin,size.x*.10),size.y-margin-_utilities.size.y)
-	var logo_top: float = margin+(0.0 if compact else size.y*.03)
-	var logo_height := minf(size.y*.44,maxf(64,_utilities.position.y-height-logo_top-margin-12*touch_scale))
-	var logo_width := minf(size.x*.53,logo_height*1.776)
-	_wordmark.position = Vector2(size.x*.035,logo_top); _wordmark.size = Vector2(logo_width,logo_height)
-	_menu.position = Vector2(maxf(margin+22,size.x*.13),_wordmark.position.y+logo_height+12*touch_scale)
+	_utilities.reset_size(); _utilities.position = Vector2(maxf(margin,content.size.x*.10),content.size.y-margin-_utilities.size.y)
+	var logo_top: float = margin+(0.0 if compact else content.size.y*.03)
+	var logo_height := minf(content.size.y*.44,maxf(64,_utilities.position.y-height-logo_top-margin-12*touch_scale))
+	var logo_width := minf(content.size.x*.53,logo_height*1.776)
+	_wordmark.position = Vector2(content.size.x*.035,logo_top); _wordmark.size = Vector2(logo_width,logo_height)
+	_menu.position = Vector2(maxf(margin+22,content.size.x*.13),_wordmark.position.y+logo_height+12*touch_scale)
 	_ornament.queue_redraw()
 
 
@@ -141,6 +142,7 @@ func _finish_start() -> void:
 	if not _starting or is_queued_for_deletion(): return
 	if _expedition:
 		Expedition.start()
+		Achievements.start_run("expedition")
 		goto("res://src/screens/expedition_map_screen.gd")
 		return
 	load("res://src/expedition/room_run_state.gd").start()
@@ -194,6 +196,10 @@ func _on_library() -> void:
 	_mount_overlay(viewer)
 
 
+func _on_achievements() -> void:
+	if _can_interact(): _mount_overlay(AchievementOverlay.new())
+
+
 func _on_graph() -> void:
 	if _can_interact(): goto("res://src/screens/glyph_graph_screen.gd")
 
@@ -211,4 +217,6 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_continue_rooms() -> void:
 	if not _can_interact(): return
 	var run = load("res://src/expedition/room_run_state.gd").restore(load("res://src/expedition/room_run_state.gd").SAVE_PATH,true)
-	if run!=null: goto("res://src/screens/room_map_screen.gd")
+	if run!=null:
+		if run.phase == "defeat" or GameState.player_hp <= 0: goto("res://src/screens/run_result_screen.gd")
+		else: goto("res://src/screens/room_map_screen.gd")

@@ -55,10 +55,50 @@ func _run() -> void:
 	var reward := await _open("reward", 4)
 	_ok(reward._cards.size() == 4 and reward._showcase.stage.objects.size() == 4, "four-option reward creates four actual 3D specimens")
 	_ok(reward._showcase.viewport.own_world_3d and reward._showcase.stage.camera.current, "specimens use their own 3D world and camera")
+	_ok(reward._selected == -1 and reward._hud.action_button.disabled, "reward requires an explicit selection before claiming")
+	reward._accept_pick()
+	_ok(not reward._busy and not reward._settled, "claiming without selecting cannot take a default glyph")
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	reward._cards[2]._on_gui_input(click)
+	var selected_title: String = reward._hud.detail_title.text
+	for card: GlyphOffer in reward._cards:
+		card.mouse_entered.emit()
+		card.focus_entered.emit()
+	_ok(reward._selected == 2 and reward._cards[2].selected and reward._hud.detail_title.text == selected_title, "crossing other glyphs or moving focus preserves the clicked selection")
+	click.button_index = MOUSE_BUTTON_RIGHT
+	reward._cards[1]._on_gui_input(click)
+	_ok(reward._selected == 2, "right click does not change the selected reward")
+	click.button_index = MOUSE_BUTTON_LEFT
+	reward._cards[3]._on_gui_input(click)
+	_ok(reward._selected == 3 and not reward._hud.action_button.disabled and reward._cards.filter(func(card): return card.selected).size() == 1, "left click changes selection and enables a separate claim confirmation")
 	var rng: int = GameState.rng.state
 	reward._inspect(3)
 	await _frames(10)
-	_ok(reward._hud.description.text == reward._with_hint(reward._options[3]).description and GameState.rng.state == rng, "inspection retains complete rules without consuming RNG")
+	_ok(reward._hud.description.get_parsed_text() == BattleText.clean(reward._with_hint(reward._options[3]).description) and GameState.rng.state == rng, "inspection retains complete rules without consuming RNG")
+	var offered: CharacterData = reward._options[3]
+	for character: CharacterData in Database.characters.values():
+		if character.description.contains("热度"):
+			reward._options[3] = character
+			break
+	reward._inspect(3)
+	var body: EffectText = reward._hud.description
+	_ok("url=term:heat" in body.text, "reward glyph explanation links heat to the glossary")
+	var words: Array = reward._words_for(reward._options[3].glyph)
+	_ok(words.is_empty() or "url=word:" in body.text, "suggested reward words open their full effects")
+	body.meta_hover_started.emit("term:heat")
+	await _frames(2)
+	_ok(body._cards.size() == 1 and body._cards[0].get_meta("entry") == "term:heat", "hovering reward heat opens its explanation")
+	body.meta_clicked.emit("term:heat")
+	_ok(body._pinned, "reward explanations can be pinned by clicking")
+	body.open_entry("term:capacity", 1)
+	_ok(body._cards.size() == 2, "reward explanations support nested glossary reading")
+	reward._options[3] = offered
+	reward._inspect(0)
+	_ok(body._cards.is_empty(), "changing reward glyph dismisses the previous explanation")
+	reward._inspect(3)
+	_ok(GameState.rng.state == rng, "reading reward explanations leaves reward RNG unchanged")
 	var stage: Node3D = reward._showcase.stage
 	_ok(stage.objects[3].position.y > stage.rests[3].y, "inspection physically lifts the selected specimen")
 	await _shot("reward-four")
@@ -74,6 +114,13 @@ func _run() -> void:
 	_ok(GameState.deck_size() == before + 1 and Router.current_path.ends_with("map_screen.gd"), "claim settles once and returns to the existing route")
 	_ok(weak_stage.get_ref() == null, "leaving the reward releases its 3D stage")
 	var shop := await _open("shop")
+	var shop_body: EffectText = shop._hud.description
+	_ok(shop_body.get_parsed_text().contains("可组：") and shop_body.text.contains("url=word:"), "shop glyphs show composable words as effect-help links")
+	var shop_word: String = EffectGlossary.words_for_glyph(shop._offers[0].character.glyph)[0]
+	shop_body.meta_hover_started.emit("word:" + shop_word)
+	await _frames(2)
+	_ok(shop_body._cards.size() == 1 and shop_body._cards[0].get_meta("entry") == "word:" + shop_word, "shop word hints open the full word effect on hover")
+	shop_body.close_help()
 	await _shot("shop-desktop")
 	shop._inspect(4)
 	_ok(shop._hud.detail_title.text.begins_with("复制") and shop._hud.description.text.contains("复制"), "service seals explain the original shop services")
