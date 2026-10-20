@@ -113,14 +113,14 @@ func _layout() -> void:
 	var safe := ScreenLayout.safe_rect(content).intersection(Rect2(Vector2.ZERO,content.size))
 	var area := safe.size
 	var compact := area.y / touch_scale < 600
-	_menu.columns = 2 if compact else 1
+	_menu.columns = (3 if area.y/touch_scale<300 else 2) if compact else 1
 	_menu.add_theme_constant_override("v_separation", int(6 * touch_scale))
 	_menu.add_theme_constant_override("h_separation", int(36 * touch_scale))
 	for button in _buttons:
 		button.custom_minimum_size.y = 48 * touch_scale
 		var utility := button.get_parent()==_utilities
 		button.add_theme_font_size_override("font_size", int((14 if utility else 23) * touch_scale))
-	var width := minf(300 * touch_scale, area.x*.40) if not compact else area.x*.51
+	var width := minf(300 * touch_scale, area.x*.40) if not compact else area.x*(0.80 if _menu.columns==3 else 0.51)
 	_menu.custom_minimum_size.x = width
 	_menu.size.x = width
 	_menu.reset_size()

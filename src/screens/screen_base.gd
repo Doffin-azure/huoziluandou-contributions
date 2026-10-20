@@ -46,9 +46,10 @@ func _ready() -> void:
 
 func _layout_inventory_bar() -> void:
 	var height := 64.0 * clampf(JourneyStyle.touch_scale(self), 1.0, 1.85)
-	inventory_bar.position = Vector2.ZERO
-	inventory_bar.size = Vector2(size.x, height)
-	content.offset_top = height
+	var safe := ScreenLayout.safe_rect(self)
+	inventory_bar.position = safe.position
+	inventory_bar.size = Vector2(safe.size.x, height)
+	content.offset_top = safe.position.y + height
 	inventory_bar.update_scale()
 
 

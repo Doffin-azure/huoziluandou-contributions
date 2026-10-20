@@ -164,7 +164,7 @@ func _render_event() -> void:
 
 func _layout() -> void:
 	if _copy == null or size.x < 1: return
-	var safe := ScreenLayout.safe_rect(self)
+	var safe := ScreenLayout.safe_rect(content).intersection(Rect2(Vector2.ZERO, content.size))
 	var key := str(safe) + str(ScreenLayout.window_size(self)) + str(JourneyStyle.touch_scale(self))
 	if key == _layout_key: return
 	_layout_key = key
@@ -173,7 +173,7 @@ func _layout() -> void:
 	_scroll.size = safe.size
 	_vertical = safe.size.x / maxf(1, safe.size.y) < 1.1
 	var compact := safe.size.y/_ui_scale < 600 or safe.size.x/_ui_scale < 900
-	var margin := (8 if compact else 24)*_ui_scale
+	var margin := (6 if compact else 24)*_ui_scale
 	_page_margin = margin
 	var width := minf(safe.size.x - margin * 2, 1080 * _ui_scale)
 	var art_width := (width if _vertical else width * (0.32 if compact else 0.40)) if _art.visible else 0.0
@@ -183,12 +183,12 @@ func _layout() -> void:
 	_art.position.x = (safe.size.x - width) * 0.5
 	_copy.position.x = _art.position.x if _vertical else _art.position.x + art_width + gap
 	_copy.size.x = copy_width
-	_copy.add_theme_constant_override("separation", int(4 * _ui_scale if compact else 14))
+	_copy.add_theme_constant_override("separation", int(2 * _ui_scale if compact else 14))
 	_eyebrow.visible = not compact
 	_eyebrow.add_theme_font_size_override("font_size", int(14 * _ui_scale))
-	_title.add_theme_font_size_override("font_size", int((28 if compact else 42) * _ui_scale))
+	_title.add_theme_font_size_override("font_size", int((24 if compact else 42) * _ui_scale))
 	_body.add_theme_font_size_override("font_size", int((16 if compact else 20) * _ui_scale))
-	_notice.add_theme_font_size_override("font_size", int(16 * _ui_scale))
+	_notice.add_theme_font_size_override("font_size", int((14 if compact else 16) * _ui_scale))
 	for index in _buttons.size():
 		var label := _choice_labels[index]
 		var font_size := int((16 if compact else 18) * _ui_scale)
@@ -202,6 +202,14 @@ func _layout() -> void:
 	if is_instance_valid(_leave_button):
 		_leave_button.custom_minimum_size.y = 48*_ui_scale
 		_leave_button.add_theme_font_size_override("font_size",int(18*_ui_scale))
+	# 小屏横排时把失败提示放在插画下方，保留完整的操作按钮高度。
+	if compact and not _vertical and _art.visible:
+		if _notice.get_parent()!=_page: _notice.reparent(_page)
+		_notice.size.x = art_width
+		_notice.size.y = _notice.get_theme_font("font").get_multiline_string_size(_notice.text,HORIZONTAL_ALIGNMENT_LEFT,art_width,_notice.get_theme_font_size("font_size")).y
+	elif _notice.get_parent()!=_copy:
+		_notice.reparent(_copy)
+		_copy.move_child(_notice,_body_scroll.get_index()+1)
 	_body_scroll.custom_minimum_size.y = 0
 	var body_font := _body.get_theme_font("font")
 	var body_size := body_font.get_multiline_string_size(_body.text,HORIZONTAL_ALIGNMENT_LEFT,copy_width,_body.get_theme_font_size("font_size"))
@@ -213,6 +221,12 @@ func _layout() -> void:
 func _place() -> void:
 	if _copy == null or size.y < 1: return
 	var copy_height := _copy.get_combined_minimum_size().y
+	# 换行与错误提示的最小高度在容器布局后才稳定，按最终高度收紧正文。
+	var overflow := copy_height - (_scroll.size.y - _page_margin*2)
+	if not _vertical and overflow>0.5 and _body_scroll.custom_minimum_size.y>0:
+		_body_scroll.custom_minimum_size.y = maxf(0,_body_scroll.custom_minimum_size.y-overflow)
+		_place.call_deferred()
+		return
 	var art_height := _art.size.y if _art.visible else 0.0
 	var art_gap := 24 * _ui_scale if _art.visible and _vertical else 0.0
 	var height := art_height + art_gap + copy_height if _vertical else maxf(art_height, copy_height)
@@ -221,6 +235,8 @@ func _place() -> void:
 	_art.position.y = top
 	_copy.position.y = top + art_height + art_gap if _vertical else top + (height - copy_height) * 0.5
 	_copy.size.y = copy_height
+	if _notice.get_parent()==_page:
+		_notice.position = Vector2(_art.position.x,minf(_art.position.y+art_height+8*_ui_scale,_scroll.size.y-_notice.size.y-_page_margin))
 
 
 func _choose(index: int) -> void:
