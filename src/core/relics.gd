@@ -40,11 +40,11 @@ const DEFS := {
 	"question": ["问字签", "每场开局从 3 枚能配词的字里挑 1 枚，作为本场临时字落到盘上", false],
 	"goldleaf": ["泥金笔", "拾取时选两枚字，永久镀金", false],
 	"moon": ["月字模", "每场开局盘上多一枚临时【月】：它在场时，每次出字后其他字向它聚拢；打出【月】再聚拢一次；下回合消失", false],
-	"slot": ["叠字钱", "可以连出三枚相连的相同字，获得 50 金币", false],
+	"slot": ["叠字钱", "可以连出三枚相连的相同字，获得 50 铜钱", false],
 	"death": ["判官笔", "拾取时获得 1 枚【死】", false],
 	"ruin": ["生死簿", "拾取时获得 1 枚【亡】", false],
 	"rubbing": ["复字拓片", "拾取时选一枚字复制，保留镀金和强化", false],
-	"midas": ["金字碑", "所有己方字永久镀金，之后拿到的也镀金；一场战斗累计赚到 20 金币时，你化为金像，立即死去", false],
+	"midas": ["金字碑", "所有己方字永久镀金，之后拿到的也镀金；一场战斗累计赚到 20 铜钱时，你化为金像，立即死去", false],
 	"monkey": ["许愿笺", "拾取时许一个愿：从 3 个有代价的愿望里选 1 个", false],
 	"palindrome": ["反字模", "二字词可以倒着连出，发动原词效果；正着本身成词时按正着算", false],
 	"binding": ["串字绳", "同一行最左和最右两格视作相邻，可以跨边连词", false],
@@ -532,11 +532,11 @@ static func on_turn_start(b: BattleState) -> void:
 	b.moon_uid = -1
 
 
-## 金字碑：本场累计收入达到 20 金币就化为金像
+## 金字碑：本场累计收入达到 20 铜钱就化为金像
 static func on_gold_earned(b: BattleState) -> void:
 	if b.relics.has("midas") and b.player.is_alive() and b.gold_earned >= BattleBalance.i("midas_gold", 20):
 		b.player.hp = 0
-		b._log(name_of("midas") + "：本场已赚 %d 金币，你化为了金像" % b.gold_earned)
+		b._log(name_of("midas") + "：本场已赚 %d 铜钱，你化为了金像" % b.gold_earned)
 
 
 ## 校勘尺：本场每净化 2 枚污染字，随机补 1 字
@@ -568,13 +568,13 @@ static func slot_word(glyph: String) -> WordData:
 	eff.kind = EffectData.Kind.GAIN_GOLD
 	eff.handler = "gold"
 	eff.amount = gold
-	eff.note = "获得 %d 金币" % gold
+	eff.note = "获得 %d 铜钱" % gold
 	var w := WordData.new()
 	w.id = "relic_slot"
 	w.word = glyph.repeat(3)
 	var gs: Array[String] = [glyph, glyph, glyph]
 	w.glyphs = gs
-	w.description = name_of("slot") + "：三连【%s】，获得 %d 金币" % [glyph, gold]
+	w.description = name_of("slot") + "：三连【%s】，获得 %d 铜钱" % [glyph, gold]
 	w.effect_summary = w.description
 	var list: Array[EffectData] = [eff]
 	w.effects = list

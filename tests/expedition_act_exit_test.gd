@@ -52,7 +52,7 @@ func _ready() -> void:
 	var old_theme: String = ex.m.tn
 	ex.next_act()
 	check(ex.act == 2 and not ex.boss_down and ex.m.tn != old_theme and ex.t == 0, "结算进入二层、解除封层、换地图")
-	check(GameState.gold == 68 and GameState.player_hp == 28 and ex.ink == ink_before + 2, "首领金币6、回墨1与一幕补给各发放一次")
+	check(GameState.gold == 68 and GameState.player_hp == 28 and ex.ink == ink_before + 2, "首领铜钱6、回墨1与一幕补给各发放一次")
 	check(ex.tray == ["火"], "字匣跨层保留")
 	var paid_gold := GameState.gold; var paid_hp := GameState.player_hp
 	ex.next_act()

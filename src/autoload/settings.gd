@@ -19,6 +19,7 @@ var board_font_path := ""
 var reduced_motion: bool = false
 var sfx_volume := 0.65
 var music_volume := 0.6
+var route_hint_seen := false
 
 var _cfg := ConfigFile.new()
 
@@ -32,6 +33,7 @@ func _ready() -> void:
 		reduced_motion = bool(_cfg.get_value("visual", "reduced_motion", false))
 		sfx_volume = clampf(float(_cfg.get_value("audio", "sfx_volume", 0.65)), 0.0, 1.0)
 		music_volume = clampf(float(_cfg.get_value("audio", "music_volume", 0.6)), 0.0, 1.0)
+		route_hint_seen = bool(_cfg.get_value("guides", "route_hint_seen", false))
 
 
 func set_drag_release_play(value: bool) -> void:
@@ -58,7 +60,14 @@ func _save() -> void:
 	_cfg.set_value("visual", "reduced_motion", reduced_motion)
 	_cfg.set_value("audio", "sfx_volume", sfx_volume)
 	_cfg.set_value("audio", "music_volume", music_volume)
+	_cfg.set_value("guides", "route_hint_seen", route_hint_seen)
 	_cfg.save(storage_path)
+
+
+func dismiss_route_hint() -> void:
+	if route_hint_seen: return
+	route_hint_seen = true
+	_save()
 
 
 func set_reduced_motion(value: bool) -> void:

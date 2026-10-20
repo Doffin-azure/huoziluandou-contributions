@@ -7,18 +7,18 @@
 script = ExtResource("1_68ugk")
 kind = 29
 handler = "inject_bounty"
-note = "本回合敌人每成功向盘面注入1枚污染字，获得2金币；污染字照常保留。"
+note = "本回合敌人每成功向盘面注入1枚污染字，获得2铜钱；污染字照常保留。"
 
 [resource]
 script = ExtResource("2_tw0vb")
 id = "extra_jiashou"
 word = "加收"
 glyphs = Array[String](["加", "收"])
-description = "本回合敌人每成功向盘面注入1枚污染字，获得2金币；污染字照常保留。"
+description = "本回合敌人每成功向盘面注入1枚污染字，获得2铜钱；污染字照常保留。"
 effects = Array[ExtResource("1_68ugk")]([SubResource("Resource_orp7b")])
 group = "经济"
 design_stage = "设计负责人新增"
-effect_summary = "本回合敌人每成功向盘面注入1枚污染字，获得2金币；污染字照常保留。"
+effect_summary = "本回合敌人每成功向盘面注入1枚污染字，获得2铜钱；污染字照常保留。"
 effect_handler_id = "inject_bounty"
 priority = "经济"
 implemented = true

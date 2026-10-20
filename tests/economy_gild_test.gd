@@ -21,10 +21,10 @@ func _ready() -> void:
 	check(not r.ok and GameState.gold == before and b.board.fill_count() == 2, "无效目标不吞字、不扣费")
 	GameState.gold = 2
 	r = cast(b, "投资", {"gild_uid": card.uid})
-	check(not r.ok and not card.gilded and GameState.gold == 2, "金币不足不吞字、不镀金")
+	check(not r.ok and not card.gilded and GameState.gold == 2, "铜钱不足不吞字、不镀金")
 	GameState.gold = 20
 	r = cast(b, "投资", {"gild_uid": card.uid})
-	check(r.ok and GameState.gold == 17 and card.gilded and not other.gilded, "花3金币只强化指定实体")
+	check(r.ok and GameState.gold == 17 and card.gilded and not other.gilded, "花3铜钱只强化指定实体")
 	r = cast(b, "精金", {"gild_uid": card.uid})
 	check(not r.ok and GameState.gold == 17, "已镀金实体不可重复选择")
 	clear_board(b)
@@ -33,7 +33,7 @@ func _ready() -> void:
 	b.board.set_cell(0, 0, card)
 	card.temporary_uses = 1
 	b.try_play([Vector2i.ZERO])
-	check(GameState.gold == 18 and b.board.get_cell(0, 0) == card, "使用复制层的单字同样+1金币")
+	check(GameState.gold == 18 and b.board.get_cell(0, 0) == card, "使用复制层的单字同样+1铜钱")
 	put(b, "破", 1)
 	b.try_play([Vector2i.ZERO, Vector2i.RIGHT])
 	check(GameState.gold == 19, "组词每个镀金实体只结算1次")
@@ -46,7 +46,7 @@ func _ready() -> void:
 	card.fusion.append("破")
 	b.board.set_cell(0, 0, card)
 	b.try_play([Vector2i.ZERO])
-	check(GameState.gold == 20, "融合单格即使贡献多个字形也只+1金币")
+	check(GameState.gold == 20, "融合单格即使贡献多个字形也只+1铜钱")
 	card.fusion.clear()
 	var next := make("paper_shell")
 	next.start(GameState.make_battle_deck(), [Database.get_enemy("paper_shell")], 123)
@@ -59,8 +59,8 @@ func _ready() -> void:
 	before = GameState.gold
 	cast(b, "资金")
 	b.begin_player_turn(false)
-	check(GameState.gold == before + 5, "资金直接增加普通金币，过回合不清空")
-	check(EffectUtil.pay(b, 3) and GameState.gold == before + 2, "费用直接支付普通金币")
+	check(GameState.gold == before + 5, "资金直接增加普通铜钱，过回合不清空")
+	check(EffectUtil.pay(b, 3) and GameState.gold == before + 2, "费用直接支付普通铜钱")
 	for word in Database.words.values():
 		for eff in word.effects:
 			check(not eff.handler in ["temp_funds", "invest_equity", "equity_interest", "compound_equity", "reinvest", "permanent_gold_growth", "alchemy", "pure_gold"], "生效词库不含旧经济handler：" + word.word)
@@ -84,7 +84,7 @@ func _ready() -> void:
 	check(not screen._bubble.frame_details.visible, "悬停特殊字不显示说明")
 	screen._board_view._on_tile_pressed(Vector2i.ZERO)
 	check(screen._bubble.frame_details.text.contains("镀金") and screen._bubble.frame_details.text.contains("蔓生") and screen._bubble.frame_details.text.contains("额外使用"), "左侧同时解释同一字的镀金、污染、叠层")
-	check(screen._gold_strip.entries.size() == 1, "钱包只有普通金币")
+	check(screen._gold_strip.entries.size() == 1, "钱包只有普通铜钱")
 	var view: TileView = screen._board_view.tiles[0]
 	view.set_selected(false)
 	check(view._sel_border.visible and view._sel_border.get_theme_stylebox("panel").border_color == Palette.GOLD_DK, "2D镀金呈金框")
@@ -110,7 +110,7 @@ func _ready() -> void:
 	picker.chose.emit(GameState.deck.size())
 	picker.queue_free()
 	for i in 3: await get_tree().process_frame
-	check(GameState.gold == before and not GameState.deck[0].gilded and screen.battle.board.fill_count() == 2, "取消选字保留金币和施词字")
+	check(GameState.gold == before and not GameState.deck[0].gilded and screen.battle.board.fill_count() == 2, "取消选字保留铜钱和施词字")
 	var original_children: int = screen._bubble._column.get_child_count()
 	for i in 10: screen._bubble.set_idle("操作提示")
 	check(screen._bubble._column.get_child_count() == original_children, "反复更新出词预览不累积说明控件")

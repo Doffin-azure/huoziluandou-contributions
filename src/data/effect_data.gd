@@ -106,7 +106,7 @@ func describe_builtin() -> String:
 		Kind.DRAW_CHARS:
 			return "随机补 %d 个字" % amount
 		Kind.GAIN_GOLD:
-			return "获得 %d 金币" % amount
+			return "获得 %d 铜钱" % amount
 		Kind.ENERGY:
 			return "获得 %d 储能" % amount
 		Kind.HEAT:

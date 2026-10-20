@@ -239,7 +239,7 @@ func _inventory_interaction_checks(screen: Control, view: ExpeditionMapView, ex:
 			if view.walker_at(candidate): actor_point = candidate; break
 	_check(view.walker_at(actor_point),"人物立片透明像素拾取可用")
 	await _click_point(view.global_position+actor_point)
-	_check(screen._actor_panel.visible and screen._hp_bar.value==GameState.player_hp and screen._stat_label.text.contains(str(GameState.gold)),"点击人物展开生命、金币与字匣")
+	_check(screen._actor_panel.visible and screen._hp_bar.value==GameState.player_hp and screen._stat_label.text.contains(str(GameState.gold)),"点击人物展开生命、铜钱与字匣")
 	_check(before==_snapshot(ex),"打开人物行囊不移动、不耗步、不耗随机数")
 	_capture_image("14-inventory-1280.png")
 	await _click_point(screen._tray_row.get_child(0).get_global_rect().get_center())

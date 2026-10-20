@@ -128,7 +128,7 @@ func run() -> void:
 	BattleBalance.values["core/corrosion_per_stack"] = 5
 	BattleBalance.values["core/burn_actions"] = 4
 	BattleBalance.values["core/double_attack_mult"] = 3
-	check(EffectGlossary.entry("term:gilded").text.contains("4金币") and EffectGlossary.entry("term:gilded").text.contains("临时复制不继承"), "镀金更新数值时保留实体和继承规则")
+	check(EffectGlossary.entry("term:gilded").text.contains("4铜钱") and EffectGlossary.entry("term:gilded").text.contains("临时复制不继承"), "镀金更新数值时保留实体和继承规则")
 	check(EffectGlossary.entry("term:strength").text.contains("+3") and EffectGlossary.entry("term:regen").text.contains("×2") and EffectGlossary.entry("term:corrosion").text.contains("×5"), "力量、再生和心蚀词条同步当前倍率")
 	check(EffectGlossary.entry("term:burn").text.contains("持续4次") and EffectGlossary.entry("term:double_attack").text.contains("×3"), "持续次数与超强倍率也从配置读取")
 	var strength := Database.get_status("strength")
@@ -140,7 +140,7 @@ func run() -> void:
 	strength.decay_per_turn = old_decay
 	var entity: CharInstance = GameState.deck[0]
 	var messages := EffectHandlersActions._gild_glyph(b, {"target": {"gild_uid": entity.uid}}, null)
-	check(entity.gilded and str(messages).contains("+4金币"), "镀金实际可用，结算提示与配置相符")
+	check(entity.gilded and str(messages).contains("+4铜钱"), "镀金实际可用，结算提示与配置相符")
 	BattleBalance.values = saved_values
 	card.queue_free()
 	screen.queue_free()

@@ -223,7 +223,7 @@ static func validate_builtin(b: BattleState, handler: String, path: Array, targe
 		var word: WordData = Database.get_word_by_glyphs_string("".join(b.board.glyphs_of(path)))
 		var cost := int(word.effects[0].args.get("cost", 0)) if word != null else 0
 		if EffectUtil.available(b) < EffectUtil.discounted_cost(b, cost):
-			return "镀金：金币不足（需%d）" % cost
+			return "镀金：铜钱不足（需%d）" % cost
 	if handler == "anchor_self":
 		var anchor_tile: Vector2i = target.get("tile", Vector2i(-1, -1))
 		if not _empty(b, anchor_tile): return "础：请选择棋盘内的空格"
@@ -349,7 +349,7 @@ static func validate_solo_throw(b: BattleState, inst: CharInstance, origin: Vect
 	if not b.solo_throw_destinations(inst, origin).has(target.tile2):
 		return "投：落点必须为空格"
 	if EffectUtil.available(b) < EffectUtil.discounted_cost(b, BattleBalance.i("throw_cost", 1)):
-		return "投：支付额不足（需支付 1 金币）"
+		return "投：支付额不足（需支付 1 铜钱）"
 	return ""
 
 
@@ -401,7 +401,7 @@ static func validate_solo_bag(b: BattleState, source: CharInstance, origin: Vect
 	if not candidates.any(func(inst): return inst.uid == int(target.get("bag_uid", -1))):
 		return "选字：所选实体不在当前候选字袋中"
 	if source.data.solo_handler == "buy_bag_solo" and EffectUtil.available(b) < EffectUtil.discounted_cost(b, BattleBalance.i("buy_cost", 2)):
-		return "购：支付额不足（需支付 2 金币）"
+		return "购：支付额不足（需支付 2 铜钱）"
 	return ""
 
 

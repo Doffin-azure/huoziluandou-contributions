@@ -38,7 +38,7 @@ var damage_taken_last_turn: int = 0
 var damage_taken_this_turn: int = 0
 var damage_dealt_this_turn: int = 0
 var gold_earned: int = 0
-var gold_earned_this_turn: int = 0 ## 利：本回合实际获得过金币，不受随后支出影响
+var gold_earned_this_turn: int = 0 ## 利：本回合实际获得过铜钱，不受随后支出影响
 var zero_effect_count: int = 0
 var pending_place: CharInstance = null
 var pending_choice: Dictionary = {} ## 多阶段选字的施词身份快照
@@ -454,11 +454,11 @@ func _spawn_temp_dian() -> void:
 		_log("电能：消耗储能，随机空格生成临时【电】")
 
 
-## 战内获得金币（受安全阀限制）。返回实际获得。
+## 战内获得铜钱（受安全阀限制）。返回实际获得。
 
 func earn_gold(amount: int) -> int:
 	var allowed: int = amount
-	# gold_cap_per_battle <= 0 表示本场金币收入不限
+	# gold_cap_per_battle <= 0 表示本场铜钱收入不限
 	if rules.gold_cap_per_battle > 0 and gold_earned + amount > rules.gold_cap_per_battle:
 		allowed = max(0, rules.gold_cap_per_battle - gold_earned)
 	gold_earned += allowed
@@ -467,7 +467,7 @@ func earn_gold(amount: int) -> int:
 	if allowed > 0 and has_ability("profit_share"):
 		var energy_gain := BattleBalance.i("profit_energy", 1) * allowed * passive_multiplier("分利")
 		add_energy(energy_gain)
-		_log("分利：获得 %d 金币，同时储能 +%d" % [allowed, energy_gain])
+		_log("分利：获得 %d 铜钱，同时储能 +%d" % [allowed, energy_gain])
 	Relics.on_gold_earned(self)
 	return allowed
 
@@ -571,10 +571,10 @@ func deal_damage(target: Combatant, amount: int, is_attack: bool = true) -> int:
 		real = target.take_damage(dmg)
 	if not target.is_player:
 		damage_dealt_this_turn += real
-		# 爆金：敌方每受到一次「攻击」获得 1 金币（被格挡/护甲吸收也算，故不看 real）
+		# 爆金：敌方每受到一次「攻击」获得 1 铜钱（被格挡/护甲吸收也算，故不看 real）
 		if is_attack and target.status_stacks("gold_burst") > 0:
 			earn_gold(BattleBalance.i("bounty_on_hit", 1))
-			_log("爆金：%s 受击，获得 1 金币" % target.display_name)
+			_log("爆金：%s 受击，获得 1 铜钱" % target.display_name)
 		_check_bounty()
 	return real
 
@@ -583,7 +583,7 @@ func _check_bounty() -> void:
 		bounty_paid = false
 		GameState.add_gold(bounty_reward)
 		gold_earned_this_turn += maxi(0, bounty_reward)
-		_log("重金：悬赏达成，获得 %d 金币" % bounty_reward)
+		_log("重金：悬赏达成，获得 %d 铜钱" % bounty_reward)
 
 
 # ---------------------------------------------------------------- 出字
@@ -911,8 +911,8 @@ func _execute_play_inner(play: Dictionary, shared: Dictionary) -> Dictionary:
 		for c in consumed:
 			var inst_g: CharInstance = c.inst
 			if inst_g.gilded and earn_gold(BattleBalance.i("gild_gold", 1)) > 0:
-				result.messages.append("镀金：【%s】+%d 金币" % [inst_g.glyph(), BattleBalance.i("gild_gold", 1)])
-				_log("镀金：【%s】+%d 金币" % [inst_g.glyph(), BattleBalance.i("gild_gold", 1)])
+				result.messages.append("镀金：【%s】+%d 铜钱" % [inst_g.glyph(), BattleBalance.i("gild_gold", 1)])
+				_log("镀金：【%s】+%d 铜钱" % [inst_g.glyph(), BattleBalance.i("gild_gold", 1)])
 
 	# 心力：每打出一颗【心】，叠加一层心力
 	if has_ability("heart_power") and not discard_only:
@@ -1824,7 +1824,7 @@ func inject_enemy_glyphs(count: int, pollution_id: String, fixed_glyph := "", so
 	var n: int = BattleOps.inject_enemy_glyphs(self, count, pollution_id, fixed_glyph, source_id)
 	if n > 0 and has_ability("inject_bounty"):
 		var g := earn_gold(n * BattleBalance.i("inject_bounty", 2))
-		_log("加收：敌人注入 %d 枚，获得 %d 金币" % [n, g])
+		_log("加收：敌人注入 %d 枚，获得 %d 铜钱" % [n, g])
 	return n
 
 func spawn_scorch_into_bag(count: int) -> int:

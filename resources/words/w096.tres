@@ -8,18 +8,18 @@ script = ExtResource("1_406ai")
 kind = 28
 handler = "joint_funding"
 timing = "persistent"
-note = "本场支付金币费用时，自动用每2储能抵1金币，余款支付普通金币。"
+note = "本场支付铜钱费用时，自动用每2储能抵1铜钱，余款支付普通铜钱。"
 
 [resource]
 script = ExtResource("2_b5x5b")
 id = "w096"
 word = "合资"
 glyphs = Array[String](["合", "资"])
-description = "本场支付金币费用时，自动用每2储能抵1金币，余款支付普通金币。"
+description = "本场支付铜钱费用时，自动用每2储能抵1铜钱，余款支付普通铜钱。"
 effects = Array[ExtResource("1_406ai")]([SubResource("Resource_cxarw")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "本场支付金币费用时，自动用每2储能抵1金币，余款支付普通金币。"
+effect_summary = "本场支付铜钱费用时，自动用每2储能抵1铜钱，余款支付普通铜钱。"
 effect_handler_id = "joint_funding"
 timing = "persistent"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"

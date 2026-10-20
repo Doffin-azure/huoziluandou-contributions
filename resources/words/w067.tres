@@ -11,18 +11,18 @@ amount = 2
 args = {
 "gold": 2
 }
-note = "获得2金币；在词尾原格生成1枚本场可循环使用的【币】，战后移除。原格未空出时不生成。"
+note = "获得2铜钱；在词尾原格生成1枚本场可循环使用的【币】，战后移除。原格未空出时不生成。"
 
 [resource]
 script = ExtResource("2_bunqd")
 id = "w067"
 word = "铸币"
 glyphs = Array[String](["铸", "币"])
-description = "获得2金币；在词尾原格生成1枚本场可循环使用的【币】，战后移除。原格未空出时不生成。"
+description = "获得2铜钱；在词尾原格生成1枚本场可循环使用的【币】，战后移除。原格未空出时不生成。"
 effects = Array[ExtResource("1_8jerj")]([SubResource("Resource_ncwbr")])
 group = "经济"
 design_stage = "已完成逐组第一轮讨论；尚非全部定稿"
-effect_summary = "获得2金币；在词尾原格生成1枚本场可循环使用的【币】，战后移除。原格未空出时不生成。"
+effect_summary = "获得2铜钱；在词尾原格生成1枚本场可循环使用的【币】，战后移除。原格未空出时不生成。"
 effect_handler_id = "mint"
 implementation_delta = "尚无P25词效实现，Godot需按策划单独排期"
 priority = "P3·补全词效"

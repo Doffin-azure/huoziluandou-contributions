@@ -1,5 +1,5 @@
 extends Node
-## 经典模式遗物：精英给 1 件、首领回血后二选一、事件可能出遗物、商店 45 金币 1 件候选。
+## 经典模式遗物：精英给 1 件、首领回血后二选一、事件可能出遗物、商店 45 铜钱 1 件候选。
 
 var checks := 0
 var failures := 0
@@ -98,7 +98,7 @@ func _ready() -> void:
 	await _frames()
 	check(done.id == "slab" and GameState.relic_binds.has("slab"), "关闭选择窗时随机绑定")
 
-	# 商店：1 件遗物，45 金币
+	# 商店：1 件遗物，45 铜钱
 	GameState.start_new_run("v03")
 	_own_all_but(["strike", "breach"])
 	GameState.gold = 100
@@ -106,12 +106,12 @@ func _ready() -> void:
 	await _frames()
 	var shop: Control = Router.current
 	var relics: Array = shop._offers.filter(func(o): return o.kind == "relic")
-	check(relics.size() == 1 and relics[0].price == 45, "商店有 1 件遗物，45 金币")
+	check(relics.size() == 1 and relics[0].price == 45, "商店有 1 件遗物，45 铜钱")
 	var index: int = shop._offers.find(relics[0])
 	var id: String = relics[0].relic
 	shop._buy(index)
 	await _frames()
-	check(GameState.has_relic(id) and GameState.gold == 55 and not shop._offers.any(func(o): return o.kind == "relic"), "买下遗物扣 45 金币，货架清空")
+	check(GameState.has_relic(id) and GameState.gold == 55 and not shop._offers.any(func(o): return o.kind == "relic"), "买下遗物扣 45 铜钱，货架清空")
 	shop._refresh_stock()
 	var refreshed: Array = shop._offers.filter(func(o): return o.kind == "relic")
 	check(refreshed.size() == 1 and refreshed[0].relic != id, "刷新补上一件没有的遗物")

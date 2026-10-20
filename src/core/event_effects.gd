@@ -20,7 +20,7 @@ static func node(event: Dictionary, node_id := "start") -> Dictionary:
 		var nodes: Dictionary = event.get("nodes", {})
 		raw = nodes.get(node_id, nodes.get("start", {})).duplicate(true)
 	var result: Dictionary = raw.duplicate(true)
-	for key in ["id", "title", "illustration", "acts", "tags", "allow_leave"]:
+	for key in ["id", "title", "illustration", "illustration_style", "acts", "tags", "allow_leave"]:
 		if not result.has(key) and event.has(key): result[key] = event[key]
 	result["body"] = resolve_text(str(result.get("body", "")))
 	var options: Array = result.get("options", [])
@@ -245,7 +245,7 @@ static func _execute(effects: Array, removal_counts: Array, selected: Array, rng
 			"gold": GameState.add_gold(amount)
 			"spend_gold":
 				if amount <= 0 or not GameState.spend_gold(amount):
-					return {"ok": false, "reason": "金币不足"}
+					return {"ok": false, "reason": "铜钱不足"}
 			"max_hp":
 				GameState.player_max_hp = maxi(1, GameState.player_max_hp + amount)
 				GameState.player_hp = mini(GameState.player_hp, GameState.player_max_hp)

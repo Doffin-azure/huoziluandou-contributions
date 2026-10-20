@@ -451,7 +451,7 @@ func _test_loot_rest_shop() -> void:
 	var gi: int = opts.map(func(o): return o.kind).find("gold")
 	if gi >= 0:
 		ex.choose_loot(gi)
-		_ok(GameState.gold > gold and ex.taken.has(big) and ex.panels.is_empty(), "选了金币，赏格清空")
+		_ok(GameState.gold > gold and ex.taken.has(big) and ex.panels.is_empty(), "选了铜钱，赏格清空")
 	else:
 		ex.choose_loot(0)
 	# 休息
@@ -494,7 +494,7 @@ func _test_loot_rest_shop() -> void:
 		if ex.m.mech[k].g == "炉": ex.pos = k; break
 	ex.push_panel({"kind": "forge", "k": ex.pos})
 	gold = GameState.gold
-	_ok(ex.forge(0, 1) and ex.tray.size() == 1 and Database.get_character_by_glyph(ex.tray[0]).rarity >= 2 and GameState.gold == gold, "熔炉：两字熔成一枚稀有字，无额外金币")
+	_ok(ex.forge(0, 1) and ex.tray.size() == 1 and Database.get_character_by_glyph(ex.tray[0]).rarity >= 2 and GameState.gold == gold, "熔炉：两字熔成一枚稀有字，无额外铜钱")
 
 
 func _battle(ex: Expedition, f: Dictionary) -> BattleState:
@@ -551,7 +551,7 @@ func _test_finish_and_acts() -> void:
 	var t0 := ex.t
 	var r := ex.finish_battle(true)
 	_ok(r.reward and r.count == 3 and ex.taken.has(foe_k), "战胜明敌：去战后三选一")
-	_ok(GameState.gold == gold + 2 and ex.ink == ink + 1 and ex.t >= t0 + 2, "基础战后金币+2、回墨1、耗2步")
+	_ok(GameState.gold == gold + 2 and ex.ink == ink + 1 and ex.t >= t0 + 2, "基础战后铜钱+2、回墨1、耗2步")
 	# 伏兵：打赢后领地里的奖励解封
 	var amb: Dictionary = ex.m.ambush[0]
 	var sealed_k: int = amb.sealed[0]
@@ -569,7 +569,7 @@ func _test_finish_and_acts() -> void:
 	ex.fight = {"kind": "elite", "k": _find(ex, func(k): return ex.m.node.has(k) and ex.m.node[k].t == "险"), "g": "甲", "name": "守口精英"}
 	gold = GameState.gold
 	ex.finish_battle(true)
-	_ok(ex.seals.size() == 1 and Expedition.SEALS[ex.seals[0]][1] == "精英" and GameState.gold == gold + 4, "精英：印章+金币4")
+	_ok(ex.seals.size() == 1 and Expedition.SEALS[ex.seals[0]][1] == "精英" and GameState.gold == gold + 4, "精英：印章+铜钱4")
 	# 镇纸
 	ex.seals = ["镇纸"]
 	GameState.player_hp = 50
@@ -682,7 +682,7 @@ func _test_screens() -> void:
 	var gold := GameState.gold
 	Router.current._on_skip()
 	await get_tree().process_frame
-	_ok(Router.current_path.contains("expedition_map_screen") and GameState.gold == gold + Expedition.SKIP_GOLD, "跳过三选一拿 %d 金币，回到远征地图" % Expedition.SKIP_GOLD)
+	_ok(Router.current_path.contains("expedition_map_screen") and GameState.gold == gold + Expedition.SKIP_GOLD, "跳过三选一拿 %d 铜钱，回到远征地图" % Expedition.SKIP_GOLD)
 	ex.fight = {"kind": "boss", "k": ex.boss, "name": "首领", "g": ex.m.TH.boss, "caught": true, "debuff": "先手"}
 	Router.current.refresh()
 	Router.current._start_battle()

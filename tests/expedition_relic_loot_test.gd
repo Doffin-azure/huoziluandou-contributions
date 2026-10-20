@@ -31,7 +31,7 @@ func _ready() -> void:
 				ex.rng.seed = seed_value * 7 + 13
 				ex.relic_rng.seed = seed_value * 31 + 91
 				var opts := ex.loot_options(tier)
-				check(opts.size() == (2 if tier == "小" else 3) + (1 if bonus else 0) and opts.any(func(o): return o.kind == "gold") and opts.any(func(o): return o.kind == "glyphs"), "赏选项数、金币与字保底保持")
+				check(opts.size() == (2 if tier == "小" else 3) + (1 if bonus else 0) and opts.any(func(o): return o.kind == "gold") and opts.any(func(o): return o.kind == "glyphs"), "赏选项数、铜钱与字保底保持")
 				var unique := {}
 				for o in opts: unique[ex._loot_key(o)] = true
 				check(unique.size() == opts.size(), "每份奖励去重")

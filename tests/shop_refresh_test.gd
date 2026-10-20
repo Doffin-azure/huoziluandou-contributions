@@ -1,5 +1,5 @@
 extends Node
-## 商店刷新：花 5 金币换一批字和遗物，服务保留；金币不够不能刷。远征商店与旧版商店都测。
+## 商店刷新：花 5 铜钱换一批字和遗物，服务保留；铜钱不够不能刷。远征商店与旧版商店都测。
 
 var checks := 0
 var failures := 0
@@ -34,12 +34,12 @@ func _ready() -> void:
 		var new_glyphs: Array = ex.shop_offers().filter(func(o): return o.kind == "glyph").map(func(o): return o.glyph)
 		changed = changed or new_glyphs != old_glyphs
 	var offers: Array = ex.shop_offers()
-	check(GameState.gold == gold - Expedition.SHOP_REFRESH_COST * refreshed, "每次刷新扣 %d 金币" % Expedition.SHOP_REFRESH_COST)
+	check(GameState.gold == gold - Expedition.SHOP_REFRESH_COST * refreshed, "每次刷新扣 %d 铜钱" % Expedition.SHOP_REFRESH_COST)
 	check(changed, "刷新后换了字")
 	check(offers.filter(func(o): return o.kind == "glyph").size() == 3, "刷新后补满三枚字")
 	check(not offers.any(func(o): return o.kind == "heal") and offers.any(func(o): return o.kind == "remove") and offers.any(func(o): return o.kind == "gild"), "已买的服务不会被刷回来，没买的保留")
 	GameState.gold = Expedition.SHOP_REFRESH_COST - 1
-	check(not ex.refresh_shop() and GameState.gold == Expedition.SHOP_REFRESH_COST - 1, "金币不够不能刷新")
+	check(not ex.refresh_shop() and GameState.gold == Expedition.SHOP_REFRESH_COST - 1, "铜钱不够不能刷新")
 	ex.pop_panel()
 	GameState.gold = 100
 	check(not ex.refresh_shop(), "不在商店里不能刷新")
@@ -52,14 +52,14 @@ func _ready() -> void:
 	check(shop._hud.tertiary_button != null and not shop._hud.tertiary_button.disabled, "旧版商店有刷新按钮")
 	var services: Array = shop._offers.filter(func(o): return o.kind not in ["buy_char", "relic"])
 	shop._refresh_stock()
-	check(GameState.gold == 20 - Expedition.SHOP_REFRESH_COST, "旧版商店刷新扣 5 金币")
+	check(GameState.gold == 20 - Expedition.SHOP_REFRESH_COST, "旧版商店刷新扣 5 铜钱")
 	check(shop._offers.filter(func(o): return o.kind == "buy_char").size() == 3, "旧版商店刷出三枚字")
 	check(shop._offers.filter(func(o): return o.kind not in ["buy_char", "relic"]) == services, "旧版商店服务原样保留")
 	GameState.gold = 4
 	shop._refresh()
-	check(shop._hud.tertiary_button.disabled, "金币不够时刷新按钮变灰")
+	check(shop._hud.tertiary_button.disabled, "铜钱不够时刷新按钮变灰")
 	shop._refresh_stock()
-	check(GameState.gold == 4, "金币不够点了也不扣钱")
+	check(GameState.gold == 4, "铜钱不够点了也不扣钱")
 	shop.queue_free()
 	Music.stop()
 	# 音频线程下一次混音才释放播放实例

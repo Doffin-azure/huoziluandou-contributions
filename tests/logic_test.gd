@@ -210,14 +210,14 @@ func _test_resource_glyphs() -> void:
 	b2.begin_player_turn(false)
 	_ok(deferred and b2.player.energy == 3 and not b2.has_ability("energy_next_turn"), "蓄：下回合才获得 2 储能（%d）" % b2.player.energy)
 
-	# 金：金币
-	print("[金] 金币")
+	# 金：铜钱
+	print("[金] 铜钱")
 	var b3 := _battle()
 	var g0 := GameState.gold
 	GameState.gold = 0
 	_place(b3, 0, 0, "金")
 	b3.try_play([Vector2i(0, 0)])
-	_ok(GameState.gold == 1, "金：金币 +1（%d）" % GameState.gold)
+	_ok(GameState.gold == 1, "金：铜钱 +1（%d）" % GameState.gold)
 	GameState.gold = g0
 
 	# 力：下一次攻击总伤害 +2。
@@ -265,12 +265,12 @@ func _test_batch2_glyphs() -> void:
 	_ok(b2.player.heat == 1, "爆：热度 +1（%d）" % b2.player.heat)
 
 	# 资：临时资金 +2
-	print("[资] 普通金币 +2")
+	print("[资] 普通铜钱 +2")
 	var b3 := _battle()
 	var gold_before := GameState.gold
 	_place(b3, 0, 0, "资")
 	b3.try_play([Vector2i(0, 0)])
-	_ok(GameState.gold == gold_before + 2, "资：普通金币+2")
+	_ok(GameState.gold == gold_before + 2, "资：普通铜钱+2")
 
 	# 收：随机补 1 字
 	print("[收] 随机补 1 字")
@@ -655,7 +655,7 @@ func _test_immediate_economy() -> void:
 		_place(b, 1, row, glyphs[1])
 		var result := b.try_play([Vector2i(0, row), Vector2i(1, row)])
 		_ok(result.ok, "即时经济词生效：" + glyphs)
-	_ok(GameState.gold == 107, "复利、利息、炼金直接获得2+2+3金币")
+	_ok(GameState.gold == 107, "复利、利息、炼金直接获得2+2+3铜钱")
 	GameState.settle_victory_economy()
 	_ok(GameState.gold == 107, "胜利没有额外投资返还")
 	GameState.gold = g0
@@ -748,14 +748,14 @@ func _test_repeat_zero() -> void:
 
 
 func _test_mint() -> void:
-	print("[铸币] 金币 + 临时币")
+	print("[铸币] 铜钱 + 临时币")
 	var b := _battle()
 	var g0 := GameState.gold
 	GameState.gold = 10
 	_place(b, 0, 0, "铸")
 	_place(b, 1, 0, "币")
 	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
-	_ok(GameState.gold == 12, "铸币：+2 金币（当前 %d）" % GameState.gold)
+	_ok(GameState.gold == 12, "铸币：+2 铜钱（当前 %d）" % GameState.gold)
 	var has_coin := false
 	for c in b.board.cells:
 		if c != null and c.glyph() == "币":
@@ -765,7 +765,7 @@ func _test_mint() -> void:
 
 
 func _test_buyback() -> void:
-	print("[回购] 付金币回收本回合消耗字")
+	print("[回购] 付铜钱回收本回合消耗字")
 	var b := _battle()
 	var g0 := GameState.gold
 	GameState.gold = 10
@@ -958,12 +958,12 @@ func _test_jingjin() -> void:
 	_add_enemy(b, 200)
 	var gg := GameState.gold
 	b.try_play([Vector2i(0, 1)])
-	_ok(GameState.gold == gg + 1, "镀金单字+1金币")
+	_ok(GameState.gold == gg + 1, "镀金单字+1铜钱")
 	b.board.set_cell(0, 1, card)
 	_place(b, 1, 1, "破")
 	gg = GameState.gold
 	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
-	_ok(GameState.gold == gg + 1, "镀金参与组词+1金币")
+	_ok(GameState.gold == gg + 1, "镀金参与组词+1铜钱")
 	GameState.gold = g0
 	GameState.deck = saved
 
@@ -1269,7 +1269,7 @@ func _test_edge_batch2() -> void:
 	var g0 := GameState.gold
 	GameState.gold = 10
 	EffectUtil.pay(b10, 3)
-	_ok(b10.player.persistent_block >= 3, "收息：花金币附等额持久盾")
+	_ok(b10.player.persistent_block >= 3, "收息：花铜钱附等额持久盾")
 	GameState.gold = g0
 	# 加收
 	var b11 := _battle()
@@ -1278,7 +1278,7 @@ func _test_edge_batch2() -> void:
 	b11.try_play([Vector2i(0, 0), Vector2i(1, 0)])
 	var g1 := GameState.gold
 	var inj := b11.inject_enemy_glyphs(2, "rush")
-	_ok(inj >= 1 and GameState.gold > g1, "加收：敌人注入获得金币")
+	_ok(inj >= 1 and GameState.gold > g1, "加收：敌人注入获得铜钱")
 	GameState.gold = g1
 	# 电力（用「左击」的行位移触发额外位移）
 	var b12 := _battle()
@@ -1518,7 +1518,7 @@ func _test_blastproof() -> void:
 
 
 func _test_joint_funding() -> void:
-	print("[合资] 2 储能抵 1 金币")
+	print("[合资] 2 储能抵 1 铜钱")
 	var b := _battle()
 	var g0 := GameState.gold
 	GameState.gold = 1
@@ -1531,12 +1531,12 @@ func _test_joint_funding() -> void:
 	_place(b, 0, 1, "投")
 	_place(b, 1, 1, "币")
 	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
-	_ok(b.player.energy == 4 and GameState.gold == 1, "用 6 储能抵 3 金币（储 %d 金 %d）" % [b.player.energy, GameState.gold])
+	_ok(b.player.energy == 4 and GameState.gold == 1, "用 6 储能抵 3 铜钱（储 %d 金 %d）" % [b.player.energy, GameState.gold])
 	GameState.gold = g0
 
 
 func _test_profit_share() -> void:
-	print("[分利] 获得金币同时获得等量储能")
+	print("[分利] 获得铜钱同时获得等量储能")
 	var b := _battle()
 	var g0 := GameState.gold
 	GameState.gold = 0
@@ -1546,7 +1546,7 @@ func _test_profit_share() -> void:
 	_ok(b.has_ability("profit_share"), "分利生效")
 	b.player.energy = 0
 	b.earn_gold(5)
-	_ok(b.player.energy == 5, "获得 5 金币 → 储能 +5（当前 %d）" % b.player.energy)
+	_ok(b.player.energy == 5, "获得 5 铜钱 → 储能 +5（当前 %d）" % b.player.energy)
 	GameState.gold = g0
 
 
@@ -1562,7 +1562,7 @@ func _test_suspend() -> void:
 
 
 func _test_refine_remove() -> void:
-	print("[炼化] 降热+金币+移出一张牌")
+	print("[炼化] 降热+铜钱+移出一张牌")
 	var b := _battle()
 	var g0 := GameState.gold
 	GameState.gold = 10
@@ -1571,7 +1571,7 @@ func _test_refine_remove() -> void:
 	_place(b, 0, 0, "炼")
 	_place(b, 1, 0, "化")
 	b.try_play([Vector2i(0, 0), Vector2i(1, 0)], {"remove_glyph": "洗"})
-	_ok(b.player.heat == 2 and GameState.gold == 14, "热度 -3、金币 +4（热 %d 金 %d）" % [b.player.heat, GameState.gold])
+	_ok(b.player.heat == 2 and GameState.gold == 14, "热度 -3、铜钱 +4（热 %d 金 %d）" % [b.player.heat, GameState.gold])
 	var still := false
 	for c in b.bag:
 		if c.glyph() == "洗":
@@ -1581,7 +1581,7 @@ func _test_refine_remove() -> void:
 
 
 func _test_gold_payment() -> void:
-	print("[资金→投币] 普通金币支付")
+	print("[资金→投币] 普通铜钱支付")
 	var b := _battle()
 	var e := _add_enemy(b, 200)
 	var g0 := GameState.gold
@@ -1589,11 +1589,11 @@ func _test_gold_payment() -> void:
 	_place(b, 0, 0, "资")
 	_place(b, 1, 0, "金")
 	b.try_play([Vector2i(0, 0), Vector2i(1, 0)])
-	_ok(GameState.gold == 55, "资金：普通金币+5")
+	_ok(GameState.gold == 55, "资金：普通铜钱+5")
 	_place(b, 0, 1, "投")
 	_place(b, 1, 1, "币")
 	b.try_play([Vector2i(0, 1), Vector2i(1, 1)])
-	_ok(GameState.gold == 52, "投币：支付3普通金币")
+	_ok(GameState.gold == 52, "投币：支付3普通铜钱")
 	_ok(200 - e.hp == 15, "投币：支付 3 × 5 = 15 伤（实际 %d）" % (200 - e.hp))
 	GameState.gold = g0
 
