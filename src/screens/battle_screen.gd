@@ -195,6 +195,10 @@ func build(root: Control) -> void:
 	else:
 		_board_view.call_deferred("play_opening")
 	_on_log("战斗开始：%s" % node.title)
+	# 开局就可能分出胜负：连字环自动打死敌人、生生不息反噬、金字碑开局化金
+	if battle.is_over():
+		_check_battle_over.call_deferred()
+		return
 	_offer_question.call_deferred()
 
 

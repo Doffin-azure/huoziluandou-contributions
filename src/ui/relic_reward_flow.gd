@@ -52,8 +52,18 @@ static func grant(host: Node, id: String, on_done: Callable) -> void:
 ## 拾取后的选择：绑定类挑一枚绑定；泥金笔 / 复字拓片挑字；许愿笺许愿
 
 
+## 补上事件 / 宝藏入手时没来得及做的挑字、许愿；一件件弹完再 on_done
+static func drain_pending(host: Node, on_done: Callable) -> void:
+	var id := Relics.next_pending_setup()
+	if id.is_empty():
+		on_done.call()
+		return
+	bind_owned(host, id, func(_id): drain_pending(host, on_done))
+
+
 ## Also used after a saved route controller has granted the relic exactly once.
 static func bind_owned(host: Node, id: String, on_done: Callable) -> void:
+	Relics.clear_pending_setup(id)
 	if not Relics.pick_spec(id).is_empty():
 		_pick_loop(host, id, int(Relics.pick_spec(id)[1]), on_done)
 		return

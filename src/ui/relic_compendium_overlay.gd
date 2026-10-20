@@ -11,7 +11,7 @@ func _ready() -> void:
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	add_theme_constant_override("separation", 10)
 	var normal_count := Relics.normal_pool().size()
-	var summary := Ink.label("共 %d 件 · 普通遗物 %d 件 · 事件专属 %d 件" % [Relics.DEFS.size(), normal_count, Relics.event_pool().size()], "Muted")
+	var summary := Ink.label("共 %d 件 · 普通遗物 %d 件 · 事件专属 %d 件" % [Relics.visible_ids().size(), normal_count, Relics.event_pool().size()], "Muted")
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_child(summary)
 	_scroll = ScrollContainer.new()
@@ -24,7 +24,7 @@ func _ready() -> void:
 	_grid.add_theme_constant_override("h_separation", 12)
 	_grid.add_theme_constant_override("v_separation", 12)
 	_scroll.add_child(_grid)
-	var ids := Relics.DEFS.keys()
+	var ids := Relics.visible_ids()
 	ids.sort_custom(func(a, b):
 		var ta := int(Relics.TIER.get(a, 2))
 		var tb := int(Relics.TIER.get(b, 2))

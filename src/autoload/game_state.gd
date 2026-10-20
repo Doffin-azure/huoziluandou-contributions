@@ -89,13 +89,17 @@ func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> voi
 func add_character(data: CharacterData, count: int = 1) -> void:
 	if data == null:
 		return
-	# 许愿笺·千字同文：之后拿到的字都变成许愿的字；金字碑：新字也镀金
-	data = Relics.redirect_glyph(data)
 	for i in count:
-		var inst := CharInstance.new(data)
-		inst.gilded = relics.has("midas")
-		deck.append(inst)
+		deck.append(new_deck_inst(data))
 	EventBus.deck_changed.emit()
+
+
+## 新拿到的永久字都走这里：许愿笺·千字同文改成许愿的字；金字碑：新字也镀金
+func new_deck_inst(data: CharacterData) -> CharInstance:
+	var inst := CharInstance.new(Relics.redirect_glyph(data))
+	if relics.has("midas"):
+		Relics.midas_gild(inst)
+	return inst
 
 
 # ---------------------------------------------------------------- 遗物
@@ -116,9 +120,12 @@ func add_relic(id: String) -> bool:
 func remove_relic(id: String) -> bool:
 	if not relics.has(id):
 		return false
+	Relics.on_remove(id)
 	relics.erase(id)
 	relic_binds.erase(id)
-	relic_counters.erase(id)   # 「fireman_claimed」这类一局一次的标记不清
+	# 「*_claimed」这类一局一次的标记不清；许愿笺的愿也留着，再买回来不能重新许愿
+	if id != "monkey":
+		relic_counters.erase(id)
 	return true
 
 
@@ -146,7 +153,7 @@ func relic_bound_inst(id: String) -> CharInstance:
 ## 把战斗中收购得到的实体字永久加入字袋
 func add_captured(instances: Array) -> void:
 	for inst in instances:
-		var c := CharInstance.new(inst.data)
+		var c := new_deck_inst(inst.data)
 		c.upgrade_level = inst.upgrade_level
 		deck.append(c)
 	if not instances.is_empty():

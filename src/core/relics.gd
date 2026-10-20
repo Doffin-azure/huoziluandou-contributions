@@ -76,6 +76,13 @@ const WHEEL_DIRS := ["up", "down", "left", "right"]
 const WHEEL_TEXT := {"up": "上", "down": "下", "left": "左", "right": "右"}
 ## 事件遗物池：只能由事件发放，不进入商店、许愿、普通奖励等普通遗物池。
 const EVENT_ONLY := ["black_water", "life_lantern", "life_debt"]
+## 效果和配套事件还没做的遗物：不进任何池、不进图鉴；定义保留，旧存档里有也不报错
+const HIDDEN := ["black_water", "life_lantern"]
+## 一局只生效一次的拾取效果：卖掉再买、再从事件拿到都不重复给（字、重铸、挑字、许愿）
+const ONCE_PICKUP := ["fireman", "chaos_dice", "death", "ruin", "goldleaf", "rubbing", "monkey"]
+## 连字环不自动打的词效：花金币、花储能、买字一类（"要付费的词留给你"）
+const CHAIN_PAID_HANDLERS := ["spend_gold_damage", "bounty", "buyback", "buy_bag_solo", "energy_discharge",
+	"energy_to_bonus", "energy_to_heat_block", "energy_to_heat_damage", "solo_release"]
 
 
 static func name_of(id: String) -> String:
@@ -96,12 +103,21 @@ static func text(id: String) -> String:
 
 ## 普通遗物池：不含事件专属遗物。商店、许愿、普通奖励都从这里取。
 static func normal_pool() -> Array:
-	return DEFS.keys().filter(func(id): return not EVENT_ONLY.has(id))
+	return DEFS.keys().filter(func(id): return not EVENT_ONLY.has(id) and not HIDDEN.has(id))
+
+
+## 图鉴等展示用：去掉还没做完的隐藏遗物
+static func visible_ids() -> Array:
+	return DEFS.keys().filter(func(id): return not HIDDEN.has(id))
+
+
+static func is_hidden(id: String) -> bool:
+	return HIDDEN.has(id)
 
 
 ## 事件遗物池：只给事件使用；事件可以显式指定，也可用 roll_event_choices。
 static func event_pool() -> Array:
-	return EVENT_ONLY.filter(func(id): return DEFS.has(id))
+	return EVENT_ONLY.filter(func(id): return DEFS.has(id) and not HIDDEN.has(id))
 
 
 static func is_event_relic(id: String) -> bool:
@@ -238,9 +254,11 @@ static func on_player_turn_end(b: BattleState) -> void:
 			empty_rows += 1
 	if empty_rows <= 0:
 		return
-	var gain := empty_rows * 2
-	b.player.add_persistent_block(gain)
-	b._log("空铅盒：%d 行空置，持久盾 +%d" % [empty_rows, gain])
+	var before := b.player.persistent_block
+	b.player.add_persistent_block(empty_rows * 2)
+	var gain := b.player.persistent_block - before
+	if gain > 0:  # 冷心等不能获得格挡时不报
+		b._log("空铅盒：%d 行空置，持久盾 +%d" % [empty_rows, gain])
 
 
 static func board_dirty(b: BattleState) -> bool:
@@ -333,7 +351,9 @@ static func on_cards_consumed(b: BattleState, consumed: Array) -> void:
 		refill += 1
 	if refill > 0:
 		var n := b.draw_to_board(refill)
-		b._log("补字鬼手：补 %d 字（本场还剩 %d 次）" % [n, b.magic_hand_left])
+		b.magic_hand_left += refill - n  # 字袋空了没补上的不算次数
+		if n > 0:
+			b._log("补字鬼手：补 %d 字（本场还剩 %d 次）" % [n, b.magic_hand_left])
 
 
 ## 回合结束（敌人行动前）：繁殖字向四邻空格生成临时复制；新生的下回合才繁殖
@@ -395,12 +415,15 @@ static func rest_bonus() -> int:
 
 ## 拾取效果（绑定类在 GameState.bind_relic 里另外处理）
 static func on_pickup(id: String) -> void:
+	if ONCE_PICKUP.has(id):
+		# 一局只给一次：卖掉再买 / 再从事件拿到不重复给；挑字类同时不再弹挑字面板
+		if GameState.relic_counters.get(id + "_claimed", false):
+			GameState.relic_counters[id + "_repeat"] = true
+			return
+		GameState.relic_counters[id + "_claimed"] = true
+		GameState.relic_counters.erase(id + "_repeat")
 	match id:
 		"fireman":
-			# 一局只给一次【火】：卖掉再买 / 再熔出来不重复给
-			if GameState.relic_counters.get("fireman_claimed", false):
-				return
-			GameState.relic_counters["fireman_claimed"] = true
 			for i in BattleBalance.i("fireman_count", 4):
 				_grant_glyph("火", "火种")
 		"chaos_dice":
@@ -411,7 +434,70 @@ static func on_pickup(id: String) -> void:
 			_grant_glyph("亡", name_of("ruin"))
 		"midas":
 			for inst in GameState.deck:
-				inst.gilded = true
+				midas_gild(inst)
+
+
+## 拾取后还要玩家挑字 / 许愿的遗物
+static func needs_setup(id: String) -> bool:
+	if id == "monkey":
+		return GameState.has_relic("monkey") and not GameState.relic_counters.has("monkey")
+	return GameState.has_relic(id) and not pick_spec(id).is_empty() and not pick_candidates(id).is_empty()
+
+
+## 事件、宝藏等没经过 RelicRewardFlow 的入手：记下来，等能弹窗的界面补上挑字 / 许愿（随存档保存）
+static func queue_setup(id: String) -> void:
+	if not needs_setup(id):
+		return
+	var pending: Array = GameState.relic_counters.get("_pending_setup", [])
+	if not pending.has(id):
+		pending.append(id)
+	GameState.relic_counters["_pending_setup"] = pending
+
+
+## 取出下一件待补挑字 / 许愿的遗物；已经不需要的直接跳过
+static func next_pending_setup() -> String:
+	var pending: Array = GameState.relic_counters.get("_pending_setup", [])
+	while not pending.is_empty():
+		var id := str(pending.pop_front())
+		if needs_setup(id):
+			GameState.relic_counters["_pending_setup"] = pending
+			return id
+	GameState.relic_counters.erase("_pending_setup")
+	return ""
+
+
+static func clear_pending_setup(id: String) -> void:
+	var pending: Array = GameState.relic_counters.get("_pending_setup", [])
+	pending.erase(id)
+	if pending.is_empty():
+		GameState.relic_counters.erase("_pending_setup")
+
+
+## 拾取效果已经在本局给过、这次重复拿到：不再挑字 / 许愿
+static func is_repeat_pickup(id: String) -> bool:
+	return bool(GameState.relic_counters.get(id + "_repeat", false))
+
+
+## 金字碑镀金：记下是它镀的，失去金字碑时只退这些
+static func midas_gild(inst: CharInstance) -> void:
+	if inst.gilded:
+		return
+	inst.gilded = true
+	var uids: Array = GameState.relic_counters.get("midas_gilded", [])
+	uids.append(inst.uid)
+	GameState.relic_counters["midas_gilded"] = uids
+
+
+## 失去遗物时撤销持续效果（GameState.remove_relic 在清计数之前调用）
+static func on_remove(id: String) -> void:
+	match id:
+		"midas":
+			var uids: Array = GameState.relic_counters.get("midas_gilded", [])
+			for inst in GameState.deck:
+				if uids.has(inst.uid):
+					inst.gilded = false
+			GameState.relic_counters.erase("midas_gilded")
+			EventBus.deck_changed.emit()
 
 
 ## 乱文骨骰：字袋全部换成随机字，并在原数量上多补 3 枚。
@@ -429,7 +515,8 @@ static func _rebuild_deck_chaos() -> void:
 	GameState.deck.clear()
 	for _i in old_count + 3:
 		var cd: CharacterData = pool[GameState.rng.randi_range(0, pool.size() - 1)]
-		GameState.deck.append(CharInstance.new(cd))
+		# 走正常的拿字规则：千字同文改字形、金字碑镀金
+		GameState.deck.append(GameState.new_deck_inst(cd))
 	GameState.relic_binds.clear()
 	for id in bind_ids:
 		for inst: CharInstance in GameState.deck:
@@ -449,7 +536,7 @@ static func on_battle_won() -> void:
 		if GameState.expedition != null:
 			g = GameState.expedition.roll_glyph(1, false, GameState.expedition.relic_rng)
 		else:
-			var pool: Array = Database.characters.values().filter(func(cd): return not cd.is_pollution and not cd.pending_design and cd.rarity <= 2 and not cd.tags.has("enemy") and not cd.tags.has("彩蛋"))
+			var pool: Array = Database.characters.values().filter(func(cd): return not cd.is_pollution and not cd.pending_design and cd.rarity <= 2 and not cd.tags.has("enemy") and not cd.tags.has("event") and not cd.tags.has("彩蛋"))
 			if not pool.is_empty():
 				g = pool[GameState.rng.randi_range(0, pool.size() - 1)].glyph
 		if not g.is_empty():
@@ -546,9 +633,10 @@ static func on_cleansed(b: BattleState, count: int) -> void:
 	b.cleansed_count += count
 	var need := BattleBalance.i("proof_every", 2)
 	while b.cleansed_count >= need:
+		if b.draw_to_board(1) <= 0:
+			return  # 字袋空了：攒着的净化数留到下次能补的时候
 		b.cleansed_count -= need
-		if b.draw_to_board(1) > 0:
-			b._log(name_of("proof") + "：净化满 %d 枚，补 1 字" % need)
+		b._log(name_of("proof") + "：净化满 %d 枚，补 1 字" % need)
 
 
 ## 查不到词时的遗物补充：反字模（二字倒连）、叠字钱（三枚相同字）
@@ -664,6 +752,8 @@ static func run_chain(b: BattleState) -> void:
 	if not b.relics.has("chain"):
 		return
 	for step in CHAIN_MAX:
+		if b.formation_mode:
+			return  # 合击队列里的词要玩家自己接着结算
 		var found := chain_words(b)
 		if found.is_empty():
 			return
@@ -713,8 +803,10 @@ static func _chain_ok(w: WordData) -> bool:
 	if not BattleState.has_required_target(w.requires_target, {}):
 		return false
 	for eff in w.effects:
-		if eff.args.keys().any(func(k): return str(k).contains("cost")):
+		if eff.args.keys().any(func(k): return str(k).contains("cost")) or CHAIN_PAID_HANDLERS.has(eff.handler):
 			return false
+		if eff.handler == "ability_shared_attack":
+			return false  # 合击会把后面的词排进队列而不结算
 		if eff.target in [EffectData.Target.BOARD_TILE, EffectData.Target.BOARD_ROW, EffectData.Target.BOARD_2X2, EffectData.Target.BOARD_3X3, EffectData.Target.EMPTY_TILE, EffectData.Target.DISCARD_GLYPH, EffectData.Target.BAG_GLYPH, EffectData.Target.ENEMY_GLYPH]:
 			return false
 	return true
@@ -737,7 +829,7 @@ static func _chain_dfs(b: BattleState, path: Array, node: Dictionary, found: Arr
 
 ## 拾取时要挑字的遗物：返回 [动作, 枚数]；不需要时为空
 static func pick_spec(id: String) -> Array:
-	return PICK.get(id, [])
+	return [] if is_repeat_pickup(id) else PICK.get(id, [])
 
 
 ## 泥金笔 / 复字拓片：对字袋里一枚该字形的永久实体执行动作；镀金跳过已镀金的
@@ -828,6 +920,8 @@ static func wish_glyph_id() -> String:
 
 ## 之后拿到的字：千字同文把它换成许愿的字
 static func redirect_glyph(cd: CharacterData) -> CharacterData:
+	if cd == null or cd.is_pollution:
+		return cd  # 污染字照样是污染字，不会被许愿洗白
 	var id := wish_glyph_id()
 	if id.is_empty() or Database.get_character(id) == null:
 		return cd
