@@ -301,6 +301,10 @@ func _on_removed(character: CharacterData, generation := -1) -> void:
 
 func _finish() -> void:
 	if _room_session!=null: goto("res://src/screens/room_map_screen.gd"); return
+	# 经典模式：事件里拿到要挑字 / 许愿的遗物，离开前补上
+	if not Relics.next_pending_peek().is_empty():
+		RelicRewardFlow.drain_pending(self, _finish)
+		return
 	GameState.clear_event_temp_hp()
 	GameState.complete_current_node()
 	goto("res://src/screens/map_screen.gd")

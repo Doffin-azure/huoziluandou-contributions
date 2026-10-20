@@ -254,6 +254,7 @@ func _grant_treasure_relic() -> String:
 	if Relics.needs_bind(id):
 		for inst: CharInstance in GameState.deck:
 			if GameState.bind_relic(id, inst.id()): break
+	Relics.queue_setup(id)  # 挑字 / 许愿留给地图界面补上（存档里也记着）
 	_log("宝箱：获得遗物「%s」" % Relics.name_of(id))
 	return id
 
@@ -476,6 +477,7 @@ func _grant_battle_relic(mode: String) -> void:
 		for inst: CharInstance in GameState.deck:
 			if GameState.bind_relic(id, inst.id()):
 				break
+	Relics.queue_setup(id)
 	_log("奇遇：战斗得器「%s」" % Relics.name_of(id))
 
 

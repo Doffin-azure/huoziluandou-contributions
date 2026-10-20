@@ -1575,7 +1575,7 @@ func _enemy_act(e: Combatant, opening := false, skip_move := false) -> void:
 	var ed: EnemyData = e.enemy_data
 	if ed == null or ed.moves.is_empty():
 		return
-	if not opening and enemy_skip_turns > 0:
+	if not opening and not skip_move and enemy_skip_turns > 0:  # 急就章那回合不消耗停火
 		enemy_skip_turns -= 1
 		e.move_index += 1
 		_log("停火：%s 这一回合不攻击" % e.display_name)

@@ -53,7 +53,7 @@ func _run() -> void:
 	var page := library._relic_page
 	_ok(page.is_visible_in_tree() and not library._scroll.visible, "遗物是图鉴内的独立子页面")
 	var cards := page._grid.get_children()
-	_ok(cards.size() == Relics.DEFS.size(), "全部 %d 件遗物均有卡片" % Relics.DEFS.size())
+	_ok(cards.size() == Relics.visible_ids().size(), "全部 %d 件可见遗物均有卡片" % Relics.visible_ids().size())
 	var seen := {}
 	var names_ok := true
 	var descriptions_ok := true
@@ -73,7 +73,7 @@ func _run() -> void:
 		order_ok = order_ok and (tier > last_tier or (tier == last_tier and id > last_id))
 		last_tier = tier
 		last_id = id
-	_ok(seen.size() == Relics.DEFS.size(), "遗物 ID 无遗漏或重复")
+	_ok(seen.size() == Relics.visible_ids().size(), "遗物 ID 无遗漏或重复")
 	_ok(names_ok and descriptions_ok, "名称与完整效果同步当前遗物数据")
 	_ok(tags_ok, "档次、事件专属、绑定和持有状态正确")
 	_ok(order_ok, "按档次与 ID 稳定排序")

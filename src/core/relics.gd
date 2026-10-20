@@ -466,6 +466,14 @@ static func next_pending_setup() -> String:
 	return ""
 
 
+## 看一眼还有没有待补的（不取出）
+static func next_pending_peek() -> String:
+	for id in GameState.relic_counters.get("_pending_setup", []):
+		if needs_setup(str(id)):
+			return str(id)
+	return ""
+
+
 static func clear_pending_setup(id: String) -> void:
 	var pending: Array = GameState.relic_counters.get("_pending_setup", [])
 	pending.erase(id)
