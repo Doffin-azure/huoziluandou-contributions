@@ -29,21 +29,59 @@ func run() -> void:
 		add_child(local)
 		var expected := "taopunk"
 		check(local.visual_style == expected and GameStyle.get_style(id).id == expected, id + " resolves to a supported theme")
-		check(local.reduced_motion and local.drag_release_play and is_equal_approx(local.sfx_volume, 0.31) and local.board_font_path.ends_with("NotoSerifSC-VF.ttf"), id + " migration preserves motion, input, volume and font preferences")
+		check(local.reduced_motion and local.drag_release_play and is_equal_approx(local.sfx_volume, 0.31) and local.board_font_id == BoardTypography.DEFAULT_ID, id + " migration preserves motion, input and volume, and uses bundled font")
 		local.set_visual_style("paper")
 		local.set_visual_style("neon")
 		var saved := ConfigFile.new()
-		check(saved.load(path) == OK and saved.get_value("visual", "art_style") == "taopunk" and not saved.has_section_key("visual", "style") and saved.get_value("custom", "keep") == "unchanged", id + " setter persists the supported id without duplicate legacy keys")
+		check(saved.load(path) == OK and saved.get_value("visual", "art_style") == "taopunk" and not saved.has_section_key("visual", "style") and not saved.has_section_key("visual", "board_font") and saved.get_value("custom", "keep") == "unchanged", id + " setter persists supported ids without legacy theme or font paths")
 		local.queue_free()
 		await get_tree().process_frame
-	for retained_style in [GameStyle.taopunk(), GameStyle.paper()]:
+	var font_cases := ["C:/Windows/Fonts/simsun.ttc", "user://untrusted.ttf", "res://project.godot", "https://example.com/font.ttf", "../font.otf", "unknown", "serif_light", "serif_bold", "wenkai", "longcang"]
+	for i in font_cases.size():
+		var requested: String = font_cases[i]
+		var path := "res://shots/frontend-legacy-cleanup/font-%d.cfg" % i
+		var config := ConfigFile.new()
+		config.set_value("visual", "board_font", requested)
+		config.set_value("visual", "board_font_id", requested)
+		config.set_value("custom", "keep", "unchanged")
+		config.save(path)
+		var local = load("res://src/autoload/settings.gd").new()
+		local.storage_path = path
+		add_child(local)
+		var expected: String = requested if BoardTypography.is_builtin(requested) else BoardTypography.DEFAULT_ID
+		check(local.board_font_id == expected, "font migration accepts only bundled IDs: " + requested)
+		var saved := ConfigFile.new()
+		check(saved.load(path) == OK and saved.get_value("visual", "board_font_id") == expected and not saved.has_section_key("visual", "board_font") and saved.get_value("custom", "keep") == "unchanged", "font migration removes external paths and preserves unrelated data")
+		local.set_board_font_id("serif_bold")
+		local.set_board_font_id(requested if not BoardTypography.is_builtin(requested) else "invalid")
+		check(local.board_font_id == "serif_bold", "runtime rejects external font paths and unknown IDs")
+		local.free()
+		local = load("res://src/autoload/settings.gd").new()
+		local.storage_path = path
+		add_child(local)
+		check(local.board_font_id == "serif_bold", "bundled font selection survives restart")
+		local.free()
+	var missing: Array[String] = []
+	for text in Database.char_by_glyph.keys():
+		for character in str(text):
+			if not BoardTypography.BUNDLED_FONT.has_char(character.unicode_at(0)):
+				missing.append(character)
+	check(missing.is_empty(), "bundled font covers all database glyphs: " + str(missing))
+	for entry in BoardTypography.STYLES:
+		var font: Font = BoardTypography.font_for_id(entry.id)
+		var missing_glyphs: Array[String] = []
+		for glyph in Database.char_by_glyph:
+			if not font.has_char(str(glyph).unicode_at(0)): missing_glyphs.append(glyph)
+		check(missing_glyphs.is_empty(), "bundled font and bundled fallback cover all game glyphs: " + entry.family)
+	check(not GameStyle.new().has_method("paper") and GameStyle.new().id == "taopunk", "retired theme factory is removed and new tokens use the approved style")
+	for retained_style in [GameStyle.taopunk()]:
 		var id: String = retained_style.id
 		Ink.apply_style(retained_style)
 		var background := Ink.background()
 		var material := Ink.make_tile_material(Color("d9c7ab"))
 		check(background.material.shader.resource_path.ends_with("/paper.gdshader") and material.shader.resource_path.ends_with("/wood.gdshader"), id + " retains its paper and wood materials")
 		var skin := Ink.theme.get_stylebox("normal", "Button") as StyleBoxFlat
-		check(skin.bg_color == Palette.PAPER_WARM and skin.shadow_size == 0 and skin.corner_radius_top_left == 8 + Palette.CORNER_BONUS, id + " keeps its exact panel color, radius and shadow behavior")
+		check(skin.bg_color == Palette.PAPER_WARM and skin.shadow_size == 0 and skin.corner_radius_top_left == 8 + Palette.CORNER_BONUS, id + " retains its original panel color, radius and shadow behavior")
 		background.free()
 	var settings := SettingsOverlay.new()
 	add_child(settings)

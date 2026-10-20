@@ -51,6 +51,7 @@ func _initialize() -> void:
 	_build_enemies()
 	EnemyRoster.save_enemies()
 	_build_acts()
+	EnemyRoster.save_acts()
 	_build_starter_deck()
 	_build_rules()
 

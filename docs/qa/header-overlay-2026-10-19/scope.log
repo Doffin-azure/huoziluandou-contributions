@@ -1,0 +1,11 @@
+Patch Scope Summary
+- Budget preset: local-fix
+- Budget: max 2 file(s), max 80 known changed line(s)
+- Files changed: 3585
+- Known lines changed: 3582031 (+3579975/-2056)
+- Unknown-line files: 3037
+- Untracked files included: 3488
+- Coverage: tracked changes against HEAD (staged and unstaged combined) plus untracked files
+Paths
+Exit status: 2
+Global scope includes previous work; see current-task-production.patch for the isolated production changes.

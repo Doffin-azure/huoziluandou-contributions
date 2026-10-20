@@ -1,0 +1,128 @@
+{
+  "generator": "built-in image_gen",
+  "date": "2026-10-20",
+  "style_reference": "assets/taopunk/ink_guardian.png",
+  "transparent_background": true,
+  "artworks": [
+    {
+      "id": "ink_creditor",
+      "path": "assets/taopunk/enemies/bronze_masks/ink_creditor.png",
+      "original": "assets/taopunk/enemies/human_repaint/ink_creditor.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-f5812131-82b5-497e-b09e-47635c6924f5.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the EDIT TARGET, an existing transparent full-body game enemy. Image 2 is the STYLE AND MASK MATERIAL REFERENCE: the game's Ink Spirit, with an ancient cast bronze ritual fox/beast mask, ochre-bronze ridges, dark green patina, crisp ink outlines and red eye slits. Change ONLY the target's head/face area and neckline as needed to fully conceal the human face. Fit a solid opaque full-face ancient bronze beast mask over the ENTIRE face from forehead through chin and around the sides. No visible human skin on face, no human eyes, lips, nose, ears or facial hair sticking out. Replace exposed ears with dark hood/wrap shadows, and exposed neck with dark high collar/wrap, while retaining the original head angle, head center, hairstyle silhouette and hat/headband. The mask should feel like the same in-world family as Ink Spirit's mask, with cast engraved brow ridges, stylized animal muzzle, small red-lit eye slits in black recesses, worn ochre bronze and restrained green patina, flat hard-edged hand-inked rendering, no glossy photoreal metal. Keep mask modest and fitted to the original head, no oversized added halo, no giant horns. Preserve ALL other artwork, complete pose, body silhouette, clothing folds/colors, hands and fingers, props, full canvas framing and aspect ratio as closely as possible. It remains one full-body enemy asset ready to use with the same animation rig. Keep TRUE transparent alpha background, including outside silhouette; absolutely no background/vignette/glow/ground plane/shadow/text/border. User requirement: no human face showing; bronze full-face mask like Ink Spirit. Character-specific instruction: Lean bent ledger merchant. A narrow fox-beast bronze mask, sly slanted red slits, small cast pointed chin plate replacing the human goatee. Keep scholar cap, account backpack, ledger and open palm.",
+      "size": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "3a74fb48fd091216da0914ae53d6fa560de5c3883ebd6a6c92b0d918876f4359",
+      "original_sha256": "c5eb7f4569171ad637a229315f1767abc5fe20bc04edac2ab9239786214a0485"
+    },
+    {
+      "id": "copy_master",
+      "path": "assets/taopunk/enemies/bronze_masks/copy_master.png",
+      "original": "assets/taopunk/enemies/human_repaint/copy_master.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-efc33c64-1ac8-4571-89a6-faa6bc516d6b.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the EDIT TARGET, an existing transparent full-body game enemy. Image 2 is the STYLE AND MASK MATERIAL REFERENCE: the game's Ink Spirit, with an ancient cast bronze ritual fox/beast mask, ochre-bronze ridges, dark green patina, crisp ink outlines and red eye slits. Change ONLY the target's head/face area and neckline as needed to fully conceal the human face. Fit a solid opaque full-face ancient bronze beast mask over the ENTIRE face from forehead through chin and around the sides. No visible human skin on face, no human eyes, lips, nose, ears or facial hair sticking out. Replace exposed ears with dark hood/wrap shadows, and exposed neck with dark high collar/wrap, while retaining the original head angle, head center, hairstyle silhouette and hat/headband. The mask should feel like the same in-world family as Ink Spirit's mask, with cast engraved brow ridges, stylized animal muzzle, small red-lit eye slits in black recesses, worn ochre bronze and restrained green patina, flat hard-edged hand-inked rendering, no glossy photoreal metal. Keep mask modest and fitted to the original head, no oversized added halo, no giant horns. Preserve ALL other artwork, complete pose, body silhouette, clothing folds/colors, hands and fingers, props, full canvas framing and aspect ratio as closely as possible. It remains one full-body enemy asset ready to use with the same animation rig. Keep TRUE transparent alpha background, including outside silhouette; absolutely no background/vignette/glow/ground plane/shadow/text/border. User requirement: no human face showing; bronze full-face mask like Ink Spirit. Character-specific instruction: Seated white-haired rubbing artisan. Broad heavy bronze lion/taotie mask with squared jaw, fitted under swept hair; remove all human beard. Preserve rubbing pad, sheet across lap, hands and seated feet.",
+      "size": [
+        1312,
+        1199
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "ea17e5289b3471684ca6c2b080f608b3ac80329d2b39c781c2caa1ae291df171",
+      "original_sha256": "6c5945583e37f28c8284ef64f15f135bdf2a069563a267a79d59dd5c8037cee0"
+    },
+    {
+      "id": "seal_officer",
+      "path": "assets/taopunk/enemies/bronze_masks/seal_officer.png",
+      "original": "assets/taopunk/enemies/human_repaint/seal_officer.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-4ea5ce8f-0197-4378-8a9b-b5672e052bb0.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the EDIT TARGET, an existing transparent full-body game enemy. Image 2 is the STYLE AND MASK MATERIAL REFERENCE: the game's Ink Spirit, with an ancient cast bronze ritual fox/beast mask, ochre-bronze ridges, dark green patina, crisp ink outlines and red eye slits. Change ONLY the target's head/face area and neckline as needed to fully conceal the human face. Fit a solid opaque full-face ancient bronze beast mask over the ENTIRE face from forehead through chin and around the sides. No visible human skin on face, no human eyes, lips, nose, ears or facial hair sticking out. Replace exposed ears with dark hood/wrap shadows, and exposed neck with dark high collar/wrap, while retaining the original head angle, head center, hairstyle silhouette and hat/headband. The mask should feel like the same in-world family as Ink Spirit's mask, with cast engraved brow ridges, stylized animal muzzle, small red-lit eye slits in black recesses, worn ochre bronze and restrained green patina, flat hard-edged hand-inked rendering, no glossy photoreal metal. Keep mask modest and fitted to the original head, no oversized added halo, no giant horns. Preserve ALL other artwork, complete pose, body silhouette, clothing folds/colors, hands and fingers, props, full canvas framing and aspect ratio as closely as possible. It remains one full-body enemy asset ready to use with the same animation rig. Keep TRUE transparent alpha background, including outside silhouette; absolutely no background/vignette/glow/ground plane/shadow/text/border. User requirement: no human face showing; bronze full-face mask like Ink Spirit. Character-specific instruction: Tall standing official with high black hat holding a large seal. Stern long bronze fox/beast mask with vertical brow ridge, fully covering jaw and old beard; keep hat, seal and posture.",
+      "size": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "577ecc181f2910eaf0399b882a2a360c246c35760b066df8ba3bdd2afca9e448",
+      "original_sha256": "c2bb4b490452b1e87687f834a04815e03345b1b51e3e553ec09247eb5fa057b3"
+    },
+    {
+      "id": "wheel_master",
+      "path": "assets/taopunk/enemies/bronze_masks/wheel_master.png",
+      "original": "assets/taopunk/enemies/human_repaint/wheel_master.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-e620c9e4-2519-4fd6-b432-3c4f0d5d4421.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the EDIT TARGET, an existing transparent full-body game enemy. Image 2 is the STYLE AND MASK MATERIAL REFERENCE: the game's Ink Spirit, with an ancient cast bronze ritual fox/beast mask, ochre-bronze ridges, dark green patina, crisp ink outlines and red eye slits. Change ONLY the target's head/face area and neckline as needed to fully conceal the human face. Fit a solid opaque full-face ancient bronze beast mask over the ENTIRE face from forehead through chin and around the sides. No visible human skin on face, no human eyes, lips, nose, ears or facial hair sticking out. Replace exposed ears with dark hood/wrap shadows, and exposed neck with dark high collar/wrap, while retaining the original head angle, head center, hairstyle silhouette and hat/headband. The mask should feel like the same in-world family as Ink Spirit's mask, with cast engraved brow ridges, stylized animal muzzle, small red-lit eye slits in black recesses, worn ochre bronze and restrained green patina, flat hard-edged hand-inked rendering, no glossy photoreal metal. Keep mask modest and fitted to the original head, no oversized added halo, no giant horns. Preserve ALL other artwork, complete pose, body silhouette, clothing folds/colors, hands and fingers, props, full canvas framing and aspect ratio as closely as possible. It remains one full-body enemy asset ready to use with the same animation rig. Keep TRUE transparent alpha background, including outside silhouette; absolutely no background/vignette/glow/ground plane/shadow/text/border. User requirement: no human face showing; bronze full-face mask like Ink Spirit. Character-specific instruction: Crouched muscular roller printer. Sturdy broad bronze beast mask with angular cheek guards, short muzzle and narrow red slits; fit under red headband. Preserve roller, both handles/hands and full crouching pose.",
+      "size": [
+        1222,
+        1287
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "9ee6418a362524113ed2361d219f74170cb730eb9a614d12d533de51f19dd00f",
+      "original_sha256": "d4ea197a2fb8836fd2c408ecf83417c4d233e485aa190df38e7f83c1b0d9ad65"
+    },
+    {
+      "id": "proof_boss",
+      "path": "assets/taopunk/enemies/bronze_masks/proof_boss.png",
+      "original": "assets/taopunk/enemies/human_repaint/proof_boss.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-8a6f06ba-54db-4a9e-be2d-e91907649241.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the EDIT TARGET, an existing transparent full-body game enemy. Image 2 is the STYLE AND MASK MATERIAL REFERENCE: the game's Ink Spirit, with an ancient cast bronze ritual fox/beast mask, ochre-bronze ridges, dark green patina, crisp ink outlines and red eye slits. Change ONLY the target's head/face area and neckline as needed to fully conceal the human face. Fit a solid opaque full-face ancient bronze beast mask over the ENTIRE face from forehead through chin and around the sides. No visible human skin on face, no human eyes, lips, nose, ears or facial hair sticking out. Replace exposed ears with dark hood/wrap shadows, and exposed neck with dark high collar/wrap, while retaining the original head angle, head center, hairstyle silhouette and hat/headband. The mask should feel like the same in-world family as Ink Spirit's mask, with cast engraved brow ridges, stylized animal muzzle, small red-lit eye slits in black recesses, worn ochre bronze and restrained green patina, flat hard-edged hand-inked rendering, no glossy photoreal metal. Keep mask modest and fitted to the original head, no oversized added halo, no giant horns. Preserve ALL other artwork, complete pose, body silhouette, clothing folds/colors, hands and fingers, props, full canvas framing and aspect ratio as closely as possible. It remains one full-body enemy asset ready to use with the same animation rig. Keep TRUE transparent alpha background, including outside silhouette; absolutely no background/vignette/glow/ground plane/shadow/text/border. User requirement: no human face showing; bronze full-face mask like Ink Spirit. Character-specific instruction: Seated proofreading official behind desk. Refined symmetrical bronze beast mask with sharp brow and short closed metal muzzle, remove human beard, keep black official cap, brush, slip, desk and all books.",
+      "size": [
+        1299,
+        1211
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "b63a779886086e5998d850b2e589a0526128c4eb18f900dff383d8c4cc98bb82",
+      "original_sha256": "15f805189f65949c42b56418a2f19223d2c55e5b47e74d65522ab7d4069e8d85"
+    },
+    {
+      "id": "compiler_boss",
+      "path": "assets/taopunk/enemies/bronze_masks/compiler_boss.png",
+      "original": "assets/taopunk/enemies/human_repaint/compiler_boss.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-cc62ed53-804c-46e2-ba89-e599bafa304f.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the EDIT TARGET, an existing transparent full-body game enemy. Image 2 is the STYLE AND MASK MATERIAL REFERENCE: the game's Ink Spirit, with an ancient cast bronze ritual fox/beast mask, ochre-bronze ridges, dark green patina, crisp ink outlines and red eye slits. Change ONLY the target's head/face area and neckline as needed to fully conceal the human face. Fit a solid opaque full-face ancient bronze beast mask over the ENTIRE face from forehead through chin and around the sides. No visible human skin on face, no human eyes, lips, nose, ears or facial hair sticking out. Replace exposed ears with dark hood/wrap shadows, and exposed neck with dark high collar/wrap, while retaining the original head angle, head center, hairstyle silhouette and hat/headband. The mask should feel like the same in-world family as Ink Spirit's mask, with cast engraved brow ridges, stylized animal muzzle, small red-lit eye slits in black recesses, worn ochre bronze and restrained green patina, flat hard-edged hand-inked rendering, no glossy photoreal metal. Keep mask modest and fitted to the original head, no oversized added halo, no giant horns. Preserve ALL other artwork, complete pose, body silhouette, clothing folds/colors, hands and fingers, props, full canvas framing and aspect ratio as closely as possible. It remains one full-body enemy asset ready to use with the same animation rig. Keep TRUE transparent alpha background, including outside silhouette; absolutely no background/vignette/glow/ground plane/shadow/text/border. User requirement: no human face showing; bronze full-face mask like Ink Spirit. Character-specific instruction: Tall elder compiler between two scrolls. Long narrow ancient bronze beast mask, elongated closed cast chin plate replacing ALL white beard, restrained forehead red seal, preserve high cap, hair behind head, both long scrolls and hands.",
+      "size": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "6030715870cff4252bdd6c27dc447805f514bb006ab9bfe44a1327533413c3c8",
+      "original_sha256": "ac70d1afefbbb6ae37b0be149f4a936c8a8610c3bead421638589fd787bf76ec"
+    },
+    {
+      "id": "blank_child",
+      "path": "assets/taopunk/enemies/bronze_masks/blank_child.png",
+      "original": "assets/taopunk/enemies/human_repaint/blank_child.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-b38c376f-8b21-46b7-b061-8d375126898c.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the EDIT TARGET, an existing transparent full-body game enemy. Image 2 is the STYLE AND MASK MATERIAL REFERENCE: the game's Ink Spirit, with an ancient cast bronze ritual fox/beast mask, ochre-bronze ridges, dark green patina, crisp ink outlines and red eye slits. Change ONLY the target's head/face area and neckline as needed to fully conceal the human face. Fit a solid opaque full-face ancient bronze beast mask over the ENTIRE face from forehead through chin and around the sides. No visible human skin on face, no human eyes, lips, nose, ears or facial hair sticking out. Replace exposed ears with dark hood/wrap shadows, and exposed neck with dark high collar/wrap, while retaining the original head angle, head center, hairstyle silhouette and hat/headband. The mask should feel like the same in-world family as Ink Spirit's mask, with cast engraved brow ridges, stylized animal muzzle, small red-lit eye slits in black recesses, worn ochre bronze and restrained green patina, flat hard-edged hand-inked rendering, no glossy photoreal metal. Keep mask modest and fitted to the original head, no oversized added halo, no giant horns. Preserve ALL other artwork, complete pose, body silhouette, clothing folds/colors, hands and fingers, props, full canvas framing and aspect ratio as closely as possible. It remains one full-body enemy asset ready to use with the same animation rig. Keep TRUE transparent alpha background, including outside silhouette; absolutely no background/vignette/glow/ground plane/shadow/text/border. User requirement: no human face showing; bronze full-face mask like Ink Spirit. Character-specific instruction: Small white-robed child spirit. Small rounded ancient bronze fox mask fully replacing ivory face, modest pointed side ridges, two red slits in dark sockets; keep black tied hair, red ribbon, oversized blank white robe, dark hands and feet.",
+      "size": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "4b5d1e0fcf2db9f05f473b734bc420d731ece3380d58a145d5834ce87b3511df",
+      "original_sha256": "6193a52df45f4ca44ea83a2d7c74ad6731ca55ec563b9215fd58970513694057"
+    }
+  ],
+  "style_reference_sha256": "ae32f6668a72608b730ca0215f3a35541851a3657533d25c45dae11f2a9ce915"
+}

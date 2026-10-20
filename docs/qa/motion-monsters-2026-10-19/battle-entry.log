@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS legacy paper preference does not override the approved art default
+PASS retired paper art preference migrates to the approved theme
+PASS real main scene opens the courtyard title
+PASS title start reaches the real journey map
+PASS map node opens the actual battle screen
+PASS main scene anchors provide a full battle canvas and visible board
+PASS normal entry uses approved backdrop without allocating a legacy table viewport
+PASS normal entry connects the 3D board and production monster art actor
+[battle_art_entry_test] PASS=8 FAIL=0

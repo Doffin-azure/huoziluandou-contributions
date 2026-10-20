@@ -11,6 +11,7 @@ const GLYPHS := ["击", "破", "回", "流", "防", "御", "加", "速", "充", 
 
 
 func _ready() -> void:
+	Settings.storage_path = "user://battle_presentation_regression-settings.cfg"
 	_capture = OS.get_cmdline_user_args().has("--capture")
 	_saved_motion = Settings.reduced_motion
 	_saved_volume = Settings.sfx_volume

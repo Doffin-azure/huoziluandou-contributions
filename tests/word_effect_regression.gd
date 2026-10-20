@@ -6,6 +6,7 @@ const EXPECTED_CHECKS := 417
 var checks: Array = []
 
 func _ready() -> void:
+	Settings.storage_path = "user://word_effect_regression-settings.cfg"
 	_run_controls()
 	_run_logic()
 	_run_baojinbi()

@@ -10,6 +10,7 @@ const GRID := ["击", "破", "回", "流", "防", "御", "加", "速", "充", "�
 
 
 func _ready() -> void:
+	Settings.storage_path = "user://glyph_vfx_test-settings.cfg"
 	_capture = OS.get_cmdline_user_args().has("--capture")
 	_saved_motion = Settings.reduced_motion
 	Settings.reduced_motion = false

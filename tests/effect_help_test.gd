@@ -23,6 +23,9 @@ func _frames(count := 4) -> void:
 		await get_tree().process_frame
 
 func _run() -> void:
+	# Headless starts at 64×64; exercise a supported landscape viewport explicitly.
+	get_window().size = Vector2i(1280, 720)
+	await _frames()
 	var all_valid := true
 	for key in EffectGlossary.TERMS.values():
 		all_valid = all_valid and not EffectGlossary.entry("term:" + str(key)).is_empty()

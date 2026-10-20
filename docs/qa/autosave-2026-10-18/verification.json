@@ -1,0 +1,16 @@
+{
+  "package": "com.huozi.game",
+  "versionCode": 2026101803,
+  "phone_apk": "build\\android\\20261018-autosave\\huoziluandou-autosave-arm64.apk",
+  "bytes": 146386783,
+  "sha256": "cd2cbe462f7283e5312668fafe69ff7134a1c4f27ed50a0bc9321d05963cd8be",
+  "emulator": "Android 15 API 35 x86_64",
+  "landscape": [
+    2400,
+    1080
+  ],
+  "dpi": 440,
+  "force_stop_resume": "passed: turn 2, HP 54/60, gold 6, board and enemy intent matched",
+  "test_assertions": 340,
+  "failures": 0
+}

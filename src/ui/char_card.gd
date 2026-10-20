@@ -14,6 +14,7 @@ var _tags: Label
 var _rank: Label
 var _hover := false
 var _motion: Tween
+var _tap := TouchTap.new()
 
 
 func setup(p_character: CharacterData, p_compact := false) -> void:
@@ -25,11 +26,12 @@ func setup(p_character: CharacterData, p_compact := false) -> void:
 func _ready() -> void:
 	JourneyStyle.apply(self)
 	custom_minimum_size = custom_minimum_size.max(Vector2(220, 314) if not compact else Vector2(280, 100))
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_PASS
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	focus_mode = Control.FOCUS_ALL
 	var mobile := JourneyStyle.touch_scale(self) > 1.1
 	var col := Ink.vbox(8 if mobile else 12)
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(col)
 	var face := PanelContainer.new()
 	face.add_theme_stylebox_override("panel", JourneyStyle.frame("paper", 10))
@@ -47,7 +49,9 @@ func _ready() -> void:
 	col.add_child(row)
 	_title = JourneyStyle.label("", "Subheading")
 	row.add_child(_title)
-	row.add_child(Ink.expander())
+	var spacer := Ink.expander()
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(spacer)
 	_rank = JourneyStyle.label("", "Muted", JourneyStyle.GOLD)
 	_rank.add_theme_font_size_override("font_size", 11)
 	row.add_child(_rank)
@@ -92,7 +96,7 @@ func _update_frame() -> void:
 
 
 func _on_gui_input(event: InputEvent) -> void:
-	if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or event.is_action_pressed("ui_accept"):
+	if _tap.matches(event, self):
 		clicked.emit()
 		accept_event()
 

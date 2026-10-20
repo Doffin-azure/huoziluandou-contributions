@@ -1,0 +1,32 @@
+{
+  "previous_assets_verified": [
+    {
+      "manifest": "assets/taopunk/enemies/batch2-manifest.json",
+      "count": 16
+    },
+    {
+      "manifest": "assets/taopunk/enemies/human_repaint/manifest.json",
+      "count": 7
+    },
+    {
+      "manifest": "assets/taopunk/enemies/bronze_masks/manifest.json",
+      "count": 7
+    },
+    {
+      "manifest": "assets/taopunk/enemies/zodiac_masks/manifest.json",
+      "count": 6
+    }
+  ],
+  "new_assets_verified": 6,
+  "blank_child_sha256": "6193a52df45f4ca44ea83a2d7c74ad6731ca55ec563b9215fd58970513694057",
+  "video": {
+    "path": "object-motion-preview.mp4",
+    "size": [
+      1280,
+      900
+    ],
+    "fps": 12.0,
+    "duration": 5.0,
+    "sha256": "00202db87c68d2eba40b96fbeb1a1c571d091d0457e233844af853cc390e8682"
+  }
+}

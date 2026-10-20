@@ -1,0 +1,250 @@
+{
+  "coverage": "Partial current-task attribution with captured baselines and normalized line endings. Excludes newly restored files and later focused patches without captured baselines. Not a full-worktree budget pass.",
+  "files": [
+    {
+      "path": "tests/autosave_test.gd",
+      "added": 5,
+      "deleted": 1
+    },
+    {
+      "path": "tests/battle_art_entry_test.gd",
+      "added": 2,
+      "deleted": 1
+    },
+    {
+      "path": "tests/battle_entrance_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/battle_presentation_regression.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/battle_responsive_layout_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/battle_ui_test.gd",
+      "added": 7,
+      "deleted": 2
+    },
+    {
+      "path": "tests/enemy_attack_animation_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/first_run_tutorial_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/fold_page_moth_animation_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/frontend_feedback_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/glyph_graph_interaction_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/glyph_vfx_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/hud_stability_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/journey_ui_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/menu_return_performance_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/mobile_density_layout_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/mobile_presentation_fix_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/needle_wasp_animation_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/object_stage_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/paper_shell_animation_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/recent_log_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/run_settlement_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/study_flow_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/tilting_inkstone_animation_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/title_menu_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/touch_access_audit_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/tutorial_interaction_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/ui_consistency_test.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/ui_resolution_matrix.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "tests/word_effect_regression.gd",
+      "added": 1,
+      "deleted": 0
+    },
+    {
+      "path": "src/autoload/database.gd",
+      "added": 13,
+      "deleted": 0
+    },
+    {
+      "path": "src/battle/ink_spirit.gd",
+      "added": 17,
+      "deleted": 0
+    },
+    {
+      "path": "src/board/board_view.gd",
+      "added": 14,
+      "deleted": 0
+    },
+    {
+      "path": "src/core/battle_ops.gd",
+      "added": 4,
+      "deleted": 2
+    },
+    {
+      "path": "src/core/battle_state.gd",
+      "added": 46,
+      "deleted": 11
+    },
+    {
+      "path": "src/core/combatant.gd",
+      "added": 9,
+      "deleted": 0
+    },
+    {
+      "path": "src/core/effect_util.gd",
+      "added": 2,
+      "deleted": 0
+    },
+    {
+      "path": "src/core/run_harness.gd",
+      "added": 1,
+      "deleted": 1
+    },
+    {
+      "path": "src/data/enemy_data.gd",
+      "added": 6,
+      "deleted": 0
+    },
+    {
+      "path": "src/data/enemy_move_data.gd",
+      "added": 3,
+      "deleted": 0
+    },
+    {
+      "path": "src/data/map_node_data.gd",
+      "added": 8,
+      "deleted": 0
+    },
+    {
+      "path": "src/expedition/expedition.gd",
+      "added": 87,
+      "deleted": 28
+    },
+    {
+      "path": "src/screens/battle_screen.gd",
+      "added": 4,
+      "deleted": 1
+    },
+    {
+      "path": "resources/acts/act_1.tres",
+      "added": 39,
+      "deleted": 40
+    },
+    {
+      "path": "resources/acts/act_2.tres",
+      "added": 43,
+      "deleted": 39
+    },
+    {
+      "path": "resources/acts/act_3.tres",
+      "added": 43,
+      "deleted": 40
+    },
+    {
+      "path": "src/core/save_codec.gd",
+      "added": 11,
+      "deleted": 1
+    },
+    {
+      "path": "src/ui/enemy_intent.gd",
+      "added": 4,
+      "deleted": 1
+    },
+    {
+      "path": "src/tools/build_content.gd",
+      "added": 4,
+      "deleted": 0
+    }
+  ]
+}

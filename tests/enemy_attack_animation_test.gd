@@ -10,6 +10,7 @@ const GLYPHS := ["击", "破", "回", "流", "防", "御", "加", "速", "充", 
 
 
 func _ready() -> void:
+	Settings.storage_path = "user://enemy_attack_animation_test-settings.cfg"
 	_capture = OS.get_cmdline_user_args().has("--capture") and DisplayServer.get_name() != "headless"
 	_run.call_deferred()
 
@@ -28,7 +29,12 @@ func _frames(count: int) -> void:
 
 
 func _record(id: String, primary: bool) -> void:
-	for i in 72:
+	var i := -1
+	var deadline := Time.get_ticks_msec()+12000
+	# A multi-hit sequence can outlast seventy-two frames on a fast renderer.
+	# Observe its complete lifetime, including recovery, rather than a fixed FPS.
+	while (i < 71 or _screen._busy) and Time.get_ticks_msec() < deadline:
+		i += 1
 		await get_tree().process_frame
 		for child in _screen._effects.get_children():
 			if child is EnemyAttackEffect: _observed_effects[child.get_instance_id()] = true
@@ -73,6 +79,7 @@ func _case(id: String, move_index: int, primary: bool) -> void:
 	battle.enemies[0].move_index = move_index
 	_screen._refresh_all()
 	await _frames(16)
+	await _settled()
 	var actor: EnemyAttackActor = _screen._enemy_widgets[0]._visual._attack_actor
 	var move: EnemyMoveData = data.enemies[0].moves[move_index]
 	var hits: int = move.hits if move.kind == EnemyMoveData.Kind.MULTI else 1

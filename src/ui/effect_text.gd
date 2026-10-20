@@ -54,6 +54,7 @@ func _journey_links(value: String) -> String:
 
 
 func _on_link_entered(meta: Variant, depth: int) -> void:
+	if _touch_mode(): return
 	_hovered[depth] = str(meta)
 	open_entry(str(meta), depth)
 
@@ -67,6 +68,10 @@ func _on_link_clicked(meta: Variant, depth: int) -> void:
 	open_entry(str(meta), depth)
 	_pinned = not _cards.is_empty()
 	accept_event()
+
+
+func _touch_mode() -> bool:
+	return DisplayServer.is_touchscreen_available() or BattleTouchLayout.test_dpi > 0
 
 
 func open_entry(meta: String, depth := 0) -> void:
@@ -97,8 +102,7 @@ func open_entry(meta: String, depth := 0) -> void:
 	if not is_in_group("effect_help_open"):
 		add_to_group("effect_help_open")
 	_viewport_size = get_viewport_rect().size
-	var pixel_scale := get_viewport().get_screen_transform().get_scale().y
-	var help_scale := clampf(1.0 / maxf(0.01, pixel_scale), 1.0, 1.85)
+	var help_scale := JourneyStyle.touch_scale(self)
 	var width := minf(380.0 * help_scale, _viewport_size.x - 24.0)
 	var card := Ink.panel("PanelCard")
 	# CanvasLayer 不继承 Control 的主题链，浮层需显式使用当前游戏主题。
@@ -133,7 +137,7 @@ func open_entry(meta: String, depth := 0) -> void:
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	head.add_child(title)
 	var close := Ink.button("×")
-	close.custom_minimum_size = Vector2(44, 44) * help_scale
+	close.custom_minimum_size = Vector2(48, 48) * help_scale
 	close.add_theme_font_size_override("font_size", int(18 * help_scale))
 	close.pressed.connect(close_help)
 	head.add_child(close)
@@ -153,7 +157,7 @@ func open_entry(meta: String, depth := 0) -> void:
 	description.meta_hover_ended.connect(_on_link_exited.bind(depth + 1))
 	description.meta_clicked.connect(_on_link_clicked.bind(depth + 1))
 	scroll.add_child(description)
-	var hint := Ink.label("悬浮查看 · 点击保持展开 · ×关闭", "Muted")
+	var hint := Ink.label("点按词条查看 · ×关闭" if _touch_mode() else "悬浮查看 · 点按词条固定 · ×关闭", "Muted")
 	hint.add_theme_font_size_override("font_size", int(13 * help_scale))
 	col.add_child(hint)
 	card.modulate.a = 0.0
@@ -227,12 +231,18 @@ func _update_help(delta: float, pointer: Vector2) -> void:
 
 
 func _input(event: InputEvent) -> void:
+	# Handle the native finger once; its earlier emulated press must neither
+	# close the help nor reach an underlying GUI action.
+	if event is InputEventMouse and event.device == InputEvent.DEVICE_ID_EMULATION:
+		if not contains_pointer(event.position) and not get_global_rect().has_point(event.position): get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("cancel_selection"):
 		close_help()
 		get_viewport().set_input_as_handled()
 	elif (event is InputEventMouseButton and event.pressed) or (event is InputEventScreenTouch and event.pressed):
 		if not contains_pointer(event.position) and not get_global_rect().has_point(event.position):
 			close_help()
+			get_viewport().set_input_as_handled()
 
 
 func contains_pointer(point: Vector2, margin := 0.0) -> bool:
@@ -242,9 +252,9 @@ func contains_pointer(point: Vector2, margin := 0.0) -> bool:
 	return false
 
 
-static func blocks_pointer(viewport: Viewport, point: Vector2) -> bool:
+static func blocks_pointer(viewport: Viewport, _point: Vector2) -> bool:
 	for control in viewport.get_tree().get_nodes_in_group("effect_help_open"):
-		if control.get_viewport() == viewport and control.is_visible_in_tree() and control.contains_pointer(point):
+		if control.get_viewport() == viewport and control.is_visible_in_tree():
 			return true
 	return false
 

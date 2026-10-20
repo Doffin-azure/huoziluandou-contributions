@@ -1,0 +1,84 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+WARNING: TAA is only available when using the Forward+ renderer.
+   at: viewport_set_use_taa (servers/rendering/renderer_viewport.cpp:1450)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://src/study/study_stage.gd:44)
+       [1] _run (res://tests/taopunk_art_test.gd:56)
+       [2] _frames (res://tests/taopunk_art_test.gd:31)
+WARNING: Depth of field blur is only available when using the Forward+ or Mobile renderer.
+   at: camera_attributes_set_dof_blur (servers/rendering/storage/camera_attributes_storage.cpp:74)
+   GDScript backtrace (most recent call first):
+       [0] _apply_camera (res://src/study/study_stage.gd:447)
+       [1] set_screen (res://src/study/study_stage.gd:413)
+       [2] goto (res://src/autoload/router.gd:38)
+       [3] _run (res://tests/taopunk_art_test.gd:60)
+       [4] _frames (res://tests/taopunk_art_test.gd:31)
+  ✓ 青铜绘卷使用独立风格令牌
+  ✓ 定稿环境为独立手绘背景，保留书房场景供切换
+  ✓ 手绘战斗中停用隐藏的书房 3D 渲染
+  ✓ 16 个字块仍有真实独立 3D 命中与动效
+  ✓ 青铜框独立于实时字块
+  ✓ 墨灵素材保持原版本，未采用精简或重绘稿
+  ✓ 墨灵使用从定稿提取的独立角色
+  ✓ 敌人 bronze_seal 映射独立场景插画
+  ✓ bronze_seal 取区有效且保留透明通道
+  ✓ bronze_seal 在桌面和手机中完整显示并贴住台面
+  ✓ 敌人 iron_seal 映射独立场景插画
+  ✓ iron_seal 取区有效且保留透明通道
+  ✓ iron_seal 在桌面和手机中完整显示并贴住台面
+  ✓ 敌人 paper_guard 映射独立场景插画
+  ✓ paper_guard 取区有效且保留透明通道
+  ✓ paper_guard 在桌面和手机中完整显示并贴住台面
+  ✓ 敌人 rust_scribe 映射独立场景插画
+  ✓ rust_scribe 取区有效且保留透明通道
+  ✓ rust_scribe 在桌面和手机中完整显示并贴住台面
+  ✓ 敌人 ember_imp 映射独立场景插画
+  ✓ ember_imp 取区有效且保留透明通道
+  ✓ ember_imp 在桌面和手机中完整显示并贴住台面
+  ✓ 敌人 boss_lead_plate 映射独立场景插画
+  ✓ boss_lead_plate 取区有效且保留透明通道
+  ✓ boss_lead_plate 在桌面和手机中完整显示并贴住台面
+  ✓ 敌人 boss_word_demon 映射独立场景插画
+  ✓ boss_word_demon 取区有效且保留透明通道
+  ✓ boss_word_demon 在桌面和手机中完整显示并贴住台面
+  ✓ 敌人 boss_chaos_press 映射独立场景插画
+  ✓ boss_chaos_press 取区有效且保留透明通道
+  ✓ boss_chaos_press 在桌面和手机中完整显示并贴住台面
+  ✓ 未知敌人保留旧有绘制回退
+  ✓ 边框中央透明，不遮挡实时汉字
+  ✓ 宽屏纸面保留定稿近方形构图
+  ✓ 桌面字盘与顶栏留出场景空间
+  ✓ 实际截图 taopunk-battle-reference-aspect
+  ✓ 定稿击破词效完整呈现，无需滚动
+  ✓ 实际截图 taopunk-battle-desktop
+  ✓ 字体选择实时更新 3D 字盘字形
+  ✓ 2D 字盘回退也使用选中的内置字体
+  ✓ 配置只保存内置字体 ID
+  ✓ 文件路径不覆盖内置字体选择
+  ✓ 字体解析只使用内置白名单
+  ✓ 内置样式 宋体标准 可通过按钮实时选择
+  ✓ 实际截图 taopunk-battle-font-serif_standard
+  ✓ 内置样式 宋体细体 可通过按钮实时选择
+  ✓ 实际截图 taopunk-battle-font-serif_light
+  ✓ 内置样式 宋体粗体 可通过按钮实时选择
+  ✓ 实际截图 taopunk-battle-font-serif_bold
+  ✓ 内置样式 霞鹜文楷 可通过按钮实时选择
+  ✓ 实际截图 taopunk-battle-font-wenkai
+  ✓ 内置样式 龙藏草书 可通过按钮实时选择
+  ✓ 实际截图 taopunk-battle-font-longcang
+  ✓ 字体设置不提供文件选择器
+  ✓ 恢复默认字体
+  ✓ 字体切换不重置战斗、连线或随机数
+  ✓ 定稿字盘仍能打出击破并结算 8 伤害
+  ✓ 实际截图 taopunk-battle-phone
+  ✓ 手机保持左词效、中央字盘、右敌人
+  ✓ 手绘风格保留手机 48×48 字块触控尺寸
+  ✓ 真实设置页提供字体入口
+  ✓ 实际截图 taopunk-settings-phone
+  ✓ 关闭设置保留青铜绘卷与当前战斗
+  ✓ 离开战斗后仍使用青铜绘卷
+TAOPUNK ART: 64 passed, 0 failed

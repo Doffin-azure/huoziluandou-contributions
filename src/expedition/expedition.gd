@@ -36,6 +36,7 @@ const SKIP_GOLD := 16
 const SHOP_REFRESH_COST := 5
 ## 首领击败即封层；有限补给代替无压力清图，进入下一幕时发放。
 const ACT_SUPPLY := {1: {"gold": 12, "heal": 8, "ink": 1}, 2: {"gold": 16, "heal": 10, "ink": 1}}
+const SHOP_CARD_COUNT := 5
 ## 印章：效果 / 主要来源
 const SEALS := {
 	"镇纸": ["每场战斗少掉 4 点血", "精英"], "夜灯": ["视野 +1 格", "大赏"], "更漏": ["首领走路概率增长得更慢", "大赏"],
@@ -855,14 +856,14 @@ func shop_offers() -> Array:
 	if m.has("shops") and m.shops.has(pos):
 		return m.shops[pos]
 	var offers: Array = []
-	# 同原商店：三枚 ≤2 稀有度的字，各 12～15 金币
-	for i in 3:
+	# 每批五枚 ≤2 稀有度的字，各 12～15 金币。
+	for i in SHOP_CARD_COUNT:
 		offers.append({"kind": "glyph", "glyph": roll_glyph(0), "base": rng.randi_range(12, 15)})
 	offers.append({"kind": "remove", "base": rng.randi_range(16, 20)})
 	offers.append({"kind": "gild", "base": rng.randi_range(28, 35)})
 	offers.append({"kind": "heal", "base": rng.randi_range(10, 14)})
-	# 遗物货架：每家一件，用遗物自己的随机数（不打乱原来的货）
-	for id in Relics.roll_choices(GameState.relics, relic_rng):
+	# 遗物使用独立随机数，三件现货。
+	for id in Relics.roll_choices(GameState.relics, relic_rng, 3):
 		offers.append({"kind": "relic", "relic": id, "base": Relics.price(id)})
 	if not m.has("shops"):
 		m["shops"] = {}
@@ -870,20 +871,28 @@ func shop_offers() -> Array:
 	return offers
 
 
-## 花 SHOP_REFRESH_COST 金币换一批字和遗物；删字 / 修饰 / 治疗这些服务原样保留。
+func shop_refresh_cost() -> int:
+	var counts: Dictionary = m.get("shop_refreshes", {})
+	return SHOP_REFRESH_COST * (int(counts.get(pos, 0)) + 1)
+
+
+## 每家商店依次收取 5、10、15…金币；服务保留，计数存于地图中。
 func refresh_shop() -> bool:
-	if top_panel().get("kind", "") != "shop" or GameState.gold < SHOP_REFRESH_COST:
+	var cost := shop_refresh_cost()
+	if top_panel().get("kind", "") != "shop" or GameState.gold < cost:
 		return false
 	var services: Array = shop_offers().filter(func(o): return o.kind in ["remove", "gild", "heal"])
-	GameState.spend_gold(SHOP_REFRESH_COST)
+	GameState.spend_gold(cost)
+	if not m.has("shop_refreshes"): m["shop_refreshes"] = {}
+	m.shop_refreshes[pos] = int(m.shop_refreshes.get(pos, 0)) + 1
 	var offers: Array = []
-	for i in 3:
+	for i in SHOP_CARD_COUNT:
 		offers.append({"kind": "glyph", "glyph": roll_glyph(0), "base": rng.randi_range(12, 15)})
 	offers.append_array(services)
-	for id in Relics.roll_choices(GameState.relics, relic_rng):
+	for id in Relics.roll_choices(GameState.relics, relic_rng, 3):
 		offers.append({"kind": "relic", "relic": id, "base": Relics.price(id)})
 	m.shops[pos] = offers
-	_log("商店：花 %d 金币刷新货架" % SHOP_REFRESH_COST)
+	_log("商店：花 %d 金币刷新货架，下次 %d 金币" % [cost, shop_refresh_cost()])
 	return true
 
 
@@ -1108,6 +1117,12 @@ func next_act() -> void:
 	GameState.heal(int(supply.heal))
 	ink += int(supply.ink)
 	_log("幕间补给：金币 +%d，气血 +%d，墨 +%d" % [supply.gold, GameState.player_hp - hp_before, supply.ink])
+	# Archive completed locations before load_act clears this act's map state.
+	# visited already belongs to the saved run, so its save schema stays compatible.
+	for key in taken:
+		GameState.visited["ex:%d:site:%s" % [act, key]] = true
+	for key in amb_done:
+		GameState.visited["ex:%d:ambush:%s" % [act, key]] = true
 	load_act(act + 1)
 
 
@@ -1131,6 +1146,8 @@ func _assign_encounter_stages() -> void:
 
 
 ## 伏兵用领地主人作锚点，换一个入口也不会换怪。阶段由地图固定，不随等待或绕路升级。
+
+
 func encounter_anchor(kind: String, cell: int) -> int:
 	if kind == "ambush":
 		var owner := int(m.get("terr", {}).get(cell, -1))
@@ -1149,6 +1166,7 @@ func stage_text(kind: String, cell: int) -> String:
 
 
 func encounter_enemy(kind: String, cell: int) -> EnemyData:
+	if not m.is_empty() and not m.has("encounter_stages"): _assign_encounter_stages()
 	var stage := encounter_stage(kind, cell)
 	var pool: Array = NORMAL_STAGES[act][stage]
 	if kind == "boss": pool = [EnemyRoster.BOSSES[act]]
@@ -1368,6 +1386,4 @@ func receive_reward_glyph(cd: CharacterData) -> void:
 
 
 func _log(text: String) -> void:
-	lines.push_front(text)
-	if lines.size() > 40:
-		lines.resize(40)
+	RecentLog.append(lines, text, true)

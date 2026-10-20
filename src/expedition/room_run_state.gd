@@ -578,7 +578,7 @@ func legal_actions() -> Array:
 			return range(ids.size()).map(func(i):return {"type":"reward_relic","index":i,"relic":ids[i]})
 	if phase=="shop":
 		var stock: Array = super.legal_actions()
-		if GameState.gold>=Expedition.SHOP_REFRESH_COST: stock.append({"type":"shop_refresh","price":Expedition.SHOP_REFRESH_COST})
+		if GameState.gold>=shop_refresh_cost(): stock.append({"type":"shop_refresh","price":shop_refresh_cost()})
 		return stock
 	if phase=="encounter": return [{"type":"interact","label":"开战"}]
 	if phase=="act_end": return [{"type":"next_act","label":"完成远征" if GameState.act_index==3 else "进入下一幕"}]
@@ -726,6 +726,7 @@ func save_run(path := SAVE_PATH) -> Error:
 	if travel!=null: data.run["forward"] = {"history":travel.history.duplicate(),"departed":travel.departed}
 	data.run["planned_route"] = planned_route.duplicate()
 	data.player = {"hp":GameState.player_hp,"max_hp":GameState.player_max_hp,"gold":GameState.gold,"sequence":GameState.battle_sequence,"relics":GameState.relics,"binds":GameState.relic_binds,"counters":GameState.relic_counters,"reduction":GameState.permanent_damage_reduction,"deck":[]}
+	data.player["revive_charges"] = GameState.revive_charges
 	for inst in GameState.deck:
 		data.player.deck.append({"uid":inst.uid,"data":inst.data,"gilded":inst.gilded,"upgrade":inst.upgrade_level,"modifiers":inst.modifiers.duplicate(),"pollutions":inst.pollutions.duplicate(),"fusion":inst.fusion.duplicate()})
 	return ResourceSaver.save(data,path)
@@ -779,6 +780,7 @@ static func restore(path := SAVE_PATH, as_nodes := false):
 		GameState.deck.append(inst)
 	GameState.player_hp = player.hp; GameState.player_max_hp = player.max_hp; GameState.gold = player.gold
 	GameState.battle_sequence = player.sequence; GameState.relics = player.relics; GameState.relic_binds = player.binds; GameState.relic_counters = player.counters
+	GameState.revive_charges = int(player.get("revive_charges", 0))
 	GameState.permanent_damage_reduction = player.reduction
 	GameState.rng.state = state.rng
 	if run.layout_kind=="node_graph":
@@ -802,13 +804,19 @@ func use_node_map() -> void:
 
 func _start_shop() -> void:
 	super._start_shop()
-	var ids: Array = RelicRewardFlow.roll(1,RelicRewardFlow.side_rng("shop"))
-	if not ids.is_empty(): shop_offers.append({"kind":"relic","character":null,"relic":ids[0],"price":RelicRewardFlow.SHOP_PRICE})
+	var ids: Array = RelicRewardFlow.roll(3,RelicRewardFlow.side_rng("shop"))
+	for id in ids: shop_offers.append({"kind":"relic","character":null,"relic":id,"price":Relics.price(id)})
+
+
+func shop_refresh_cost() -> int:
+	return Expedition.SHOP_REFRESH_COST * (int(contents.get(current_room, {}).get("shop_refreshes", 0)) + 1)
 
 
 func _apply_shop(type: String, action: Dictionary) -> Dictionary:
 	if type=="shop_refresh":
-		if phase!="shop" or not GameState.spend_gold(Expedition.SHOP_REFRESH_COST): return _fail("金币不足或正在处理服务")
+		if phase!="shop" or not GameState.spend_gold(shop_refresh_cost()): return _fail("金币不足或正在处理服务")
+		if not contents.has(current_room): contents[current_room] = {}
+		contents[current_room]["shop_refreshes"] = int(contents[current_room].get("shop_refreshes", 0)) + 1
 		var services: Array = shop_offers.filter(func(item):return item.kind not in ["buy_char","relic"])
 		_start_shop()
 		shop_offers = shop_offers.filter(func(item):return item.kind in ["buy_char","relic"])+services

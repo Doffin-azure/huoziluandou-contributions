@@ -1,0 +1,435 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 68 / 词 164 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS all twenty-nine loaded enemies are mapped
+PASS blank_child owns a full-resolution portrait
+PASS blank_child does not borrow another enemy texture
+PASS blank_child mounts an actual animated actor
+PASS blank_child has idle, hit and death clips
+PASS blank_child animates 留白 with valid impact timing
+PASS blank_child animates 扑击 with valid impact timing
+PASS blank_child animation does not consume gameplay RNG
+PASS blank_child skin weights stay normalized over the whole artwork
+PASS blank_child attack moves independent anatomical joints
+PASS blank_child real feedback enters the hit clip
+PASS blank_child defeat enters the death clip
+PASS blank_child death settles without restarting idle
+PASS blank_child reduced motion stops animated playback
+PASS bomb_press owns a full-resolution portrait
+PASS bomb_press does not borrow another enemy texture
+PASS bomb_press mounts an actual animated actor
+PASS bomb_press has idle, hit and death clips
+PASS bomb_press animates 布印 with valid impact timing
+PASS bomb_press animates 引爆 with valid impact timing
+PASS bomb_press animation does not consume gameplay RNG
+PASS bomb_press skin weights stay normalized over the whole artwork
+PASS bomb_press attack moves independent anatomical joints
+PASS bomb_press real feedback enters the hit clip
+PASS bomb_press defeat enters the death clip
+PASS bomb_press death settles without restarting idle
+PASS bomb_press reduced motion stops animated playback
+PASS boss_chaos_press owns a full-resolution portrait
+PASS boss_chaos_press does not borrow another enemy texture
+PASS boss_chaos_press mounts an actual animated actor
+PASS boss_chaos_press has idle, hit and death clips
+PASS boss_chaos_press animates 吞字 with valid impact timing
+PASS boss_chaos_press animates 乱版 with valid impact timing
+PASS boss_chaos_press animates 封泥 with valid impact timing
+PASS boss_chaos_press animates 蚀海 with valid impact timing
+PASS boss_chaos_press animation does not consume gameplay RNG
+PASS boss_chaos_press skin weights stay normalized over the whole artwork
+PASS boss_chaos_press attack moves independent anatomical joints
+PASS boss_chaos_press real feedback enters the hit clip
+PASS boss_chaos_press defeat enters the death clip
+PASS boss_chaos_press death settles without restarting idle
+PASS boss_chaos_press reduced motion stops animated playback
+PASS boss_lead_plate owns a full-resolution portrait
+PASS boss_lead_plate does not borrow another enemy texture
+PASS boss_lead_plate mounts an actual animated actor
+PASS boss_lead_plate has idle, hit and death clips
+PASS boss_lead_plate animates 压印 with valid impact timing
+PASS boss_lead_plate animates 连铸 with valid impact timing
+PASS boss_lead_plate animates 蚀版 with valid impact timing
+PASS boss_lead_plate animation does not consume gameplay RNG
+PASS boss_lead_plate skin weights stay normalized over the whole artwork
+PASS boss_lead_plate attack moves independent anatomical joints
+PASS boss_lead_plate real feedback enters the hit clip
+PASS boss_lead_plate defeat enters the death clip
+PASS boss_lead_plate death settles without restarting idle
+PASS boss_lead_plate reduced motion stops animated playback
+PASS boss_word_demon owns a full-resolution portrait
+PASS boss_word_demon does not borrow another enemy texture
+PASS boss_word_demon mounts an actual animated actor
+PASS boss_word_demon has idle, hit and death clips
+PASS boss_word_demon animates 撕字 with valid impact timing
+PASS boss_word_demon animates 结阵 with valid impact timing
+PASS boss_word_demon animates 散字 with valid impact timing
+PASS boss_word_demon animation does not consume gameplay RNG
+PASS boss_word_demon skin weights stay normalized over the whole artwork
+PASS boss_word_demon attack moves independent anatomical joints
+PASS boss_word_demon real feedback enters the hit clip
+PASS boss_word_demon defeat enters the death clip
+PASS boss_word_demon death settles without restarting idle
+PASS boss_word_demon reduced motion stops animated playback
+PASS bronze_seal owns a full-resolution portrait
+PASS bronze_seal does not borrow another enemy texture
+PASS bronze_seal mounts an actual animated actor
+PASS bronze_seal has idle, hit and death clips
+PASS bronze_seal animates 铸壁 with valid impact timing
+PASS bronze_seal animates 印击 with valid impact timing
+PASS bronze_seal animates 蚀版 with valid impact timing
+PASS bronze_seal animation does not consume gameplay RNG
+PASS bronze_seal skin weights stay normalized over the whole artwork
+PASS bronze_seal attack moves independent anatomical joints
+PASS bronze_seal real feedback enters the hit clip
+PASS bronze_seal defeat enters the death clip
+PASS bronze_seal death settles without restarting idle
+PASS bronze_seal reduced motion stops animated playback
+PASS charge_badger owns a full-resolution portrait
+PASS charge_badger does not borrow another enemy texture
+PASS charge_badger mounts an actual animated actor
+PASS charge_badger has idle, hit and death clips
+PASS charge_badger animates 聚电 with valid impact timing
+PASS charge_badger animates 放弧 with valid impact timing
+PASS charge_badger animates 扑击 with valid impact timing
+PASS charge_badger animation does not consume gameplay RNG
+PASS charge_badger skin weights stay normalized over the whole artwork
+PASS charge_badger attack moves independent anatomical joints
+PASS charge_badger real feedback enters the hit clip
+PASS charge_badger defeat enters the death clip
+PASS charge_badger death settles without restarting idle
+PASS charge_badger reduced motion stops animated playback
+PASS compiler_boss owns a full-resolution portrait
+PASS compiler_boss does not borrow another enemy texture
+PASS compiler_boss mounts an actual animated actor
+PASS compiler_boss has idle, hit and death clips
+PASS compiler_boss animates 异文审校 with valid impact timing
+PASS compiler_boss animates 重文校印 with valid impact timing
+PASS compiler_boss animates 收卷 with valid impact timing
+PASS compiler_boss animation does not consume gameplay RNG
+PASS compiler_boss skin weights stay normalized over the whole artwork
+PASS compiler_boss attack moves independent anatomical joints
+PASS compiler_boss real feedback enters the hit clip
+PASS compiler_boss defeat enters the death clip
+PASS compiler_boss death settles without restarting idle
+PASS compiler_boss reduced motion stops animated playback
+PASS copy_master owns a full-resolution portrait
+PASS copy_master does not borrow another enemy texture
+PASS copy_master mounts an actual animated actor
+PASS copy_master has idle, hit and death clips
+PASS copy_master animates 笔击 with valid impact timing
+PASS copy_master animates 拓 with valid impact timing
+PASS copy_master animates 笔击 with valid impact timing
+PASS copy_master animation does not consume gameplay RNG
+PASS copy_master skin weights stay normalized over the whole artwork
+PASS copy_master attack moves independent anatomical joints
+PASS copy_master real feedback enters the hit clip
+PASS copy_master defeat enters the death clip
+PASS copy_master death settles without restarting idle
+PASS copy_master reduced motion stops animated playback
+PASS corrosion_beetle owns a full-resolution portrait
+PASS corrosion_beetle does not borrow another enemy texture
+PASS corrosion_beetle mounts an actual animated actor
+PASS corrosion_beetle has idle, hit and death clips
+PASS corrosion_beetle animates 蛀咬 with valid impact timing
+PASS corrosion_beetle animates 注蚀 with valid impact timing
+PASS corrosion_beetle animation does not consume gameplay RNG
+PASS corrosion_beetle skin weights stay normalized over the whole artwork
+PASS corrosion_beetle attack moves independent anatomical joints
+PASS corrosion_beetle real feedback enters the hit clip
+PASS corrosion_beetle defeat enters the death clip
+PASS corrosion_beetle death settles without restarting idle
+PASS corrosion_beetle reduced motion stops animated playback
+PASS double_slip owns a full-resolution portrait
+PASS double_slip does not borrow another enemy texture
+PASS double_slip mounts an actual animated actor
+PASS double_slip has idle, hit and death clips
+PASS double_slip animates 翻签 with valid impact timing
+PASS double_slip animates 合简 with valid impact timing
+PASS double_slip animates 扑击 with valid impact timing
+PASS double_slip animation does not consume gameplay RNG
+PASS double_slip skin weights stay normalized over the whole artwork
+PASS double_slip attack moves independent anatomical joints
+PASS double_slip real feedback enters the hit clip
+PASS double_slip defeat enters the death clip
+PASS double_slip death settles without restarting idle
+PASS double_slip reduced motion stops animated playback
+PASS ember_imp owns a full-resolution portrait
+PASS ember_imp does not borrow another enemy texture
+PASS ember_imp mounts an actual animated actor
+PASS ember_imp has idle, hit and death clips
+PASS ember_imp animates 连焰 with valid impact timing
+PASS ember_imp animates 落灰 with valid impact timing
+PASS ember_imp animation does not consume gameplay RNG
+PASS ember_imp skin weights stay normalized over the whole artwork
+PASS ember_imp attack moves independent anatomical joints
+PASS ember_imp real feedback enters the hit clip
+PASS ember_imp defeat enters the death clip
+PASS ember_imp death settles without restarting idle
+PASS ember_imp reduced motion stops animated playback
+PASS fold_moth owns a full-resolution portrait
+PASS fold_moth does not borrow another enemy texture
+PASS fold_moth mounts an actual animated actor
+PASS fold_moth has idle, hit and death clips
+PASS fold_moth animates 折页 with valid impact timing
+PASS fold_moth animates 扑击 with valid impact timing
+PASS fold_moth animation does not consume gameplay RNG
+PASS fold_moth real feedback enters the hit clip
+PASS fold_moth defeat enters the death clip
+PASS fold_moth death settles without restarting idle
+PASS fold_moth reduced motion stops animated playback
+PASS furnace_beast owns a full-resolution portrait
+PASS furnace_beast does not borrow another enemy texture
+PASS furnace_beast mounts an actual animated actor
+PASS furnace_beast has idle, hit and death clips
+PASS furnace_beast animates 炉息 with valid impact timing
+PASS furnace_beast animates 喷焰 with valid impact timing
+PASS furnace_beast animation does not consume gameplay RNG
+PASS furnace_beast skin weights stay normalized over the whole artwork
+PASS furnace_beast attack moves independent anatomical joints
+PASS furnace_beast real feedback enters the hit clip
+PASS furnace_beast defeat enters the death clip
+PASS furnace_beast death settles without restarting idle
+PASS furnace_beast reduced motion stops animated playback
+PASS glutton owns a full-resolution portrait
+PASS glutton does not borrow another enemy texture
+PASS glutton mounts an actual animated actor
+PASS glutton has idle, hit and death clips
+PASS glutton animates 啃咬 with valid impact timing
+PASS glutton animates 吞字 with valid impact timing
+PASS glutton animates 腹击 with valid impact timing
+PASS glutton animation does not consume gameplay RNG
+PASS glutton skin weights stay normalized over the whole artwork
+PASS glutton attack moves independent anatomical joints
+PASS glutton real feedback enters the hit clip
+PASS glutton defeat enters the death clip
+PASS glutton death settles without restarting idle
+PASS glutton reduced motion stops animated playback
+PASS ink_creditor owns a full-resolution portrait
+PASS ink_creditor does not borrow another enemy texture
+PASS ink_creditor mounts an actual animated actor
+PASS ink_creditor has idle, hit and death clips
+PASS ink_creditor animates 挂账 with valid impact timing
+PASS ink_creditor animates 催账 with valid impact timing
+PASS ink_creditor animates 扑击 with valid impact timing
+PASS ink_creditor animation does not consume gameplay RNG
+PASS ink_creditor skin weights stay normalized over the whole artwork
+PASS ink_creditor attack moves independent anatomical joints
+PASS ink_creditor real feedback enters the hit clip
+PASS ink_creditor defeat enters the death clip
+PASS ink_creditor death settles without restarting idle
+PASS ink_creditor reduced motion stops animated playback
+PASS ink_spirit owns a full-resolution portrait
+PASS ink_spirit does not borrow another enemy texture
+PASS ink_spirit mounts an actual animated actor
+PASS ink_spirit has idle, hit and death clips
+PASS ink_spirit animates 溅墨 with valid impact timing
+PASS ink_spirit animates 落墨 with valid impact timing
+PASS ink_spirit animates 结茧 with valid impact timing
+PASS ink_spirit animation does not consume gameplay RNG
+PASS ink_spirit real feedback enters the hit clip
+PASS ink_spirit defeat enters the death clip
+PASS ink_spirit death settles without restarting idle
+PASS ink_spirit reduced motion stops animated playback
+PASS iron_seal owns a full-resolution portrait
+PASS iron_seal does not borrow another enemy texture
+PASS iron_seal mounts an actual animated actor
+PASS iron_seal has idle, hit and death clips
+PASS iron_seal animates 重压 with valid impact timing
+PASS iron_seal animates 横扫 with valid impact timing
+PASS iron_seal animation does not consume gameplay RNG
+PASS iron_seal skin weights stay normalized over the whole artwork
+PASS iron_seal attack moves independent anatomical joints
+PASS iron_seal real feedback enters the hit clip
+PASS iron_seal defeat enters the death clip
+PASS iron_seal death settles without restarting idle
+PASS iron_seal reduced motion stops animated playback
+PASS leech owns a full-resolution portrait
+PASS leech does not borrow another enemy texture
+PASS leech mounts an actual animated actor
+PASS leech has idle, hit and death clips
+PASS leech animates 汲电 with valid impact timing
+PASS leech animates 汲电 with valid impact timing
+PASS leech animation does not consume gameplay RNG
+PASS leech skin weights stay normalized over the whole artwork
+PASS leech attack moves independent anatomical joints
+PASS leech real feedback enters the hit clip
+PASS leech defeat enters the death clip
+PASS leech death settles without restarting idle
+PASS leech reduced motion stops animated playback
+PASS needle_bee owns a full-resolution portrait
+PASS needle_bee does not borrow another enemy texture
+PASS needle_bee mounts an actual animated actor
+PASS needle_bee has idle, hit and death clips
+PASS needle_bee animates 连针 with valid impact timing
+PASS needle_bee animates 蓄势 with valid impact timing
+PASS needle_bee animates 重刺 with valid impact timing
+PASS needle_bee animation does not consume gameplay RNG
+PASS needle_bee real feedback enters the hit clip
+PASS needle_bee defeat enters the death clip
+PASS needle_bee death settles without restarting idle
+PASS needle_bee reduced motion stops animated playback
+PASS nest_moth owns a full-resolution portrait
+PASS nest_moth does not borrow another enemy texture
+PASS nest_moth mounts an actual animated actor
+PASS nest_moth has idle, hit and death clips
+PASS nest_moth animates 结巢 with valid impact timing
+PASS nest_moth animates 啄字 with valid impact timing
+PASS nest_moth animates 扑击 with valid impact timing
+PASS nest_moth animation does not consume gameplay RNG
+PASS nest_moth skin weights stay normalized over the whole artwork
+PASS nest_moth attack moves independent anatomical joints
+PASS nest_moth real feedback enters the hit clip
+PASS nest_moth defeat enters the death clip
+PASS nest_moth death settles without restarting idle
+PASS nest_moth reduced motion stops animated playback
+PASS paper_guard owns a full-resolution portrait
+PASS paper_guard does not borrow another enemy texture
+PASS paper_guard mounts an actual animated actor
+PASS paper_guard has idle, hit and death clips
+PASS paper_guard animates 覆纸 with valid impact timing
+PASS paper_guard animates 割 with valid impact timing
+PASS paper_guard animates 糊 with valid impact timing
+PASS paper_guard animation does not consume gameplay RNG
+PASS paper_guard skin weights stay normalized over the whole artwork
+PASS paper_guard attack moves independent anatomical joints
+PASS paper_guard real feedback enters the hit clip
+PASS paper_guard defeat enters the death clip
+PASS paper_guard death settles without restarting idle
+PASS paper_guard reduced motion stops animated playback
+PASS paper_shell owns a full-resolution portrait
+PASS paper_shell does not borrow another enemy texture
+PASS paper_shell mounts an actual animated actor
+PASS paper_shell has idle, hit and death clips
+PASS paper_shell animates 刺击 with valid impact timing
+PASS paper_shell animates 补纸 with valid impact timing
+PASS paper_shell animation does not consume gameplay RNG
+PASS paper_shell real feedback enters the hit clip
+PASS paper_shell defeat enters the death clip
+PASS paper_shell death settles without restarting idle
+PASS paper_shell reduced motion stops animated playback
+PASS proof_boss owns a full-resolution portrait
+PASS proof_boss does not borrow another enemy texture
+PASS proof_boss mounts an actual animated actor
+PASS proof_boss has idle, hit and death clips
+PASS proof_boss animates 校勘 with valid impact timing
+PASS proof_boss animates 朱批 with valid impact timing
+PASS proof_boss animates 双批 with valid impact timing
+PASS proof_boss animation does not consume gameplay RNG
+PASS proof_boss skin weights stay normalized over the whole artwork
+PASS proof_boss attack moves independent anatomical joints
+PASS proof_boss real feedback enters the hit clip
+PASS proof_boss defeat enters the death clip
+PASS proof_boss death settles without restarting idle
+PASS proof_boss reduced motion stops animated playback
+PASS rail_boss owns a full-resolution portrait
+PASS rail_boss does not borrow another enemy texture
+PASS rail_boss mounts an actual animated actor
+PASS rail_boss has idle, hit and death clips
+PASS rail_boss animates 压轨 with valid impact timing
+PASS rail_boss animates 铅铸 with valid impact timing
+PASS rail_boss animates 双铸 with valid impact timing
+PASS rail_boss animation does not consume gameplay RNG
+PASS rail_boss skin weights stay normalized over the whole artwork
+PASS rail_boss attack moves independent anatomical joints
+PASS rail_boss real feedback enters the hit clip
+PASS rail_boss defeat enters the death clip
+PASS rail_boss death settles without restarting idle
+PASS rail_boss reduced motion stops animated playback
+PASS rust_scribe owns a full-resolution portrait
+PASS rust_scribe does not borrow another enemy texture
+PASS rust_scribe mounts an actual animated actor
+PASS rust_scribe has idle, hit and death clips
+PASS rust_scribe animates 污墨 with valid impact timing
+PASS rust_scribe animates 刺 with valid impact timing
+PASS rust_scribe animates 蚀文 with valid impact timing
+PASS rust_scribe animation does not consume gameplay RNG
+PASS rust_scribe skin weights stay normalized over the whole artwork
+PASS rust_scribe attack moves independent anatomical joints
+PASS rust_scribe real feedback enters the hit clip
+PASS rust_scribe defeat enters the death clip
+PASS rust_scribe death settles without restarting idle
+PASS rust_scribe reduced motion stops animated playback
+PASS seal_officer owns a full-resolution portrait
+PASS seal_officer does not borrow another enemy texture
+PASS seal_officer mounts an actual animated actor
+PASS seal_officer has idle, hit and death clips
+PASS seal_officer animates 钤印 with valid impact timing
+PASS seal_officer animates 朱批 with valid impact timing
+PASS seal_officer animates 笔击 with valid impact timing
+PASS seal_officer animation does not consume gameplay RNG
+PASS seal_officer skin weights stay normalized over the whole artwork
+PASS seal_officer attack moves independent anatomical joints
+PASS seal_officer real feedback enters the hit clip
+PASS seal_officer defeat enters the death clip
+PASS seal_officer death settles without restarting idle
+PASS seal_officer reduced motion stops animated playback
+PASS tilting_inkwell owns a full-resolution portrait
+PASS tilting_inkwell does not borrow another enemy texture
+PASS tilting_inkwell mounts an actual animated actor
+PASS tilting_inkwell has idle, hit and death clips
+PASS tilting_inkwell animates 左倾 with valid impact timing
+PASS tilting_inkwell animates 溅墨 with valid impact timing
+PASS tilting_inkwell animates 旋砚 with valid impact timing
+PASS tilting_inkwell animates 溅墨 with valid impact timing
+PASS tilting_inkwell animation does not consume gameplay RNG
+PASS tilting_inkwell real feedback enters the hit clip
+PASS tilting_inkwell defeat enters the death clip
+PASS tilting_inkwell death settles without restarting idle
+PASS tilting_inkwell reduced motion stops animated playback
+PASS wheel_master owns a full-resolution portrait
+PASS wheel_master does not borrow another enemy texture
+PASS wheel_master mounts an actual animated actor
+PASS wheel_master has idle, hit and death clips
+PASS wheel_master animates 轮铸 with valid impact timing
+PASS wheel_master animates 压印 with valid impact timing
+PASS wheel_master animates 双印 with valid impact timing
+PASS wheel_master animation does not consume gameplay RNG
+PASS wheel_master skin weights stay normalized over the whole artwork
+PASS wheel_master attack moves independent anatomical joints
+PASS wheel_master real feedback enters the hit clip
+PASS wheel_master defeat enters the death clip
+PASS wheel_master death settles without restarting idle
+PASS wheel_master reduced motion stops animated playback
+PASS blank_child actual battle turn routes into its own animation
+PASS blank_child actual settlement completes and clears replay context
+PASS blank_child whole illustration fits the phone portrait area
+PASS corrosion_beetle actual battle turn routes into its own animation
+PASS corrosion_beetle actual settlement completes and clears replay context
+PASS glutton actual battle turn routes into its own animation
+PASS glutton actual settlement completes and clears replay context
+PASS furnace_beast actual battle turn routes into its own animation
+PASS furnace_beast actual settlement completes and clears replay context
+PASS charge_badger actual battle turn routes into its own animation
+PASS charge_badger actual settlement completes and clears replay context
+PASS ink_creditor actual battle turn routes into its own animation
+PASS ink_creditor actual settlement completes and clears replay context
+PASS double_slip actual battle turn routes into its own animation
+PASS double_slip actual settlement completes and clears replay context
+PASS nest_moth actual battle turn routes into its own animation
+PASS nest_moth actual settlement completes and clears replay context
+PASS bomb_press actual battle turn routes into its own animation
+PASS bomb_press actual settlement completes and clears replay context
+PASS copy_master actual battle turn routes into its own animation
+PASS copy_master actual settlement completes and clears replay context
+PASS seal_officer actual battle turn routes into its own animation
+PASS seal_officer actual settlement completes and clears replay context
+PASS wheel_master actual battle turn routes into its own animation
+PASS wheel_master actual settlement completes and clears replay context
+PASS leech actual battle turn routes into its own animation
+PASS leech actual settlement completes and clears replay context
+PASS proof_boss actual battle turn routes into its own animation
+PASS proof_boss actual settlement completes and clears replay context
+PASS proof_boss actual half-health refresh triggers its phase transition
+PASS proof_boss whole illustration fits the phone portrait area
+PASS rail_boss actual battle turn routes into its own animation
+PASS rail_boss actual settlement completes and clears replay context
+PASS rail_boss actual half-health refresh triggers its phase transition
+PASS rail_boss whole illustration fits the phone portrait area
+PASS compiler_boss actual battle turn routes into its own animation
+PASS compiler_boss actual settlement completes and clears replay context
+PASS compiler_boss actual half-health refresh triggers its phase transition
+PASS compiler_boss whole illustration fits the phone portrait area
+[enemy_art_completion_test] PASS=429 FAIL=0 TOTAL=429

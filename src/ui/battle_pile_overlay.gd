@@ -15,6 +15,7 @@ var _window: MarginContainer
 var _scroll: ScrollContainer
 var _grid: GridContainer
 var _close_button: Button
+var _dim_tap := TouchTap.new()
 
 
 func setup(p_title: String, instances: Array) -> void:
@@ -56,7 +57,7 @@ func _ready() -> void:
 	dim.color = Color(0.04, 0.06, 0.05, 0.32)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.gui_input.connect(func(event: InputEvent):
-		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if _dim_tap.matches(event, dim):
 			close())
 	add_child(dim)
 	_canvas = Control.new()

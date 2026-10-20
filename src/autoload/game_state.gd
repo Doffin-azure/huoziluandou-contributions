@@ -35,6 +35,7 @@ var relic_binds: Dictionary = {}
 var relic_counters: Dictionary = {}
 ## 反死亡：本局存着的复活次数（一局最多拿到一次）
 var revive_charges: int = 0
+var first_run_tutorial: bool = false
 
 
 func _ready() -> void:
@@ -53,6 +54,7 @@ func start_new_run(starter_id: String = "v03", custom_glyphs: Array = []) -> voi
 	relic_binds.clear()
 	relic_counters.clear()
 	revive_charges = 0
+	first_run_tutorial = false
 	player_max_hp = rules.player_max_hp
 	player_hp = player_max_hp
 	gold = rules.starting_gold

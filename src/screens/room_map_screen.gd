@@ -203,7 +203,7 @@ func _treasure_receipt() -> void:
 	var id := str(receipt.get("relic",""))
 	var overlay := ChoiceOverlay.new()
 	overlay.setup({"title":"宝藏 · 碑间遗器", "body":("获得遗物「%s」\n%s" % [Relics.name_of(id),Relics.desc_of(id)]) if not id.is_empty() else "普通遗物已取尽，获得 30 金币。",
-		"options":[{"text":"收下，继续前行","primary":true}]})
+		"relic_id":id,"options":[{"text":"收下，继续前行","primary":true}]})
 	overlay.chose.connect(func(_index):
 		if not id.is_empty():
 			RelicRewardFlow.bind_owned(self,id,func(_id):
@@ -266,4 +266,11 @@ func _refresh_inventory() -> void:
 			button.custom_minimum_size.x = 64*JourneyStyle.touch_scale(self)
 			button.disabled = not enabled; grid.add_child(button)
 	for word: String in run.active: _inventory_box.add_child(JourneyStyle.label(word+"："+str(Lexicon.WORDS[word][1]),"Muted"))
+	_inventory_box.add_child(_button("遗物 · %d 件" % GameState.relics.size(), _open_relics))
 	_inventory_box.add_child(_button("收起",_close_inventory))
+
+
+func _open_relics() -> void:
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title":"当前遗物", "body":"\n\n".join(GameState.relics.map(func(id): return Relics.text(id))) if not GameState.relics.is_empty() else "暂无遗物。", "relics":GameState.relics.duplicate(), "hud_details":true,"scroll_body":true,"dismissible":true,"options":[{"text":"关闭","primary":true}]})
+	add_child(overlay)

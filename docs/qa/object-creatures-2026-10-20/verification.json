@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-20",
+  "renderer": "Godot 4.7.2 Compatibility / NVIDIA RTX 4060 Laptop",
+  "test": {
+    "scene": "res://tests/enemy_art_completion_test.tscn",
+    "passed": 429,
+    "failed": 0,
+    "log": "test.log"
+  },
+  "current_assets": "assets/taopunk/enemies/object_creatures/manifest.json",
+  "creatures": [
+    "ink_creditor",
+    "copy_master",
+    "seal_officer",
+    "wheel_master",
+    "proof_boss",
+    "compiler_boss"
+  ],
+  "blank_child_preserved": true,
+  "unchanged_gameplay_resources": true,
+  "asset_verification": {
+    "previous_assets_verified": [
+      {
+        "manifest": "assets/taopunk/enemies/batch2-manifest.json",
+        "count": 16
+      },
+      {
+        "manifest": "assets/taopunk/enemies/human_repaint/manifest.json",
+        "count": 7
+      },
+      {
+        "manifest": "assets/taopunk/enemies/bronze_masks/manifest.json",
+        "count": 7
+      },
+      {
+        "manifest": "assets/taopunk/enemies/zodiac_masks/manifest.json",
+        "count": 6
+      }
+    ],
+    "new_assets_verified": 6,
+    "blank_child_sha256": "6193a52df45f4ca44ea83a2d7c74ad6731ca55ec563b9215fd58970513694057",
+    "video": {
+      "path": "object-motion-preview.mp4",
+      "size": [
+        1280,
+        900
+      ],
+      "fps": 12.0,
+      "duration": 5.0,
+      "sha256": "00202db87c68d2eba40b96fbeb1a1c571d091d0457e233844af853cc390e8682"
+    }
+  },
+  "screenshots": [
+    "all-seven.png",
+    "battle-compiler_boss.png",
+    "battle-copy_master.png",
+    "battle-ink_creditor.png",
+    "battle-proof_boss.png",
+    "battle-seal_officer.png",
+    "battle-wheel_master.png",
+    "before-after.png",
+    "motion-attack.png",
+    "motion-death.png",
+    "motion-hit.png",
+    "motion-idle.png",
+    "motion-special.png",
+    "phone-compiler_boss.png",
+    "phone-copy_master.png",
+    "phone-ink_creditor.png",
+    "phone-proof_boss.png",
+    "phone-seal_officer.png",
+    "phone-wheel_master.png",
+    "six-object-creatures.png"
+  ],
+  "native_live_encounters": 6,
+  "notes": [
+    "Function tests verify resource coverage, animation routing and rules integration; artistic quality is assessed visually.",
+    "All six live encounters captured at desktop and phone aspect ratios; phone capture is desktop emulation."
+  ]
+}

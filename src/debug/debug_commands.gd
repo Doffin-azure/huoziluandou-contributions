@@ -4,6 +4,7 @@ class_name DebugCommands
 ## 只在调试构建由 DebugConsole 安装。
 
 static var _cmds: Dictionary = {}
+const RelicTools = preload("res://src/debug/relic_tools.gd")
 
 
 static func is_empty() -> bool:
@@ -52,6 +53,14 @@ static func _refresh() -> void:
 	var s = Router.current
 	if s != null and s.has_method("_refresh_all"):
 		s.call("_refresh_all")
+
+
+static func _refresh_relics() -> void:
+	var s = Router.current
+	if s != null and s.has_method("refresh"):
+		s.call("refresh")
+	_refresh()
+	SaveManager.request_save()
 
 
 static func _ck() -> Array:
@@ -333,6 +342,12 @@ static func install() -> void:
 		return out)
 
 	# ---- D. 字袋 / 构筑 ----
+	register("relic-test", "遗物效果自检（保留对局）：/relic-test [all|名字或id]", func(a): return RelicTools.run_checks(a))
+	register("relic-status", "查看持有/本场遗物、绑字与触发计数", func(_a): return RelicTools.status(_battle()))
+	register("relic-bind", "指定绑字：/relic-bind 名字或id 字形或#实体uid", func(a):
+		var out := RelicTools.bind(a)
+		_refresh_relics()
+		return out)
 	register("deck", "打印永久字袋", func(_a):
 		var counts := GameState.glyph_counts()
 		var out: Array = ["字袋 %d 枚：" % GameState.deck_size()]
@@ -356,12 +371,12 @@ static func install() -> void:
 				if GameState.remove_relic(id): done.append(Relics.name_of(id))
 			elif GameState.add_relic(id):
 				done.append(Relics.name_of(id))
-				if Relics.needs_bind(id) and not GameState.deck.is_empty() and not GameState.relic_binds.has(id):
-					GameState.bind_relic(id, GameState.deck[0].id())
-		var s = Router.current
-		if s != null and s.has_method("refresh"): s.call("refresh")
-		_refresh()
-		return [("移除：" if drop else "得到：") + ("、".join(done) if not done.is_empty() else "无变化（绑定类自动绑字袋第一枚；战斗中改动下一场生效）")])
+				if Relics.needs_bind(id) and not GameState.relic_binds.has(id):
+					for c in GameState.deck:
+						if GameState.bind_relic(id, c.id()):
+							break
+		_refresh_relics()
+		return [("移除：" if drop else "得到：") + ("、".join(done) if not done.is_empty() else "无变化"), "绑定类自动选未占用的字；/relic-bind 指定绑字，/relic-status 查看。战斗中改动下一场生效。"])
 	register("tray", "远征字匣放字：/tray 火热强", func(a):
 		var ex: Expedition = GameState.expedition
 		if ex == null or a.is_empty(): return ["用法：在远征地图里 /tray 火热强"]

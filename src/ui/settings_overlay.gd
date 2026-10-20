@@ -17,7 +17,7 @@ func _ready() -> void:
 
 func _layout() -> void:
 	if _panel != null:
-		_panel.custom_minimum_size = Vector2(minf(600, size.x - 32), minf(580, size.y - 32))
+		_panel.custom_minimum_size = Vector2(minf(680 * JourneyStyle.touch_scale(self), size.x - 32), minf(580, size.y - 32))
 
 
 func _build() -> void:
@@ -55,7 +55,7 @@ func _build() -> void:
 
 	col.add_child(Ink.hline())
 
-	# 字盘字体独立于美术风格，继续允许自定义。
+	# 字盘字体独立于美术风格，只选择随包发布的内置样式。
 	col.add_child(BoardFontPicker.new())
 
 	col.add_child(Ink.hline())
@@ -98,19 +98,28 @@ func _build() -> void:
 	volume.value_changed.connect(func(value: float): Settings.set_sfx_volume(value / 100.0))
 	audio_row.add_child(volume)
 	col.add_child(audio_row)
-
 	var music_row := Ink.hbox(12)
 	music_row.add_child(Ink.label("音乐音量", "Subheading"))
-	var music := HSlider.new()
-	music.min_value = 0
-	music.max_value = 100
-	music.step = 1
-	music.value = Settings.music_volume * 100
-	music.custom_minimum_size = Vector2(160, 48)
-	music.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	music.value_changed.connect(func(value: float): Settings.set_music_volume(value / 100.0))
-	music_row.add_child(music)
+	var music_volume := HSlider.new()
+	music_volume.min_value = 0
+	music_volume.max_value = 100
+	music_volume.step = 1
+	music_volume.value = Settings.music_volume * 100
+	music_volume.custom_minimum_size = Vector2(160, 48)
+	music_volume.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	music_volume.value_changed.connect(func(value: float): Settings.set_music_volume(value / 100.0))
+	music_row.add_child(music_volume)
 	col.add_child(music_row)
+
+	_wrap_labels(col)
+
+
+func _wrap_labels(node: Node) -> void:
+	for child in node.get_children():
+		if child is Label:
+			child.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			child.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_wrap_labels(child)
 
 
 func _toggle_text() -> String:

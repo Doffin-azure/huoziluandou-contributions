@@ -38,12 +38,16 @@ func _ready() -> void:
 
 
 func _sync_actor() -> void:
-	var character_active := CHARACTER_ACTORS.has(enemy_id) and Palette.STYLE_ID == "taopunk"
+	var roster_active := EnemyAnimationCatalog.DATA.has(enemy_id)
+	var character_active := (CHARACTER_ACTORS.has(enemy_id) or roster_active) and Palette.STYLE_ID == "taopunk"
 	if _character_actor != null and _character_actor_id != enemy_id:
 		_character_actor.queue_free()
 		_character_actor = null
 	if character_active and _character_actor == null:
-		_character_actor = CHARACTER_ACTORS[enemy_id].new()
+		if roster_active:
+			_character_actor = RosterEnemyActor.new()
+			_character_actor.enemy_id = enemy_id
+		else: _character_actor = CHARACTER_ACTORS[enemy_id].new()
 		_character_actor_id = enemy_id
 		add_child(_character_actor)
 	if _character_actor != null:
@@ -103,7 +107,8 @@ func _visual_move(move: EnemyMoveData) -> EnemyMoveData:
 func play_action(move: EnemyMoveData) -> Dictionary:
 	move = _visual_move(move)
 	if has_character_actor(): return _character_actor.call("play_action",move)
-	return _actor.play_action(move) if _actor != null and _actor.visible else {}
+	if _actor != null and _actor.visible: return _actor.play_action(move)
+	return _attack_actor.play_action(move) if _attack_actor != null and _attack_actor.visible else {}
 
 
 func action_origin() -> Vector2:
@@ -136,9 +141,21 @@ func attack_effect() -> String:
 
 
 func apply_character_feedback(event: Dictionary) -> bool:
-	if not has_character_actor(): return false
-	_character_actor.call("apply_feedback",event)
-	return true
+	if has_character_actor():
+		_character_actor.call("apply_feedback",event)
+		return true
+	if _attack_actor != null and _attack_actor.visible:
+		_attack_actor.apply_feedback(event)
+		return true
+	if _actor != null and _actor.visible:
+		_actor.apply_feedback(event)
+		return true
+	return false
+
+
+func set_combat_phase(value: int) -> void:
+	if has_character_actor() and _character_actor.has_method("set_phase"):
+		_character_actor.call("set_phase",value)
 
 
 func play_attack_hit(move: EnemyMoveData, hit_index: int) -> Dictionary:

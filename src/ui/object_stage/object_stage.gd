@@ -8,6 +8,7 @@ var reward_count := 3
 var camera: Camera3D
 var objects: Array[Node3D] = []
 var rests: Array[Vector3] = []
+var object_scales: Array[Vector3] = []
 var _materials: Dictionary = {}
 var _motions: Dictionary = {}
 var _lid: Node3D
@@ -15,6 +16,7 @@ var _lantern: Node3D
 var _clock := 0.0
 var _selected := -1
 var _lid_motion: Tween
+var shop_actions: Dictionary = {}
 
 
 func _ready() -> void:
@@ -22,6 +24,7 @@ func _ready() -> void:
 	_build_room()
 	_build_counter()
 	if mode == "shop": _build_shop_joinery()
+	if mode == "shop": _build_shop_actions()
 	Settings.changed.connect(_apply_motion)
 	_apply_motion()
 
@@ -181,6 +184,9 @@ func _build_counter() -> void:
 			w.box(Vector3(x, 0.88, -1.55), Vector3(0.5, 0.18, 0.34), pigment("gold"))
 	else:
 		w.box(Vector3(-1.4, 0.57, 0.2), Vector3(8.7, 0.045, 2.55), pigment("red"))
+		# A raised back ledge carries five smaller letter specimens.
+		w.box(Vector3(-1.1, 0.83, -0.30), Vector3(9.05, 0.44, 1.12), pigment("wood"))
+		w.box(Vector3(-1.1, 1.055, -0.30), Vector3(9.14, 0.035, 1.18), pigment("gold"))
 		for x in [-5.62, 2.82]: w.box(Vector3(x, 0.61, 0.2), Vector3(0.04, 0.015, 2.5), pigment("gold"))
 		# Wrapped books, inkstone, brush pot and stacked coin disks.
 		for i in 4:
@@ -317,6 +323,38 @@ func _build_lantern(at: Vector3) -> void:
 	w.finish(_lantern)
 
 
+func _build_shop_actions() -> void:
+	var action := preload("res://src/ui/object_stage/shop_action_3d.gd").new()
+	action.name = "StockRefreshDial"
+	action.stage = self
+	action.position = Vector3(-6.3, 1.5, 1.55)
+	action.rotation.x = -0.35
+	add_child(action)
+	shop_actions.refresh = action
+
+
+func add_relic(id: String, slot: int, price: int) -> int:
+	# Registered relics use their own authored specimen. Keep a readable fallback
+	# for future definitions that have not received a model and icon yet.
+	if RelicArt.texture(id) == null:
+		add_object(Relics.name_of(id).left(1), 0, 0, true)
+		var token: Node3D = objects.back()
+		token.position = Vector3(-3.9 + slot * 2.8, 0.74, 1.85)
+		token.scale = Vector3.ONE * 0.65
+		token.set_meta("relic_id", id)
+		token.set_meta("price", price)
+		rests[-1] = token.position
+		object_scales[-1] = token.scale
+		return objects.size() - 1
+	var node := preload("res://src/ui/object_stage/relic_specimen.gd").build(self, id, price)
+	node.position = Vector3(-3.9 + slot * 2.8, 0.74, 1.85)
+	add_child(node)
+	objects.append(node)
+	rests.append(node.position)
+	object_scales.append(node.scale)
+	return objects.size() - 1
+
+
 func clear_objects() -> void:
 	for motion in _motions.values():
 		if motion.is_valid(): motion.kill()
@@ -326,12 +364,14 @@ func clear_objects() -> void:
 		object.queue_free()
 	objects.clear()
 	rests.clear()
+	object_scales.clear()
 
 
 func add_object(glyph: String, slot: int, rank := 0, service := false) -> int:
 	var node := Node3D.new()
-	var shop_slots := [Vector3(-4.2, 0.82, 0.2), Vector3(-1.4, 0.82, 0.2), Vector3(1.4, 0.82, 0.2), Vector3(4.15, 0.65, 0.7), Vector3(5.6, 0.65, 0.7), Vector3(4.8, 1.75, -0.55), Vector3(-6.2, 0.65, 0.9)]
+	var shop_slots := [Vector3(-4.6, 1.075, -0.30), Vector3(-2.85, 1.075, -0.30), Vector3(-1.1, 1.075, -0.30), Vector3(0.65, 1.075, -0.30), Vector3(2.4, 1.075, -0.30), Vector3(4.15, 0.65, 0.7), Vector3(5.6, 0.65, 0.7), Vector3(4.8, 1.75, -0.55)]
 	node.position = shop_slots[slot % shop_slots.size()] if mode == "shop" else Vector3((slot - (reward_count - 1) * 0.5) * minf(2.85, 8.8 / reward_count), 1.0, 0.1)
+	if mode == "shop" and not service: node.scale = Vector3.ONE * 0.78
 	add_child(node)
 	var w := Workshop.new()
 	var scale_factor := 0.53 if service else 1.0
@@ -368,6 +408,7 @@ func add_object(glyph: String, slot: int, rank := 0, service := false) -> int:
 	node.add_child(text)
 	objects.append(node)
 	rests.append(node.position)
+	object_scales.append(node.scale)
 	return objects.size() - 1
 
 
@@ -406,7 +447,7 @@ func take(index: int) -> void:
 	if _motions.has(index) and _motions[index].is_valid(): _motions[index].kill()
 	var tw := create_tween().set_parallel(true)
 	tw.tween_property(objects[index], "position", rests[index] + Vector3(0, 0.8, 2.0), 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tw.tween_property(objects[index], "scale", Vector3.ONE * 0.55, 0.22)
+	tw.tween_property(objects[index], "scale", object_scales[index] * 0.55, 0.22)
 	_motions[index] = tw
 
 
@@ -419,13 +460,14 @@ func restore_object(index: int) -> void:
 func _apply_motion() -> void:
 	set_process(not Settings.reduced_motion)
 	if not Settings.reduced_motion: return
+	for action in shop_actions.values(): action.highlight(false)
 	if _lid_motion != null and _lid_motion.is_valid(): _lid_motion.kill()
 	if _lid != null: _lid.rotation.x = -0.30
 	for i in objects.size():
 		if _motions.has(i) and _motions[i].is_valid(): _motions[i].kill()
 		objects[i].position = rests[i] + Vector3(0, 0.18 if i == _selected else 0.0, 0)
 		objects[i].rotation_degrees = Vector3.ZERO
-		objects[i].scale = Vector3.ONE
+		objects[i].scale = object_scales[i]
 
 
 func _exit_tree() -> void:

@@ -1,0 +1,324 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS 960x432-160dpi graph builds with usable area
+PASS 960x432-160dpi graph fits screen
+PASS 960x432-160dpi every fitted node and selection ring is visible
+PASS 960x432-160dpi node circles do not overlap
+PASS 960x432-160dpi action fits and retains 48dp: 全部字
+PASS 960x432-160dpi action fits and retains 48dp: 可用字
+PASS 960x432-160dpi action fits and retains 48dp: 初始字
+PASS 960x432-160dpi action fits and retains 48dp: −
+PASS 960x432-160dpi action fits and retains 48dp: ＋
+PASS 960x432-160dpi action fits and retains 48dp: 适应窗口
+PASS 960x432-160dpi action fits and retains 48dp: 字详情
+PASS 960x432-160dpi action fits and retains 48dp: 返回标题
+PASS 960x432-160dpi graph uses available width
+PASS 960x432-160dpi overview glyph text remains at least 14dp
+LAYOUT 960x432-160dpi viewport=(1600.0, 720.0) graph=(1546.0, 418.0) unit=1.66666666666667 world=[P: (-496.7683, -138.9608), S: (1063.308, 277.9216)] min_font_dp=21.965909888004
+PASS archive 960x432-160dpi all
+PASS 960x432-160dpi starter graph builds with usable area
+PASS 960x432-160dpi starter graph fits screen
+PASS 960x432-160dpi starter every fitted node and selection ring is visible
+PASS 960x432-160dpi starter node circles do not overlap
+PASS 960x432-160dpi starter action fits and retains 48dp: 全部字
+PASS 960x432-160dpi starter action fits and retains 48dp: 可用字
+PASS 960x432-160dpi starter action fits and retains 48dp: 初始字
+PASS 960x432-160dpi starter action fits and retains 48dp: −
+PASS 960x432-160dpi starter action fits and retains 48dp: ＋
+PASS 960x432-160dpi starter action fits and retains 48dp: 适应窗口
+PASS 960x432-160dpi starter action fits and retains 48dp: 字详情
+PASS 960x432-160dpi starter action fits and retains 48dp: 返回标题
+PASS 960x432-160dpi starter graph uses available width
+PASS 960x432-160dpi starter overview glyph text remains at least 14dp
+LAYOUT 960x432-160dpi starter viewport=(1600.0, 720.0) graph=(1546.0, 418.0) unit=1.66666666666667 world=[P: (-368.1935, -97.35616), S: (735.5868, 194.1842)] min_font_dp=31.4381839028092
+PASS 960x432-160dpi starter filter keeps nine glyphs
+PASS archive 960x432-160dpi starter
+PASS 960x432-160dpi mobile node opens dismissible details
+PASS 960x432-160dpi details fit viewport
+PASS archive 960x432-160dpi detail
+PASS archive 960x432-160dpi zoom-pan
+PASS 1280x720-0dpi graph builds with usable area
+PASS 1280x720-0dpi graph fits screen
+PASS 1280x720-0dpi every fitted node and selection ring is visible
+PASS 1280x720-0dpi node circles do not overlap
+PASS 1280x720-0dpi action fits and retains 48dp: 全部字
+PASS 1280x720-0dpi action fits and retains 48dp: 可用字
+PASS 1280x720-0dpi action fits and retains 48dp: 初始字
+PASS 1280x720-0dpi action fits and retains 48dp: −
+PASS 1280x720-0dpi action fits and retains 48dp: ＋
+PASS 1280x720-0dpi action fits and retains 48dp: 适应窗口
+PASS 1280x720-0dpi action fits and retains 48dp: 返回标题
+PASS 1280x720-0dpi graph uses available width
+PASS 1280x720-0dpi overview glyph text remains at least 14dp
+LAYOUT 1280x720-0dpi viewport=(1280.0, 720.0) graph=(912.0, 469.0) unit=1.0 world=[P: (-376.6297, -184.3802), S: (824.9601, 368.7604)] min_font_dp=28.2389420771276
+PASS archive 1280x720-0dpi all
+PASS 1280x720-0dpi starter graph builds with usable area
+PASS 1280x720-0dpi starter graph fits screen
+PASS 1280x720-0dpi starter every fitted node and selection ring is visible
+PASS 1280x720-0dpi starter node circles do not overlap
+PASS 1280x720-0dpi starter action fits and retains 48dp: 全部字
+PASS 1280x720-0dpi starter action fits and retains 48dp: 可用字
+PASS 1280x720-0dpi starter action fits and retains 48dp: 初始字
+PASS 1280x720-0dpi starter action fits and retains 48dp: −
+PASS 1280x720-0dpi starter action fits and retains 48dp: ＋
+PASS 1280x720-0dpi starter action fits and retains 48dp: 适应窗口
+PASS 1280x720-0dpi starter action fits and retains 48dp: 返回标题
+PASS 1280x720-0dpi starter graph uses available width
+PASS 1280x720-0dpi starter overview glyph text remains at least 14dp
+LAYOUT 1280x720-0dpi starter viewport=(1280.0, 720.0) graph=(912.0, 469.0) unit=1.0 world=[P: (-217.6301, -97.35616), S: (435.4377, 194.1842)] min_font_dp=46.8
+PASS 1280x720-0dpi starter filter keeps nine glyphs
+PASS archive 1280x720-0dpi starter
+PASS archive 1280x720-0dpi detail
+PASS archive 1280x720-0dpi zoom-pan
+PASS 1280x720-320dpi graph builds with usable area
+PASS 1280x720-320dpi graph fits screen
+PASS 1280x720-320dpi every fitted node and selection ring is visible
+PASS 1280x720-320dpi node circles do not overlap
+PASS 1280x720-320dpi action fits and retains 48dp: 全部字
+PASS 1280x720-320dpi action fits and retains 48dp: 可用字
+PASS 1280x720-320dpi action fits and retains 48dp: 初始字
+PASS 1280x720-320dpi action fits and retains 48dp: −
+PASS 1280x720-320dpi action fits and retains 48dp: ＋
+PASS 1280x720-320dpi action fits and retains 48dp: 适应窗口
+PASS 1280x720-320dpi action fits and retains 48dp: 字详情
+PASS 1280x720-320dpi action fits and retains 48dp: 返回标题
+PASS 1280x720-320dpi graph uses available width
+PASS 1280x720-320dpi overview glyph text remains at least 14dp
+LAYOUT 1280x720-320dpi viewport=(1280.0, 720.0) graph=(1220.0, 369.0) unit=2.0 world=[P: (-487.7218, -142.8015), S: (1065.882, 285.603)] min_font_dp=14.4894076827598
+PASS archive 1280x720-320dpi all
+PASS 1280x720-320dpi starter graph builds with usable area
+PASS 1280x720-320dpi starter graph fits screen
+PASS 1280x720-320dpi starter every fitted node and selection ring is visible
+PASS 1280x720-320dpi starter node circles do not overlap
+PASS 1280x720-320dpi starter action fits and retains 48dp: 全部字
+PASS 1280x720-320dpi starter action fits and retains 48dp: 可用字
+PASS 1280x720-320dpi starter action fits and retains 48dp: 初始字
+PASS 1280x720-320dpi starter action fits and retains 48dp: −
+PASS 1280x720-320dpi starter action fits and retains 48dp: ＋
+PASS 1280x720-320dpi starter action fits and retains 48dp: 适应窗口
+PASS 1280x720-320dpi starter action fits and retains 48dp: 字详情
+PASS 1280x720-320dpi starter action fits and retains 48dp: 返回标题
+PASS 1280x720-320dpi starter graph uses available width
+PASS 1280x720-320dpi starter overview glyph text remains at least 14dp
+LAYOUT 1280x720-320dpi starter viewport=(1280.0, 720.0) graph=(1220.0, 369.0) unit=2.0 world=[P: (-349.4373, -97.35616), S: (698.196, 194.1842)] min_font_dp=22.1198617670888
+PASS 1280x720-320dpi starter filter keeps nine glyphs
+PASS archive 1280x720-320dpi starter
+PASS 1280x720-320dpi mobile node opens dismissible details
+PASS 1280x720-320dpi details fit viewport
+PASS archive 1280x720-320dpi detail
+PASS archive 1280x720-320dpi zoom-pan
+PASS 1920x1080-0dpi graph builds with usable area
+PASS 1920x1080-0dpi graph fits screen
+PASS 1920x1080-0dpi every fitted node and selection ring is visible
+PASS 1920x1080-0dpi node circles do not overlap
+PASS 1920x1080-0dpi action fits and retains 48dp: 全部字
+PASS 1920x1080-0dpi action fits and retains 48dp: 可用字
+PASS 1920x1080-0dpi action fits and retains 48dp: 初始字
+PASS 1920x1080-0dpi action fits and retains 48dp: −
+PASS 1920x1080-0dpi action fits and retains 48dp: ＋
+PASS 1920x1080-0dpi action fits and retains 48dp: 适应窗口
+PASS 1920x1080-0dpi action fits and retains 48dp: 返回标题
+PASS 1920x1080-0dpi graph uses available width
+PASS 1920x1080-0dpi overview glyph text remains at least 14dp
+LAYOUT 1920x1080-0dpi viewport=(1280.0, 720.0) graph=(912.0, 469.0) unit=1.0 world=[P: (-376.6297, -184.3802), S: (824.9601, 368.7604)] min_font_dp=28.2389420771276
+PASS archive 1920x1080-0dpi all
+PASS 1920x1080-0dpi starter graph builds with usable area
+PASS 1920x1080-0dpi starter graph fits screen
+PASS 1920x1080-0dpi starter every fitted node and selection ring is visible
+PASS 1920x1080-0dpi starter node circles do not overlap
+PASS 1920x1080-0dpi starter action fits and retains 48dp: 全部字
+PASS 1920x1080-0dpi starter action fits and retains 48dp: 可用字
+PASS 1920x1080-0dpi starter action fits and retains 48dp: 初始字
+PASS 1920x1080-0dpi starter action fits and retains 48dp: −
+PASS 1920x1080-0dpi starter action fits and retains 48dp: ＋
+PASS 1920x1080-0dpi starter action fits and retains 48dp: 适应窗口
+PASS 1920x1080-0dpi starter action fits and retains 48dp: 返回标题
+PASS 1920x1080-0dpi starter graph uses available width
+PASS 1920x1080-0dpi starter overview glyph text remains at least 14dp
+LAYOUT 1920x1080-0dpi starter viewport=(1280.0, 720.0) graph=(912.0, 469.0) unit=1.0 world=[P: (-217.6301, -97.35616), S: (435.4377, 194.1842)] min_font_dp=46.8
+PASS 1920x1080-0dpi starter filter keeps nine glyphs
+PASS archive 1920x1080-0dpi starter
+PASS archive 1920x1080-0dpi detail
+PASS archive 1920x1080-0dpi zoom-pan
+PASS 2400x1080-440dpi graph builds with usable area
+PASS 2400x1080-440dpi graph fits screen
+PASS 2400x1080-440dpi every fitted node and selection ring is visible
+PASS 2400x1080-440dpi node circles do not overlap
+PASS 2400x1080-440dpi action fits and retains 48dp: 全部字
+PASS 2400x1080-440dpi action fits and retains 48dp: 可用字
+PASS 2400x1080-440dpi action fits and retains 48dp: 初始字
+PASS 2400x1080-440dpi action fits and retains 48dp: −
+PASS 2400x1080-440dpi action fits and retains 48dp: ＋
+PASS 2400x1080-440dpi action fits and retains 48dp: 适应窗口
+PASS 2400x1080-440dpi action fits and retains 48dp: 字详情
+PASS 2400x1080-440dpi action fits and retains 48dp: 返回标题
+PASS 2400x1080-440dpi graph uses available width
+PASS 2400x1080-440dpi overview glyph text remains at least 14dp
+LAYOUT 2400x1080-440dpi viewport=(1600.0, 720.0) graph=(1544.0, 394.0) unit=1.83333333333333 world=[P: (-496.7683, -138.9608), S: (1063.308, 277.9216)] min_font_dp=18.6082577996463
+PASS archive 2400x1080-440dpi all
+PASS 2400x1080-440dpi starter graph builds with usable area
+PASS 2400x1080-440dpi starter graph fits screen
+PASS 2400x1080-440dpi starter every fitted node and selection ring is visible
+PASS 2400x1080-440dpi starter node circles do not overlap
+PASS 2400x1080-440dpi starter action fits and retains 48dp: 全部字
+PASS 2400x1080-440dpi starter action fits and retains 48dp: 可用字
+PASS 2400x1080-440dpi starter action fits and retains 48dp: 初始字
+PASS 2400x1080-440dpi starter action fits and retains 48dp: −
+PASS 2400x1080-440dpi starter action fits and retains 48dp: ＋
+PASS 2400x1080-440dpi starter action fits and retains 48dp: 适应窗口
+PASS 2400x1080-440dpi starter action fits and retains 48dp: 字详情
+PASS 2400x1080-440dpi starter action fits and retains 48dp: 返回标题
+PASS 2400x1080-440dpi starter graph uses available width
+PASS 2400x1080-440dpi starter overview glyph text remains at least 14dp
+LAYOUT 2400x1080-440dpi starter viewport=(1600.0, 720.0) graph=(1544.0, 394.0) unit=1.83333333333333 world=[P: (-368.1935, -97.35616), S: (735.5868, 194.1842)] min_font_dp=26.6326245440735
+PASS 2400x1080-440dpi starter filter keeps nine glyphs
+PASS archive 2400x1080-440dpi starter
+PASS 2400x1080-440dpi mobile node opens dismissible details
+PASS 2400x1080-440dpi details fit viewport
+PASS archive 2400x1080-440dpi detail
+PASS archive 2400x1080-440dpi zoom-pan
+PASS 2532x1170-460dpi graph builds with usable area
+PASS 2532x1170-460dpi graph fits screen
+PASS 2532x1170-460dpi every fitted node and selection ring is visible
+PASS 2532x1170-460dpi node circles do not overlap
+PASS 2532x1170-460dpi action fits and retains 48dp: 全部字
+PASS 2532x1170-460dpi action fits and retains 48dp: 可用字
+PASS 2532x1170-460dpi action fits and retains 48dp: 初始字
+PASS 2532x1170-460dpi action fits and retains 48dp: −
+PASS 2532x1170-460dpi action fits and retains 48dp: ＋
+PASS 2532x1170-460dpi action fits and retains 48dp: 适应窗口
+PASS 2532x1170-460dpi action fits and retains 48dp: 字详情
+PASS 2532x1170-460dpi action fits and retains 48dp: 返回标题
+PASS 2532x1170-460dpi graph uses available width
+PASS 2532x1170-460dpi overview glyph text remains at least 14dp
+LAYOUT 2532x1170-460dpi viewport=(1558.0, 720.0) graph=(1502.0, 405.0) unit=1.76923076923077 world=[P: (-496.7683, -138.9608), S: (1063.308, 277.9216)] min_font_dp=19.9183508531736
+PASS archive 2532x1170-460dpi all
+PASS 2532x1170-460dpi starter graph builds with usable area
+PASS 2532x1170-460dpi starter graph fits screen
+PASS 2532x1170-460dpi starter every fitted node and selection ring is visible
+PASS 2532x1170-460dpi starter node circles do not overlap
+PASS 2532x1170-460dpi starter action fits and retains 48dp: 全部字
+PASS 2532x1170-460dpi starter action fits and retains 48dp: 可用字
+PASS 2532x1170-460dpi starter action fits and retains 48dp: 初始字
+PASS 2532x1170-460dpi starter action fits and retains 48dp: −
+PASS 2532x1170-460dpi starter action fits and retains 48dp: ＋
+PASS 2532x1170-460dpi starter action fits and retains 48dp: 适应窗口
+PASS 2532x1170-460dpi starter action fits and retains 48dp: 字详情
+PASS 2532x1170-460dpi starter action fits and retains 48dp: 返回标题
+PASS 2532x1170-460dpi starter graph uses available width
+PASS 2532x1170-460dpi starter overview glyph text remains at least 14dp
+LAYOUT 2532x1170-460dpi starter viewport=(1558.0, 720.0) graph=(1502.0, 405.0) unit=1.76923076923077 world=[P: (-368.1935, -97.35616), S: (735.5868, 194.1842)] min_font_dp=28.5076639372324
+PASS 2532x1170-460dpi starter filter keeps nine glyphs
+PASS archive 2532x1170-460dpi starter
+PASS 2532x1170-460dpi mobile node opens dismissible details
+PASS 2532x1170-460dpi details fit viewport
+PASS archive 2532x1170-460dpi detail
+PASS archive 2532x1170-460dpi zoom-pan
+PASS 3440x1440-0dpi graph builds with usable area
+PASS 3440x1440-0dpi graph fits screen
+PASS 3440x1440-0dpi every fitted node and selection ring is visible
+PASS 3440x1440-0dpi node circles do not overlap
+PASS 3440x1440-0dpi action fits and retains 48dp: 全部字
+PASS 3440x1440-0dpi action fits and retains 48dp: 可用字
+PASS 3440x1440-0dpi action fits and retains 48dp: 初始字
+PASS 3440x1440-0dpi action fits and retains 48dp: −
+PASS 3440x1440-0dpi action fits and retains 48dp: ＋
+PASS 3440x1440-0dpi action fits and retains 48dp: 适应窗口
+PASS 3440x1440-0dpi action fits and retains 48dp: 返回标题
+PASS 3440x1440-0dpi graph uses available width
+PASS 3440x1440-0dpi overview glyph text remains at least 14dp
+LAYOUT 3440x1440-0dpi viewport=(1720.0, 720.0) graph=(1352.0, 469.0) unit=1.0 world=[P: (-431.2885, -152.5061), S: (955.1405, 305.0122)] min_font_dp=36.367424366839
+PASS archive 3440x1440-0dpi all
+PASS 3440x1440-0dpi starter graph builds with usable area
+PASS 3440x1440-0dpi starter graph fits screen
+PASS 3440x1440-0dpi starter every fitted node and selection ring is visible
+PASS 3440x1440-0dpi starter node circles do not overlap
+PASS 3440x1440-0dpi starter action fits and retains 48dp: 全部字
+PASS 3440x1440-0dpi starter action fits and retains 48dp: 可用字
+PASS 3440x1440-0dpi starter action fits and retains 48dp: 初始字
+PASS 3440x1440-0dpi starter action fits and retains 48dp: −
+PASS 3440x1440-0dpi starter action fits and retains 48dp: ＋
+PASS 3440x1440-0dpi starter action fits and retains 48dp: 适应窗口
+PASS 3440x1440-0dpi starter action fits and retains 48dp: 返回标题
+PASS 3440x1440-0dpi starter graph uses available width
+PASS 3440x1440-0dpi starter overview glyph text remains at least 14dp
+LAYOUT 3440x1440-0dpi starter viewport=(1720.0, 720.0) graph=(1352.0, 469.0) unit=1.0 world=[P: (-308.4429, -97.35616), S: (616.4735, 194.1842)] min_font_dp=46.8
+PASS 3440x1440-0dpi starter filter keeps nine glyphs
+PASS archive 3440x1440-0dpi starter
+PASS archive 3440x1440-0dpi detail
+PASS archive 3440x1440-0dpi zoom-pan
+PASS mouse press does not prematurely select
+PASS mouse release selects the correct transformed glyph once
+PASS mouse dragging on a node pans without selecting
+PASS mouse pan does not mutate graph layout
+PASS mouse release outside graph cannot leave a stuck drag
+PASS mouse hiding graph cancels pending gestures
+PASS mouse background drag pans without a node hit
+PASS wheel zoom stays anchored at pointer
+PASS mouse maximum zoom is bounded
+PASS mouse minimum zoom is bounded
+PASS mouse fit button restores full graph and displayed scale
+PASS mouse zoom buttons are reciprocal
+PASS mouse picking remains accurate after zoom and pan
+PASS mouse scope change resets camera and stale selection
+PASS mouse implemented scope retains graph data
+PASS mouse excessive pan cannot lose the entire graph
+PASS touch press does not prematurely select
+PASS touch release selects the correct transformed glyph once
+PASS touch dragging on a node pans without selecting
+PASS touch pan does not mutate graph layout
+PASS touch release outside graph cannot leave a stuck drag
+PASS touch hiding graph cancels pending gestures
+PASS touch background drag pans without a node hit
+PASS two native fingers double zoom
+PASS pinch keeps its central world point anchored
+PASS pinch handoff pans and never creates a tap
+PASS emulated mouse cannot duplicate native touch selection
+PASS canceled finger clears navigation and never selects
+PASS touch maximum zoom is bounded
+PASS touch minimum zoom is bounded
+PASS touch fit button restores full graph and displayed scale
+PASS touch zoom buttons are reciprocal
+PASS touch picking remains accurate after zoom and pan
+PASS touch scope change resets camera and stale selection
+PASS touch implemented scope retains graph data
+PASS touch excessive pan cannot lose the entire graph
+PASS live resize switches to full-width compact graph
+PASS live resize preserves explored center and relative zoom
+PASS live resize never repacks the world
+PASS desktop resize restores side details and auto fit
+PASS live resize desktop graph builds with usable area
+PASS live resize desktop graph fits screen
+PASS live resize desktop every fitted node and selection ring is visible
+PASS live resize desktop node circles do not overlap
+PASS live resize desktop action fits and retains 48dp: 全部字
+PASS live resize desktop action fits and retains 48dp: 可用字
+PASS live resize desktop action fits and retains 48dp: 初始字
+PASS live resize desktop action fits and retains 48dp: −
+PASS live resize desktop action fits and retains 48dp: ＋
+PASS live resize desktop action fits and retains 48dp: 适应窗口
+PASS live resize desktop action fits and retains 48dp: 返回标题
+PASS live resize desktop graph uses available width
+PASS live resize desktop overview glyph text remains at least 14dp
+LAYOUT live resize desktop viewport=(1280.0, 720.0) graph=(912.0, 469.0) unit=1.0 world=[P: (-376.6297, -184.3802), S: (824.9601, 368.7604)] min_font_dp=28.2389420771276
+PASS empty graph fits without invalid coordinates
+PASS single isolated glyph is centered and selectable
+PASS isolated-only graph builds with usable area
+PASS isolated-only graph fits screen
+PASS isolated-only every fitted node and selection ring is visible
+PASS isolated-only node circles do not overlap
+PASS isolated-only action fits and retains 48dp: 全部字
+PASS isolated-only action fits and retains 48dp: 可用字
+PASS isolated-only action fits and retains 48dp: 初始字
+PASS isolated-only action fits and retains 48dp: −
+PASS isolated-only action fits and retains 48dp: ＋
+PASS isolated-only action fits and retains 48dp: 适应窗口
+PASS isolated-only action fits and retains 48dp: 返回标题
+PASS isolated-only graph uses available width
+PASS isolated-only overview glyph text remains at least 14dp
+LAYOUT isolated-only viewport=(1280.0, 720.0) graph=(912.0, 469.0) unit=1.0 world=[P: (-92.0, 74.0), S: (184.0, 120.0)] min_font_dp=46.8
+PASS single connected self-loop fits safely
+[glyph_graph_interaction_test] PASS=302 FAIL=0

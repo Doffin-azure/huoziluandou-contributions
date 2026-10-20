@@ -1,0 +1,80 @@
+{
+  "upstream": "7e82dec",
+  "icons": [
+    {
+      "path": "assets/relics/icons/barrier.png",
+      "before_sha256": "e82e8da113ed663ce2eee11046fd97e5a4db2feb5e525e6dc0282e97da406e32",
+      "after_sha256": "e82e8da113ed663ce2eee11046fd97e5a4db2feb5e525e6dc0282e97da406e32"
+    },
+    {
+      "path": "assets/relics/icons/blitz.png",
+      "before_sha256": "b0fe8d518c172dfc0a637a78c107472c0c7742ff21bdd50d2ac0bb16fe0ae270",
+      "after_sha256": "b0fe8d518c172dfc0a637a78c107472c0c7742ff21bdd50d2ac0bb16fe0ae270"
+    },
+    {
+      "path": "assets/relics/icons/breach.png",
+      "before_sha256": "95e10d9824c1d8950e008f80d0b784666afa58c4d0de7bd7c6d27614d9426bfa",
+      "after_sha256": "95e10d9824c1d8950e008f80d0b784666afa58c4d0de7bd7c6d27614d9426bfa"
+    },
+    {
+      "path": "assets/relics/icons/buckler.png",
+      "before_sha256": "33f9e89c88afb4bb8f0398d056b2d00433225c8da30e4f6ef0033afa38628637",
+      "after_sha256": "33f9e89c88afb4bb8f0398d056b2d00433225c8da30e4f6ef0033afa38628637"
+    },
+    {
+      "path": "assets/relics/icons/clean.png",
+      "before_sha256": "863bb79c20624033fedd5510b1726168e0dcd44302efcb979ce687d0ab06c709",
+      "after_sha256": "863bb79c20624033fedd5510b1726168e0dcd44302efcb979ce687d0ab06c709"
+    },
+    {
+      "path": "assets/relics/icons/egg.png",
+      "before_sha256": "0b7fad87acbee54a811537c5560ff89d4e65c7081b06672360ae3c6e33848c1f",
+      "after_sha256": "0b7fad87acbee54a811537c5560ff89d4e65c7081b06672360ae3c6e33848c1f"
+    },
+    {
+      "path": "assets/relics/icons/fertilizer.png",
+      "before_sha256": "d16db41ed0014ef230416982d1751edd4f2de4eaf5dc132be1ea673f3c83e22a",
+      "after_sha256": "d16db41ed0014ef230416982d1751edd4f2de4eaf5dc132be1ea673f3c83e22a"
+    },
+    {
+      "path": "assets/relics/icons/fireman.png",
+      "before_sha256": "c6b6c7e3479699b038d4d09027fdff2b3e6fcc6fcbd321531f085db12603f8c5",
+      "after_sha256": "c6b6c7e3479699b038d4d09027fdff2b3e6fcc6fcbd321531f085db12603f8c5"
+    },
+    {
+      "path": "assets/relics/icons/powerbank.png",
+      "before_sha256": "e39530a8e374aacfe00db5b1439c7ecc635ffe73aeb9bc839dd18a2a9453bb27",
+      "after_sha256": "e39530a8e374aacfe00db5b1439c7ecc635ffe73aeb9bc839dd18a2a9453bb27"
+    },
+    {
+      "path": "assets/relics/icons/press.png",
+      "before_sha256": "63f187a5abb99758e4f4425628df665476946d113cd10291c562e9a60c32cbc6",
+      "after_sha256": "63f187a5abb99758e4f4425628df665476946d113cd10291c562e9a60c32cbc6"
+    },
+    {
+      "path": "assets/relics/icons/skyfire.png",
+      "before_sha256": "bf3ff9d95e7030586aea488ac165b9115a10c9f4d5ce5c2658fdc6d74443f120",
+      "after_sha256": "bf3ff9d95e7030586aea488ac165b9115a10c9f4d5ce5c2658fdc6d74443f120"
+    },
+    {
+      "path": "assets/relics/icons/slab.png",
+      "before_sha256": "8f0cca1892d00f6ab26ec2644ae51d2a66742d39364dbd1d6a198f041e558ee6",
+      "after_sha256": "8f0cca1892d00f6ab26ec2644ae51d2a66742d39364dbd1d6a198f041e558ee6"
+    },
+    {
+      "path": "assets/relics/icons/sleep.png",
+      "before_sha256": "ff003ef98b3722e987802341c5ad9eaa40b447ba4a0d44f59c9c781f8216723c",
+      "after_sha256": "ff003ef98b3722e987802341c5ad9eaa40b447ba4a0d44f59c9c781f8216723c"
+    },
+    {
+      "path": "assets/relics/icons/strike.png",
+      "before_sha256": "78019dc63f8593b1fbd9e454a73756b891551ca14f9ab4a032d61284eb6d4cd1",
+      "after_sha256": "78019dc63f8593b1fbd9e454a73756b891551ca14f9ab4a032d61284eb6d4cd1"
+    },
+    {
+      "path": "assets/relics/icons/wheel.png",
+      "before_sha256": "a81ac72ef1e9c1ac527ec4598d63832f55abe9cf08651e0afb0ec61a4ba45476",
+      "after_sha256": "a81ac72ef1e9c1ac527ec4598d63832f55abe9cf08651e0afb0ec61a4ba45476"
+    }
+  ]
+}

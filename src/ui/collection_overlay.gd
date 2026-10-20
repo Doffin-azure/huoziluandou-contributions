@@ -12,6 +12,7 @@ var _mode := "chars"
 var _word_grid: GridContainer
 var _scroll: ScrollContainer
 var _counts: Dictionary = {}
+var _dim_tap := TouchTap.new()
 
 
 static func open_deck(owner: Control) -> void:
@@ -49,10 +50,10 @@ func _build() -> void:
 
 	var frame := MarginContainer.new()
 	frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	frame.add_theme_constant_override("margin_left", 60)
-	frame.add_theme_constant_override("margin_right", 60)
-	frame.add_theme_constant_override("margin_top", 40)
-	frame.add_theme_constant_override("margin_bottom", 40)
+	frame.add_theme_constant_override("margin_left", 16)
+	frame.add_theme_constant_override("margin_right", 16)
+	frame.add_theme_constant_override("margin_top", 16)
+	frame.add_theme_constant_override("margin_bottom", 16)
 	add_child(frame)
 
 	var panel := Ink.panel("PanelCard")
@@ -65,16 +66,22 @@ func _build() -> void:
 
 	var head := Ink.hbox(12)
 	col.add_child(head)
+	var headings := JourneyStyle.flow(12)
+	headings.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(headings)
 	var title := Ink.h2(cfg.get("title", "字库图鉴"))
-	head.add_child(title)
+	headings.add_child(title)
 	if not str(cfg.get("subtitle", "")).is_empty():
 		var st := Ink.label(str(cfg["subtitle"]), "Muted")
 		st.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		head.add_child(st)
-	head.add_child(Ink.expander())
+		st.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		st.custom_minimum_size.x = minf(400, size.x * 0.22)
+		headings.add_child(st)
+
 	var close := Ink.button("关闭")
 	close.theme_type_variation = "GhostButton"
-	close.custom_minimum_size = Vector2(90, 48 * JourneyStyle.touch_scale(self))
+	close.custom_minimum_size = Vector2(90, ceilf(48 * JourneyStyle.touch_scale(self)))
+	close.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	close.pressed.connect(_close)
 	head.add_child(close)
 
@@ -152,7 +159,7 @@ func _populate_chars() -> void:
 
 
 func _on_dim_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
+	if _dim_tap.matches(event, get_child(0)):
 		_close()
 
 
@@ -180,7 +187,7 @@ func _populate_words() -> void:
 		var meta := JourneyStyle.label(w.group, "Muted")
 		inner.add_child(meta)
 		var d := EffectText.new()
-		d.add_theme_font_size_override("normal_font_size", 17)
+		d.add_theme_font_size_override("normal_font_size", int(17 * JourneyStyle.touch_scale(self)))
 		d.set_effect_text(EffectGlossary.brief(w), 0, w)
 		inner.add_child(d)
 		_word_grid.add_child(holder)

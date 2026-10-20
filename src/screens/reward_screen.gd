@@ -1,6 +1,7 @@
 extends ScreenBase
 ## 战后奖励：三选一增字，或跳过换金币。
-## 经典模式：精英先给 1 件遗物；首领（最后一幕除外）先回血，再二选一遗物。
+## 经典模式：精英先给 1 件遗物；首领（最后一幕除外）先回血，再三选一遗物。
+## 庭院路线的首领沿用控制器提供的两件候选。
 
 ## 首领战后回复最大气血的比例
 const BOSS_HEAL_RATIO := 0.3
@@ -18,6 +19,9 @@ var _boss_heal := 0
 var _settled := false
 var _reward_owner: RefCounted
 var _reward_room := ""
+var _relic_kind := ""
+var _relic_choices: Array = []
+var _relic_pending := false
 
 
 func has_scene_background() -> bool:
@@ -29,6 +33,7 @@ func build(root: Control) -> void:
 	node = params.get("node", null)
 	_expedition = params.get("expedition", false) and GameState.expedition != null
 	var is_boss := node != null and node.type == MapNodeData.Type.BOSS
+	var saved: Dictionary = params.get("_saved_screen", {})
 	_room_run = params.get("room_run", false) and GameState.room_run != null
 	if _room_run:
 		_reward_owner = GameState.room_run
@@ -37,11 +42,22 @@ func build(root: Control) -> void:
 		# their own stable snapshot throughout the take animation and callbacks.
 		_options = _reward_owner.reward_options.duplicate()
 	else:
-		_options = _roll_options(is_boss, int(params.get("count", 3)))
-	var relic_step := _relic_step(is_boss)
-	if relic_step == "boss":
-		_boss_heal = mini(GameState.player_max_hp - GameState.player_hp, int(round(GameState.player_max_hp * BOSS_HEAL_RATIO)))
-		GameState.heal(_boss_heal)
+		_options = saved.options if saved.has("options") else _roll_options(is_boss, int(params.get("count", 3)))
+		if saved.has("relic_kind"):
+			_relic_kind = str(saved.relic_kind)
+			_relic_choices = saved.get("relic_choices", [])
+			_relic_pending = bool(saved.get("relic_pending", false))
+			_boss_heal = int(saved.get("boss_heal", 0))
+		else:
+			if not _room_run and not _expedition and node != null and not params.get("relic_done", false):
+				if node.type == MapNodeData.Type.ELITE: _relic_kind = "elite"
+				elif is_boss and GameState.act_index < 3: _relic_kind = "boss"
+			if _relic_kind == "boss":
+				_boss_heal = mini(GameState.player_max_hp - GameState.player_hp, int(round(GameState.player_max_hp * BOSS_HEAL_RATIO)))
+				GameState.heal(_boss_heal)
+			if not _relic_kind.is_empty():
+				_relic_choices = RelicRewardFlow.roll(3 if _relic_kind == "boss" else 1)
+				_relic_pending = not _relic_choices.is_empty()
 	_showcase = preload("res://src/ui/object_stage/object_stage_view.gd").new()
 	_showcase.mode = "reward"
 	_showcase.reward_count = _options.size()
@@ -76,8 +92,10 @@ func build(root: Control) -> void:
 	_layout_cards.call_deferred()
 	_inspect(0)
 	_showcase.stage.open_case()
-	if not relic_step.is_empty():
-		_offer_relics.call_deferred(relic_step)
+	if _relic_pending:
+		_hud.action_button.disabled = true
+		_hud.secondary_button.disabled = true
+		_offer_relics.call_deferred()
 	if _room_run and not _reward_owner.contents[_reward_room].get("battle_relics",[]).is_empty():
 		_set_busy(true)
 		_offer_room_relics.call_deferred()
@@ -86,8 +104,8 @@ func build(root: Control) -> void:
 func _offer_room_relics() -> void:
 	var ids: Array = _reward_owner.contents[_reward_room].get("battle_relics",[]).duplicate()
 	var overlay := ChoiceOverlay.new()
-	var options: Array = ids.map(func(id):return {"text":"遗物「%s」" % Relics.name_of(id),"hint":Relics.desc_of(id)})
-	overlay.setup({"title":"幕末 · 遗物" if node.type==MapNodeData.Type.BOSS else "精英战利品", "body":"选择一件遗物，然后择字。", "options":options})
+	var options: Array = ids.map(func(id):return {"text":"遗物「%s」" % Relics.name_of(id),"relic_id":id,"hint":Relics.desc_of(id)})
+	overlay.setup({"title":"幕末 · 遗物" if node.type==MapNodeData.Type.BOSS else "精英战利品", "body":"选择一件遗物，然后择字。", "options":options,"compact":true,"physical_relics":true})
 	overlay.chose.connect(func(index: int):
 		if GameState.room_run!=_reward_owner or _reward_owner.current_room!=_reward_room: return
 		var result: Dictionary = _reward_owner.apply({"type":"reward_relic","index":index})
@@ -99,29 +117,22 @@ func _offer_room_relics() -> void:
 	add_child(overlay)
 
 
-## 只在经典模式发遗物：精英 1 件，首领二选一；第三幕首领后直接通关，不再发。
-func _relic_step(is_boss: bool) -> String:
-	if _room_run or _expedition or node == null or params.get("relic_done", false):
-		return ""
-	if node.type == MapNodeData.Type.ELITE:
-		return "elite"
-	if is_boss and GameState.act_index < 3:
-		return "boss"
-	return ""
-
-
-func _offer_relics(step: String) -> void:
-	params["relic_done"] = true
-	if step == "elite":
-		RelicRewardFlow.offer(self, "精英战利品", "击败精英，得到一件遗物。", RelicRewardFlow.roll(1), _on_relic_taken)
-	else:
-		var body := ("首领倒下，气血回复 %d 点。" % _boss_heal) + "从两件遗物中选一件。"
-		RelicRewardFlow.offer(self, "幕末 · 遗物", body, RelicRewardFlow.roll(2), _on_relic_taken)
+func _offer_relics() -> void:
+	var title := "精英战利品" if _relic_kind == "elite" else "幕末 · 遗物"
+	var body := "击败精英，得到一件遗物。" if _relic_kind == "elite" else "首领倒下，气血回复 %d 点。从三件遗物中选一件。" % _boss_heal
+	if _relic_kind == "boss" and _relic_choices.size() < 3:
+		body = "首领倒下，气血回复 %d 点。剩余未拥有的遗物不足三件，选择一件。" % _boss_heal
+	RelicRewardFlow.offer(self, title, body, _relic_choices, _on_relic_taken)
 
 
 func _on_relic_taken(_id: String) -> void:
-	if is_inside_tree():
-		_hud.status_label.text = "气血 %d / %d    金币 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
+	_relic_pending = false
+	params["relic_done"] = true
+	if not is_inside_tree(): return
+	_hud.status_label.text = "气血 %d / %d    金币 %d" % [GameState.player_hp, GameState.player_max_hp, GameState.gold]
+	_hud.action_button.disabled = false
+	_hud.secondary_button.disabled = false
+	SaveManager.request_save()
 
 
 func _layout_cards() -> void:
@@ -141,7 +152,7 @@ func _inspect(index: int) -> void:
 
 
 func _accept_pick() -> void:
-	if _busy or _settled or _selected<0 or _selected>=_options.size(): return
+	if _busy or _relic_pending or _settled or _selected<0 or _selected>=_options.size(): return
 	_set_busy(true)
 	var choice: CharacterData = _options[_selected]
 	if Settings.reduced_motion:
@@ -225,7 +236,7 @@ func _words_for(glyph: String) -> Array:
 
 
 func _on_pick(c: CharacterData) -> void:
-	if _settled: return
+	if _relic_pending or _settled: return
 	_set_busy(true)
 	if c==null or not _options.has(c):
 		_claim_failed("无效奖励，请重新选择。")
@@ -243,7 +254,7 @@ func _on_pick(c: CharacterData) -> void:
 
 
 func _on_skip() -> void:
-	if _busy or _settled: return
+	if _busy or _relic_pending or _settled: return
 	_set_busy(true)
 	if _room_run:
 		if not _claim_room_reward({"type":"skip"}): return
@@ -283,3 +294,13 @@ func _on_victory_choice(index: int) -> void:
 		goto("res://src/screens/map_screen.gd")
 	else:
 		goto("res://src/screens/title_screen.gd")
+
+
+func save_checkpoint() -> Dictionary:
+	if _busy: return {}
+	# A binding picker has already granted the relic; keep the preceding whole transaction.
+	for child in get_children():
+		if child is CollectionOverlay: return {}
+	var snapshot := super.save_checkpoint()
+	snapshot.screen = {"options": _options, "relic_kind": _relic_kind, "relic_choices": _relic_choices, "relic_pending": _relic_pending, "boss_heal": _boss_heal}
+	return snapshot

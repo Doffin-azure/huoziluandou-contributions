@@ -31,25 +31,37 @@ const SHEFU := preload("res://src/data/shefu_rewards.gd")
 const EVENTS: Array = preload("res://src/data/event_catalog.gd").EVENTS
 
 
+func save_checkpoint() -> Dictionary:
+	if _done or _pending_removal: return {}
+	var snapshot := super.save_checkpoint()
+	snapshot.screen = {"event": _event}
+	return snapshot
+
+
+
 func build(root: Control) -> void:
 	node = params.get("node", null)
-	if params.get("room_run",false) and GameState.room_run!=null:
-		_room_session = preload("res://src/screens/room_node_session.gd").new(GameState.room_run)
-		_event = _room_session.run.current_event()
+	var saved: Dictionary = params.get("_saved_screen", {})
+	if saved.has("event"):
+		_event = saved.event
 	else:
-		var pool: Array = EventEffects.all().filter(func(event): return EventEffects.condition_met(event.get("requires", {})))
-		if pool.is_empty(): pool = EventEffects.all()
-		_event = EventEffects.node(pool[GameState.rng.randi_range(0, pool.size() - 1)])
+		if params.get("room_run",false) and GameState.room_run!=null:
+			_room_session = preload("res://src/screens/room_node_session.gd").new(GameState.room_run)
+			_event = _room_session.run.current_event()
+		else:
+			var pool: Array = EventEffects.all().filter(func(event): return EventEffects.condition_met(event.get("requires", {})))
+			if pool.is_empty(): pool = EventEffects.all()
+			_event = EventEffects.node(pool[GameState.rng.randi_range(0, pool.size() - 1)])
 
-	if _room_session == null:
-		var side := RelicRewardFlow.side_rng("event")
-		if side.randf() < RELIC_CHANCE:
-			var found := RelicRewardFlow.roll(1, side)
-			if not found.is_empty():
-				_event.options.append({"text": "拾得遗物「%s」（%s）" % [Relics.name_of(found[0]), Relics.desc_of(found[0])], "relic": found[0]})
+		if _room_session == null:
+			var side := RelicRewardFlow.side_rng("event")
+			if side.randf() < RELIC_CHANCE:
+				var found := RelicRewardFlow.roll(1, side)
+				if not found.is_empty():
+					_event.options.append({"text": "拾得遗物「%s」（%s）" % [Relics.name_of(found[0]), Relics.desc_of(found[0])], "relic": found[0]})
 
-	_event = LANTERN.fill(_event, GameState.rng)
-	_event = SHEFU.fill(_event, GameState.rng)
+		_event = LANTERN.fill(_event, GameState.rng)
+		_event = SHEFU.fill(_event, GameState.rng)
 
 	_scroll = ScrollContainer.new()
 	_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -132,7 +144,7 @@ func _layout() -> void:
 	_layout_key = key
 	_vertical = size.x / maxf(1, size.y) < 1.1
 	var compact := size.x / maxf(1, size.y) >= 1.95 or size.x < 1100
-	_ui_scale = maxf(1.0, size.y / maxf(1, get_window().size.y))
+	_ui_scale = JourneyStyle.touch_scale(self)
 	var margin := 24 * _ui_scale
 	var width := minf(size.x - margin * 2, 1080 * _ui_scale)
 	var art_width := (width if _vertical else width * 0.40) if _art.visible else 0.0

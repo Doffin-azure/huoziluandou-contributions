@@ -14,9 +14,18 @@ func _init() -> void:
 
 func add_tab(caption: String, page: Control) -> void:
 	var button := JourneyStyle.button(caption, show_tab.bind(caption))
+	button.custom_minimum_size.y = 48 * JourneyStyle.touch_scale(self)
+	button.add_theme_font_size_override("font_size", int(16 * JourneyStyle.touch_scale(self)))
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_bar.add_child(button)
 	_buttons[caption] = button
+	if caption in ["行旅", "战报"]:
+		page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		add_child(page)
+		_pages[caption] = page
+		show_tab(_pages.keys()[0])
+		return
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL

@@ -1,7 +1,7 @@
 extends Node
 ## Ink —— 全局“美术工具箱”。
 ## 所有界面都用 Ink.xxx() 组装；改一处即全局换皮。
-## 当前使用青铜绘卷令牌；字体可独立自定义。
+## 当前使用青铜绘卷令牌；字盘可独立选择内置字体样式。
 
 var theme: Theme
 var serif: Font
@@ -16,7 +16,7 @@ var _wood_shader: Shader
 
 func _ready() -> void:
 	_load_fonts()
-	_reload_board_font(Settings.board_font_path)
+	_reload_board_font(Settings.board_font_id)
 	Settings.board_font_changed.connect(_reload_board_font)
 	_load_shaders()
 	var sid := "taopunk"
@@ -35,24 +35,8 @@ func apply_style(new_style: GameStyle) -> void:
 
 
 func _load_fonts() -> void:
-	var bundled := "res://assets/fonts/NotoSerifSC-VF.ttf"
-	if ResourceLoader.exists(bundled):
-		var font_file: Font = load(bundled)
-		var weight_tag := TextServerManager.get_primary_interface().name_to_tag("wght")
-		var display := FontVariation.new()
-		display.base_font = font_file
-		display.variation_opentype = {weight_tag: 650.0}
-		serif = display
-		var reading := FontVariation.new()
-		reading.base_font = font_file
-		reading.variation_opentype = {weight_tag: 450.0}
-		sans = reading
-	else:
-		var sf := SystemFont.new()
-		sf.font_names = PackedStringArray(["Noto Serif SC", "SimSun", "Microsoft YaHei", "PingFang SC"])
-		serif = sf
-	if sans == null:
-		sans = serif
+	serif = BoardTypography.font_for_id(BoardTypography.DEFAULT_ID)
+	sans = BoardTypography.font_for_id("serif_light")
 
 
 func _load_shaders() -> void:
@@ -60,9 +44,8 @@ func _load_shaders() -> void:
 	_wood_shader = load("res://src/shaders/wood.gdshader")
 
 
-func _reload_board_font(path: String) -> void:
-	var loaded := BoardTypography.load_font(path, serif)
-	board_font = loaded if loaded != null else serif
+func _reload_board_font(font_id: String) -> void:
+	board_font = BoardTypography.font_for_id(font_id)
 	board_font_changed.emit()
 
 

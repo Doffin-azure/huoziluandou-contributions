@@ -1,0 +1,67 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+WARNING: Volumetric fog is only available when using the Forward+ renderer.
+   at: environment_set_volumetric_fog (servers/rendering/storage/environment_storage.cpp:458)
+   GDScript backtrace (most recent call first):
+       [0] _build_light (res://src/ui/object_stage/object_stage.gd:89)
+       [1] _ready (res://src/ui/object_stage/object_stage.gd:21)
+       [2] _ready (res://src/ui/object_stage/object_stage_view.gd:22)
+       [3] build (res://src/screens/shop_screen.gd:31)
+       [4] _ready (res://src/screens/screen_base.gd:35)
+       [5] goto (res://src/autoload/router.gd:44)
+       [6] _run (res://tests/shop_actions_test.gd:38)
+WARNING: Depth of field blur is only available when using the Forward+ or Mobile renderer.
+   at: camera_attributes_set_dof_blur (servers/rendering/storage/camera_attributes_storage.cpp:74)
+   GDScript backtrace (most recent call first):
+       [0] _build_light (res://src/ui/object_stage/object_stage.gd:117)
+       [1] _ready (res://src/ui/object_stage/object_stage.gd:21)
+       [2] _ready (res://src/ui/object_stage/object_stage_view.gd:22)
+       [3] build (res://src/screens/shop_screen.gd:31)
+       [4] _ready (res://src/screens/screen_base.gd:35)
+       [5] goto (res://src/autoload/router.gd:44)
+       [6] _run (res://tests/shop_actions_test.gd:38)
+PASS refresh disabled below five gold
+PASS buy relic button is visible and disabled below price
+PASS insufficient gold cannot open or purchase relic
+PASS buy button shows stocked relic, effect and 45 gold price
+PASS confirmation blocks underlying refresh and purchase
+PASS cancel changes no ownership, gold or RNG
+PASS confirmed purchase grants one relic and debits 45 once
+PASS bought stock disables relic button until refresh
+PASS purchase checkpoint accepted
+PASS purchase checkpoint resumes
+PASS purchase ownership, balance and sold stock survive resume
+PASS refresh button spends five gold and preserves services
+PASS refresh restocks unowned relic and enables purchase
+PASS bound relic purchase opens glyph picker and locks trading
+PASS binding blocks refresh charges
+PASS closing bound relic picker completes binding and unlocks shop
+PASS (1920, 1080) shop button fits with 48px touch height: 买遗物 · 45金
+PASS (1920, 1080) shop button fits with 48px touch height: 刷新货架 · 5 金币
+PASS (1920, 1080) shop button fits with 48px touch height: 离开市集
+PASS (1920, 1080) shop button fits with 48px touch height: 购入 · 15 金币
+PASS buy button does not cover balance
+PASS capture shop-1920x1080
+PASS purchase confirmation fits (1920, 1080)
+PASS capture purchase-1920x1080
+PASS (960, 432) shop button fits with 48px touch height: 买遗物 · 45金
+PASS (960, 432) shop button fits with 48px touch height: 刷新货架 · 5 金币
+PASS (960, 432) shop button fits with 48px touch height: 离开市集
+PASS (960, 432) shop button fits with 48px touch height: 购入 · 13 金币
+PASS buy button does not cover balance
+PASS capture shop-960x432
+PASS purchase confirmation fits (960, 432)
+PASS capture purchase-960x432
+PASS (640, 360) shop button fits with 48px touch height: 买遗物 · 45金
+PASS (640, 360) shop button fits with 48px touch height: 刷新货架 · 5 金币
+PASS (640, 360) shop button fits with 48px touch height: 离开市集
+PASS (640, 360) shop button fits with 48px touch height: 购入 · 15 金币
+PASS buy button does not cover balance
+PASS capture shop-640x360
+PASS purchase confirmation fits (640, 360)
+PASS capture purchase-640x360
+PASS complete relic collection disables purchase without fake stock
+[shop_actions_test] PASS=41 FAIL=0 TOTAL=41

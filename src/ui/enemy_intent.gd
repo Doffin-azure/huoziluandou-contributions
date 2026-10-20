@@ -117,6 +117,7 @@ func _details(link_pollution := false) -> String:
 	if _move.kind in [EnemyMoveData.Kind.ATTACK, EnemyMoveData.Kind.MULTI]:
 		var attacks := _move.hits if _move.kind == EnemyMoveData.Kind.MULTI else 1
 		lines.append("攻击%d次，每次%d伤害，尚未扣除你的防御。" % [attacks, maxi(0, _move.damage + _unit.status_stacks("strength"))])
+		if not _move.description.is_empty(): lines.append(_move.description)
 	else:
 		lines.append(BattleText.enemy_move(_move))
 	if _move.kind in [EnemyMoveData.Kind.BUFF, EnemyMoveData.Kind.DEBUFF]:

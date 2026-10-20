@@ -1,0 +1,206 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 68 / 词 164 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS all thirty-eight icons still map to valid upstream relic IDs
+PASS strike imports at 1024 square
+PASS strike has visible art on transparent background
+PASS strike has its own intact specimen render
+PASS strike stands directly on the counter without a display plinth
+PASS strike keeps authored components batched into at most twelve material surfaces
+PASS breach imports at 1024 square
+PASS breach has visible art on transparent background
+PASS breach has its own intact specimen render
+PASS breach stands directly on the counter without a display plinth
+PASS breach keeps authored components batched into at most twelve material surfaces
+PASS slab imports at 1024 square
+PASS slab has visible art on transparent background
+PASS slab has its own intact specimen render
+PASS slab stands directly on the counter without a display plinth
+PASS slab keeps authored components batched into at most twelve material surfaces
+PASS press imports at 1024 square
+PASS press has visible art on transparent background
+PASS press has its own intact specimen render
+PASS press stands directly on the counter without a display plinth
+PASS press keeps authored components batched into at most twelve material surfaces
+PASS sleep imports at 1024 square
+PASS sleep has visible art on transparent background
+PASS sleep has its own intact specimen render
+PASS sleep stands directly on the counter without a display plinth
+PASS sleep keeps authored components batched into at most twelve material surfaces
+PASS clean imports at 1024 square
+PASS clean has visible art on transparent background
+PASS clean has its own intact specimen render
+PASS clean stands directly on the counter without a display plinth
+PASS clean keeps authored components batched into at most twelve material surfaces
+PASS wheel imports at 1024 square
+PASS wheel has visible art on transparent background
+PASS wheel has its own intact specimen render
+PASS wheel stands directly on the counter without a display plinth
+PASS wheel keeps authored components batched into at most twelve material surfaces
+PASS powerbank imports at 1024 square
+PASS powerbank has visible art on transparent background
+PASS powerbank has its own intact specimen render
+PASS powerbank stands directly on the counter without a display plinth
+PASS powerbank keeps authored components batched into at most twelve material surfaces
+PASS fireman imports at 1024 square
+PASS fireman has visible art on transparent background
+PASS fireman has its own intact specimen render
+PASS fireman stands directly on the counter without a display plinth
+PASS fireman keeps authored components batched into at most twelve material surfaces
+PASS fertilizer imports at 1024 square
+PASS fertilizer has visible art on transparent background
+PASS fertilizer has its own intact specimen render
+PASS fertilizer stands directly on the counter without a display plinth
+PASS fertilizer keeps authored components batched into at most twelve material surfaces
+PASS skyfire imports at 1024 square
+PASS skyfire has visible art on transparent background
+PASS skyfire has its own intact specimen render
+PASS skyfire stands directly on the counter without a display plinth
+PASS skyfire keeps authored components batched into at most twelve material surfaces
+PASS blitz imports at 1024 square
+PASS blitz has visible art on transparent background
+PASS blitz has its own intact specimen render
+PASS blitz stands directly on the counter without a display plinth
+PASS blitz keeps authored components batched into at most twelve material surfaces
+PASS egg imports at 1024 square
+PASS egg has visible art on transparent background
+PASS egg has its own intact specimen render
+PASS egg stands directly on the counter without a display plinth
+PASS egg keeps authored components batched into at most twelve material surfaces
+PASS buckler imports at 1024 square
+PASS buckler has visible art on transparent background
+PASS buckler has its own intact specimen render
+PASS buckler stands directly on the counter without a display plinth
+PASS buckler keeps authored components batched into at most twelve material surfaces
+PASS barrier imports at 1024 square
+PASS barrier has visible art on transparent background
+PASS barrier has its own intact specimen render
+PASS barrier stands directly on the counter without a display plinth
+PASS barrier keeps authored components batched into at most twelve material surfaces
+PASS empty_case imports at 1024 square
+PASS empty_case has visible art on transparent background
+PASS empty_case has its own intact specimen render
+PASS empty_case stands directly on the counter without a display plinth
+PASS empty_case keeps authored components batched into at most twelve material surfaces
+PASS stay_wax imports at 1024 square
+PASS stay_wax has visible art on transparent background
+PASS stay_wax has its own intact specimen render
+PASS stay_wax stands directly on the counter without a display plinth
+PASS stay_wax keeps authored components batched into at most twelve material surfaces
+PASS amber imports at 1024 square
+PASS amber has visible art on transparent background
+PASS amber has its own intact specimen render
+PASS amber stands directly on the counter without a display plinth
+PASS amber keeps authored components batched into at most twelve material surfaces
+PASS ghost_hand imports at 1024 square
+PASS ghost_hand has visible art on transparent background
+PASS ghost_hand has its own intact specimen render
+PASS ghost_hand stands directly on the counter without a display plinth
+PASS ghost_hand keeps authored components batched into at most twelve material surfaces
+PASS cracked_bottle imports at 1024 square
+PASS cracked_bottle has visible art on transparent background
+PASS cracked_bottle has its own intact specimen render
+PASS cracked_bottle stands directly on the counter without a display plinth
+PASS cracked_bottle keeps authored components batched into at most twelve material surfaces
+PASS rotting_fruit imports at 1024 square
+PASS rotting_fruit has visible art on transparent background
+PASS rotting_fruit has its own intact specimen render
+PASS rotting_fruit stands directly on the counter without a display plinth
+PASS rotting_fruit keeps authored components batched into at most twelve material surfaces
+PASS chaos_dice imports at 1024 square
+PASS chaos_dice has visible art on transparent background
+PASS chaos_dice has its own intact specimen render
+PASS chaos_dice stands directly on the counter without a display plinth
+PASS chaos_dice keeps authored components batched into at most twelve material surfaces
+PASS black_water imports at 1024 square
+PASS black_water has visible art on transparent background
+PASS black_water has its own intact specimen render
+PASS black_water stands directly on the counter without a display plinth
+PASS black_water keeps authored components batched into at most twelve material surfaces
+PASS life_lantern imports at 1024 square
+PASS life_lantern has visible art on transparent background
+PASS life_lantern has its own intact specimen render
+PASS life_lantern stands directly on the counter without a display plinth
+PASS life_lantern keeps authored components batched into at most twelve material surfaces
+PASS life_debt imports at 1024 square
+PASS life_debt has visible art on transparent background
+PASS life_debt has its own intact specimen render
+PASS life_debt stands directly on the counter without a display plinth
+PASS life_debt keeps authored components batched into at most twelve material surfaces
+PASS chain imports at 1024 square
+PASS chain has visible art on transparent background
+PASS chain has its own intact specimen render
+PASS chain stands directly on the counter without a display plinth
+PASS chain keeps authored components batched into at most twelve material surfaces
+PASS question imports at 1024 square
+PASS question has visible art on transparent background
+PASS question has its own intact specimen render
+PASS question stands directly on the counter without a display plinth
+PASS question keeps authored components batched into at most twelve material surfaces
+PASS goldleaf imports at 1024 square
+PASS goldleaf has visible art on transparent background
+PASS goldleaf has its own intact specimen render
+PASS goldleaf stands directly on the counter without a display plinth
+PASS goldleaf keeps authored components batched into at most twelve material surfaces
+PASS moon imports at 1024 square
+PASS moon has visible art on transparent background
+PASS moon has its own intact specimen render
+PASS moon stands directly on the counter without a display plinth
+PASS moon keeps authored components batched into at most twelve material surfaces
+PASS slot imports at 1024 square
+PASS slot has visible art on transparent background
+PASS slot has its own intact specimen render
+PASS slot stands directly on the counter without a display plinth
+PASS slot keeps authored components batched into at most twelve material surfaces
+PASS death imports at 1024 square
+PASS death has visible art on transparent background
+PASS death has its own intact specimen render
+PASS death stands directly on the counter without a display plinth
+PASS death keeps authored components batched into at most twelve material surfaces
+PASS ruin imports at 1024 square
+PASS ruin has visible art on transparent background
+PASS ruin has its own intact specimen render
+PASS ruin stands directly on the counter without a display plinth
+PASS ruin keeps authored components batched into at most twelve material surfaces
+PASS rubbing imports at 1024 square
+PASS rubbing has visible art on transparent background
+PASS rubbing has its own intact specimen render
+PASS rubbing stands directly on the counter without a display plinth
+PASS rubbing keeps authored components batched into at most twelve material surfaces
+PASS midas imports at 1024 square
+PASS midas has visible art on transparent background
+PASS midas has its own intact specimen render
+PASS midas stands directly on the counter without a display plinth
+PASS midas keeps authored components batched into at most twelve material surfaces
+PASS monkey imports at 1024 square
+PASS monkey has visible art on transparent background
+PASS monkey has its own intact specimen render
+PASS monkey stands directly on the counter without a display plinth
+PASS monkey keeps authored components batched into at most twelve material surfaces
+PASS palindrome imports at 1024 square
+PASS palindrome has visible art on transparent background
+PASS palindrome has its own intact specimen render
+PASS palindrome stands directly on the counter without a display plinth
+PASS palindrome keeps authored components batched into at most twelve material surfaces
+PASS binding imports at 1024 square
+PASS binding has visible art on transparent background
+PASS binding has its own intact specimen render
+PASS binding stands directly on the counter without a display plinth
+PASS binding keeps authored components batched into at most twelve material surfaces
+PASS proof imports at 1024 square
+PASS proof has visible art on transparent background
+PASS proof has its own intact specimen render
+PASS proof stands directly on the counter without a display plinth
+PASS proof keeps authored components batched into at most twelve material surfaces
+PASS unknown relic cannot display an unrelated icon
+PASS purchase confirmation depicts the exact stocked relic
+PASS previewing art leaves purchase and gold unchanged
+PASS (1280, 720) reward art matches all three candidates
+PASS (1280, 720) reward icons keep every choice visible
+PASS (640, 360) reward art matches all three candidates
+PASS (640, 360) reward icons keep every choice visible
+PASS battle guide displays the full owned collection
+PASS expedition loadout displays the full owned collection
+[relic_art_test] PASS=200 FAIL=0 TOTAL=200

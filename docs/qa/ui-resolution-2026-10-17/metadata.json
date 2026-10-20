@@ -1,0 +1,15 @@
+{
+  "baseline_head": "0d5a0ea03519a478fcaf8759c3ded6b1853ffe5e",
+  "engine": "Godot 4.7.2",
+  "renderer": "Vulkan Forward+",
+  "host": "Windows / RTX 4060 Laptop GPU",
+  "orientation": "landscape only",
+  "physical_devices_tested": false,
+  "profiles": 18,
+  "cases_per_profile": 51,
+  "before_images": 918,
+  "after_images": 918,
+  "tests_passed": 938,
+  "unchanged_baseline_test_failures": 6,
+  "baseline_patch": "baseline.patch"
+}

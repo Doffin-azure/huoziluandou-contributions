@@ -49,9 +49,19 @@ func _ready() -> void:
 		_column.add_child(tools)
 	else:
 		tools.free()
+	if host != null and host.has_method("_open_battle_guide"):
+		_column.add_child(_button("战斗与遗物说明", _open_tool.bind("_open_battle_guide")))
+	if host != null and host.has_method("can_skip_first_run_tutorial") and host.can_skip_first_run_tutorial():
+		_column.add_child(_button("跳过新手引导", _skip_first_run_tutorial.bind(host)))
 	_column.add_child(_button("设置", _open_settings))
-	_column.add_child(_button("放弃本局（返回主界面）", func(): Router.goto("res://src/screens/title_screen.gd")))
-	var quit := _button("退出游戏", func(): get_tree().quit())
+	_column.add_child(_button("保存并返回主界面", func():
+		SaveManager.checkpoint()
+		SaveManager.flush()
+		Router.goto("res://src/screens/title_screen.gd")))
+	var quit := _button("退出游戏", func():
+		SaveManager.checkpoint()
+		SaveManager.flush()
+		get_tree().quit())
 	quit.theme_type_variation = "DangerButton"
 	_column.add_child(quit)
 	resized.connect(_layout)
@@ -70,13 +80,13 @@ func _button(text: String, action: Callable, primary := false) -> Button:
 func _layout() -> void:
 	if _panel == null or size.x < 1:
 		return
-	var factor := clampf(size.y / maxf(1, DisplayServer.window_get_size().y), 1.0, 1.85)
+	var factor := JourneyStyle.touch_scale(self)
 	if not is_equal_approx(factor, _ui_scale):
 		_ui_scale = factor
 		for button in _buttons:
 			button.custom_minimum_size.y = 48 * factor
-			button.add_theme_font_size_override("font_size", int(minf(34, 20 * factor)))
-		_heading.add_theme_font_size_override("font_size", int(minf(44, 28 * factor)))
+			button.add_theme_font_size_override("font_size", int(20 * factor))
+		_heading.add_theme_font_size_override("font_size", int(28 * factor))
 		_column.add_theme_constant_override("separation", int(6 * factor))
 		for edge in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
 			_padding.add_theme_constant_override(edge, int(16 * factor))
@@ -91,6 +101,12 @@ func _open_tool(method: String) -> void:
 	_close()
 	if host != null and host.has_method(method):
 		host.call(method)
+
+
+func _skip_first_run_tutorial(host: Control) -> void:
+	if is_instance_valid(host) and host.has_method("skip_first_run_tutorial"):
+		host.call("skip_first_run_tutorial")
+	_close()
 
 
 func _open_settings() -> void:

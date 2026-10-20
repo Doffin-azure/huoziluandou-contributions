@@ -1,0 +1,87 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS refresh disabled below five gold
+PASS stock contains three distinct random relics
+PASS stock prices follow relic rarity and exclude owned relics
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS stock roll does not advance gameplay RNG
+PASS seed sweep covers distinct stock and all three price tiers
+PASS insufficient gold cannot purchase
+PASS clicked specimen opens its own description and exact price
+PASS confirmation blocks underlying refresh and purchase
+PASS cancel changes no ownership, gold or RNG
+PASS confirmed specimen purchase debits its own price exactly once
+PASS bought specimen leaves a gap and other stock remains
+PASS purchased display slot is not replaced
+PASS purchase checkpoint accepted
+PASS purchase checkpoint resumes
+PASS ownership, prices and empty slot survive resume
+PASS first refresh spends five and preserves services
+PASS refresh restores three stock items without owned relics
+PASS compact dial updates next fee to ten
+PASS refresh count checkpoint accepted
+PASS refresh count checkpoint resumes
+PASS resume preserves next refresh fee
+PASS second refresh costs ten and advances fee to fifteen
+PASS owned collection produces no stock
+PASS one remaining relic produces one sale item
+PASS rare bound relic costs seventy and opens glyph picker
+PASS binding blocks refresh charges
+PASS closing picker completes binding and unlocks shop
+PASS one small refresh dial replaces the giant generic buttons
+PASS individual relic retains 48px target: clean
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: strike
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: slab
+PASS displayed specimen matches offered identity
+PASS refresh dial is compact with accessible hit target
+PASS actual mouse click selects displayed relic
+PASS mouse activates compact refresh exactly once (gold=195, next=10)
+PASS touch selects physical relic
+PASS keyboard activates focused relic
+PASS one small refresh dial replaces the giant generic buttons
+PASS individual relic retains 48px target: clean
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: strike
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: slab
+PASS displayed specimen matches offered identity
+PASS refresh dial is compact with accessible hit target
+PASS actual mouse click selects displayed relic
+PASS mouse activates compact refresh exactly once (gold=195, next=10)
+PASS touch selects physical relic
+PASS keyboard activates focused relic
+PASS one small refresh dial replaces the giant generic buttons
+PASS individual relic retains 48px target: clean
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: strike
+PASS displayed specimen matches offered identity
+PASS individual relic retains 48px target: slab
+PASS displayed specimen matches offered identity
+PASS refresh dial is compact with accessible hit target
+PASS actual mouse click selects displayed relic
+PASS mouse activates compact refresh exactly once (gold=195, next=10)
+PASS touch selects physical relic
+PASS keyboard activates focused relic
+[shop_actions_test] PASS=82 FAIL=0 TOTAL=82

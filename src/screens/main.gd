@@ -7,6 +7,9 @@ extends Control
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	# Test harnesses may instantiate Main; only normal startup uses the real save slot.
+	if get_parent() == get_tree().root:
+		SaveManager.activate()
 	var study := StudyStage.new()
 	add_child(study)
 	Router.study_stage = study
@@ -96,8 +99,4 @@ func _load_deck_file(path: String) -> Array:
 
 
 func _exit_tree() -> void:
-	Router.study_stage = null
-	if Router.host == self:
-		Router.host = null
-		Router.current = null
-		Router.current_path = ""
+	Router.release_host(self)

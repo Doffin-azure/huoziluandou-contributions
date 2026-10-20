@@ -85,8 +85,15 @@ func run_checks() -> void:
 	await snap("treasure.png")
 	if receipt!=null: receipt._on_choose(0)
 	await frames(3)
-	var binding := picker_of(Router.current)
-	if binding!=null: binding._close()
+	# Expanded relics may require two picks, a wish, then another glyph pick.
+	for _step in 8:
+		if run.phase != "treasure": break
+		var binding := picker_of(Router.current)
+		if binding != null: binding._close()
+		else:
+			var followup := choice_of(Router.current)
+			if followup != null: followup._on_choose(0)
+		await frames(3)
 	await frames(6)
 	check(run.resolved.has(id) and run.phase=="map","treasure settles once")
 	check_cached()

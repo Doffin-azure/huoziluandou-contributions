@@ -16,6 +16,22 @@ var _utilities: HBoxContainer
 var _main_buttons: Array[Button] = []
 
 
+func set_route_active(active: bool) -> void:
+	visible = active
+	process_mode = Node.PROCESS_MODE_INHERIT if active else Node.PROCESS_MODE_DISABLED
+	if not active:
+		_starting = false
+		if is_instance_valid(_entry_timer): _entry_timer.stop()
+		if _menu_tween != null: _menu_tween.kill()
+	else:
+		if is_instance_valid(_menu): _menu.modulate.a = 1.0
+		if is_instance_valid(_veil): _veil.color.a = 0.0
+		_lock_buttons()
+	if is_instance_valid(_courtyard):
+		_courtyard.set_active(active)
+		if active: _courtyard.reset_camera()
+
+
 func has_scene_background() -> bool:
 	return true
 

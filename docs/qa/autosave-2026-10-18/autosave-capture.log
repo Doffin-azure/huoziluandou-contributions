@@ -1,0 +1,97 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS fresh slot has no Continue
+WARNING: TAA is only available when using the Forward+ renderer.
+   at: viewport_set_use_taa (servers/rendering/renderer_viewport.cpp:1450)
+   GDScript backtrace (most recent call first):
+       [0] _ready (res://src/study/study_stage.gd:44)
+       [1] _ready (res://src/screens/main.gd:14)
+       [2] _run (res://tests/autosave_test.gd:46)
+PASS Continue hidden for a fresh install
+PASS mainline map automatically saved
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS HP, gold and mainline route restored
+PASS visible touch target 开始新冒险 (1280, 720)
+PASS visible touch target 继续冒险 (1280, 720)
+PASS visible touch target 墨途远征 (1280, 720)
+PASS visible touch target 自定义构筑 (1280, 720)
+PASS visible touch target 字库图鉴 (1280, 720)
+PASS visible touch target 字网图谱 (1280, 720)
+PASS visible touch target 设置 (1280, 720)
+PASS visible touch target 离开 (1280, 720)
+PASS screenshot title-desktop
+PASS visible touch target 开始新冒险 (960, 432)
+PASS visible touch target 继续冒险 (960, 432)
+PASS visible touch target 墨途远征 (960, 432)
+PASS visible touch target 自定义构筑 (960, 432)
+PASS visible touch target 字库图鉴 (960, 432)
+PASS visible touch target 字网图谱 (960, 432)
+PASS visible touch target 设置 (960, 432)
+PASS visible touch target 离开 (960, 432)
+PASS screenshot title-phone-landscape
+PASS Continue returns after screenshots
+PASS investment due battle preserved
+PASS permanent glyph upgrades survive
+PASS UIDs and relic bindings survive
+PASS 64-bit RNG state unchanged by resume
+WARNING: Volumetric fog is only available when using the Forward+ renderer.
+   at: environment_set_volumetric_fog (servers/rendering/storage/environment_storage.cpp:458)
+   GDScript backtrace (most recent call first):
+       [0] _build_light (res://src/ui/object_stage/object_stage.gd:89)
+       [1] _ready (res://src/ui/object_stage/object_stage.gd:21)
+       [2] _ready (res://src/ui/object_stage/object_stage_view.gd:22)
+       [3] build (res://src/screens/shop_screen.gd:28)
+       [4] _ready (res://src/screens/screen_base.gd:41)
+       [5] goto (res://src/autoload/router.gd:42)
+       [6] _run (res://tests/autosave_test.gd:78)
+       [7] _frames (res://tests/autosave_test.gd:18)
+WARNING: Depth of field blur is only available when using the Forward+ or Mobile renderer.
+   at: camera_attributes_set_dof_blur (servers/rendering/storage/camera_attributes_storage.cpp:74)
+   GDScript backtrace (most recent call first):
+       [0] _build_light (res://src/ui/object_stage/object_stage.gd:117)
+       [1] _ready (res://src/ui/object_stage/object_stage.gd:21)
+       [2] _ready (res://src/ui/object_stage/object_stage_view.gd:22)
+       [3] build (res://src/screens/shop_screen.gd:28)
+       [4] _ready (res://src/screens/screen_base.gd:41)
+       [5] goto (res://src/autoload/router.gd:42)
+       [6] _run (res://tests/autosave_test.gd:78)
+       [7] _frames (res://tests/autosave_test.gd:18)
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS shop offers and prices do not reroll
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS purchased offer remains sold, cost applied once
+PASS unfinished shop picker is not checkpointed
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS unfinished purchase rolls back cost and offer together
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS event and RNG restored without reroll
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS reward choices restored exactly
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS resume does not start an additional battle
+PASS complete stable battle restored: board, piles, statuses, turn and RNG
+PASS shared battle character references and coordinates preserved
+PASS next turn deterministic after restore
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS expedition map, integer keys, fog and random streams preserved
+PASS pending expedition panel preserved
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS expedition encounter and battle restored together
+PASS truncated newest save falls back to previous generation
+PASS unknown model type rejected
+PASS finished run clears both save generations
+PASS mainline victory retires save
+PASS expedition finish retires save
+[autosave_test] PASS=63 FAIL=0

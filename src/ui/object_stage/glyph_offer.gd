@@ -7,6 +7,7 @@ var character: CharacterData
 var caption := ""
 var selected := false
 var _caption: Label
+var _tap := TouchTap.new()
 
 
 func _ready() -> void:
@@ -33,7 +34,7 @@ func set_selected(value: bool) -> void:
 
 
 func _on_gui_input(event: InputEvent) -> void:
-	if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or event.is_action_pressed("ui_accept"):
+	if _tap.matches(event, self):
 		clicked.emit()
 		accept_event()
 

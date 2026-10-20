@@ -1412,13 +1412,8 @@ func begin_player_turn(draw: bool = true, open_monster_tasks: bool = true) -> vo
 			_log("精心：本回合补 %d 枚，改为从字袋定向选字（随机落地）" % amount)
 		else:
 			draw_to_board(amount)
-		# 重力（持续能力）：回合开局抽完牌后也全盘下落
-		if has_ability("gravity_always"):
-			apply_gravity()
-			_log("重力：回合开局下落")
-		# 遗物：无垢拓纸检查后补字，再按获得顺序发动重力类遗物
-		Relics.after_turn_draw(self)
-		Relics.apply_gravity_relics(self)
+		if manual_draw_pending <= 0:
+			_after_turn_draw()
 	abilities.erase("split_mind")
 	abilities.erase("profit_share")
 	abilities.erase("inject_bounty")
@@ -1436,6 +1431,15 @@ func begin_player_turn(draw: bool = true, open_monster_tasks: bool = true) -> vo
 		_decay_turn_statuses(enemy, ["vulnerable"])
 	_log("—— 第 %d 回合 ——" % turn)
 	EventBus.turn_ended.emit(turn)
+
+## 基础补字真正落盘后统一结算；精心等待玩家选字时不能提前判污染或移动字盘。
+func _after_turn_draw() -> void:
+	if has_ability("gravity_always"):
+		apply_gravity()
+		_log("重力：回合开局下落")
+	Relics.after_turn_draw(self)
+	Relics.apply_gravity_relics(self)
+
 
 func _tick_player_statuses() -> void:
 	var poison := player.status_stacks("poison")
@@ -1504,6 +1508,7 @@ func end_player_turn() -> void:
 		_enemy_act(e)
 		if not player.is_alive():
 			break
+	EnemyMechanics.replicate_glyphs(self)
 	EnemyMechanics.release_dead(self)
 	if blitz:
 		blitz_turn = 0
@@ -1645,10 +1650,10 @@ func current_intent(e: Combatant) -> EnemyMoveData:
 	return EnemyMechanics.preview(self, e)
 
 func _log(text: String) -> void:
-	log.append(text)
-	if log.size() > 120:
-		log.pop_front()
-	EventBus.log_message.emit(text)
+	var clean := RecentLog.line(text)
+	if clean.is_empty(): return
+	RecentLog.append(log, clean)
+	EventBus.log_message.emit(clean)
 
 
 ## 战斗结束，把盘面/弃字堆中的己方与自我污染字归还永久字袋；敌方字清除。
@@ -1770,6 +1775,7 @@ func place_manual_draw(glyphs: Array) -> int:
 		placed += 1
 	var total := record_draw(placed, quota)
 	_log("精心：定向放入 %d 枚字，随机补 %d 枚（随机落地）" % [chosen, total - chosen])
+	_after_turn_draw()
 	return total
 
 func _draw_one() -> bool:

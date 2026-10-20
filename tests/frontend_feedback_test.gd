@@ -7,6 +7,7 @@ var saved_motion := false
 var saved_style := ""
 
 func _ready() -> void:
+	Settings.storage_path = "user://frontend_feedback_test-settings.cfg"
 	saved_motion = Settings.reduced_motion
 	saved_style = Palette.STYLE_ID
 	Settings.reduced_motion = true

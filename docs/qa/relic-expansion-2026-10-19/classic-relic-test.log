@@ -1,0 +1,66 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 68 / 词 164 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS normal reward offers three glyphs
+PASS one pick settles once and leaves without a second round
+PASS double skip grants exactly 16 gold once
+PASS elite drops one relic
+PASS pending relic prevents skipping or claiming glyphs underneath
+PASS elite relic grants once then unlocks glyph reward
+PASS boss heals 30 percent of maximum HP
+PASS boss offers three distinct unowned relics
+PASS stable reward/shop checkpoint accepted
+PASS checkpoint resumes through real save codec
+PASS resume preserves HP, relic candidates and RNG without another heal
+PASS resume preserves glyph candidates
+PASS boss choice grants exactly one selected relic
+PASS stable reward/shop checkpoint accepted
+PASS checkpoint resumes through real save codec
+PASS claimed relic and heal never repeat after resume
+PASS pre-binding offer can be saved
+PASS unfinished binding does not overwrite the whole transaction
+PASS interrupted binding resumes preceding offer
+PASS interrupted relic pickup rolls back together
+PASS closing glyph picker binds the relic once
+PASS boss healing caps at maximum; small relic pool still works
+PASS exhausted relic pool never blocks reward
+PASS final act retains victory flow without another inter-act reward
+PASS classic shop stocks three random relics at tier prices
+PASS relic purchase consumes exact gold and stock
+PASS 5 gold refresh restocks unowned relic
+PASS stable reward/shop checkpoint accepted
+PASS checkpoint resumes through real save codec
+PASS refresh result and cost survive resume exactly
+PASS (1920, 1080) three-way relic dialog fits
+PASS (1920, 1080) all three relic buttons visible together
+PASS (1920, 1080) eleven shop targets fit and retain touch sizes
+PASS (1920, 1080) shop action fits and retains 48px height
+PASS (1920, 1080) shop action fits and retains 48px height
+PASS (1920, 1080) shop action fits and retains 48px height
+PASS (1280, 720) three-way relic dialog fits
+PASS (1280, 720) all three relic buttons visible together
+PASS (1280, 720) eleven shop targets fit and retain touch sizes
+PASS (1280, 720) shop action fits and retains 48px height
+PASS (1280, 720) shop action fits and retains 48px height
+PASS (1280, 720) shop action fits and retains 48px height
+PASS (960, 432) three-way relic dialog fits
+PASS (960, 432) all three relic buttons visible together
+PASS (960, 432) eleven shop targets fit and retain touch sizes
+PASS (960, 432) shop action fits and retains 48px height
+PASS (960, 432) shop action fits and retains 48px height
+PASS (960, 432) shop action fits and retains 48px height
+PASS (844, 390) three-way relic dialog fits
+PASS (844, 390) all three relic buttons visible together
+PASS (844, 390) eleven shop targets fit and retain touch sizes
+PASS (844, 390) shop action fits and retains 48px height
+PASS (844, 390) shop action fits and retains 48px height
+PASS (844, 390) shop action fits and retains 48px height
+PASS (640, 360) three-way relic dialog fits
+PASS (640, 360) all three relic buttons visible together
+PASS (640, 360) eleven shop targets fit and retain touch sizes
+PASS (640, 360) shop action fits and retains 48px height
+PASS (640, 360) shop action fits and retains 48px height
+PASS (640, 360) shop action fits and retains 48px height
+[classic_relic_test] PASS=60 FAIL=0 TOTAL=60

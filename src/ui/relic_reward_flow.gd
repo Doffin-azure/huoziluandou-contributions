@@ -27,11 +27,11 @@ static func offer(host: Node, title: String, body: String, ids: Array, on_done: 
 		return
 	var options: Array = []
 	for i in ids.size():
-		options.append({"text": "遗物「%s」" % Relics.name_of(ids[i]), "hint": Relics.desc_of(ids[i]), "primary": i == 0})
+		options.append({"text": "遗物「%s」" % Relics.name_of(ids[i]), "hint": Relics.desc_of(ids[i]), "relic_id": ids[i], "primary": i == 0})
 	if allow_skip:
 		options.append({"text": "不要"})
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": title, "body": body, "options": options})
+	overlay.setup({"title": title, "body": body, "options": options, "compact": true, "physical_relics": true})
 	overlay.chose.connect(func(index: int):
 		if index >= ids.size():
 			on_done.call("")
@@ -123,7 +123,7 @@ static func _wish(host: Node, on_done: Callable) -> void:
 	for w in wishes:
 		options.append({"text": "「%s」" % Relics.WISHES[w][0], "hint": Relics.WISHES[w][1]})
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title": "阴司愿帖 · 许一个愿", "body": "每个愿望都有代价，只能许一次。", "options": options})
+	overlay.setup({"title": "阴司愿帖 · 许一个愿", "body": "每个愿望都有代价，只能许一次。", "options": options, "compact": true})
 	overlay.chose.connect(func(index: int):
 		var wish: String = wishes[index]
 		if wish != "endless_glyph":

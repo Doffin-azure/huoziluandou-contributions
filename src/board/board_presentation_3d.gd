@@ -20,7 +20,6 @@ var _red: StandardMaterial3D
 var _atlas: Texture2D
 var _face_shader: Shader
 var _body_mesh: ArrayMesh
-var _shared_stage: StudyStage
 
 
 func _ready() -> void:
@@ -43,37 +42,17 @@ func _ready() -> void:
 	_world = Node3D.new()
 	viewport.add_child(_world)
 	_atlas = load("res://assets/battle/type_faces_atlas.png")
-	_face_shader = load("res://src/shaders/type_face_illustrated.gdshader" if Palette.STYLE_ID == "taopunk" else "res://src/shaders/type_face.gdshader")
+	_face_shader = preload("res://src/shaders/type_face_illustrated.gdshader")
 	var wood := StandardMaterial3D.new()
-	wood.albedo_texture = load("res://assets/study/walnut_albedo.png")
-	wood.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
-	wood.roughness = 0.58
+	wood.albedo_color = Color("3a2e1d")
+	wood.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_wood = wood
 	var frame: StandardMaterial3D = wood.duplicate()
-	frame.albedo_color = Color("978570")
+	frame.albedo_color = Palette.GOLD_DK
 	_frame = frame
 	var floor_material: StandardMaterial3D = wood.duplicate()
-	floor_material.albedo_color = Color("685242")
+	floor_material.albedo_color = Color("111b1a")
 	_floor = floor_material
-	if Palette.STYLE_ID == "taopunk":
-		wood.albedo_texture = null
-		wood.albedo_color = Color("3a2e1d")
-		wood.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		frame.albedo_texture = null
-		frame.albedo_color = Palette.GOLD_DK
-		frame.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		floor_material.albedo_texture = null
-		floor_material.albedo_color = Color("111b1a")
-		floor_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	if is_instance_valid(Router.study_stage) and Router.study_stage.shared_table_active():
-		_shared_stage = Router.study_stage
-		_wood = _shared_stage.battle_table.wood_material(Color("b19b7e"), Vector3(0.96, 0.18, 0.96), 0.24)
-		var worn_frame := _shared_stage.battle_table.wood_material(Color("d3c1a9"), Vector3.ONE, 0.10)
-		worn_frame.set_shader_parameter("grain_texture", load("res://assets/battle/worn_walnut_albedo.png"))
-		_frame = worn_frame
-		_floor = _shared_stage.battle_table.wood_material(Color("77634c"), Vector3.ONE, 0.10)
-		display.hide()
-		viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
 	_socket = StandardMaterial3D.new()
 	_socket.albedo_color = Color("21170e")
 	_socket.roughness = 0.92
@@ -148,15 +127,6 @@ func _mesh(parent: Node3D, mesh: Mesh, position: Vector3, material: Material) ->
 
 
 func _box(parent: Node3D, position: Vector3, dimensions: Vector3, material: Material, bevel := 0.012) -> MeshInstance3D:
-	if material is ShaderMaterial and material.shader.resource_path.ends_with("table_wood.gdshader"):
-		var surface: ShaderMaterial = material.duplicate()
-		surface.set_shader_parameter("half_size", dimensions * 0.5)
-		if dimensions.x > dimensions.z:
-			surface.set_shader_parameter("rotate_grain", true)
-			surface.set_shader_parameter("grain_scale", Vector2(maxf(0.20, dimensions.z * 0.70), maxf(0.40, dimensions.x * 0.70)))
-		else:
-			surface.set_shader_parameter("grain_scale", Vector2(maxf(0.20, dimensions.x * 0.70), maxf(0.40, dimensions.z * 0.70)))
-		return _mesh(parent, TypeMeshes.beveled_box(dimensions, bevel), position, surface)
 	return _mesh(parent, TypeMeshes.beveled_box(dimensions, bevel), position, material)
 
 
@@ -165,32 +135,12 @@ func set_tiles(tiles: Array) -> void:
 	grid_size = int(round(sqrt(tiles.size())))
 	camera.size = grid_size * PITCH + 0.65
 	_tray = Node3D.new()
-	if is_instance_valid(_shared_stage):
-		_shared_stage.battle_table.add_child(_tray)
-	else:
-		_world.add_child(_tray)
+	_world.add_child(_tray)
 	var side := grid_size * PITCH + 0.46
 	_box(_tray, Vector3(0, -0.115, 0), Vector3(side, 0.19, side), _floor, 0.028)
-	for axis in (0 if Palette.STYLE_ID == "taopunk" else 2):
-		for sign_value in [-1.0, 1.0]:
-			var position := Vector3.ZERO
-			position[axis * 2] = (side - 0.25) * 0.5 * sign_value
-			position.y = 0.065
-			var dimensions := Vector3(side, 0.30, 0.25) if axis == 1 else Vector3(0.25, 0.30, side)
-			_box(_tray, position, dimensions, _frame, 0.030)
-			# 窄凸线与内侧压边分别受光，形成参考图中磨亮的层叠木框。
-			var ridge := position
-			ridge.y = 0.222
-			_box(_tray, ridge, Vector3(side - 0.08, 0.035, 0.072) if axis == 1 else Vector3(0.072, 0.035, side - 0.08), _frame, 0.009)
-			var inset := position
-			inset[axis * 2] -= sign_value * 0.117
-			inset.y = 0.164
-			_box(_tray, inset, Vector3(side - 0.26, 0.040, 0.045) if axis == 1 else Vector3(0.045, 0.040, side - 0.26), _frame, 0.008)
 	for tile in tiles:
 		actors.append(_make_actor(tile))
-	if Palette.STYLE_ID == "taopunk":
-		add_child(BronzeFrame.new())
-	_sync_shared_layout()
+	add_child(BronzeFrame.new())
 	_sync_tiles()
 
 
@@ -203,7 +153,7 @@ func _label(parent: Node3D, position: Vector3, color: Color, font_size: int, pix
 	label.modulate = color
 	label.rotation_degrees.x = -90
 	label.position = position
-	label.shaded = Palette.STYLE_ID != "taopunk"
+	label.shaded = false
 	parent.add_child(label)
 	return label
 
@@ -311,10 +261,6 @@ func has_projection() -> bool:
 
 
 func _project(point: Vector3) -> Vector2:
-	if is_instance_valid(_shared_stage):
-		var projected := _shared_stage.camera.unproject_position(_tray.global_transform * point)
-		var canvas_point := _shared_stage.get_global_transform() * (projected * _shared_stage.size / Vector2(_shared_stage.viewport.size))
-		return get_global_transform().affine_inverse() * canvas_point
 	var pixel := camera.unproject_position(point)
 	return pixel * size / Vector2(viewport.size)
 
@@ -347,30 +293,7 @@ func center_of(index: int) -> Vector2:
 
 
 func _process(_delta: float) -> void:
-	if is_instance_valid(_shared_stage):
-		_sync_shared_layout()
-	elif is_instance_valid(Router.study_stage):
-		_sun.rotation = Router.study_stage._sun.rotation
-		_sun.light_color = Router.study_stage._sun.light_color
 	_sync_tiles()
-
-
-func _sync_shared_layout() -> void:
-	if not is_instance_valid(_shared_stage) or _tray == null or size.x < 10:
-		return
-	var rect := get_global_rect()
-	var left := _shared_stage.table_point(rect.position, BattleTableScene.TABLE_Y)
-	var right := _shared_stage.table_point(rect.position + Vector2(rect.size.x, 0), BattleTableScene.TABLE_Y)
-	var world_scale := left.distance_to(right) / (grid_size * PITCH + 0.65)
-	_tray.scale = Vector3.ONE * world_scale
-	var face_height := BattleTableScene.TABLE_Y + (0.21 + FACE_Y) * world_scale
-	_tray.position = _shared_stage.table_point(rect.get_center(), face_height) - Vector3(0, FACE_Y * world_scale, 0)
-
-
-func _exit_tree() -> void:
-	# 共享场景中的字盘仍由该控件拥有；切屏时主动释放，避免留下模型。
-	if is_instance_valid(_shared_stage) and is_instance_valid(_tray):
-		_tray.queue_free()
 
 
 func _refresh_font() -> void:

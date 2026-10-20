@@ -6,6 +6,7 @@ var _screen: Control
 
 
 func _ready() -> void:
+	Settings.storage_path = "user://battle-pile-settings.cfg"
 	_run.call_deferred()
 
 
@@ -32,7 +33,7 @@ func _shot(name: String) -> void:
 	if not OS.get_cmdline_user_args().has("--capture"): return
 	await _frames()
 	RenderingServer.force_draw(false)
-	get_viewport().get_texture().get_image().save_png("res://shots/%s.png" % name)
+	get_viewport().get_texture().get_image().save_png("res://docs/qa/reward-shop-2026-10-19/%s.png" % name)
 
 
 func _browse(id: String) -> BattlePileOverlay:
@@ -61,6 +62,7 @@ func _run() -> void:
 	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7})
 	_screen = Router.current
 	await _frames(24)
+	while _screen._busy: await get_tree().process_frame
 	var hit := CharInstance.new(Database.get_character_by_glyph("击"))
 	var hit2 := CharInstance.new(hit.data)
 	var broken := CharInstance.new(Database.get_character_by_glyph("破"))
@@ -80,6 +82,8 @@ func _run() -> void:
 	await _shot("pile-battle-desktop")
 	var overlay := await _browse("bag")
 	_ok(overlay != null and overlay.total == 5 and overlay.groups.size() == 4, "抽牌堆显示实际 5 枚字，普通重复字合并，污染及融合字分开")
+	_ok(overlay._window.get_global_rect().get_center().distance_to(overlay.get_global_rect().get_center()) < 2, "牌堆窗口居中")
+	_ok(overlay._window.size.x < overlay._canvas.size.x and overlay.z_index == 100, "牌堆窗口保留战斗背景并覆盖敌人图层")
 	_ok(_screen._modal_count == 1 and not _screen._board_view._interactable and _screen._end_btn.disabled, "查看牌堆锁住战斗操作")
 	_screen._pile_label.item_for("discard").pressed.emit()
 	_ok(_screen._modal_count == 1, "重复点击不叠加牌堆弹窗")
@@ -124,6 +128,7 @@ func _run() -> void:
 			_ok(button.size.x * factor >= 47.5 and button.size.y * factor >= 47.5, str(window_size) + " " + id + " 触控区至少 48×48")
 		await _shot("pile-battle-phone-%d" % window_size.x)
 		overlay = await _browse("bag")
+		_ok(overlay.get_global_rect().encloses(overlay._window.get_global_rect()), "手机窗口完整位于画面内")
 		_ok(not overlay._scroll.get_h_scroll_bar().visible and overlay._grid.columns >= 2, "手机牌堆两列阅读，无横向滚动")
 		_ok(overlay._close_button.size.y * overlay._canvas.scale.y * factor >= 47.5, "手机返回按钮至少 48 触控像素")
 		await _shot("pile-contents-phone-%d" % window_size.x)

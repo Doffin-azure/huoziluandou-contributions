@@ -612,20 +612,21 @@ func _test_expedition() -> void:
 	_ok(not ex.forge(0,1), "同一熔炉不能反复使用")
 	GameState.expedition = null
 
-	# 商店：每家一件遗物；买、卖半价；卖掉以后还能再得到
+	# 商店：随机三件现货、按档次定价；买走只移除该件，卖掉以后还能再得到
 	_reset()
 	ex = Expedition.start(11)
 	ex.panels = [{"kind": "shop"}]
 	var offers := ex.shop_offers()
 	var shelf: Array = offers.filter(func(o): return o.kind == "relic")
-	_ok(shelf.size() == 1 and offers.filter(func(o): return o.kind == "glyph").size() == 3, "商店：原来的货不变，另有一件遗物")
+	_ok(shelf.size() == 3 and offers.filter(func(o): return o.kind == "glyph").size() == 5, "商店：原来的货不变，另有三件随机遗物")
+	_ok(shelf.all(func(o): return o.base == Relics.price(o.relic)), "每件遗物按自身档次定价")
 	var rid: String = shelf[0].relic
 	var cost := ex.price(shelf[0])
 	GameState.gold = cost - 1
 	_ok(not ex.buy(offers.find(shelf[0])), "商店：钱不够买不了遗物")
 	GameState.gold = cost + 10
 	_ok(ex.buy(offers.find(shelf[0])) and GameState.has_relic(rid) and GameState.gold == 10, "商店：买下「%s」❖ %d" % [Relics.name_of(rid), cost])
-	_ok(not ex.shop_offers().any(func(o): return o.kind == "relic"), "商店：买走后货架空了")
+	_ok(not ex.shop_offers().any(func(o): return o.kind == "relic" and o.relic == rid) and ex.shop_offers().filter(func(o): return o.kind == "relic").size() == 2, "商店：买走一件，其余两件仍在货架")
 	if ex.top_panel().get("kind", "") == "relic_bind":
 		ex.bind_relic(GameState.deck[0].id())
 	var gold := GameState.gold

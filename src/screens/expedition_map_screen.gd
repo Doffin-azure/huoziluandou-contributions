@@ -145,6 +145,7 @@ func _build_header() -> Control:
 	_relic_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_relic_label.mouse_filter = Control.MOUSE_FILTER_PASS
 	stats.add_child(_relic_label)
+	stats.add_child(_ghost("印章与遗物", _open_loadout))
 	row.add_child(stats)
 	_confront_btn = _ghost("迎战首领", func(): ex.confront())
 	_confront_btn.tooltip_text = "首领在 2 步内时可以主动迎战，不吃位置减益"
@@ -636,16 +637,18 @@ func _event_shop() -> void:
 		b.disabled = GameState.gold < cost or (o.kind == "relic" and GameState.has_relic(o.relic))
 		_add(b)
 		if o.kind == "relic":
+			RelicArt.apply_button(b, str(o.relic))
 			var cap := Ink.caption(Relics.desc_of(o.relic))
 			cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			_add(cap)
 	for id in GameState.relics.duplicate():
 		var sell := _ghost("卖掉「%s」　❖ +%d" % [Relics.name_of(id), Relics.sell_price(id)], func(): ex.sell_relic(id))
 		sell.tooltip_text = Relics.text(id)
+		RelicArt.apply_button(sell, str(id))
 		_add(sell)
 	_add(Ink.caption("丢弃过的字可按半价回购。"))
-	var refresh := _ghost("刷新货架　❖ %d" % Expedition.SHOP_REFRESH_COST, func(): ex.refresh_shop())
-	refresh.disabled = GameState.gold < Expedition.SHOP_REFRESH_COST
+	var refresh := _ghost("刷新货架　❖ %d" % ex.shop_refresh_cost(), func(): ex.refresh_shop())
+	refresh.disabled = GameState.gold < ex.shop_refresh_cost()
 	_add(refresh)
 	_add(Ink.caption("刷新换一批字和遗物，服务保留。"))
 	_add(_ghost("离开", func(): ex.leave_panel()))
@@ -914,3 +917,9 @@ func _legend_row(glyph: String, bg: Color, fg: Color, desc: String) -> Control:
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(l)
 	return row
+
+
+func _open_loadout() -> void:
+	var overlay := ChoiceOverlay.new()
+	overlay.setup({"title":"印章与遗物", "body":_seal_label.text + "\n" + _seal_label.tooltip_text + "\n\n" + "\n".join(GameState.relics.map(func(id): return Relics.text(id))), "relics":GameState.relics.duplicate(), "hud_details":true,"scroll_body":true,"dismissible":true,"options":[{"text":"返回整备","primary":true}]})
+	add_child(overlay)

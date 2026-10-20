@@ -305,7 +305,7 @@ func _apply_reward(t: String, action: Dictionary) -> Dictionary:
 
 func _start_shop() -> void:
 	shop_offers.clear()
-	for c in _pick_from_db(0, 2, 3):
+	for c in _pick_from_db(0, 2, Expedition.SHOP_CARD_COUNT):
 		shop_offers.append({"kind": "buy_char", "character": c, "price": GameState.rng.randi_range(12, 15)})
 	shop_offers.append({"kind": "remove", "character": null, "price": GameState.rng.randi_range(16, 20)})
 	shop_offers.append({"kind": "copy", "character": null, "price": GameState.rng.randi_range(18, 22)})

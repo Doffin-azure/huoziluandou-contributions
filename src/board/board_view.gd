@@ -27,6 +27,8 @@ var _cancelled_drag_cell := Vector2i(-1, -1)
 var enemy_markers: Array = []
 var _path_layer: Control
 var _presentation: BoardPresentation3D
+## Guided practice can require explicit confirmation without changing player settings.
+var require_confirmation := false
 
 
 func setup(p_board: BoardState) -> void:
@@ -54,7 +56,7 @@ func _build() -> void:
 	tray.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	tray.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(tray)
-	if Palette.STYLE_ID in ["paper", "taopunk"]:
+	if Palette.STYLE_ID == "taopunk":
 		tray.hide()
 		_presentation = BoardPresentation3D.new()
 		add_child(_presentation)
@@ -235,7 +237,7 @@ func _finish_drag() -> void:
 	var was_dragging := _dragging
 	_dragging = false
 	_cancelled_drag_cell = Vector2i(-1, -1)
-	if was_dragging and _drag_moved and not path.is_empty() and Settings.drag_release_play:
+	if was_dragging and _drag_moved and not path.is_empty() and Settings.drag_release_play and not require_confirmation:
 		commit.emit(path.duplicate())
 
 

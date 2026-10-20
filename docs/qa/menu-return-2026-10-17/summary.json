@@ -1,0 +1,102 @@
+{
+  "桌面画质 1280×720": {
+    "route_cpu_ms": {
+      "before": {
+        "median": 6746.8825,
+        "max": 7402.032,
+        "min": 4587.853
+      },
+      "after": {
+        "median": 0.5465,
+        "max": 1.242,
+        "min": 0.465
+      }
+    },
+    "first_post_draw_ms": {
+      "before": {
+        "median": 6770.0605,
+        "max": 7418.864,
+        "min": 4605.83
+      },
+      "after": {
+        "median": 16.5805,
+        "max": 19.478,
+        "min": 15.688
+      }
+    },
+    "max_frame_gap_ms": {
+      "before": {
+        "median": 6770.1825,
+        "max": 7418.955,
+        "min": 4606.442
+      },
+      "after": {
+        "median": 30.39,
+        "max": 142.338,
+        "min": 27.319
+      }
+    },
+    "p95_frame_gap_ms": {
+      "before": {
+        "median": 26.683,
+        "max": 6793.942,
+        "min": 16.888
+      },
+      "after": {
+        "median": 19.92,
+        "max": 93.196,
+        "min": 17.182
+      }
+    }
+  },
+  "手机画质 960×432（电脑运行）": {
+    "route_cpu_ms": {
+      "before-mobile-budget": {
+        "median": 4965.0495,
+        "max": 5150.006,
+        "min": 4789.355
+      },
+      "after-mobile-budget": {
+        "median": 0.6415,
+        "max": 1.22,
+        "min": 0.46
+      }
+    },
+    "first_post_draw_ms": {
+      "before-mobile-budget": {
+        "median": 4977.2654999999995,
+        "max": 5162.795,
+        "min": 4801.098
+      },
+      "after-mobile-budget": {
+        "median": 16.6865,
+        "max": 23.99,
+        "min": 16.419
+      }
+    },
+    "max_frame_gap_ms": {
+      "before-mobile-budget": {
+        "median": 4977.620999999999,
+        "max": 5163.022,
+        "min": 4801.294
+      },
+      "after-mobile-budget": {
+        "median": 21.314,
+        "max": 28.032,
+        "min": 19.687
+      }
+    },
+    "p95_frame_gap_ms": {
+      "before-mobile-budget": {
+        "median": 25.395,
+        "max": 26.112,
+        "min": 19.057
+      },
+      "after-mobile-budget": {
+        "median": 19.915,
+        "max": 26.083,
+        "min": 18.447
+      }
+    }
+  }
+}

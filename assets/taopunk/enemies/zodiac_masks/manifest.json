@@ -1,0 +1,121 @@
+{
+  "generator": "built-in image_gen",
+  "date": "2026-10-20",
+  "style_reference": "assets/taopunk/ink_guardian.png",
+  "transparent_background": true,
+  "unchanged": {
+    "blank_child": "assets/taopunk/enemies/human_repaint/blank_child.png"
+  },
+  "artworks": [
+    {
+      "id": "ink_creditor",
+      "zodiac": "鼠",
+      "path": "assets/taopunk/enemies/zodiac_masks/ink_creditor.png",
+      "original": "assets/taopunk/enemies/bronze_masks/ink_creditor.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-f0312181-716d-4d54-a2d4-7bf053cf4688.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the edit target: a full-body transparent game enemy currently wearing a FOX bronze mask. Image 2 is MATERIAL/RENDERING REFERENCE ONLY (game's Ink Spirit), NOT mask shape. Replace ONLY the current fox mask with the specified UNIQUE CHINESE ZODIAC ANIMAL ritual full-face bronze mask. This is a deliberate change of ANIMAL SPECIES and silhouette, not recoloring or adding emblems to the fox face. Absolutely remove the fox ears, fox snout, generic forehead medallion and side gear-discs unless explicitly part of the specified new design. The specified animal must be immediately recognizable from outline, ear/horn shapes, muzzle length and carved facial planes at small game size. Fit the mask to the existing head orientation, no exposed human skin/eyes/mouth/ears/beard; dark head/neck wrap continues from mask edges into existing collar. Material is worn ochre cast bronze, restrained green patina, selected dark recesses, faint red light in eye slits, decisive ink outlines and hard cel-shaded metal planes. Not photoreal, no shiny plastic, no uniform small texture. Keep the original complete body pose, full-body frame, aspect ratio, clothes, hands/fingers, hat/hair/headband silhouette, ALL props and all locations as unchanged as possible, so the existing animation rig still fits. Only the MASK is redesigned. Keep the background truly transparent RGBA, no vignette, glow, ground shadow, backdrop, text or border. ONE full-body character only. RAT (Chinese zodiac): a narrow rat mask with TWO SHORT ROUND DISK-LIKE EARS near the temples (not pointed ears), long tapered triangular rat muzzle ending in a small blackened-bronze nose, paired tiny carved incisor blocks, three long engraved whisker grooves on either cheek. A sly small asymmetric eye slit. Low narrow skull. No horns, no mane, no forehead jewel, NO FOX EARS. Merchant cap remains above mask; entire face covered.",
+      "size": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "a7c21d038f5b50b78fd8cdb3b684f7a715cd194bf457275c48984804f429f3df",
+      "original_sha256": "3a74fb48fd091216da0914ae53d6fa560de5c3883ebd6a6c92b0d918876f4359"
+    },
+    {
+      "id": "copy_master",
+      "zodiac": "牛",
+      "path": "assets/taopunk/enemies/zodiac_masks/copy_master.png",
+      "original": "assets/taopunk/enemies/bronze_masks/copy_master.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-8e7f00d2-1355-42b2-8493-e1c32b31abd9.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the edit target: a full-body transparent game enemy currently wearing a FOX bronze mask. Image 2 is MATERIAL/RENDERING REFERENCE ONLY (game's Ink Spirit), NOT mask shape. Replace ONLY the current fox mask with the specified UNIQUE CHINESE ZODIAC ANIMAL ritual full-face bronze mask. This is a deliberate change of ANIMAL SPECIES and silhouette, not recoloring or adding emblems to the fox face. Absolutely remove the fox ears, fox snout, generic forehead medallion and side gear-discs unless explicitly part of the specified new design. The specified animal must be immediately recognizable from outline, ear/horn shapes, muzzle length and carved facial planes at small game size. Fit the mask to the existing head orientation, no exposed human skin/eyes/mouth/ears/beard; dark head/neck wrap continues from mask edges into existing collar. Material is worn ochre cast bronze, restrained green patina, selected dark recesses, faint red light in eye slits, decisive ink outlines and hard cel-shaded metal planes. Not photoreal, no shiny plastic, no uniform small texture. Keep the original complete body pose, full-body frame, aspect ratio, clothes, hands/fingers, hat/hair/headband silhouette, ALL props and all locations as unchanged as possible, so the existing animation rig still fits. Only the MASK is redesigned. Keep the background truly transparent RGBA, no vignette, glow, ground shadow, backdrop, text or border. ONE full-body character only. OX (Chinese zodiac): a heavy BROAD SQUARE ox mask with TWO THICK HORNS curving outward then upward from the temples, wide flat forehead, blunt broad rectangular bovine muzzle, large sculpted nostril sockets, one heavy green-bronze nose ring. Short broad ears under the horns, calm narrow horizontal eye slits. Strong blocky jaw. NO POINTED FOX EARS, no forehead jewel or gear-discs. White swept hair remains behind horns; completely remove fox face.",
+      "size": [
+        1312,
+        1199
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "28460fd11e1cd58cc013a83afba659c2a469e1e887caba82ed93910e6c37c2c5",
+      "original_sha256": "ea17e5289b3471684ca6c2b080f608b3ac80329d2b39c781c2caa1ae291df171"
+    },
+    {
+      "id": "seal_officer",
+      "zodiac": "虎",
+      "path": "assets/taopunk/enemies/zodiac_masks/seal_officer.png",
+      "original": "assets/taopunk/enemies/bronze_masks/seal_officer.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-cb26e605-bca1-428d-b67c-44b4e7b32d61.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the edit target: a full-body transparent game enemy currently wearing a FOX bronze mask. Image 2 is MATERIAL/RENDERING REFERENCE ONLY (game's Ink Spirit), NOT mask shape. Replace ONLY the current fox mask with the specified UNIQUE CHINESE ZODIAC ANIMAL ritual full-face bronze mask. This is a deliberate change of ANIMAL SPECIES and silhouette, not recoloring or adding emblems to the fox face. Absolutely remove the fox ears, fox snout, generic forehead medallion and side gear-discs unless explicitly part of the specified new design. The specified animal must be immediately recognizable from outline, ear/horn shapes, muzzle length and carved facial planes at small game size. Fit the mask to the existing head orientation, no exposed human skin/eyes/mouth/ears/beard; dark head/neck wrap continues from mask edges into existing collar. Material is worn ochre cast bronze, restrained green patina, selected dark recesses, faint red light in eye slits, decisive ink outlines and hard cel-shaded metal planes. Not photoreal, no shiny plastic, no uniform small texture. Keep the original complete body pose, full-body frame, aspect ratio, clothes, hands/fingers, hat/hair/headband silhouette, ALL props and all locations as unchanged as possible, so the existing animation rig still fits. Only the MASK is redesigned. Keep the background truly transparent RGBA, no vignette, glow, ground shadow, backdrop, text or border. ONE full-body character only. TIGER (Chinese zodiac): a fierce BROAD TIGER mask with small rounded tiger ears, wide feline nose and blunt short muzzle, squared flared cheek plates, strong blackened-bronze tiger stripe engravings on forehead/cheeks and a clear carved central WANG-pattern brow. Two short cast fangs integrated with the CLOSED lower muzzle, no exposed mouth inside. Red narrow eye slits, wide threatening silhouette. NO LONG FOX EARS, no horns, no forehead medallion. Keep official hat.",
+      "size": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "cb4940560182ef974b04ecf4a1bffecf824ad990af35f3d90939d824bb79432b",
+      "original_sha256": "577ecc181f2910eaf0399b882a2a360c246c35760b066df8ba3bdd2afca9e448"
+    },
+    {
+      "id": "wheel_master",
+      "zodiac": "马",
+      "path": "assets/taopunk/enemies/zodiac_masks/wheel_master.png",
+      "original": "assets/taopunk/enemies/bronze_masks/wheel_master.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-5f2bbdb6-a026-4723-855b-63c70bc96520.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the edit target: a full-body transparent game enemy currently wearing a FOX bronze mask. Image 2 is MATERIAL/RENDERING REFERENCE ONLY (game's Ink Spirit), NOT mask shape. Replace ONLY the current fox mask with the specified UNIQUE CHINESE ZODIAC ANIMAL ritual full-face bronze mask. This is a deliberate change of ANIMAL SPECIES and silhouette, not recoloring or adding emblems to the fox face. Absolutely remove the fox ears, fox snout, generic forehead medallion and side gear-discs unless explicitly part of the specified new design. The specified animal must be immediately recognizable from outline, ear/horn shapes, muzzle length and carved facial planes at small game size. Fit the mask to the existing head orientation, no exposed human skin/eyes/mouth/ears/beard; dark head/neck wrap continues from mask edges into existing collar. Material is worn ochre cast bronze, restrained green patina, selected dark recesses, faint red light in eye slits, decisive ink outlines and hard cel-shaded metal planes. Not photoreal, no shiny plastic, no uniform small texture. Keep the original complete body pose, full-body frame, aspect ratio, clothes, hands/fingers, hat/hair/headband silhouette, ALL props and all locations as unchanged as possible, so the existing animation rig still fits. Only the MASK is redesigned. Keep the background truly transparent RGBA, no vignette, glow, ground shadow, backdrop, text or border. ONE full-body character only. HORSE (Chinese zodiac): distinctly EQUINE mask with a VERY LONG RECTANGULAR HORSE MUZZLE projecting downward/front, broad nostril plates at the low end, two short upright narrow horse ears (not huge fox triangles), a vertical mane-like rib down the forehead and straight long cheek plates. Long horse face is the dominant identifying geometry. No cat nose, no fox muzzle, no medallion, no horns or tusks. Fit under the existing red headband, same head pose.",
+      "size": [
+        1222,
+        1287
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "6f8671a9acbcc9733c057642bdee28797b972cdd59596bc2af520c653ce09b72",
+      "original_sha256": "9ee6418a362524113ed2361d219f74170cb730eb9a614d12d533de51f19dd00f"
+    },
+    {
+      "id": "proof_boss",
+      "zodiac": "蛇",
+      "path": "assets/taopunk/enemies/zodiac_masks/proof_boss.png",
+      "original": "assets/taopunk/enemies/bronze_masks/proof_boss.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-5110ac89-bbb2-4396-a133-9817e4b13696.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the edit target: a full-body transparent game enemy currently wearing a FOX bronze mask. Image 2 is MATERIAL/RENDERING REFERENCE ONLY (game's Ink Spirit), NOT mask shape. Replace ONLY the current fox mask with the specified UNIQUE CHINESE ZODIAC ANIMAL ritual full-face bronze mask. This is a deliberate change of ANIMAL SPECIES and silhouette, not recoloring or adding emblems to the fox face. Absolutely remove the fox ears, fox snout, generic forehead medallion and side gear-discs unless explicitly part of the specified new design. The specified animal must be immediately recognizable from outline, ear/horn shapes, muzzle length and carved facial planes at small game size. Fit the mask to the existing head orientation, no exposed human skin/eyes/mouth/ears/beard; dark head/neck wrap continues from mask edges into existing collar. Material is worn ochre cast bronze, restrained green patina, selected dark recesses, faint red light in eye slits, decisive ink outlines and hard cel-shaded metal planes. Not photoreal, no shiny plastic, no uniform small texture. Keep the original complete body pose, full-body frame, aspect ratio, clothes, hands/fingers, hat/hair/headband silhouette, ALL props and all locations as unchanged as possible, so the existing animation rig still fits. Only the MASK is redesigned. Keep the background truly transparent RGBA, no vignette, glow, ground shadow, backdrop, text or border. ONE full-body character only. SNAKE (Chinese zodiac): a smooth narrow VIPER SERPENT mask, LOW WIDE TRIANGULAR SNAKE HEAD with angular brow/supraocular plates and small side-set RED SLIT eye recesses, no animal ears at all, no horns or mane, elongated smoothly tapering snout ending in two tiny nostril holes, overlapping large bronze scale plates down the cheeks/jaw, thin closed sinuous mouth seam and a restrained coiled-serpent ridge on the forehead. Green patina in scales. NO FOX EARS, no feline muzzle, no medallion. Fits beneath official hat, all human face covered.",
+      "size": [
+        1299,
+        1211
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "d75188b2b365828bfa2f18db71141e6db2e9f47e735eaa2bec2356d093ef532b",
+      "original_sha256": "b63a779886086e5998d850b2e589a0526128c4eb18f900dff383d8c4cc98bb82"
+    },
+    {
+      "id": "compiler_boss",
+      "zodiac": "龙",
+      "path": "assets/taopunk/enemies/zodiac_masks/compiler_boss.png",
+      "original": "assets/taopunk/enemies/bronze_masks/compiler_boss.png",
+      "generated_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a153b8-9bed-7fe1-98cf-41093eafc891\\exec-178ae947-8626-4267-829f-c5ca2f98c362.png",
+      "prompt": "Use case: precise-object-edit. Image 1 is the edit target: a full-body transparent game enemy currently wearing a FOX bronze mask. Image 2 is MATERIAL/RENDERING REFERENCE ONLY (game's Ink Spirit), NOT mask shape. Replace ONLY the current fox mask with the specified UNIQUE CHINESE ZODIAC ANIMAL ritual full-face bronze mask. This is a deliberate change of ANIMAL SPECIES and silhouette, not recoloring or adding emblems to the fox face. Absolutely remove the fox ears, fox snout, generic forehead medallion and side gear-discs unless explicitly part of the specified new design. The specified animal must be immediately recognizable from outline, ear/horn shapes, muzzle length and carved facial planes at small game size. Fit the mask to the existing head orientation, no exposed human skin/eyes/mouth/ears/beard; dark head/neck wrap continues from mask edges into existing collar. Material is worn ochre cast bronze, restrained green patina, selected dark recesses, faint red light in eye slits, decisive ink outlines and hard cel-shaded metal planes. Not photoreal, no shiny plastic, no uniform small texture. Keep the original complete body pose, full-body frame, aspect ratio, clothes, hands/fingers, hat/hair/headband silhouette, ALL props and all locations as unchanged as possible, so the existing animation rig still fits. Only the MASK is redesigned. Keep the background truly transparent RGBA, no vignette, glow, ground shadow, backdrop, text or border. ONE full-body character only. DRAGON (Chinese zodiac): an imposing ancient CHINESE LONG DRAGON mask with TWO BRANCHING ANTLER-LIKE HORNS sweeping backward alongside the existing high cap, long angular dragon snout, articulated scale cheek armor, hooked eyebrows and two thin swept-back cast-bronze whisker prongs following the jaw; elongated closed chin plate. Visibly a Chinese dragon, not fox/cat/wolf. Bronze and dark green patina, small red slit eyes; no generic circular forehead jewel/side gears. Horns restrained enough to preserve framing.",
+      "size": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "4e3df44ace6e51af9eb8370dd9144141f7dd4bf5b99739cf5b27ab11f9b40ef7",
+      "original_sha256": "6030715870cff4252bdd6c27dc447805f514bb006ab9bfe44a1327533413c3c8"
+    }
+  ],
+  "style_reference_sha256": "ae32f6668a72608b730ca0215f3a35541851a3657533d25c45dae11f2a9ce915",
+  "unchanged_blank_child_sha256": "6193a52df45f4ca44ea83a2d7c74ad6731ca55ec563b9215fd58970513694057"
+}

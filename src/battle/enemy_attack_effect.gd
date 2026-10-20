@@ -25,6 +25,9 @@ func _draw() -> void:
 		else:
 			draw_line(p - forward * 8, p, Color(color, fade), 2 + i * 0.25, true)
 	match attack_style:
+		"arc":
+			var points := PackedVector2Array([center-forward*22,center-forward*8+side*7,center-forward*2-side*5,center+forward*10+side*4,center+forward*22])
+			draw_polyline(points,Color("ead79a"),2.8,true)
 		"seal":
 			var shape := PackedVector2Array([center + Vector2(-8, -9), center + Vector2(9, -7), center + Vector2(8, 9), center + Vector2(-9, 8)])
 			draw_colored_polygon(shape, INK)

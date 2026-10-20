@@ -8,11 +8,12 @@ var _capture := false
 
 
 func _ready() -> void:
+	Settings.storage_path = "user://object_stage_test-settings.cfg"
 	_saved_motion = Settings.reduced_motion
 	_saved_style = Settings.visual_style
 	_capture = OS.get_cmdline_user_args().has("--capture")
 	Settings.reduced_motion = false
-	Ink.apply_style(GameStyle.paper())
+	Ink.apply_style(GameStyle.taopunk())
 	_run.call_deferred()
 
 
@@ -75,7 +76,7 @@ func _run() -> void:
 	_ok(weak_stage.get_ref() == null, "leaving the reward releases its 3D stage")
 	var shop := await _open("shop")
 	await _shot("shop-desktop")
-	shop._inspect(4)
+	shop._inspect(shop._offers.find_custom(func(o): return o.kind == "copy"))
 	_ok(shop._hud.detail_title.text.begins_with("复制") and shop._hud.description.text.contains("复制"), "service seals explain the original shop services")
 	shop._inspect(0)
 	var gold: int = GameState.gold
@@ -86,11 +87,12 @@ func _run() -> void:
 	shop._purchase_selected()
 	_ok(shop._busy and GameState.gold == gold, "purchase waits for the pickup and rejects duplicate presses")
 	await get_tree().create_timer(0.4).timeout
-	_ok(GameState.gold == gold - price and GameState.deck_size() == before + 1 and shop._offers.size() == 6, "purchase charges the exact original price once")
+	_ok(GameState.gold == gold - price and GameState.deck_size() == before + 1 and shop._offers.size() == 10, "purchase charges the exact original price once")
 	_ok(shop._showcase.stage.rests[0] == second_rest and shop._offers[0].display_slot == 1, "remaining goods retain their counter positions")
 	Settings.reduced_motion = true
 	Settings.changed.emit()
 	_ok(not shop._showcase.stage.is_processing(), "live reduced motion stops the lantern")
+	_ok(shop._showcase.stage.objects[0].scale.is_equal_approx(Vector3.ONE * 0.78), "reduced motion preserves compact shop card scale")
 	Settings.reduced_motion = false
 	Settings.changed.emit()
 	_ok(shop._showcase.stage.is_processing(), "restoring motion resumes the lantern")

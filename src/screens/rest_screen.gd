@@ -6,6 +6,10 @@ var _done := false
 var _room_session: RefCounted
 
 
+func save_checkpoint() -> Dictionary:
+	return {} if _done else super.save_checkpoint()
+
+
 func build(root: Control) -> void:
 	node = params.get("node", null)
 	if params.get("room_run",false) and GameState.room_run!=null:
@@ -15,29 +19,36 @@ func build(root: Control) -> void:
 	var stats := JourneyStyle.label("气血 %d / %d" % [GameState.player_hp, GameState.player_max_hp], "Stat", JourneyStyle.GOLD)
 	var tools := Ink.hbox(16)
 	tools.add_child(stats)
-	tools.add_child(JourneyStyle.button("字袋", _open_deck))
+	var deck := JourneyStyle.button("字袋", _open_deck)
+	deck.custom_minimum_size.y = 48 * JourneyStyle.touch_scale(self)
+	tools.add_child(deck)
 	main.add_child(JourneyStyle.heading("休整 · 灯下", "灯火未熄。选择一项整备，然后继续前行。", tools))
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	main.add_child(scroll)
 	var center := CenterContainer.new()
+	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	main.add_child(center)
-	var row := Ink.hbox(20)
+	scroll.add_child(center)
+	var row := GridContainer.new()
+	row.columns = 3
+	row.add_theme_constant_override("h_separation", 12)
 	center.add_child(row)
 	row.add_child(_option_card("息", "调息", "回复 %d 点气血。" % _heal_amount(), _do_heal))
 	row.add_child(_option_card("删", "删字", "永久移除一枚字，精炼字袋。", _do_remove))
 	row.add_child(_option_card("镌", "修饰", "强化一枚字的单字效果。", _do_upgrade))
-	main.add_child(JourneyStyle.section("此处可歇脚", "三项整备，只选其一"))
-	if _room_session!=null:
-		main.add_child(JourneyStyle.button("不休整，继续前行",func(): _room_rest_action({"type":"leave_service"})))
-		if _room_session.run.phase=="rest_choose": _resume_room_choice.call_deferred()
+	if get_viewport_rect().size.x / JourneyStyle.touch_scale(self) >= 1100: main.add_child(JourneyStyle.section("此处可歇脚", "三项整备，只选其一"))
 
 
 func _option_card(seal: String, title: String, desc: String, cb: Callable) -> Control:
 	var panel := Ink.panel("PanelCard")
-	panel.custom_minimum_size = Vector2(280, 320)
-	var col := Ink.vbox(18)
+	panel.custom_minimum_size = Vector2((get_viewport_rect().size.x - 100) / 3, 0)
+	var compact := get_viewport_rect().size.x / JourneyStyle.touch_scale(self) < 1100
+	var col := Ink.vbox(6 if compact else 18)
 	panel.add_child(col)
 	var mark := JourneyStyle.label(seal, "Title", JourneyStyle.GOLD)
-	mark.add_theme_font_size_override("font_size", 76)
+	mark.add_theme_font_size_override("font_size", int(36 * JourneyStyle.touch_scale(self)) if compact else 76)
 	mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(mark)
 	var t := JourneyStyle.label(title, "Subheading")

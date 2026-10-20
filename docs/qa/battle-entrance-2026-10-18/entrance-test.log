@@ -1,0 +1,46 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS fresh fight starts entrance and locks board immediately
+PASS turn and pause buttons are locked during entrance
+PASS touch and turn hotkey cannot mutate combat behind transition
+PASS escape does not open pause behind transition
+RECORD_FOLDER C:/Users/Lenovo/AppData/Local/huozi-entrance-2951701
+PASS entrance finishes within 1.1 seconds and restores input
+PASS entrance leaves board, health, turn and combat RNG unchanged
+PASS inline tutorial is ready after entrance without advancing its step
+PASS stable fight can checkpoint after transition
+PASS resume skips entrance and restores saved fight
+PASS reduced motion opens battle immediately
+PASS changing reduced motion during entrance releases the input lock
+PASS leaving mid-entrance frees tween without changing the next route
+PASS normal map combat uses entrance
+PASS elite fork uses elite inscription
+PASS expedition boss enters through same animation with boss inscription
+PASS 1280x720-0dpi entrance covers entire viewport
+PASS archive 1280x720-0dpi-stamp
+PASS archive 1280x720-0dpi-settled
+PASS archive 1280x720-0dpi-reveal
+PASS 1280x720-0dpi repeated finish is harmless and controls unlock
+PASS archive 1280x720-0dpi-ready
+PASS 1280x720-320dpi entrance covers entire viewport
+PASS archive 1280x720-320dpi-stamp
+PASS archive 1280x720-320dpi-settled
+PASS archive 1280x720-320dpi-reveal
+PASS 1280x720-320dpi repeated finish is harmless and controls unlock
+PASS archive 1280x720-320dpi-ready
+PASS 2400x1080-440dpi entrance covers entire viewport
+PASS archive 2400x1080-440dpi-stamp
+PASS archive 2400x1080-440dpi-settled
+PASS archive 2400x1080-440dpi-reveal
+PASS 2400x1080-440dpi repeated finish is harmless and controls unlock
+PASS archive 2400x1080-440dpi-ready
+PASS 3440x1440-0dpi entrance covers entire viewport
+PASS archive 3440x1440-0dpi-stamp
+PASS archive 3440x1440-0dpi-settled
+PASS archive 3440x1440-0dpi-reveal
+PASS 3440x1440-0dpi repeated finish is harmless and controls unlock
+PASS archive 3440x1440-0dpi-ready
+[battle_entrance_test] PASS=39 FAIL=0

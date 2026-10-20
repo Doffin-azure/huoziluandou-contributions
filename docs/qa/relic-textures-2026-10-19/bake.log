@@ -1,0 +1,21 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+BAKED strike res://assets/relics/icons/strike.png
+BAKED breach res://assets/relics/icons/breach.png
+BAKED slab res://assets/relics/icons/slab.png
+BAKED press res://assets/relics/icons/press.png
+BAKED sleep res://assets/relics/icons/sleep.png
+BAKED clean res://assets/relics/icons/clean.png
+BAKED wheel res://assets/relics/icons/wheel.png
+BAKED powerbank res://assets/relics/icons/powerbank.png
+BAKED fireman res://assets/relics/icons/fireman.png
+BAKED fertilizer res://assets/relics/icons/fertilizer.png
+BAKED skyfire res://assets/relics/icons/skyfire.png
+BAKED blitz res://assets/relics/icons/blitz.png
+BAKED egg res://assets/relics/icons/egg.png
+BAKED buckler res://assets/relics/icons/buckler.png
+BAKED barrier res://assets/relics/icons/barrier.png
+[bake_relic_icons] exported 15 transparent textures

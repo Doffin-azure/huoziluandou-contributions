@@ -1,0 +1,36 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS 10,000 battle entries keep only newest 32 in chronological order
+PASS 10,000 expedition entries keep newest 32 in reverse order
+PASS line and total character budgets cap oversized histories
+PASS display collapses consecutive repeats without dropping distinct outcomes
+PASS log lines normalize whitespace and ignore blank input
+PASS encoding trims save copy without mutating active histories
+PASS new saves contain only bounded log data
+PASS old battle log is cropped before decoding to retain latest tail
+PASS old expedition log retains latest head
+PASS legacy restore preserves combat state, character identities and RNG
+PASS legacy restore preserves exploration state and RNG
+SAVE_LOG_BUDGET legacy_bytes=306284 bounded_bytes=35948
+PASS resaved legacy graph removes excess history payload
+PASS closed battle log creates zero text controls or pending refreshes after 10,000 events
+PASS both presentation and battle histories stay bounded
+PASS opening shows newest entries in a single text control
+PASS opening scrolls to latest entries after text wrapping has settled
+PASS high-density phone battle log fits screen
+PASS archive phone-battle-log
+PASS open log batches a message burst into same control and collapses repetition
+PASS hidden battle history does not re-layout text
+PASS reopening renders fresh history without accumulating controls
+PASS logging and opening history never affect combat rules
+LOG_STRESS 10000_closed_messages_us=77018 retained=32 controls=1
+PASS phone expedition does not build hidden log contents
+PASS hidden expedition log skips rebuilding during refresh
+PASS switching to expedition log renders newest-first into one control
+PASS archive phone-expedition-log
+PASS unchanged expedition refresh reuses text control
+PASS archive desktop-battle-log
+[recent_log_test] PASS=28 FAIL=0

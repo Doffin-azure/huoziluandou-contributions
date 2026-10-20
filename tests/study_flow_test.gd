@@ -12,11 +12,12 @@ var _saved_style := ""
 
 
 func _ready() -> void:
+	Settings.storage_path = "user://study_flow_test-settings.cfg"
 	_capture = OS.get_cmdline_user_args().has("--capture")
 	_saved_motion = Settings.reduced_motion
 	_saved_style = Settings.visual_style
 	Settings.reduced_motion = false
-	Ink.apply_style(GameStyle.paper())
+	Ink.apply_style(GameStyle.taopunk())
 	if _capture:
 		DirAccess.make_dir_recursive_absolute("res://shots/study-frames")
 		RenderingServer.frame_post_draw.connect(_capture_frame)
@@ -71,7 +72,7 @@ func _run() -> void:
 	_stage = Router.study_stage
 	var courtyard: Node3D = Router.current._courtyard.stage
 	_ok(is_instance_valid(courtyard) and courtyard.camera.current, "正式主场景创建独立 3D 庭院与相机")
-	_ok(not _stage.visible and _stage.viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED, "标题显示庭院时停用旧书房渲染")
+	_ok(not _stage.visible and _stage.find_children("*", "SubViewport", true, false).is_empty(), "标题显示庭院，不再分配旧书房视口")
 	_ok(courtyard.atmosphere.petals.multimesh.instance_count == 112, "正式标题包含落花与环境动画")
 	_ok(Router.current._courtyard.viewport.size.x <= 1920 and Router.current._courtyard.viewport.size.y <= 1080, "正式标题限制独立视口分辨率")
 	_ok(GameState.rng.state == rng_state, "场景建模和树影不使用游戏随机数")
@@ -95,9 +96,9 @@ func _run() -> void:
 	await _shot("courtyard-entry-live")
 	await _wait_for_map()
 	await _frames()
-	_ok(not is_instance_valid(courtyard), "进入地图后释放标题庭院与镜像视口")
+	_ok(is_instance_valid(courtyard) and not courtyard.can_process() and courtyard.mirror_viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED, "进入地图后保留标题庭院并停止处理和镜像渲染")
 	_ok(_started == 1 and GameState.node_index == 1, "只创建一次冒险并保留首个地图节点")
-	_ok(is_equal_approx(_stage.camera_blend, 1), "进入地图后相机精确落在桌面机位")
+	_ok(not _stage.visible, "进入地图后只显示行旅界面背景")
 	PauseMenu.open()
 	await _frames()
 	_ok(is_instance_valid(PauseMenu._instance), "地图界面也能使用统一菜单，没有战斗字段依赖")
@@ -113,7 +114,10 @@ func _run() -> void:
 	var map: Control = Router.current
 	map._on_node_pressed(0, map.act.nodes[0])
 	await _frames()
-	_ok(Router.current_path.contains("battle_screen") and _stage.get_instance_id() == stage_id, "从桌面地图进入战斗，复用同一书房")
+	for child in map.get_children():
+		if child is ChoiceOverlay: child._on_choose(0)
+	await _frames()
+	_ok(Router.current_path.contains("battle_screen") and _stage.get_instance_id() == stage_id and _stage.visible, "从地图进入战斗，复用轻量绘卷背景")
 	_ok(Router.current.battle.turn == 1, "战斗仍使用现有规则与首回合")
 	if _capture:
 		await get_tree().create_timer(0.30).timeout
@@ -121,7 +125,7 @@ func _run() -> void:
 	Router.goto("res://src/screens/title_screen.gd")
 	await _frames()
 	courtyard = Router.current._courtyard.stage
-	_ok(courtyard.inspection == 0 and not _stage.visible, "返回标题重建庭院全景并停用旧书房")
+	_ok(courtyard.inspection == 0 and not _stage.visible, "返回标题恢复庭院全景并隐藏战斗背景")
 	title = Router.current
 	title._on_start()
 	await _frames()
@@ -155,6 +159,6 @@ func _run() -> void:
 	Ink.apply_style(GameStyle.get_style(_saved_style))
 	main.queue_free()
 	await _frames()
-	_ok(not is_instance_valid(Router.study_stage), "退出主场景释放持续书房")
+	_ok(not is_instance_valid(Router.study_stage), "退出主场景释放战斗背景")
 	print("[study_flow_test] PASS=%d FAIL=%d" % [_pass, _fail])
 	get_tree().quit(1 if _fail > 0 else 0)

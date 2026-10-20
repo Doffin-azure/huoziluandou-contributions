@@ -1,0 +1,96 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 566.26 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+[Database] 字 61 / 词 162 / 敌人 9 / 幕 3 / 污染 3
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS six categories sum to 1075
+PASS negative values contribute zero and gold is capped
+PASS pressure score is bounded
+PASS real battle defeat routes to settlement
+PASS repeated battle completion emits one loss event
+PASS failure clears adventure save
+PASS snapshot preserves progress, kill, pressure, relic and gold
+PASS reduced motion immediately shows final score
+PASS all score lines and actions are mounted
+PASS classic restart resets the run
+PASS expedition archives unique completed locations across acts
+PASS expedition retains previous act progress and boss milestone
+PASS half-damaged boss earns half of the 150 pressure points
+PASS walking back and forth cannot increase settlement score
+PASS snapshot survives clearing expedition encounter
+PASS entering boss combat alone awards no pressure score
+PASS elite fork receives elite pressure weight
+PASS archived expedition locations remain save compatible
+PASS expedition restart enters a fresh expedition
+PASS real expedition defeat clears encounter and enters settlement
+PASS expedition snapshot survives finish_battle and retires save
+LAYOUT 960x432-160dpi screen=(1600.0, 720.0) page=[P: (20.0, 20.0), S: (1560.0, 680.0)] minimum=(821.0, 530.0) body=(793.0, 332.0) scroll=(453.0, 0.0)
+PASS 960x432-160dpi settlement frame fits viewport
+PASS 960x432-160dpi actions remain inside frame
+PASS 960x432-160dpi action is visible and at least 48dp
+PASS 960x432-160dpi action is visible and at least 48dp
+PASS 960x432-160dpi action is visible and at least 48dp
+PASS 960x432-160dpi score details do not overflow horizontally
+PASS 960x432-160dpi six score lines fit without vertical scrolling
+PASS 960x432-160dpi screenshot saved
+LAYOUT 1280x720-0dpi screen=(1280.0, 720.0) page=[P: (100.0, 50.0), S: (1080.0, 620.0)] minimum=(370.0, 367.0) body=(342.0, 215.0) scroll=(138.0, 0.0)
+PASS 1280x720-0dpi settlement frame fits viewport
+PASS 1280x720-0dpi actions remain inside frame
+PASS 1280x720-0dpi action is visible and at least 48dp
+PASS 1280x720-0dpi action is visible and at least 48dp
+PASS 1280x720-0dpi action is visible and at least 48dp
+PASS 1280x720-0dpi score details do not overflow horizontally
+PASS 1280x720-0dpi six score lines fit without vertical scrolling
+PASS 1280x720-0dpi screenshot saved
+LAYOUT 1280x720-320dpi screen=(1280.0, 720.0) page=[P: (24.0, 24.0), S: (1232.0, 672.0)] minimum=(977.0, 620.0) body=(949.0, 397.0) scroll=(541.0, 0.0)
+PASS 1280x720-320dpi settlement frame fits viewport
+PASS 1280x720-320dpi actions remain inside frame
+PASS 1280x720-320dpi action is visible and at least 48dp
+PASS 1280x720-320dpi action is visible and at least 48dp
+PASS 1280x720-320dpi action is visible and at least 48dp
+PASS 1280x720-320dpi score details do not overflow horizontally
+PASS 1280x720-320dpi six score lines fit without vertical scrolling
+PASS 1280x720-320dpi screenshot saved
+LAYOUT 1920x1080-0dpi screen=(1280.0, 720.0) page=[P: (100.0, 50.0), S: (1080.0, 620.0)] minimum=(370.0, 367.0) body=(342.0, 215.0) scroll=(138.0, 0.0)
+PASS 1920x1080-0dpi settlement frame fits viewport
+PASS 1920x1080-0dpi actions remain inside frame
+PASS 1920x1080-0dpi action is visible and at least 48dp
+PASS 1920x1080-0dpi action is visible and at least 48dp
+PASS 1920x1080-0dpi action is visible and at least 48dp
+PASS 1920x1080-0dpi score details do not overflow horizontally
+PASS 1920x1080-0dpi six score lines fit without vertical scrolling
+PASS 1920x1080-0dpi screenshot saved
+LAYOUT 2400x1080-440dpi screen=(1600.0, 720.0) page=[P: (22.0, 22.0), S: (1556.0, 676.0)] minimum=(899.0, 576.0) body=(871.0, 365.0) scroll=(497.0, 0.0)
+PASS 2400x1080-440dpi settlement frame fits viewport
+PASS 2400x1080-440dpi actions remain inside frame
+PASS 2400x1080-440dpi action is visible and at least 48dp
+PASS 2400x1080-440dpi action is visible and at least 48dp
+PASS 2400x1080-440dpi action is visible and at least 48dp
+PASS 2400x1080-440dpi score details do not overflow horizontally
+PASS 2400x1080-440dpi six score lines fit without vertical scrolling
+PASS 2400x1080-440dpi screenshot saved
+LAYOUT 2532x1170-460dpi screen=(1558.0, 720.0) page=[P: (21.23071, 21.23077), S: (1515.539, 677.5385)] minimum=(861.0, 562.0) body=(833.0, 355.0) scroll=(472.0, 0.0)
+PASS 2532x1170-460dpi settlement frame fits viewport
+PASS 2532x1170-460dpi actions remain inside frame
+PASS 2532x1170-460dpi action is visible and at least 48dp
+PASS 2532x1170-460dpi action is visible and at least 48dp
+PASS 2532x1170-460dpi action is visible and at least 48dp
+PASS 2532x1170-460dpi score details do not overflow horizontally
+PASS 2532x1170-460dpi six score lines fit without vertical scrolling
+PASS 2532x1170-460dpi screenshot saved
+LAYOUT 3440x1440-0dpi screen=(1720.0, 720.0) page=[P: (320.0, 50.0), S: (1080.0, 620.0)] minimum=(370.0, 367.0) body=(342.0, 215.0) scroll=(138.0, 0.0)
+PASS 3440x1440-0dpi settlement frame fits viewport
+PASS 3440x1440-0dpi actions remain inside frame
+PASS 3440x1440-0dpi action is visible and at least 48dp
+PASS 3440x1440-0dpi action is visible and at least 48dp
+PASS 3440x1440-0dpi action is visible and at least 48dp
+PASS 3440x1440-0dpi score details do not overflow horizontally
+PASS 3440x1440-0dpi six score lines fit without vertical scrolling
+PASS 3440x1440-0dpi screenshot saved
+PASS normal motion begins an animated reveal
+PASS score rises monotonically to the exact final total
+PASS skip kills animation and fixes final score
+PASS no tween continues after skip
+PASS completed animation offers readable scoring rules
+PASS return title action navigates correctly
+[run_settlement_test] PASS=83 FAIL=0

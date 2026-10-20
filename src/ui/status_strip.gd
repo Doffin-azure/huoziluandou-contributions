@@ -1,4 +1,4 @@
-extends HBoxContainer
+extends Control
 class_name StatusStrip
 ## 图形能力符号：只常驻图形和层数，名称与说明放进悬停/点击详情。
 signal details_requested(title: String, body: String, scroll_body: bool)
@@ -12,6 +12,7 @@ var _items: Dictionary = {}
 func _ready() -> void:
 	add_to_group("effect_help_avoid")
 	add_theme_constant_override("separation", 4)
+	mouse_filter = Control.MOUSE_FILTER_PASS
 	resized.connect(_rebuild)
 	_rebuild()
 
@@ -30,7 +31,7 @@ func _rebuild() -> void:
 	if not is_inside_tree():
 		return
 	var cell := 36.0 * _ui_scale
-	var capacity := maxi(1, int(size.x / (cell + 4)))
+	var capacity := maxi(1, int((size.x + 4) / (cell + 4)))
 	var signature := str(entries) + str(capacity) + str(_ui_scale) + Palette.STYLE_ID
 	if signature == _signature:
 		return
@@ -104,7 +105,10 @@ func _badge(symbol: String, cell: float, color: Color) -> Button:
 		focus.set_border_width_all(2)
 		button.add_theme_stylebox_override("focus", focus)
 		button.add_theme_stylebox_override("disabled", style)
+	# 固定单行手动排布，图标的最小宽度不能反过来撑开状态栏。
+	button.position = Vector2(_buttons.size() * (cell + 4), 0)
 	add_child(button)
+	button.size = Vector2(cell, cell)
 	var icon := BattleSymbol.new()
 	icon.symbol = symbol
 	icon.ink = icon_color

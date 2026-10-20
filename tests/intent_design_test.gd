@@ -58,6 +58,9 @@ func _run() -> void:
 	Router.goto("res://src/screens/battle_screen.gd", {"seed": 7, "node": fixture})
 	await _frames(8)
 	_screen = Router.current
+	var deadline := Time.get_ticks_msec() + 6000
+	while _screen._busy and Time.get_ticks_msec() < deadline: await get_tree().process_frame
+	_ok(not _screen._busy, "进入战斗演出结束后再检查意图交互")
 	var battle: BattleState = _screen.battle
 	var unit: Combatant = battle.enemies[0]
 	var view: EnemyView = _screen._enemy_widgets[0]

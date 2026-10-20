@@ -1,0 +1,53 @@
+{
+  "font_coverage": {
+    "LongCang-Regular.ttf": {
+      "file_bytes": 5162508,
+      "missing_game_characters": [],
+      "missing_source_characters": [
+        "²",
+        "·",
+        "←",
+        "↑",
+        "→",
+        "↓",
+        "≤",
+        "≥",
+        "①",
+        "②",
+        "③",
+        "④",
+        "◆",
+        "●",
+        "★",
+        "⚠",
+        "❖"
+      ]
+    },
+    "LXGWWenKai-Regular.ttf": {
+      "file_bytes": 25928940,
+      "missing_game_characters": [],
+      "missing_source_characters": []
+    },
+    "NotoSerifSC-VF.ttf": {
+      "file_bytes": 25129160,
+      "missing_game_characters": [],
+      "missing_source_characters": []
+    }
+  },
+  "checked_source_characters": 1240,
+  "packaged_fonts": {
+    "assets/.godot/imported/LongCang-Regular.ttf-2109459307ae3a88fbb324bf57342136.fontdata": 3651257,
+    "assets/.godot/imported/LXGWWenKai-Regular.ttf-228bcf86d51c4ee4cce2c848a0a87440.fontdata": 16374431,
+    "assets/.godot/imported/NotoSerifSC-VF.ttf-aecec2861a21c9cb7a0cdea630ebdd9d.fontdata": 18596037
+  },
+  "packaged_licenses": [
+    "assets/assets/fonts/LXGWWenKai-OFL.txt",
+    "assets/assets/fonts/LongCang-OFL.txt",
+    "assets/assets/fonts/NotoSerifSC-OFL.txt"
+  ],
+  "phone_apk": {
+    "path": "E:\\gamejam10\\huoziluandou\\build\\android\\20261018-builtin-fonts\\huoziluandou-builtin-fonts-arm64.apk",
+    "sha256": "8befb461ee213ce1522fd8fc6b3a107f96839efd1e93028b5c4c37a602999681",
+    "bytes": 146370073
+  }
+}

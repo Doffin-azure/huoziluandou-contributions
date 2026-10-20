@@ -1,0 +1,114 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4060 Laptop GPU",
+	"baseline": false,
+	"cold_main_cpu_ms": 7929.609,
+	"courtyard_mobile_quality": false,
+	"debug_build": true,
+	"headless": false,
+	"model": "21J8",
+	"platform": "Windows",
+	"renderer": "forward_plus",
+	"samples": [
+		{
+			"first_post_draw_ms": 16.601,
+			"max_frame_gap_ms": 30.381,
+			"nodes": 648.0,
+			"p95_frame_gap_ms": 19.887,
+			"round": 1,
+			"route_cpu_ms": 0.54,
+			"static_memory_bytes": 355180117.0,
+			"video_memory_bytes": 496544016.0
+		},
+		{
+			"first_post_draw_ms": 17.362,
+			"max_frame_gap_ms": 28.423,
+			"nodes": 648.0,
+			"p95_frame_gap_ms": 19.505,
+			"round": 2,
+			"route_cpu_ms": 1.242,
+			"static_memory_bytes": 355157053.0,
+			"video_memory_bytes": 496544016.0
+		},
+		{
+			"first_post_draw_ms": 16.56,
+			"max_frame_gap_ms": 114.483,
+			"nodes": 648.0,
+			"p95_frame_gap_ms": 83.478,
+			"round": 3,
+			"route_cpu_ms": 0.531,
+			"static_memory_bytes": 355158369.0,
+			"video_memory_bytes": 496544016.0
+		},
+		{
+			"first_post_draw_ms": 15.821,
+			"max_frame_gap_ms": 30.252,
+			"nodes": 648.0,
+			"p95_frame_gap_ms": 20.922,
+			"round": 4,
+			"route_cpu_ms": 0.617,
+			"static_memory_bytes": 355160405.0,
+			"video_memory_bytes": 496544016.0
+		},
+		{
+			"first_post_draw_ms": 19.478,
+			"max_frame_gap_ms": 27.319,
+			"nodes": 648.0,
+			"p95_frame_gap_ms": 19.806,
+			"round": 5,
+			"route_cpu_ms": 1.007,
+			"static_memory_bytes": 355162153.0,
+			"video_memory_bytes": 496544016.0
+		},
+		{
+			"first_post_draw_ms": 16.457,
+			"max_frame_gap_ms": 96.244,
+			"nodes": 648.0,
+			"p95_frame_gap_ms": 93.196,
+			"round": 6,
+			"route_cpu_ms": 0.476,
+			"static_memory_bytes": 355163469.0,
+			"video_memory_bytes": 496544016.0
+		},
+		{
+			"first_post_draw_ms": 16.64,
+			"max_frame_gap_ms": 30.291,
+			"nodes": 648.0,
+			"p95_frame_gap_ms": 17.569,
+			"round": 7,
+			"route_cpu_ms": 0.515,
+			"static_memory_bytes": 355165601.0,
+			"video_memory_bytes": 496544016.0
+		},
+		{
+			"first_post_draw_ms": 16.529,
+			"max_frame_gap_ms": 142.338,
+			"nodes": 648.0,
+			"p95_frame_gap_ms": 46.911,
+			"round": 8,
+			"route_cpu_ms": 0.465,
+			"static_memory_bytes": 355171477.0,
+			"video_memory_bytes": 496544016.0
+		},
+		{
+			"first_post_draw_ms": 16.654,
+			"max_frame_gap_ms": 30.399,
+			"nodes": 648.0,
+			"p95_frame_gap_ms": 17.182,
+			"round": 9,
+			"route_cpu_ms": 0.579,
+			"static_memory_bytes": 355173753.0,
+			"video_memory_bytes": 496544016.0
+		},
+		{
+			"first_post_draw_ms": 15.688,
+			"max_frame_gap_ms": 30.451,
+			"nodes": 648.0,
+			"p95_frame_gap_ms": 19.953,
+			"round": 10,
+			"route_cpu_ms": 0.553,
+			"static_memory_bytes": 355175597.0,
+			"video_memory_bytes": 496544016.0
+		}
+	],
+	"window_size": "(1280, 720)"
+}

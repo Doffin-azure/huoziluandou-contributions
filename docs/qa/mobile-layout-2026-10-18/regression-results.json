@@ -1,0 +1,26 @@
+[
+  {
+    "suite": "density-regression-journey_ui",
+    "summary": "[journey_ui_test] PASS=45 FAIL=0"
+  },
+  {
+    "suite": "density-regression-menu_return_performance",
+    "summary": "[menu_return_performance_test] PASS=106 FAIL=0"
+  },
+  {
+    "suite": "density-regression-mobile_density_layout",
+    "summary": "DENSITY LAYOUT: 80 passed, 0 failed"
+  },
+  {
+    "suite": "density-regression-mobile_presentation_fix",
+    "summary": "[mobile_presentation_fix_test] PASS=32 FAIL=0"
+  },
+  {
+    "suite": "density-regression-study_flow",
+    "summary": "[study_flow_test] PASS=27 FAIL=0"
+  },
+  {
+    "suite": "density-regression-title_menu",
+    "summary": "[title_menu_test] PASS=16 FAIL=0"
+  }
+]

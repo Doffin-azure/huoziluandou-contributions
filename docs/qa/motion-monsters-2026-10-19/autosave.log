@@ -1,0 +1,55 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS fresh slot has no Continue
+PASS Continue hidden for a fresh install
+PASS mainline map automatically saved
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS HP, gold and mainline route restored
+PASS investment due battle preserved
+PASS permanent glyph upgrades survive
+PASS UIDs and relic bindings survive
+PASS 64-bit RNG state unchanged by resume
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS shop offers and prices do not reroll
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS purchased offer remains sold, cost applied once
+PASS unfinished shop picker is not checkpointed
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS unfinished purchase rolls back cost and offer together
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS event and RNG restored without reroll
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS reward choices restored exactly
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS resume does not start an additional battle
+PASS complete stable battle restored: board, piles, statuses, turn and RNG
+PASS shared battle character references and coordinates preserved
+PASS next turn deterministic after restore
+PASS Continue visible after return to cached title
+PASS resume succeeds
+PASS expedition map, integer keys, fog and random streams preserved
+PASS pending expedition panel preserved
+PASS Continue visible after return to cached title
+PASS resume succeeds
+ERROR: expedition encounter and battle restored together
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _ok (res://tests/autosave_test.gd:15)
+       [1] _run (res://tests/autosave_test.gd:156)
+       [2] _resume (res://tests/autosave_test.gd:35)
+       [3] _frames (res://tests/autosave_test.gd:19)
+PASS truncated newest save falls back to previous generation
+PASS unknown model type rejected
+PASS finished run clears both save generations
+PASS mainline victory retires save
+PASS expedition finish retires save
+[autosave_test] PASS=43 FAIL=1

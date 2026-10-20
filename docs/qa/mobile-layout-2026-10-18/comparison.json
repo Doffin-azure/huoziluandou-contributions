@@ -1,0 +1,6008 @@
+[
+  {
+    "profile": "android-1080-440dpi",
+    "state": "battle-deck-words",
+    "label": "战斗／字袋词图鉴与分层遮挡",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/battle-deck-words.png",
+    "after": "after/android-1080-440dpi/battle-deck-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "battle-defeat",
+    "label": "战斗／败北",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/battle-defeat.png",
+    "after": "after/android-1080-440dpi/battle-defeat.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "battle-five",
+    "label": "战斗／5×5 字盘与四位数血量",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "",
+    "after": "after/android-1080-440dpi/battle-five.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "battle-log",
+    "label": "战斗／战报",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/battle-log.png",
+    "after": "after/android-1080-440dpi/battle-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "battle-pile",
+    "label": "战斗／抽牌堆",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/battle-pile.png",
+    "after": "after/android-1080-440dpi/battle-pile.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "battle-status",
+    "label": "战斗／三敌人与玩家状态",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/battle-status.png",
+    "after": "after/android-1080-440dpi/battle-status.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "choice",
+    "label": "岔路与选择弹窗",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/choice.png",
+    "after": "after/android-1080-440dpi/choice.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "collection-chars",
+    "label": "字库图鉴／实体字",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/collection-chars.png",
+    "after": "after/android-1080-440dpi/collection-chars.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "collection-words",
+    "label": "字库图鉴／词",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/collection-words.png",
+    "after": "after/android-1080-440dpi/collection-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "custom-deck",
+    "label": "自定义构筑",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/custom-deck.png",
+    "after": "after/android-1080-440dpi/custom-deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "deck",
+    "label": "当前字袋",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/deck.png",
+    "after": "after/android-1080-440dpi/deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "effect-help",
+    "label": "词条说明浮层",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/effect-help.png",
+    "after": "after/android-1080-440dpi/effect-help.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "event-all-broken_stele",
+    "label": "事件／断碑",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/event-all-broken_stele.png",
+    "after": "after/android-1080-440dpi/event-all-broken_stele.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "event-all-ink_pool",
+    "label": "事件／墨池（确定种子）",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/event-all-ink_pool.png",
+    "after": "after/android-1080-440dpi/event-all-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "event-all-old_bookshop",
+    "label": "事件／旧书肆（确定种子）",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/event-all-old_bookshop.png",
+    "after": "after/android-1080-440dpi/event-all-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "event-ink_pool",
+    "label": "事件／墨池",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/event-ink_pool.png",
+    "after": "after/android-1080-440dpi/event-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "event-old_bookshop",
+    "label": "事件／旧书肆",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/event-old_bookshop.png",
+    "after": "after/android-1080-440dpi/event-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-act_end",
+    "label": "远征／幕间结算",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-act_end.png",
+    "after": "after/android-1080-440dpi/expedition-act_end.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-actions",
+    "label": "远征／整备操作",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-actions.png",
+    "after": "after/android-1080-440dpi/expedition-actions.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-bind-full",
+    "label": "远征／压字石绑定",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "",
+    "after": "after/android-1080-440dpi/expedition-bind-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-boss",
+    "label": "远征／首领迎战",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-boss.png",
+    "after": "after/android-1080-440dpi/expedition-boss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-forge",
+    "label": "远征／许愿机",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-forge.png",
+    "after": "after/android-1080-440dpi/expedition-forge.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-guide",
+    "label": "远征／触屏玩法说明",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "",
+    "after": "after/android-1080-440dpi/expedition-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-late",
+    "label": "远征／满印章及全遗物整备",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "",
+    "after": "after/android-1080-440dpi/expedition-late.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-legend",
+    "label": "远征／图例",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-legend.png",
+    "after": "after/android-1080-440dpi/expedition-legend.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-loadout-detail",
+    "label": "远征／印章与遗物详情",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "",
+    "after": "after/android-1080-440dpi/expedition-loadout-detail.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-log",
+    "label": "远征／战报",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-log.png",
+    "after": "after/android-1080-440dpi/expedition-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-loot",
+    "label": "远征／大赏",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-loot.png",
+    "after": "after/android-1080-440dpi/expedition-loot.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-loss",
+    "label": "远征／中止",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-loss.png",
+    "after": "after/android-1080-440dpi/expedition-loss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-map",
+    "label": "远征／探索",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-map.png",
+    "after": "after/android-1080-440dpi/expedition-map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-mystery-0",
+    "label": "远征／谜事件一",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-mystery-0.png",
+    "after": "after/android-1080-440dpi/expedition-mystery-0.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-mystery-1",
+    "label": "远征／谜事件二",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-mystery-1.png",
+    "after": "after/android-1080-440dpi/expedition-mystery-1.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-mystery-2",
+    "label": "远征／谜事件三",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-mystery-2.png",
+    "after": "after/android-1080-440dpi/expedition-mystery-2.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-plate",
+    "label": "远征／字阵",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-plate.png",
+    "after": "after/android-1080-440dpi/expedition-plate.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-relic_bind",
+    "label": "远征／遗物绑定",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-relic_bind.png",
+    "after": "after/android-1080-440dpi/expedition-relic_bind.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-rest",
+    "label": "远征／休息点",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-rest.png",
+    "after": "after/android-1080-440dpi/expedition-rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-seal-full",
+    "label": "远征／印章已满替换",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "",
+    "after": "after/android-1080-440dpi/expedition-seal-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-seal_swap",
+    "label": "远征／印章替换",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-seal_swap.png",
+    "after": "after/android-1080-440dpi/expedition-seal_swap.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-shop",
+    "label": "远征／商店",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-shop.png",
+    "after": "after/android-1080-440dpi/expedition-shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "expedition-win",
+    "label": "远征／胜利",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/expedition-win.png",
+    "after": "after/android-1080-440dpi/expedition-win.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "glyph-detail",
+    "label": "字网／节点详情",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/glyph-detail.png",
+    "after": "after/android-1080-440dpi/glyph-detail.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "glyph-graph",
+    "label": "字网图谱",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/glyph-graph.png",
+    "after": "after/android-1080-440dpi/glyph-graph.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "map",
+    "label": "幕地图",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/map.png",
+    "after": "after/android-1080-440dpi/map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "map-guide",
+    "label": "幕地图／路线说明",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "",
+    "after": "after/android-1080-440dpi/map-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "pause",
+    "label": "暂停菜单",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/pause.png",
+    "after": "after/android-1080-440dpi/pause.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "rest",
+    "label": "休整",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/rest.png",
+    "after": "after/android-1080-440dpi/rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "rest-picker",
+    "label": "休整／删字选取",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/rest-picker.png",
+    "after": "after/android-1080-440dpi/rest-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "reward-four",
+    "label": "战后／四选一奖励",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/reward-four.png",
+    "after": "after/android-1080-440dpi/reward-four.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "settings-bottom",
+    "label": "设置／手感与音量",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/settings-bottom.png",
+    "after": "after/android-1080-440dpi/settings-bottom.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "settings-top",
+    "label": "设置／字体",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/settings-top.png",
+    "after": "after/android-1080-440dpi/settings-top.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "shop",
+    "label": "商店／买字",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/shop.png",
+    "after": "after/android-1080-440dpi/shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "shop-picker",
+    "label": "商店／复制选字",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/shop-picker.png",
+    "after": "after/android-1080-440dpi/shop-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "shop-service",
+    "label": "商店／整备服务",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/shop-service.png",
+    "after": "after/android-1080-440dpi/shop-service.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1080-440dpi",
+    "state": "title",
+    "label": "主界面",
+    "pixels": [
+      2400,
+      1080
+    ],
+    "dpi": 440.0,
+    "before": "before/android-1080-440dpi/title.png",
+    "after": "after/android-1080-440dpi/title.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "battle-deck-words",
+    "label": "战斗／字袋词图鉴与分层遮挡",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/battle-deck-words.png",
+    "after": "after/android-1440-560dpi/battle-deck-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "battle-defeat",
+    "label": "战斗／败北",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/battle-defeat.png",
+    "after": "after/android-1440-560dpi/battle-defeat.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "battle-five",
+    "label": "战斗／5×5 字盘与四位数血量",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "",
+    "after": "after/android-1440-560dpi/battle-five.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "battle-log",
+    "label": "战斗／战报",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/battle-log.png",
+    "after": "after/android-1440-560dpi/battle-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "battle-pile",
+    "label": "战斗／抽牌堆",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/battle-pile.png",
+    "after": "after/android-1440-560dpi/battle-pile.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "battle-status",
+    "label": "战斗／三敌人与玩家状态",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/battle-status.png",
+    "after": "after/android-1440-560dpi/battle-status.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "choice",
+    "label": "岔路与选择弹窗",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/choice.png",
+    "after": "after/android-1440-560dpi/choice.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "collection-chars",
+    "label": "字库图鉴／实体字",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/collection-chars.png",
+    "after": "after/android-1440-560dpi/collection-chars.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "collection-words",
+    "label": "字库图鉴／词",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/collection-words.png",
+    "after": "after/android-1440-560dpi/collection-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "custom-deck",
+    "label": "自定义构筑",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/custom-deck.png",
+    "after": "after/android-1440-560dpi/custom-deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "deck",
+    "label": "当前字袋",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/deck.png",
+    "after": "after/android-1440-560dpi/deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "effect-help",
+    "label": "词条说明浮层",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/effect-help.png",
+    "after": "after/android-1440-560dpi/effect-help.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "event-all-broken_stele",
+    "label": "事件／断碑",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/event-all-broken_stele.png",
+    "after": "after/android-1440-560dpi/event-all-broken_stele.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "event-all-ink_pool",
+    "label": "事件／墨池（确定种子）",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/event-all-ink_pool.png",
+    "after": "after/android-1440-560dpi/event-all-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "event-all-old_bookshop",
+    "label": "事件／旧书肆（确定种子）",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/event-all-old_bookshop.png",
+    "after": "after/android-1440-560dpi/event-all-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "event-ink_pool",
+    "label": "事件／墨池",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/event-ink_pool.png",
+    "after": "after/android-1440-560dpi/event-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "event-old_bookshop",
+    "label": "事件／旧书肆",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/event-old_bookshop.png",
+    "after": "after/android-1440-560dpi/event-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-act_end",
+    "label": "远征／幕间结算",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-act_end.png",
+    "after": "after/android-1440-560dpi/expedition-act_end.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-actions",
+    "label": "远征／整备操作",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-actions.png",
+    "after": "after/android-1440-560dpi/expedition-actions.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-bind-full",
+    "label": "远征／压字石绑定",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "",
+    "after": "after/android-1440-560dpi/expedition-bind-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-boss",
+    "label": "远征／首领迎战",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-boss.png",
+    "after": "after/android-1440-560dpi/expedition-boss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-forge",
+    "label": "远征／许愿机",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-forge.png",
+    "after": "after/android-1440-560dpi/expedition-forge.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-guide",
+    "label": "远征／触屏玩法说明",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "",
+    "after": "after/android-1440-560dpi/expedition-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-late",
+    "label": "远征／满印章及全遗物整备",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "",
+    "after": "after/android-1440-560dpi/expedition-late.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-legend",
+    "label": "远征／图例",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-legend.png",
+    "after": "after/android-1440-560dpi/expedition-legend.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-loadout-detail",
+    "label": "远征／印章与遗物详情",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "",
+    "after": "after/android-1440-560dpi/expedition-loadout-detail.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-log",
+    "label": "远征／战报",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-log.png",
+    "after": "after/android-1440-560dpi/expedition-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-loot",
+    "label": "远征／大赏",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-loot.png",
+    "after": "after/android-1440-560dpi/expedition-loot.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-loss",
+    "label": "远征／中止",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-loss.png",
+    "after": "after/android-1440-560dpi/expedition-loss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-map",
+    "label": "远征／探索",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-map.png",
+    "after": "after/android-1440-560dpi/expedition-map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-mystery-0",
+    "label": "远征／谜事件一",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-mystery-0.png",
+    "after": "after/android-1440-560dpi/expedition-mystery-0.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-mystery-1",
+    "label": "远征／谜事件二",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-mystery-1.png",
+    "after": "after/android-1440-560dpi/expedition-mystery-1.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-mystery-2",
+    "label": "远征／谜事件三",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-mystery-2.png",
+    "after": "after/android-1440-560dpi/expedition-mystery-2.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-plate",
+    "label": "远征／字阵",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-plate.png",
+    "after": "after/android-1440-560dpi/expedition-plate.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-relic_bind",
+    "label": "远征／遗物绑定",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-relic_bind.png",
+    "after": "after/android-1440-560dpi/expedition-relic_bind.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-rest",
+    "label": "远征／休息点",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-rest.png",
+    "after": "after/android-1440-560dpi/expedition-rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-seal-full",
+    "label": "远征／印章已满替换",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "",
+    "after": "after/android-1440-560dpi/expedition-seal-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-seal_swap",
+    "label": "远征／印章替换",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-seal_swap.png",
+    "after": "after/android-1440-560dpi/expedition-seal_swap.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-shop",
+    "label": "远征／商店",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-shop.png",
+    "after": "after/android-1440-560dpi/expedition-shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "expedition-win",
+    "label": "远征／胜利",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/expedition-win.png",
+    "after": "after/android-1440-560dpi/expedition-win.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "glyph-detail",
+    "label": "字网／节点详情",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/glyph-detail.png",
+    "after": "after/android-1440-560dpi/glyph-detail.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "glyph-graph",
+    "label": "字网图谱",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/glyph-graph.png",
+    "after": "after/android-1440-560dpi/glyph-graph.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "map",
+    "label": "幕地图",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/map.png",
+    "after": "after/android-1440-560dpi/map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "map-guide",
+    "label": "幕地图／路线说明",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "",
+    "after": "after/android-1440-560dpi/map-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "pause",
+    "label": "暂停菜单",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/pause.png",
+    "after": "after/android-1440-560dpi/pause.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "rest",
+    "label": "休整",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/rest.png",
+    "after": "after/android-1440-560dpi/rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "rest-picker",
+    "label": "休整／删字选取",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/rest-picker.png",
+    "after": "after/android-1440-560dpi/rest-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "reward-four",
+    "label": "战后／四选一奖励",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/reward-four.png",
+    "after": "after/android-1440-560dpi/reward-four.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "settings-bottom",
+    "label": "设置／手感与音量",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/settings-bottom.png",
+    "after": "after/android-1440-560dpi/settings-bottom.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "settings-top",
+    "label": "设置／字体",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/settings-top.png",
+    "after": "after/android-1440-560dpi/settings-top.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "shop",
+    "label": "商店／买字",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/shop.png",
+    "after": "after/android-1440-560dpi/shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "shop-picker",
+    "label": "商店／复制选字",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/shop-picker.png",
+    "after": "after/android-1440-560dpi/shop-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "shop-service",
+    "label": "商店／整备服务",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/shop-service.png",
+    "after": "after/android-1440-560dpi/shop-service.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-1440-560dpi",
+    "state": "title",
+    "label": "主界面",
+    "pixels": [
+      3200,
+      1440
+    ],
+    "dpi": 560.0,
+    "before": "before/android-1440-560dpi/title.png",
+    "after": "after/android-1440-560dpi/title.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "battle-deck-words",
+    "label": "战斗／字袋词图鉴与分层遮挡",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/battle-deck-words.png",
+    "after": "after/android-720-320dpi/battle-deck-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "battle-defeat",
+    "label": "战斗／败北",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/battle-defeat.png",
+    "after": "after/android-720-320dpi/battle-defeat.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "battle-five",
+    "label": "战斗／5×5 字盘与四位数血量",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/android-720-320dpi/battle-five.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "battle-log",
+    "label": "战斗／战报",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/battle-log.png",
+    "after": "after/android-720-320dpi/battle-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "battle-pile",
+    "label": "战斗／抽牌堆",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/battle-pile.png",
+    "after": "after/android-720-320dpi/battle-pile.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "battle-status",
+    "label": "战斗／三敌人与玩家状态",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/battle-status.png",
+    "after": "after/android-720-320dpi/battle-status.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "choice",
+    "label": "岔路与选择弹窗",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/choice.png",
+    "after": "after/android-720-320dpi/choice.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "collection-chars",
+    "label": "字库图鉴／实体字",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/collection-chars.png",
+    "after": "after/android-720-320dpi/collection-chars.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "collection-words",
+    "label": "字库图鉴／词",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/collection-words.png",
+    "after": "after/android-720-320dpi/collection-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "custom-deck",
+    "label": "自定义构筑",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/custom-deck.png",
+    "after": "after/android-720-320dpi/custom-deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "deck",
+    "label": "当前字袋",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/deck.png",
+    "after": "after/android-720-320dpi/deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "effect-help",
+    "label": "词条说明浮层",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/effect-help.png",
+    "after": "after/android-720-320dpi/effect-help.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "event-all-broken_stele",
+    "label": "事件／断碑",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/event-all-broken_stele.png",
+    "after": "after/android-720-320dpi/event-all-broken_stele.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "event-all-ink_pool",
+    "label": "事件／墨池（确定种子）",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/event-all-ink_pool.png",
+    "after": "after/android-720-320dpi/event-all-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "event-all-old_bookshop",
+    "label": "事件／旧书肆（确定种子）",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/event-all-old_bookshop.png",
+    "after": "after/android-720-320dpi/event-all-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "event-ink_pool",
+    "label": "事件／墨池",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/event-ink_pool.png",
+    "after": "after/android-720-320dpi/event-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "event-old_bookshop",
+    "label": "事件／旧书肆",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/event-old_bookshop.png",
+    "after": "after/android-720-320dpi/event-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-act_end",
+    "label": "远征／幕间结算",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-act_end.png",
+    "after": "after/android-720-320dpi/expedition-act_end.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-actions",
+    "label": "远征／整备操作",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-actions.png",
+    "after": "after/android-720-320dpi/expedition-actions.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-bind-full",
+    "label": "远征／压字石绑定",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/android-720-320dpi/expedition-bind-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-boss",
+    "label": "远征／首领迎战",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-boss.png",
+    "after": "after/android-720-320dpi/expedition-boss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-forge",
+    "label": "远征／许愿机",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-forge.png",
+    "after": "after/android-720-320dpi/expedition-forge.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-guide",
+    "label": "远征／触屏玩法说明",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/android-720-320dpi/expedition-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-late",
+    "label": "远征／满印章及全遗物整备",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/android-720-320dpi/expedition-late.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-legend",
+    "label": "远征／图例",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-legend.png",
+    "after": "after/android-720-320dpi/expedition-legend.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-loadout-detail",
+    "label": "远征／印章与遗物详情",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/android-720-320dpi/expedition-loadout-detail.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-log",
+    "label": "远征／战报",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-log.png",
+    "after": "after/android-720-320dpi/expedition-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-loot",
+    "label": "远征／大赏",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-loot.png",
+    "after": "after/android-720-320dpi/expedition-loot.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-loss",
+    "label": "远征／中止",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-loss.png",
+    "after": "after/android-720-320dpi/expedition-loss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-map",
+    "label": "远征／探索",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-map.png",
+    "after": "after/android-720-320dpi/expedition-map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-mystery-0",
+    "label": "远征／谜事件一",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-mystery-0.png",
+    "after": "after/android-720-320dpi/expedition-mystery-0.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-mystery-1",
+    "label": "远征／谜事件二",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-mystery-1.png",
+    "after": "after/android-720-320dpi/expedition-mystery-1.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-mystery-2",
+    "label": "远征／谜事件三",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-mystery-2.png",
+    "after": "after/android-720-320dpi/expedition-mystery-2.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-plate",
+    "label": "远征／字阵",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-plate.png",
+    "after": "after/android-720-320dpi/expedition-plate.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-relic_bind",
+    "label": "远征／遗物绑定",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-relic_bind.png",
+    "after": "after/android-720-320dpi/expedition-relic_bind.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-rest",
+    "label": "远征／休息点",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-rest.png",
+    "after": "after/android-720-320dpi/expedition-rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-seal-full",
+    "label": "远征／印章已满替换",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/android-720-320dpi/expedition-seal-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-seal_swap",
+    "label": "远征／印章替换",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-seal_swap.png",
+    "after": "after/android-720-320dpi/expedition-seal_swap.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-shop",
+    "label": "远征／商店",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-shop.png",
+    "after": "after/android-720-320dpi/expedition-shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "expedition-win",
+    "label": "远征／胜利",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/expedition-win.png",
+    "after": "after/android-720-320dpi/expedition-win.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "glyph-detail",
+    "label": "字网／节点详情",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/glyph-detail.png",
+    "after": "after/android-720-320dpi/glyph-detail.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "glyph-graph",
+    "label": "字网图谱",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/glyph-graph.png",
+    "after": "after/android-720-320dpi/glyph-graph.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "map",
+    "label": "幕地图",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/map.png",
+    "after": "after/android-720-320dpi/map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "map-guide",
+    "label": "幕地图／路线说明",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/android-720-320dpi/map-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "pause",
+    "label": "暂停菜单",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/pause.png",
+    "after": "after/android-720-320dpi/pause.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "rest",
+    "label": "休整",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/rest.png",
+    "after": "after/android-720-320dpi/rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "rest-picker",
+    "label": "休整／删字选取",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/rest-picker.png",
+    "after": "after/android-720-320dpi/rest-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "reward-four",
+    "label": "战后／四选一奖励",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/reward-four.png",
+    "after": "after/android-720-320dpi/reward-four.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "settings-bottom",
+    "label": "设置／手感与音量",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/settings-bottom.png",
+    "after": "after/android-720-320dpi/settings-bottom.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "settings-top",
+    "label": "设置／字体",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/settings-top.png",
+    "after": "after/android-720-320dpi/settings-top.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "shop",
+    "label": "商店／买字",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/shop.png",
+    "after": "after/android-720-320dpi/shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "shop-picker",
+    "label": "商店／复制选字",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/shop-picker.png",
+    "after": "after/android-720-320dpi/shop-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "shop-service",
+    "label": "商店／整备服务",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/shop-service.png",
+    "after": "after/android-720-320dpi/shop-service.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "android-720-320dpi",
+    "state": "title",
+    "label": "主界面",
+    "pixels": [
+      1600,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/android-720-320dpi/title.png",
+    "after": "after/android-720-320dpi/title.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "battle-deck-words",
+    "label": "战斗／字袋词图鉴与分层遮挡",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/battle-deck-words.png",
+    "after": "after/apk-2436-480dpi/battle-deck-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "battle-defeat",
+    "label": "战斗／败北",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/battle-defeat.png",
+    "after": "after/apk-2436-480dpi/battle-defeat.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "battle-five",
+    "label": "战斗／5×5 字盘与四位数血量",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "",
+    "after": "after/apk-2436-480dpi/battle-five.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "battle-log",
+    "label": "战斗／战报",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/battle-log.png",
+    "after": "after/apk-2436-480dpi/battle-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "battle-pile",
+    "label": "战斗／抽牌堆",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/battle-pile.png",
+    "after": "after/apk-2436-480dpi/battle-pile.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "battle-status",
+    "label": "战斗／三敌人与玩家状态",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/battle-status.png",
+    "after": "after/apk-2436-480dpi/battle-status.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "choice",
+    "label": "岔路与选择弹窗",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/choice.png",
+    "after": "after/apk-2436-480dpi/choice.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "collection-chars",
+    "label": "字库图鉴／实体字",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/collection-chars.png",
+    "after": "after/apk-2436-480dpi/collection-chars.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "collection-words",
+    "label": "字库图鉴／词",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/collection-words.png",
+    "after": "after/apk-2436-480dpi/collection-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "custom-deck",
+    "label": "自定义构筑",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/custom-deck.png",
+    "after": "after/apk-2436-480dpi/custom-deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "deck",
+    "label": "当前字袋",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/deck.png",
+    "after": "after/apk-2436-480dpi/deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "effect-help",
+    "label": "词条说明浮层",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/effect-help.png",
+    "after": "after/apk-2436-480dpi/effect-help.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "event-all-broken_stele",
+    "label": "事件／断碑",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/event-all-broken_stele.png",
+    "after": "after/apk-2436-480dpi/event-all-broken_stele.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "event-all-ink_pool",
+    "label": "事件／墨池（确定种子）",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/event-all-ink_pool.png",
+    "after": "after/apk-2436-480dpi/event-all-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "event-all-old_bookshop",
+    "label": "事件／旧书肆（确定种子）",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/event-all-old_bookshop.png",
+    "after": "after/apk-2436-480dpi/event-all-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "event-ink_pool",
+    "label": "事件／墨池",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/event-ink_pool.png",
+    "after": "after/apk-2436-480dpi/event-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "event-old_bookshop",
+    "label": "事件／旧书肆",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/event-old_bookshop.png",
+    "after": "after/apk-2436-480dpi/event-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-act_end",
+    "label": "远征／幕间结算",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-act_end.png",
+    "after": "after/apk-2436-480dpi/expedition-act_end.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-actions",
+    "label": "远征／整备操作",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-actions.png",
+    "after": "after/apk-2436-480dpi/expedition-actions.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-bind-full",
+    "label": "远征／压字石绑定",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "",
+    "after": "after/apk-2436-480dpi/expedition-bind-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-boss",
+    "label": "远征／首领迎战",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-boss.png",
+    "after": "after/apk-2436-480dpi/expedition-boss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-forge",
+    "label": "远征／许愿机",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-forge.png",
+    "after": "after/apk-2436-480dpi/expedition-forge.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-guide",
+    "label": "远征／触屏玩法说明",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "",
+    "after": "after/apk-2436-480dpi/expedition-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-late",
+    "label": "远征／满印章及全遗物整备",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "",
+    "after": "after/apk-2436-480dpi/expedition-late.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-legend",
+    "label": "远征／图例",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-legend.png",
+    "after": "after/apk-2436-480dpi/expedition-legend.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-loadout-detail",
+    "label": "远征／印章与遗物详情",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "",
+    "after": "after/apk-2436-480dpi/expedition-loadout-detail.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-log",
+    "label": "远征／战报",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-log.png",
+    "after": "after/apk-2436-480dpi/expedition-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-loot",
+    "label": "远征／大赏",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-loot.png",
+    "after": "after/apk-2436-480dpi/expedition-loot.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-loss",
+    "label": "远征／中止",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-loss.png",
+    "after": "after/apk-2436-480dpi/expedition-loss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-map",
+    "label": "远征／探索",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-map.png",
+    "after": "after/apk-2436-480dpi/expedition-map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-mystery-0",
+    "label": "远征／谜事件一",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-mystery-0.png",
+    "after": "after/apk-2436-480dpi/expedition-mystery-0.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-mystery-1",
+    "label": "远征／谜事件二",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-mystery-1.png",
+    "after": "after/apk-2436-480dpi/expedition-mystery-1.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-mystery-2",
+    "label": "远征／谜事件三",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-mystery-2.png",
+    "after": "after/apk-2436-480dpi/expedition-mystery-2.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-plate",
+    "label": "远征／字阵",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-plate.png",
+    "after": "after/apk-2436-480dpi/expedition-plate.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-relic_bind",
+    "label": "远征／遗物绑定",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-relic_bind.png",
+    "after": "after/apk-2436-480dpi/expedition-relic_bind.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-rest",
+    "label": "远征／休息点",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-rest.png",
+    "after": "after/apk-2436-480dpi/expedition-rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-seal-full",
+    "label": "远征／印章已满替换",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "",
+    "after": "after/apk-2436-480dpi/expedition-seal-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-seal_swap",
+    "label": "远征／印章替换",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-seal_swap.png",
+    "after": "after/apk-2436-480dpi/expedition-seal_swap.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-shop",
+    "label": "远征／商店",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-shop.png",
+    "after": "after/apk-2436-480dpi/expedition-shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "expedition-win",
+    "label": "远征／胜利",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/expedition-win.png",
+    "after": "after/apk-2436-480dpi/expedition-win.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "glyph-detail",
+    "label": "字网／节点详情",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/glyph-detail.png",
+    "after": "after/apk-2436-480dpi/glyph-detail.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "glyph-graph",
+    "label": "字网图谱",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/glyph-graph.png",
+    "after": "after/apk-2436-480dpi/glyph-graph.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "map",
+    "label": "幕地图",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/map.png",
+    "after": "after/apk-2436-480dpi/map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "map-guide",
+    "label": "幕地图／路线说明",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "",
+    "after": "after/apk-2436-480dpi/map-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "pause",
+    "label": "暂停菜单",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/pause.png",
+    "after": "after/apk-2436-480dpi/pause.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "rest",
+    "label": "休整",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/rest.png",
+    "after": "after/apk-2436-480dpi/rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "rest-picker",
+    "label": "休整／删字选取",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/rest-picker.png",
+    "after": "after/apk-2436-480dpi/rest-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "reward-four",
+    "label": "战后／四选一奖励",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/reward-four.png",
+    "after": "after/apk-2436-480dpi/reward-four.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "settings-bottom",
+    "label": "设置／手感与音量",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/settings-bottom.png",
+    "after": "after/apk-2436-480dpi/settings-bottom.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "settings-top",
+    "label": "设置／字体",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/settings-top.png",
+    "after": "after/apk-2436-480dpi/settings-top.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "shop",
+    "label": "商店／买字",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/shop.png",
+    "after": "after/apk-2436-480dpi/shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "shop-picker",
+    "label": "商店／复制选字",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/shop-picker.png",
+    "after": "after/apk-2436-480dpi/shop-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "shop-service",
+    "label": "商店／整备服务",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/shop-service.png",
+    "after": "after/apk-2436-480dpi/shop-service.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "apk-2436-480dpi",
+    "state": "title",
+    "label": "主界面",
+    "pixels": [
+      2436,
+      1120
+    ],
+    "dpi": 480.0,
+    "before": "before/apk-2436-480dpi/title.png",
+    "after": "after/apk-2436-480dpi/title.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "battle-deck-words",
+    "label": "战斗／字袋词图鉴与分层遮挡",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/battle-deck-words.png",
+    "after": "after/compact-1280-320dpi/battle-deck-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "battle-defeat",
+    "label": "战斗／败北",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/battle-defeat.png",
+    "after": "after/compact-1280-320dpi/battle-defeat.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "battle-five",
+    "label": "战斗／5×5 字盘与四位数血量",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/compact-1280-320dpi/battle-five.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "battle-log",
+    "label": "战斗／战报",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/battle-log.png",
+    "after": "after/compact-1280-320dpi/battle-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "battle-pile",
+    "label": "战斗／抽牌堆",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/battle-pile.png",
+    "after": "after/compact-1280-320dpi/battle-pile.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "battle-status",
+    "label": "战斗／三敌人与玩家状态",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/battle-status.png",
+    "after": "after/compact-1280-320dpi/battle-status.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "choice",
+    "label": "岔路与选择弹窗",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/choice.png",
+    "after": "after/compact-1280-320dpi/choice.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "collection-chars",
+    "label": "字库图鉴／实体字",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/collection-chars.png",
+    "after": "after/compact-1280-320dpi/collection-chars.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "collection-words",
+    "label": "字库图鉴／词",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/collection-words.png",
+    "after": "after/compact-1280-320dpi/collection-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "custom-deck",
+    "label": "自定义构筑",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/custom-deck.png",
+    "after": "after/compact-1280-320dpi/custom-deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "deck",
+    "label": "当前字袋",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/deck.png",
+    "after": "after/compact-1280-320dpi/deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "effect-help",
+    "label": "词条说明浮层",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/effect-help.png",
+    "after": "after/compact-1280-320dpi/effect-help.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "event-all-broken_stele",
+    "label": "事件／断碑",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/event-all-broken_stele.png",
+    "after": "after/compact-1280-320dpi/event-all-broken_stele.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "event-all-ink_pool",
+    "label": "事件／墨池（确定种子）",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/event-all-ink_pool.png",
+    "after": "after/compact-1280-320dpi/event-all-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "event-all-old_bookshop",
+    "label": "事件／旧书肆（确定种子）",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/event-all-old_bookshop.png",
+    "after": "after/compact-1280-320dpi/event-all-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "event-ink_pool",
+    "label": "事件／墨池",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/event-ink_pool.png",
+    "after": "after/compact-1280-320dpi/event-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "event-old_bookshop",
+    "label": "事件／旧书肆",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/event-old_bookshop.png",
+    "after": "after/compact-1280-320dpi/event-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-act_end",
+    "label": "远征／幕间结算",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-act_end.png",
+    "after": "after/compact-1280-320dpi/expedition-act_end.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-actions",
+    "label": "远征／整备操作",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-actions.png",
+    "after": "after/compact-1280-320dpi/expedition-actions.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-bind-full",
+    "label": "远征／压字石绑定",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/compact-1280-320dpi/expedition-bind-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-boss",
+    "label": "远征／首领迎战",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-boss.png",
+    "after": "after/compact-1280-320dpi/expedition-boss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-forge",
+    "label": "远征／许愿机",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-forge.png",
+    "after": "after/compact-1280-320dpi/expedition-forge.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-guide",
+    "label": "远征／触屏玩法说明",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/compact-1280-320dpi/expedition-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-late",
+    "label": "远征／满印章及全遗物整备",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/compact-1280-320dpi/expedition-late.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-legend",
+    "label": "远征／图例",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-legend.png",
+    "after": "after/compact-1280-320dpi/expedition-legend.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-loadout-detail",
+    "label": "远征／印章与遗物详情",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/compact-1280-320dpi/expedition-loadout-detail.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-log",
+    "label": "远征／战报",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-log.png",
+    "after": "after/compact-1280-320dpi/expedition-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-loot",
+    "label": "远征／大赏",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-loot.png",
+    "after": "after/compact-1280-320dpi/expedition-loot.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-loss",
+    "label": "远征／中止",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-loss.png",
+    "after": "after/compact-1280-320dpi/expedition-loss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-map",
+    "label": "远征／探索",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-map.png",
+    "after": "after/compact-1280-320dpi/expedition-map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-mystery-0",
+    "label": "远征／谜事件一",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-mystery-0.png",
+    "after": "after/compact-1280-320dpi/expedition-mystery-0.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-mystery-1",
+    "label": "远征／谜事件二",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-mystery-1.png",
+    "after": "after/compact-1280-320dpi/expedition-mystery-1.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-mystery-2",
+    "label": "远征／谜事件三",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-mystery-2.png",
+    "after": "after/compact-1280-320dpi/expedition-mystery-2.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-plate",
+    "label": "远征／字阵",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-plate.png",
+    "after": "after/compact-1280-320dpi/expedition-plate.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-relic_bind",
+    "label": "远征／遗物绑定",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-relic_bind.png",
+    "after": "after/compact-1280-320dpi/expedition-relic_bind.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-rest",
+    "label": "远征／休息点",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-rest.png",
+    "after": "after/compact-1280-320dpi/expedition-rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-seal-full",
+    "label": "远征／印章已满替换",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/compact-1280-320dpi/expedition-seal-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-seal_swap",
+    "label": "远征／印章替换",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-seal_swap.png",
+    "after": "after/compact-1280-320dpi/expedition-seal_swap.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-shop",
+    "label": "远征／商店",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-shop.png",
+    "after": "after/compact-1280-320dpi/expedition-shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "expedition-win",
+    "label": "远征／胜利",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/expedition-win.png",
+    "after": "after/compact-1280-320dpi/expedition-win.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "glyph-detail",
+    "label": "字网／节点详情",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/glyph-detail.png",
+    "after": "after/compact-1280-320dpi/glyph-detail.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "glyph-graph",
+    "label": "字网图谱",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/glyph-graph.png",
+    "after": "after/compact-1280-320dpi/glyph-graph.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "map",
+    "label": "幕地图",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/map.png",
+    "after": "after/compact-1280-320dpi/map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "map-guide",
+    "label": "幕地图／路线说明",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "",
+    "after": "after/compact-1280-320dpi/map-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "pause",
+    "label": "暂停菜单",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/pause.png",
+    "after": "after/compact-1280-320dpi/pause.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "rest",
+    "label": "休整",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/rest.png",
+    "after": "after/compact-1280-320dpi/rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "rest-picker",
+    "label": "休整／删字选取",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/rest-picker.png",
+    "after": "after/compact-1280-320dpi/rest-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "reward-four",
+    "label": "战后／四选一奖励",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/reward-four.png",
+    "after": "after/compact-1280-320dpi/reward-four.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "settings-bottom",
+    "label": "设置／手感与音量",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/settings-bottom.png",
+    "after": "after/compact-1280-320dpi/settings-bottom.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "settings-top",
+    "label": "设置／字体",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/settings-top.png",
+    "after": "after/compact-1280-320dpi/settings-top.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "shop",
+    "label": "商店／买字",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/shop.png",
+    "after": "after/compact-1280-320dpi/shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "shop-picker",
+    "label": "商店／复制选字",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/shop-picker.png",
+    "after": "after/compact-1280-320dpi/shop-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "shop-service",
+    "label": "商店／整备服务",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/shop-service.png",
+    "after": "after/compact-1280-320dpi/shop-service.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "compact-1280-320dpi",
+    "state": "title",
+    "label": "主界面",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 320.0,
+    "before": "before/compact-1280-320dpi/title.png",
+    "after": "after/compact-1280-320dpi/title.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "battle-deck-words",
+    "label": "战斗／字袋词图鉴与分层遮挡",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/battle-deck-words.png",
+    "after": "after/desktop-fhd/battle-deck-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "battle-defeat",
+    "label": "战斗／败北",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/battle-defeat.png",
+    "after": "after/desktop-fhd/battle-defeat.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "battle-five",
+    "label": "战斗／5×5 字盘与四位数血量",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-fhd/battle-five.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "battle-log",
+    "label": "战斗／战报",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/battle-log.png",
+    "after": "after/desktop-fhd/battle-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "battle-pile",
+    "label": "战斗／抽牌堆",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/battle-pile.png",
+    "after": "after/desktop-fhd/battle-pile.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "battle-status",
+    "label": "战斗／三敌人与玩家状态",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/battle-status.png",
+    "after": "after/desktop-fhd/battle-status.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "choice",
+    "label": "岔路与选择弹窗",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/choice.png",
+    "after": "after/desktop-fhd/choice.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "collection-chars",
+    "label": "字库图鉴／实体字",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/collection-chars.png",
+    "after": "after/desktop-fhd/collection-chars.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "collection-words",
+    "label": "字库图鉴／词",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/collection-words.png",
+    "after": "after/desktop-fhd/collection-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "custom-deck",
+    "label": "自定义构筑",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/custom-deck.png",
+    "after": "after/desktop-fhd/custom-deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "deck",
+    "label": "当前字袋",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/deck.png",
+    "after": "after/desktop-fhd/deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "effect-help",
+    "label": "词条说明浮层",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/effect-help.png",
+    "after": "after/desktop-fhd/effect-help.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "event-all-broken_stele",
+    "label": "事件／断碑",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/event-all-broken_stele.png",
+    "after": "after/desktop-fhd/event-all-broken_stele.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "event-all-ink_pool",
+    "label": "事件／墨池（确定种子）",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/event-all-ink_pool.png",
+    "after": "after/desktop-fhd/event-all-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "event-all-old_bookshop",
+    "label": "事件／旧书肆（确定种子）",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/event-all-old_bookshop.png",
+    "after": "after/desktop-fhd/event-all-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "event-ink_pool",
+    "label": "事件／墨池",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/event-ink_pool.png",
+    "after": "after/desktop-fhd/event-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "event-old_bookshop",
+    "label": "事件／旧书肆",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/event-old_bookshop.png",
+    "after": "after/desktop-fhd/event-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-act_end",
+    "label": "远征／幕间结算",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-act_end.png",
+    "after": "after/desktop-fhd/expedition-act_end.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-actions",
+    "label": "远征／整备操作",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-actions.png",
+    "after": "after/desktop-fhd/expedition-actions.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-bind-full",
+    "label": "远征／压字石绑定",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-fhd/expedition-bind-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-boss",
+    "label": "远征／首领迎战",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-boss.png",
+    "after": "after/desktop-fhd/expedition-boss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-forge",
+    "label": "远征／许愿机",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-forge.png",
+    "after": "after/desktop-fhd/expedition-forge.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-guide",
+    "label": "远征／触屏玩法说明",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-fhd/expedition-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-late",
+    "label": "远征／满印章及全遗物整备",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-fhd/expedition-late.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-legend",
+    "label": "远征／图例",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-legend.png",
+    "after": "after/desktop-fhd/expedition-legend.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-loadout-detail",
+    "label": "远征／印章与遗物详情",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-fhd/expedition-loadout-detail.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-log",
+    "label": "远征／战报",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-log.png",
+    "after": "after/desktop-fhd/expedition-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-loot",
+    "label": "远征／大赏",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-loot.png",
+    "after": "after/desktop-fhd/expedition-loot.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-loss",
+    "label": "远征／中止",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-loss.png",
+    "after": "after/desktop-fhd/expedition-loss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-map",
+    "label": "远征／探索",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-map.png",
+    "after": "after/desktop-fhd/expedition-map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-mystery-0",
+    "label": "远征／谜事件一",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-mystery-0.png",
+    "after": "after/desktop-fhd/expedition-mystery-0.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-mystery-1",
+    "label": "远征／谜事件二",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-mystery-1.png",
+    "after": "after/desktop-fhd/expedition-mystery-1.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-mystery-2",
+    "label": "远征／谜事件三",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-mystery-2.png",
+    "after": "after/desktop-fhd/expedition-mystery-2.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-plate",
+    "label": "远征／字阵",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-plate.png",
+    "after": "after/desktop-fhd/expedition-plate.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-relic_bind",
+    "label": "远征／遗物绑定",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-relic_bind.png",
+    "after": "after/desktop-fhd/expedition-relic_bind.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-rest",
+    "label": "远征／休息点",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-rest.png",
+    "after": "after/desktop-fhd/expedition-rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-seal-full",
+    "label": "远征／印章已满替换",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-fhd/expedition-seal-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-seal_swap",
+    "label": "远征／印章替换",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-seal_swap.png",
+    "after": "after/desktop-fhd/expedition-seal_swap.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-shop",
+    "label": "远征／商店",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-shop.png",
+    "after": "after/desktop-fhd/expedition-shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "expedition-win",
+    "label": "远征／胜利",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/expedition-win.png",
+    "after": "after/desktop-fhd/expedition-win.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "glyph-detail",
+    "label": "字网／节点详情",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/glyph-detail.png",
+    "after": "after/desktop-fhd/glyph-detail.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "glyph-graph",
+    "label": "字网图谱",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/glyph-graph.png",
+    "after": "after/desktop-fhd/glyph-graph.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "map",
+    "label": "幕地图",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/map.png",
+    "after": "after/desktop-fhd/map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "pause",
+    "label": "暂停菜单",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/pause.png",
+    "after": "after/desktop-fhd/pause.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "rest",
+    "label": "休整",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/rest.png",
+    "after": "after/desktop-fhd/rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "rest-picker",
+    "label": "休整／删字选取",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/rest-picker.png",
+    "after": "after/desktop-fhd/rest-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "reward-four",
+    "label": "战后／四选一奖励",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/reward-four.png",
+    "after": "after/desktop-fhd/reward-four.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "settings-bottom",
+    "label": "设置／手感与音量",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/settings-bottom.png",
+    "after": "after/desktop-fhd/settings-bottom.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "settings-top",
+    "label": "设置／字体",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/settings-top.png",
+    "after": "after/desktop-fhd/settings-top.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "shop",
+    "label": "商店／买字",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/shop.png",
+    "after": "after/desktop-fhd/shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "shop-picker",
+    "label": "商店／复制选字",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/shop-picker.png",
+    "after": "after/desktop-fhd/shop-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "shop-service",
+    "label": "商店／整备服务",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/shop-service.png",
+    "after": "after/desktop-fhd/shop-service.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-fhd",
+    "state": "title",
+    "label": "主界面",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-fhd/title.png",
+    "after": "after/desktop-fhd/title.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "battle-deck-words",
+    "label": "战斗／字袋词图鉴与分层遮挡",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/battle-deck-words.png",
+    "after": "after/desktop-hd/battle-deck-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "battle-defeat",
+    "label": "战斗／败北",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/battle-defeat.png",
+    "after": "after/desktop-hd/battle-defeat.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "battle-five",
+    "label": "战斗／5×5 字盘与四位数血量",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-hd/battle-five.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "battle-log",
+    "label": "战斗／战报",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/battle-log.png",
+    "after": "after/desktop-hd/battle-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "battle-pile",
+    "label": "战斗／抽牌堆",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/battle-pile.png",
+    "after": "after/desktop-hd/battle-pile.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "battle-status",
+    "label": "战斗／三敌人与玩家状态",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/battle-status.png",
+    "after": "after/desktop-hd/battle-status.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "choice",
+    "label": "岔路与选择弹窗",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/choice.png",
+    "after": "after/desktop-hd/choice.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "collection-chars",
+    "label": "字库图鉴／实体字",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/collection-chars.png",
+    "after": "after/desktop-hd/collection-chars.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "collection-words",
+    "label": "字库图鉴／词",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/collection-words.png",
+    "after": "after/desktop-hd/collection-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "custom-deck",
+    "label": "自定义构筑",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/custom-deck.png",
+    "after": "after/desktop-hd/custom-deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "deck",
+    "label": "当前字袋",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/deck.png",
+    "after": "after/desktop-hd/deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "effect-help",
+    "label": "词条说明浮层",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/effect-help.png",
+    "after": "after/desktop-hd/effect-help.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "event-all-broken_stele",
+    "label": "事件／断碑",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/event-all-broken_stele.png",
+    "after": "after/desktop-hd/event-all-broken_stele.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "event-all-ink_pool",
+    "label": "事件／墨池（确定种子）",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/event-all-ink_pool.png",
+    "after": "after/desktop-hd/event-all-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "event-all-old_bookshop",
+    "label": "事件／旧书肆（确定种子）",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/event-all-old_bookshop.png",
+    "after": "after/desktop-hd/event-all-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "event-ink_pool",
+    "label": "事件／墨池",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/event-ink_pool.png",
+    "after": "after/desktop-hd/event-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "event-old_bookshop",
+    "label": "事件／旧书肆",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/event-old_bookshop.png",
+    "after": "after/desktop-hd/event-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-act_end",
+    "label": "远征／幕间结算",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-act_end.png",
+    "after": "after/desktop-hd/expedition-act_end.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-actions",
+    "label": "远征／整备操作",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-actions.png",
+    "after": "after/desktop-hd/expedition-actions.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-bind-full",
+    "label": "远征／压字石绑定",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-hd/expedition-bind-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-boss",
+    "label": "远征／首领迎战",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-boss.png",
+    "after": "after/desktop-hd/expedition-boss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-forge",
+    "label": "远征／许愿机",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-forge.png",
+    "after": "after/desktop-hd/expedition-forge.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-guide",
+    "label": "远征／触屏玩法说明",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-hd/expedition-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-late",
+    "label": "远征／满印章及全遗物整备",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-hd/expedition-late.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-legend",
+    "label": "远征／图例",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-legend.png",
+    "after": "after/desktop-hd/expedition-legend.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-loadout-detail",
+    "label": "远征／印章与遗物详情",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-hd/expedition-loadout-detail.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-log",
+    "label": "远征／战报",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-log.png",
+    "after": "after/desktop-hd/expedition-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-loot",
+    "label": "远征／大赏",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-loot.png",
+    "after": "after/desktop-hd/expedition-loot.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-loss",
+    "label": "远征／中止",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-loss.png",
+    "after": "after/desktop-hd/expedition-loss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-map",
+    "label": "远征／探索",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-map.png",
+    "after": "after/desktop-hd/expedition-map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-mystery-0",
+    "label": "远征／谜事件一",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-mystery-0.png",
+    "after": "after/desktop-hd/expedition-mystery-0.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-mystery-1",
+    "label": "远征／谜事件二",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-mystery-1.png",
+    "after": "after/desktop-hd/expedition-mystery-1.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-mystery-2",
+    "label": "远征／谜事件三",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-mystery-2.png",
+    "after": "after/desktop-hd/expedition-mystery-2.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-plate",
+    "label": "远征／字阵",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-plate.png",
+    "after": "after/desktop-hd/expedition-plate.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-relic_bind",
+    "label": "远征／遗物绑定",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-relic_bind.png",
+    "after": "after/desktop-hd/expedition-relic_bind.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-rest",
+    "label": "远征／休息点",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-rest.png",
+    "after": "after/desktop-hd/expedition-rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-seal-full",
+    "label": "远征／印章已满替换",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "",
+    "after": "after/desktop-hd/expedition-seal-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-seal_swap",
+    "label": "远征／印章替换",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-seal_swap.png",
+    "after": "after/desktop-hd/expedition-seal_swap.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-shop",
+    "label": "远征／商店",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-shop.png",
+    "after": "after/desktop-hd/expedition-shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "expedition-win",
+    "label": "远征／胜利",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/expedition-win.png",
+    "after": "after/desktop-hd/expedition-win.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "glyph-detail",
+    "label": "字网／节点详情",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/glyph-detail.png",
+    "after": "after/desktop-hd/glyph-detail.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "glyph-graph",
+    "label": "字网图谱",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/glyph-graph.png",
+    "after": "after/desktop-hd/glyph-graph.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "map",
+    "label": "幕地图",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/map.png",
+    "after": "after/desktop-hd/map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "pause",
+    "label": "暂停菜单",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/pause.png",
+    "after": "after/desktop-hd/pause.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "rest",
+    "label": "休整",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/rest.png",
+    "after": "after/desktop-hd/rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "rest-picker",
+    "label": "休整／删字选取",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/rest-picker.png",
+    "after": "after/desktop-hd/rest-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "reward-four",
+    "label": "战后／四选一奖励",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/reward-four.png",
+    "after": "after/desktop-hd/reward-four.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "settings-bottom",
+    "label": "设置／手感与音量",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/settings-bottom.png",
+    "after": "after/desktop-hd/settings-bottom.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "settings-top",
+    "label": "设置／字体",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/settings-top.png",
+    "after": "after/desktop-hd/settings-top.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "shop",
+    "label": "商店／买字",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/shop.png",
+    "after": "after/desktop-hd/shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "shop-picker",
+    "label": "商店／复制选字",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/shop-picker.png",
+    "after": "after/desktop-hd/shop-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "shop-service",
+    "label": "商店／整备服务",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/shop-service.png",
+    "after": "after/desktop-hd/shop-service.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "desktop-hd",
+    "state": "title",
+    "label": "主界面",
+    "pixels": [
+      1280,
+      720
+    ],
+    "dpi": 0.0,
+    "before": "before/desktop-hd/title.png",
+    "after": "after/desktop-hd/title.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "battle-deck-words",
+    "label": "战斗／字袋词图鉴与分层遮挡",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/battle-deck-words.png",
+    "after": "after/tablet-1920-240dpi/battle-deck-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "battle-defeat",
+    "label": "战斗／败北",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/battle-defeat.png",
+    "after": "after/tablet-1920-240dpi/battle-defeat.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "battle-five",
+    "label": "战斗／5×5 字盘与四位数血量",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "",
+    "after": "after/tablet-1920-240dpi/battle-five.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "battle-log",
+    "label": "战斗／战报",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/battle-log.png",
+    "after": "after/tablet-1920-240dpi/battle-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "battle-pile",
+    "label": "战斗／抽牌堆",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/battle-pile.png",
+    "after": "after/tablet-1920-240dpi/battle-pile.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "battle-status",
+    "label": "战斗／三敌人与玩家状态",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/battle-status.png",
+    "after": "after/tablet-1920-240dpi/battle-status.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "choice",
+    "label": "岔路与选择弹窗",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/choice.png",
+    "after": "after/tablet-1920-240dpi/choice.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "collection-chars",
+    "label": "字库图鉴／实体字",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/collection-chars.png",
+    "after": "after/tablet-1920-240dpi/collection-chars.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "collection-words",
+    "label": "字库图鉴／词",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/collection-words.png",
+    "after": "after/tablet-1920-240dpi/collection-words.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "custom-deck",
+    "label": "自定义构筑",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/custom-deck.png",
+    "after": "after/tablet-1920-240dpi/custom-deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "deck",
+    "label": "当前字袋",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/deck.png",
+    "after": "after/tablet-1920-240dpi/deck.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "effect-help",
+    "label": "词条说明浮层",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/effect-help.png",
+    "after": "after/tablet-1920-240dpi/effect-help.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "event-all-broken_stele",
+    "label": "事件／断碑",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/event-all-broken_stele.png",
+    "after": "after/tablet-1920-240dpi/event-all-broken_stele.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "event-all-ink_pool",
+    "label": "事件／墨池（确定种子）",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/event-all-ink_pool.png",
+    "after": "after/tablet-1920-240dpi/event-all-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "event-all-old_bookshop",
+    "label": "事件／旧书肆（确定种子）",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/event-all-old_bookshop.png",
+    "after": "after/tablet-1920-240dpi/event-all-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "event-ink_pool",
+    "label": "事件／墨池",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/event-ink_pool.png",
+    "after": "after/tablet-1920-240dpi/event-ink_pool.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "event-old_bookshop",
+    "label": "事件／旧书肆",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/event-old_bookshop.png",
+    "after": "after/tablet-1920-240dpi/event-old_bookshop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-act_end",
+    "label": "远征／幕间结算",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-act_end.png",
+    "after": "after/tablet-1920-240dpi/expedition-act_end.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-actions",
+    "label": "远征／整备操作",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-actions.png",
+    "after": "after/tablet-1920-240dpi/expedition-actions.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-bind-full",
+    "label": "远征／压字石绑定",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "",
+    "after": "after/tablet-1920-240dpi/expedition-bind-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-boss",
+    "label": "远征／首领迎战",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-boss.png",
+    "after": "after/tablet-1920-240dpi/expedition-boss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-forge",
+    "label": "远征／许愿机",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-forge.png",
+    "after": "after/tablet-1920-240dpi/expedition-forge.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-guide",
+    "label": "远征／触屏玩法说明",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "",
+    "after": "after/tablet-1920-240dpi/expedition-guide.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-late",
+    "label": "远征／满印章及全遗物整备",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "",
+    "after": "after/tablet-1920-240dpi/expedition-late.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-legend",
+    "label": "远征／图例",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-legend.png",
+    "after": "after/tablet-1920-240dpi/expedition-legend.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-loadout-detail",
+    "label": "远征／印章与遗物详情",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "",
+    "after": "after/tablet-1920-240dpi/expedition-loadout-detail.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-log",
+    "label": "远征／战报",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-log.png",
+    "after": "after/tablet-1920-240dpi/expedition-log.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-loot",
+    "label": "远征／大赏",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-loot.png",
+    "after": "after/tablet-1920-240dpi/expedition-loot.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-loss",
+    "label": "远征／中止",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-loss.png",
+    "after": "after/tablet-1920-240dpi/expedition-loss.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-map",
+    "label": "远征／探索",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-map.png",
+    "after": "after/tablet-1920-240dpi/expedition-map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-mystery-0",
+    "label": "远征／谜事件一",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-mystery-0.png",
+    "after": "after/tablet-1920-240dpi/expedition-mystery-0.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-mystery-1",
+    "label": "远征／谜事件二",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-mystery-1.png",
+    "after": "after/tablet-1920-240dpi/expedition-mystery-1.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-mystery-2",
+    "label": "远征／谜事件三",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-mystery-2.png",
+    "after": "after/tablet-1920-240dpi/expedition-mystery-2.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-plate",
+    "label": "远征／字阵",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-plate.png",
+    "after": "after/tablet-1920-240dpi/expedition-plate.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-relic_bind",
+    "label": "远征／遗物绑定",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-relic_bind.png",
+    "after": "after/tablet-1920-240dpi/expedition-relic_bind.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-rest",
+    "label": "远征／休息点",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-rest.png",
+    "after": "after/tablet-1920-240dpi/expedition-rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-seal-full",
+    "label": "远征／印章已满替换",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "",
+    "after": "after/tablet-1920-240dpi/expedition-seal-full.png",
+    "before_findings": "—",
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-seal_swap",
+    "label": "远征／印章替换",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-seal_swap.png",
+    "after": "after/tablet-1920-240dpi/expedition-seal_swap.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-shop",
+    "label": "远征／商店",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-shop.png",
+    "after": "after/tablet-1920-240dpi/expedition-shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "expedition-win",
+    "label": "远征／胜利",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/expedition-win.png",
+    "after": "after/tablet-1920-240dpi/expedition-win.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "glyph-detail",
+    "label": "字网／节点详情",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/glyph-detail.png",
+    "after": "after/tablet-1920-240dpi/glyph-detail.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "glyph-graph",
+    "label": "字网图谱",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/glyph-graph.png",
+    "after": "after/tablet-1920-240dpi/glyph-graph.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "map",
+    "label": "幕地图",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/map.png",
+    "after": "after/tablet-1920-240dpi/map.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "pause",
+    "label": "暂停菜单",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/pause.png",
+    "after": "after/tablet-1920-240dpi/pause.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "rest",
+    "label": "休整",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/rest.png",
+    "after": "after/tablet-1920-240dpi/rest.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "rest-picker",
+    "label": "休整／删字选取",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/rest-picker.png",
+    "after": "after/tablet-1920-240dpi/rest-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "reward-four",
+    "label": "战后／四选一奖励",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/reward-four.png",
+    "after": "after/tablet-1920-240dpi/reward-four.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "settings-bottom",
+    "label": "设置／手感与音量",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/settings-bottom.png",
+    "after": "after/tablet-1920-240dpi/settings-bottom.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "settings-top",
+    "label": "设置／字体",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/settings-top.png",
+    "after": "after/tablet-1920-240dpi/settings-top.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "shop",
+    "label": "商店／买字",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/shop.png",
+    "after": "after/tablet-1920-240dpi/shop.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "shop-picker",
+    "label": "商店／复制选字",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/shop-picker.png",
+    "after": "after/tablet-1920-240dpi/shop-picker.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "shop-service",
+    "label": "商店／整备服务",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/shop-service.png",
+    "after": "after/tablet-1920-240dpi/shop-service.png",
+    "before_findings": 0,
+    "after_findings": 0
+  },
+  {
+    "profile": "tablet-1920-240dpi",
+    "state": "title",
+    "label": "主界面",
+    "pixels": [
+      1920,
+      1200
+    ],
+    "dpi": 240.0,
+    "before": "before/tablet-1920-240dpi/title.png",
+    "after": "after/tablet-1920-240dpi/title.png",
+    "before_findings": 0,
+    "after_findings": 0
+  }
+]

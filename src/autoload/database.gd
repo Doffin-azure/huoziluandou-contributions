@@ -80,6 +80,7 @@ func reload() -> void:
 		push_warning(balance_warning)
 	_bind_act_enemies()
 
+
 	if ResourceLoader.exists(RULES_PATH):
 		rules = BattleBalance.apply_resource(load(RULES_PATH))
 	if rules == null:

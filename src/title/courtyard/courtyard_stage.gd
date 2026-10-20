@@ -17,20 +17,26 @@ var _motion: Tween
 var contours: MeshInstance3D
 var atmosphere: Node3D
 var foreground: Node3D
+var mobile_quality := false
+var _camera_inspection := -1.0
 
 
 func _ready() -> void:
-	render_style.apply(geometry, landscape)
+	render_style.apply(geometry, landscape, not mobile_quality)
 	_build_daylight()
 	foreground = preload("res://src/title/courtyard/foreground.gd").new()
 	foreground.name = "LanternTerrace"; add_child(foreground); foreground.build()
 	_build_water()
-	_build_planar_reflection()
-	_build_contours()
+	if not mobile_quality:
+		_build_planar_reflection()
+		_build_contours()
+	else:
+		$ReflectingPool.material_override.set_shader_parameter("reflection_strength", 0.0)
 	atmosphere = Atmosphere.new()
 	atmosphere.name = "CourtyardAtmosphere"
 	add_child(atmosphere)
-	atmosphere.setup(landscape, environment, $ReflectingPool.material_override)
+	atmosphere.setup(landscape, environment, $ReflectingPool.material_override, mobile_quality)
+	get_viewport().size_changed.connect(_apply_camera)
 	_apply_camera()
 
 
@@ -74,7 +80,7 @@ func _build_daylight() -> void:
 	# Linear tonemapping keeps the chosen paint colours predictable; no filmic desaturation.
 	environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	environment.tonemap_exposure = 1.0
-	environment.ssao_enabled = RenderingServer.get_current_rendering_method() == "forward_plus"
+	environment.ssao_enabled = not mobile_quality and RenderingServer.get_current_rendering_method() == "forward_plus"
 	environment.ssao_radius = 0.25
 	environment.ssao_intensity = 0.65
 	environment.ssr_enabled = false
@@ -91,7 +97,7 @@ func _build_daylight() -> void:
 	key.light_energy = 1.85
 	key.light_angular_distance = 0.5
 	key.light_volumetric_fog_energy = 0.35
-	key.shadow_enabled = true
+	key.shadow_enabled = not mobile_quality
 	key.shadow_bias = 0.08
 	key.shadow_normal_bias = 1.1
 	key.directional_shadow_max_distance = 55
@@ -151,10 +157,11 @@ func _build_planar_reflection() -> void:
 
 
 func _process(_delta: float) -> void:
-	_apply_camera()
+	if not is_equal_approx(inspection, _camera_inspection): _apply_camera()
 
 
 func _apply_camera() -> void:
+	_camera_inspection = inspection
 	camera.position = Vector3(1.55, 2.65, 8.4).lerp(Vector3(-0.55, 2.20, -0.5), inspection)
 	_look_target = Vector3(-1.0, 2.65, -13).lerp(Vector3(-1, 2.55, -15), inspection)
 	camera.look_at(_look_target)
@@ -195,6 +202,7 @@ func set_terrace_strength(value: float) -> void:
 
 
 func set_reflections(enabled: bool) -> void:
+	if mirror_viewport == null: return
 	var material: ShaderMaterial = $ReflectingPool.material_override
 	material.set_shader_parameter("reflection_strength", 0.50 if enabled else 0.0)
 	mirror_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if enabled else SubViewport.UPDATE_DISABLED

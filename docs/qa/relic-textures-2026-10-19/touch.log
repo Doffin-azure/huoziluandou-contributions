@@ -1,0 +1,107 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 61 / 词 162 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+PASS 1600x720 finger down does not add glyph
+PASS 1600x720 native GUI tap adds once
+PASS emulated mouse duplicate ignored
+PASS scroll gesture does not edit deck
+PASS drag over glyph reaches the scroll container
+PASS canceled finger does not edit deck
+PASS native tap enables glyph inspect mode
+PASS glyph effect readable by native tap
+PASS reading glyph preserves deck and RNG
+PASS custom deck footer stays inside viewport
+PASS back dismisses glyph description
+PASS native route tap previews node
+PASS cancel route preview never enters node
+PASS future route node inspectable without entering
+PASS expedition contains visible marker or beacon
+PASS map tooltip available as touch details
+PASS map inspection preserves resources, time and RNG
+PASS cancel power preview preserves turn and resources
+PASS expedition has walkable neighbor
+PASS cancel marker movement does not spend a step
+PASS explicit confirmation moves exactly once
+PASS battle guide has explicit menu entry
+PASS battle relic effect readable after closing pause
+PASS battle guide releases lock without advancing battle
+PASS touchscreen hover cannot open transient glossary
+PASS touch glossary stays open for reading
+PASS board has a glyph outside glossary
+PASS outside native tap closes glossary without selecting board
+PASS shop native tap updates detail panel
+PASS shop preview does not buy or claim
+PASS reward native tap updates detail panel
+PASS reward preview does not buy or claim
+PASS native graph tap opens node details
+PASS native collection card tap picks exactly once
+PASS 2400x1080 finger down does not add glyph
+PASS 2400x1080 native GUI tap adds once
+PASS emulated mouse duplicate ignored
+PASS scroll gesture does not edit deck
+PASS drag over glyph reaches the scroll container
+PASS canceled finger does not edit deck
+PASS native tap enables glyph inspect mode
+PASS glyph effect readable by native tap
+PASS reading glyph preserves deck and RNG
+PASS custom deck footer stays inside viewport
+PASS back dismisses glyph description
+PASS native route tap previews node
+PASS cancel route preview never enters node
+PASS future route node inspectable without entering
+PASS expedition contains visible marker or beacon
+PASS map tooltip available as touch details
+PASS map inspection preserves resources, time and RNG
+PASS cancel power preview preserves turn and resources
+PASS expedition has walkable neighbor
+PASS cancel marker movement does not spend a step
+PASS explicit confirmation moves exactly once
+PASS battle guide has explicit menu entry
+PASS battle relic effect readable after closing pause
+PASS battle guide releases lock without advancing battle
+PASS touchscreen hover cannot open transient glossary
+PASS touch glossary stays open for reading
+PASS board has a glyph outside glossary
+PASS outside native tap closes glossary without selecting board
+PASS shop native tap updates detail panel
+PASS shop preview does not buy or claim
+PASS reward native tap updates detail panel
+PASS reward preview does not buy or claim
+PASS native graph tap opens node details
+PASS native collection card tap picks exactly once
+PASS 1280x720 finger down does not add glyph
+PASS 1280x720 native GUI tap adds once
+PASS emulated mouse duplicate ignored
+PASS scroll gesture does not edit deck
+PASS drag over glyph reaches the scroll container
+PASS canceled finger does not edit deck
+PASS native tap enables glyph inspect mode
+PASS glyph effect readable by native tap
+PASS reading glyph preserves deck and RNG
+PASS custom deck footer stays inside viewport
+PASS back dismisses glyph description
+PASS native route tap previews node
+PASS cancel route preview never enters node
+PASS future route node inspectable without entering
+PASS expedition contains visible marker or beacon
+PASS map tooltip available as touch details
+PASS map inspection preserves resources, time and RNG
+PASS cancel power preview preserves turn and resources
+PASS expedition has walkable neighbor
+PASS cancel marker movement does not spend a step
+PASS explicit confirmation moves exactly once
+PASS battle guide has explicit menu entry
+PASS battle relic effect readable after closing pause
+PASS battle guide releases lock without advancing battle
+PASS touchscreen hover cannot open transient glossary
+PASS touch glossary stays open for reading
+PASS board has a glyph outside glossary
+PASS outside native tap closes glossary without selecting board
+PASS shop native tap updates detail panel
+PASS shop preview does not buy or claim
+PASS reward native tap updates detail panel
+PASS reward preview does not buy or claim
+PASS native graph tap opens node details
+PASS native collection card tap picks exactly once
+[touch_access_audit] PASS=102 FAIL=0

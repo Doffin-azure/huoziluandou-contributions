@@ -3,7 +3,7 @@ extends Node
 ## 手感、音效、视觉风格与字盘字体分开持久化。
 
 signal changed
-signal board_font_changed(path: String)
+signal board_font_changed(font_id: String)
 
 const PATH := "user://settings.cfg"
 var storage_path := PATH
@@ -15,10 +15,12 @@ var drag_release_play: bool = false
 
 ## 视觉风格固定为青铜绘卷；旧主题配置迁移到当前定稿。
 var visual_style: String = "taopunk"
-var board_font_path := ""
+var board_font_id := BoardTypography.DEFAULT_ID
 var reduced_motion: bool = false
 var sfx_volume := 0.65
 var music_volume := 0.6
+var bgm_volume := 0.35
+var first_run_tutorial_completed := false
 
 var _cfg := ConfigFile.new()
 
@@ -28,11 +30,14 @@ func _ready() -> void:
 		drag_release_play = bool(_cfg.get_value("input", "drag_release_play", drag_release_play))
 		var stored_style := str(_cfg.get_value("visual", "art_style", visual_style))
 		visual_style = GameStyle.normalize_id(stored_style)
-		board_font_path = str(_cfg.get_value("visual", "board_font", ""))
+		var stored_font := str(_cfg.get_value("visual", "board_font_id", BoardTypography.DEFAULT_ID))
+		board_font_id = BoardTypography.normalize_id(stored_font)
 		reduced_motion = bool(_cfg.get_value("visual", "reduced_motion", false))
 		sfx_volume = clampf(float(_cfg.get_value("audio", "sfx_volume", 0.65)), 0.0, 1.0)
 		music_volume = clampf(float(_cfg.get_value("audio", "music_volume", 0.6)), 0.0, 1.0)
-		if stored_style != visual_style or _cfg.has_section_key("visual", "style"):
+		bgm_volume = clampf(float(_cfg.get_value("audio", "bgm_volume", 0.35)), 0.0, 1.0)
+		first_run_tutorial_completed = bool(_cfg.get_value("onboarding", "first_run_tutorial_completed", false))
+		if stored_style != visual_style or _cfg.has_section_key("visual", "style") or stored_font != board_font_id or _cfg.has_section_key("visual", "board_font"):
 			_save()
 
 
@@ -58,10 +63,15 @@ func _save() -> void:
 	if _cfg.has_section_key("visual", "style"):
 		_cfg.erase_section_key("visual", "style")
 	_cfg.set_value("visual", "art_style", visual_style)
-	_cfg.set_value("visual", "board_font", board_font_path)
+	# 迁移旧版外部字体配置；不读取或解析该路径指向的任何文件。
+	if _cfg.has_section_key("visual", "board_font"):
+		_cfg.erase_section_key("visual", "board_font")
+	_cfg.set_value("visual", "board_font_id", board_font_id)
 	_cfg.set_value("visual", "reduced_motion", reduced_motion)
 	_cfg.set_value("audio", "sfx_volume", sfx_volume)
 	_cfg.set_value("audio", "music_volume", music_volume)
+	_cfg.set_value("audio", "bgm_volume", bgm_volume)
+	_cfg.set_value("onboarding", "first_run_tutorial_completed", first_run_tutorial_completed)
 	_cfg.save(storage_path)
 
 
@@ -77,14 +87,26 @@ func set_sfx_volume(value: float) -> void:
 	changed.emit()
 
 
-func set_music_volume(value: float) -> void:
-	music_volume = clampf(value, 0.0, 1.0)
+func set_bgm_volume(value: float) -> void:
+	bgm_volume = clampf(value, 0.0, 1.0)
 	_save()
 	changed.emit()
 
 
-func set_board_font_path(path: String) -> void:
-	if path == board_font_path: return
-	board_font_path = path
+func complete_first_run_tutorial() -> void:
+	if first_run_tutorial_completed: return
+	first_run_tutorial_completed = true
 	_save()
-	board_font_changed.emit(path)
+
+
+func set_board_font_id(font_id: String) -> void:
+	if not BoardTypography.is_builtin(font_id) or font_id == board_font_id: return
+	board_font_id = font_id
+	_save()
+	board_font_changed.emit(font_id)
+
+
+func set_music_volume(value: float) -> void:
+	music_volume = clampf(value, 0.0, 1.0)
+	_save()
+	changed.emit()
