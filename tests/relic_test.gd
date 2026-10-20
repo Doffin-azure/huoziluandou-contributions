@@ -240,7 +240,7 @@ func _test_vial_and_combo() -> void:
 	GameState.player_hp = 50
 	var b := BattleState.new(_rules())
 	b.start([], [_enemy_data()], 7)
-	_ok(b.player.hp == 53, "还魂墨：开局回复 3 气血（%d）" % b.player.hp)
+	_ok(b.player.hp == 52, "还魂墨：开局回复 2 气血（%d）" % b.player.hp)
 	_reset(["vial"])
 	b = BattleState.new(_rules())
 	b.start([], [_enemy_data()], 7)

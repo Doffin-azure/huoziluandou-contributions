@@ -50,7 +50,7 @@ const DEFS := {
 	"binding": ["串字绳", "同一行最左和最右两格视作相邻，可以跨边连词", false],
 	"proof": ["校勘尺", "本场每净化 2 枚污染字，随机补 1 字", false],
 	# ---- 补充
-	"vial": ["还魂墨", "每场开局回复 3 气血", false],
+	"vial": ["还魂墨", "每场开局回复 2 气血", false],
 }
 ## 拾取时要从字袋挑字的遗物：[动作, 挑几枚]。绑定类（压字石、蔓生墨）另见 DEFS 第三项。
 const PICK := {"goldleaf": ["gild", 2], "rubbing": ["copy", 1]}
@@ -198,7 +198,7 @@ static func on_battle_start(b: BattleState) -> void:
 		b.player.add_persistent_block(BattleBalance.i("buckler_block", 4))
 		b._log("铜护板：持久盾 +%d" % BattleBalance.i("buckler_block", 4))
 	if b.relics.has("vial"):
-		var healed := b.heal_player(BattleBalance.i("vial_heal", 3))
+		var healed := b.heal_player(BattleBalance.i("vial_heal", 2))
 		b._log("还魂墨：回复 %d 气血" % healed)
 	if b.relics.has("powerbank"):
 		b.add_energy(BattleBalance.i("powerbank_energy", 4))

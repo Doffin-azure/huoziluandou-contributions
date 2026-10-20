@@ -143,7 +143,7 @@ func _run() -> void:
 	lore_room.phase = "event"; lore_room.event_node = "start"
 	lore_room.event_data = EFFECTS.get_event("old_gardener").duplicate(true)
 	var lore_max: int = GameState.player_max_hp
-	_check(lore_room.apply({"type": "event", "index": 2}).ok and GameState.player_max_hp == lore_max + 8, "老园丁：听旧事最大气血 +8")
+	_check(lore_room.apply({"type": "event", "index": 2}).ok and GameState.player_max_hp == lore_max + 10, "老园丁：听旧事最大气血 +10")
 	var battle_relic_room = ROOM_RUN.new()
 	battle_relic_room.reset({"seed": 7307}); battle_relic_room.autosave = false
 	battle_relic_room.phase = "event"; battle_relic_room.event_node = "start"
