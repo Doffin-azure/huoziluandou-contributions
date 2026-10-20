@@ -230,8 +230,8 @@ const EVENTS := [
 				{"type": "gold", "amount": 16},
 			]},
 			{"text": "讨一碗茶（回复 25% 气血）", "effects": [{"type": "heal_percent", "amount": 25}]},
-			{"text": "听他讲园中旧事（最大气血 +4）", "effects": [
-				{"type": "max_hp", "amount": 4},
+			{"text": "听他讲园中旧事（最大气血 +10）", "effects": [
+				{"type": "max_hp", "amount": 10},
 			]},
 		],
 	},

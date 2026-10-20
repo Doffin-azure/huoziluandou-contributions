@@ -21,6 +21,7 @@ func _ready() -> void:
 	_test_press()
 	_test_strike_breach()
 	_test_opening_defense()
+	_test_vial_and_combo()
 	_test_empty_case()
 	_test_chaos_dice()
 	_test_batch_two()
@@ -231,6 +232,36 @@ func _test_opening_defense() -> void:
 	ex.apply_battle_setup(s)
 	_ok(s.player.hp == GameState.player_hp and s.player.block == 2, "屏障：伏兵开场突袭 8 伤先被临挡吸收（剩 %d）" % s.player.block)
 	GameState.expedition = null
+
+
+# ---------------------------------------------------------------- 还魂墨 / 连击接回防
+func _test_vial_and_combo() -> void:
+	_reset(["vial"])
+	GameState.player_hp = 50
+	var b := BattleState.new(_rules())
+	b.start([], [_enemy_data()], 7)
+	_ok(b.player.hp == 52, "还魂墨：开局回复 2 气血（%d）" % b.player.hp)
+	_reset(["vial"])
+	b = BattleState.new(_rules())
+	b.start([], [_enemy_data()], 7)
+	_ok(b.player.hp == 60, "还魂墨：满血开局不溢出")
+	_ok(Relics.TIER.get("vial", 0) == 1 and Relics.normal_pool().has("vial"), "还魂墨：常见档，进普通池")
+
+	var deck: Array = []
+	for i in 10:
+		deck.append(_inst("火"))
+	b = _battle([], deck)
+	var e: Combatant = b.enemies[0]
+	_ok(_play_word(b, "回击", 0).ok, "连击：上回合先打出攻击词【回击】")
+	b.end_player_turn()
+	_clear_board(b)
+	_ok(b.attack_words_this_turn == 0, "连击：新回合攻击词计数清零")
+	var hp := e.hp
+	_ok(_play_word(b, "连击", 1).ok and e.hp < hp, "连击：重演上回合的【回击】造成伤害（%d）" % (hp - e.hp))
+	_ok(b.attack_words_this_turn == 1, "连击：重演的攻击词算进本回合（%d）" % b.attack_words_this_turn)
+	_ok(b.last_attack_word != null and b.last_attack_word.word == "回击", "连击：不改写上一个攻击词，下次连击仍重演【回击】")
+	var bag := b.bag.size()
+	_ok(_play_word(b, "回防", 2).ok and bag - b.bag.size() == 1, "连击后接【回防】：满足本回合打出过攻击词，补 1 字（%d）" % (bag - b.bag.size()))
 
 
 # ---------------------------------------------------------------- 第二批
