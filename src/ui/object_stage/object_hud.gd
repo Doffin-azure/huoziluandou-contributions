@@ -20,6 +20,7 @@ var secondary_button: Button
 var status_label: Label
 var _body_scroll: ScrollContainer
 var _column: VBoxContainer
+var _pad: MarginContainer
 
 
 func _ready() -> void:
@@ -27,6 +28,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var factor := JourneyStyle.touch_scale(self)
 	var pad := Ink.margin(24)
+	_pad = pad
 	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pad.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(pad)
@@ -106,4 +108,6 @@ func set_detail(title: String, body: String) -> void:
 
 func _layout() -> void:
 	if _body_scroll == null: return
+	var unit := JourneyStyle.touch_scale(self)
+	ScreenLayout.margins(_pad,self,(12 if unit>1.1 else 24)*unit)
 	_body_scroll.custom_minimum_size.y = minf(78 * JourneyStyle.touch_scale(self), size.y * 0.16)

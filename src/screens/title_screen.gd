@@ -110,7 +110,9 @@ func _layout() -> void:
 	if _menu == null or content.size.y < 1: return
 	# Reserve physical touch targets instead of scaling the entire menu down on phones.
 	var touch_scale := JourneyStyle.touch_scale(self)
-	var compact := content.size.y / touch_scale < 600
+	var safe := ScreenLayout.safe_rect(content).intersection(Rect2(Vector2.ZERO,content.size))
+	var area := safe.size
+	var compact := area.y / touch_scale < 600
 	_menu.columns = 2 if compact else 1
 	_menu.add_theme_constant_override("v_separation", int(6 * touch_scale))
 	_menu.add_theme_constant_override("h_separation", int(36 * touch_scale))
@@ -118,19 +120,19 @@ func _layout() -> void:
 		button.custom_minimum_size.y = 48 * touch_scale
 		var utility := button.get_parent()==_utilities
 		button.add_theme_font_size_override("font_size", int((14 if utility else 23) * touch_scale))
-	var width := minf(300 * touch_scale, content.size.x*.40) if not compact else content.size.x*.51
+	var width := minf(300 * touch_scale, area.x*.40) if not compact else area.x*.51
 	_menu.custom_minimum_size.x = width
 	_menu.size.x = width
 	_menu.reset_size()
 	var height := _menu.get_combined_minimum_size().y
 	var margin := 18*touch_scale
 	_utilities.add_theme_constant_override("separation",int(6*touch_scale))
-	_utilities.reset_size(); _utilities.position = Vector2(maxf(margin,content.size.x*.10),content.size.y-margin-_utilities.size.y)
-	var logo_top: float = margin+(0.0 if compact else content.size.y*.03)
-	var logo_height := minf(content.size.y*.44,maxf(64,_utilities.position.y-height-logo_top-margin-12*touch_scale))
-	var logo_width := minf(content.size.x*.53,logo_height*1.776)
-	_wordmark.position = Vector2(content.size.x*.035,logo_top); _wordmark.size = Vector2(logo_width,logo_height)
-	_menu.position = Vector2(maxf(margin+22,content.size.x*.13),_wordmark.position.y+logo_height+12*touch_scale)
+	_utilities.reset_size(); _utilities.position = safe.position+Vector2(maxf(margin,area.x*.10),area.y-margin-_utilities.size.y)
+	var logo_top: float = margin+(0.0 if compact else area.y*.03)
+	var logo_height := minf(area.y*.44,maxf(64,_utilities.position.y-safe.position.y-height-logo_top-margin-12*touch_scale))
+	var logo_width := minf(area.x*.53,logo_height*1.776)
+	_wordmark.position = safe.position+Vector2(area.x*.035,logo_top); _wordmark.size = Vector2(logo_width,logo_height)
+	_menu.position = Vector2(safe.position.x+maxf(margin+22,area.x*.13),_wordmark.position.y+logo_height+12*touch_scale)
 	_ornament.queue_redraw()
 
 

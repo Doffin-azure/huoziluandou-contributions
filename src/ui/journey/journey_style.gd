@@ -125,7 +125,7 @@ static func get_theme() -> Theme:
 
 
 static func touch_scale(control: Control) -> float:
-	return BattleTouchLayout.unit_for(control.get_viewport_rect().size, control.get_window().size)
+	return BattleTouchLayout.unit_for(control.get_viewport_rect().size, ScreenLayout.window_size(control))
 
 
 static func button(caption: String, action: Callable, primary := false) -> Button:
@@ -159,6 +159,9 @@ static func page(root: Control) -> VBoxContainer:
 	var pad := Ink.margin(16 if mobile else 28)
 	pad.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.add_child(pad)
+	var update_margins := func(): ScreenLayout.margins(pad, root, (12 if touch_scale(root)>1.1 else 28) * touch_scale(root))
+	root.resized.connect(update_margins)
+	update_margins.call_deferred()
 	var col := Ink.vbox(12 if mobile else 20)
 	pad.add_child(col)
 	return col

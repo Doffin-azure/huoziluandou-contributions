@@ -33,6 +33,8 @@
 | compact | 1280×720 | 320 |
 | tablet | 1920×1200 | 240 |
 
+还可使用 `vivo-y33`、`redmi-7a`、`vivo-y3`、`iqoo-u1x`、`huawei-70s`、`redmi-9a`、`iqoo-10`、`reference-2664`、`reference-large-ui`、`low-854`。这些档位和桌面布局测试共用 `tests/fixtures/mobile_screen_profiles.json`；分辨率来自厂商参数，DPI 和安全区为压力测试设定，不代表对应手机的实测值。例如 `安卓测试.cmd --profile redmi-7a`。旧手机名称仅用于屏幕布局采样，不代表支持它的旧系统或处理器。
+
 ## 手机卡顿采样
 
 手机连接后，同样可以自动覆盖部署。运行中的游戏可直接采集日志：
