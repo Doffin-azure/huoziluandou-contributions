@@ -106,8 +106,33 @@ func _ready() -> void:
 	_ok(screen!=null and screen.map_view.points.size()==55,"live map displays all candidates")
 	_ok(screen.find_children("*","SubViewport",true,false).is_empty(),"map has no 3D render targets")
 	var state: int = GameState.rng.state
-	screen._select_node(GameState.room_run.next_rooms()[0]); screen._plan_selected()
+	screen._toggle_planning(); screen._select_node(GameState.room_run.next_rooms()[0]); screen._toggle_planning()
 	_ok(GameState.rng.state==state and GameState.room_run.current_room=="start","UI preview does not enter a node")
+	# 规划模式：从最左一格格点，红圈逐步描出，非候选压暗
+	var live = GameState.room_run
+	screen._clear_plan(); screen._toggle_planning()
+	_ok(screen.map_view.planning and screen._planner_button.text=="完成预选","planner toggles on")
+	var far := ""
+	for id: String in live.graph.rooms:
+		if id!=live.current_room and not live.next_rooms().has(id): far = id; break
+	screen._select_node(far)
+	_ok(live.planned_route.is_empty(),"planner rejects a node that skips ahead")
+	_ok(not screen.map_view.plan_lit(far) and screen.map_view.plan_lit(live.next_rooms()[0]),"non-candidates are dimmed, next stops lit")
+	var step1: String = live.plan_choices()[0]
+	screen._select_node(step1)
+	var step2: String = live.plan_choices()[0]
+	screen._select_node(step2)
+	_ok(live.planned_route==[step1,step2] and live.current_room=="start","clicks chain left to right without entering")
+	_ok(screen.map_view.plan_end()==step2 and screen.map_view.circle_progress(step2)<1.0,"new red circle starts drawing at the plan end")
+	await get_tree().create_timer(.5).timeout
+	_ok(screen.map_view.circle_progress(step1)==1.0 and screen.map_view.circle_progress(step2)==1.0,"red circles finish drawing")
+	_ok(live.graph.rooms[step2].next.has(live.plan_choices()[0]),"candidates follow the plan end")
+	screen._select_node(step2)
+	_ok(live.planned_route==[step1],"clicking the last planned stop undoes one step")
+	screen._select_node(live.current_room)
+	_ok(live.planned_route.is_empty(),"clicking the current stop clears the plan")
+	screen._toggle_planning()
+	_ok(not screen.map_view.planning and screen._planner_button.text=="预选模式","planner toggles off")
 	print("[node_route_test] PASS=%d FAIL=%d TOTAL=%d" % [checks-failed,failed,checks])
 	Music.stop()
 	await get_tree().create_timer(.05).timeout

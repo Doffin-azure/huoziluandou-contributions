@@ -12,7 +12,7 @@ var _progress: Label
 var _detail_title: Label
 var _detail: Label
 var _action: Button
-var _plan_button: Button
+var _planner_button: Button
 var _selected := ""
 var _routing := false
 var _receipt_open := false
@@ -62,8 +62,8 @@ func build(root: Control) -> void:
 	text.add_child(_detail_title); text.add_child(_detail); row.add_child(text)
 	var actions := Ink.vbox(6)
 	_action = _button("选择下一站",_confirm_selected,true)
-	_plan_button = _button("预选此节点",_plan_selected)
-	actions.add_child(_action); actions.add_child(_plan_button); row.add_child(actions)
+	_planner_button = _button("预选模式",_toggle_planning)
+	actions.add_child(_action); actions.add_child(_planner_button); row.add_child(actions)
 	page.add_child(panel)
 	EventBus.gold_changed.connect(_on_gold); EventBus.hp_changed.connect(_on_hp)
 	_selected = run.current_room
@@ -103,6 +103,10 @@ func refresh() -> void:
 	map_view.selected = _selected; map_view.refresh()
 	_progress.text = "已行 %d / %d 站 · %d 个候选节点   /   向右择路，点击查看，拖动浏览" % [maxi(0,run.visited_rooms.size()-1),int(run.layout.rooms[run.graph.boss].column)+1,run.graph.rooms.size()]
 	if not run.planned_route.is_empty(): _progress.text = "预选 %d 站 · 本幕 %d 个候选节点 · 预选可随时修改，前进后不能回头" % [run.planned_route.size(),run.graph.rooms.size()]
+	if map_view.planning and run.phase!="map": _toggle_planning(); return
+	if map_view.planning:
+		_progress.text = "预选中 · 已选 %d 站 · 从左往右点亮着的候选格，点最后一站撤回" % run.planned_route.size()
+		if run.plan_choices().is_empty(): _progress.text = "预选中 · 已选 %d 站，路线已排到首领" % run.planned_route.size()
 	_update_detail()
 	if run.phase=="treasure" and not _receipt_open: _treasure_receipt.call_deferred()
 
@@ -119,7 +123,32 @@ func _update_stats() -> void:
 
 
 func _select_node(id: String) -> void:
+	if map_view.planning: _plan_click(id); return
 	_selected = id; map_view.selected = id; map_view.queue_redraw(); _update_detail()
+
+
+## 预选模式开关：开启后直接点格子排路线
+func _toggle_planning() -> void:
+	map_view.set_planning(not map_view.planning and run.phase=="map")
+	_planner_button.text = "完成预选" if map_view.planning else "预选模式"
+	refresh()
+
+
+## 预选模式点格：只能从最左（当前所在之后）一格格往右接；点最后一站撤回一步，点更早的站从那里截断
+func _plan_click(id: String) -> void:
+	if run.phase!="map": return
+	var index: int = run.planned_route.find(id)
+	var result: Dictionary
+	if index>=0 and index==run.planned_route.size()-1: result = run.apply({"type":"undo_plan"})
+	elif index>=0 or run.plan_choices().has(id): result = run.plan_room(id)
+	elif id==run.current_room: result = run.apply({"type":"clear_plan"})
+	else:
+		_detail_title.text = "%s · 不能接在这里" % run.layout.rooms[id].name
+		_detail.text = "预选要从左往右一格格接：只能点亮着的候选格。点已预选的最后一站撤回一步，点当前所在清空重来。"
+		return
+	if not result.get("ok",false): _detail.text = str(result.get("reason","不能预选到这里")); return
+	_selected = run.planned_route[-1] if not run.planned_route.is_empty() else run.current_room
+	refresh()
 
 
 func _update_detail() -> void:
@@ -136,8 +165,7 @@ func _update_detail() -> void:
 		_action.disabled = not run.next_rooms().has(_selected)
 		if _action.disabled and not run.planned_route.is_empty():
 			_action.text = "前往预选下一站"; _action.disabled = false
-	_plan_button.disabled = run.phase!="map" or not (run.plan_choices().has(_selected) or run.planned_route.has(_selected) or run.next_rooms().has(_selected))
-	_plan_button.text = "预选到此" if not run.planned_route.has(_selected) else "保留预选到此"
+	_planner_button.disabled = run.phase!="map" and not map_view.planning
 
 
 func _description(id: String) -> String:
@@ -185,11 +213,6 @@ func _start_battle() -> void:
 	if not run.begin_live_battle(): return
 	_routing = true
 	goto("res://src/screens/battle_screen.gd",{"room_run":true,"node":run.node,"seed":run.battle_seed()})
-
-
-func _plan_selected() -> void:
-	var result: Dictionary = run.plan_room(_selected)
-	if result.get("ok",false): refresh()
 
 
 func _clear_plan() -> void:
