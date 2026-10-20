@@ -28,6 +28,7 @@ func _ready() -> void:
 	_test_proof()
 	_test_blitz()
 	_test_pending_setup()
+	_test_fallback_preview()
 	_test_harness_hp()
 	GameState.relics.clear()
 	GameState.relic_binds.clear()
@@ -352,6 +353,22 @@ func _test_pending_setup() -> void:
 		c.gilded = true
 	Relics.queue_setup("goldleaf")
 	_ok(Relics.next_pending_peek().is_empty(), "没有可镀的字时不排挑字")
+
+
+# ---------------------------------------------------------------- 反字模 / 叠字钱：界面预览和实际出字一致
+func _test_fallback_preview() -> void:
+	var b := _battle(["palindrome", "slot"])
+	var word := Database.get_word_by_glyphs(["重", "连"])
+	_clear_board(b)
+	b.board.set_xy(Vector2i(0, 0), _inst("连"))
+	b.board.set_xy(Vector2i(1, 0), _inst("重"))
+	var req: Dictionary = EffectTargets.request(b, [Vector2i(0, 0), Vector2i(1, 0)])
+	if word == null:
+		_ok(false, "词库里找不到【重连】，测试需要更新")
+	else:
+		_ok(req.word == word and req.interaction == EffectTargets.interaction_of(word), "反字模：倒连【连重】按【重连】取交互（%s）" % req.interaction)
+	_ok(EffectDescriptions.word_for(["连", "重"], b) == word and EffectDescriptions.word_for(["连", "重"]) == null, "反字模：只在本场持有时预览认倒连")
+	_ok(EffectDescriptions.word_for(["击", "击", "击"], b) != null, "叠字钱：三连相同字的预览不再显示不成词")
 
 
 # ---------------------------------------------------------------- 无界面开战（庭院模拟）

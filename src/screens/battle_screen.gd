@@ -545,7 +545,7 @@ func _on_selection_changed(path: Array, glyphs: Array, word: WordData, preview_t
 		_update_input()
 		return
 	if word == null and glyphs.size() >= 2:
-		word = EffectPreview.word_for(glyphs)
+		word = EffectPreview.word_for(glyphs, battle)
 	var word_changed := _current_word != word
 	_current_word = word
 	var text := ""
@@ -597,7 +597,7 @@ func _on_enemy_clicked(index: int) -> void:
 	_refresh_intents()
 	var path: Array = _ready_action.get("path", _board_view.path)
 	if not path.is_empty():
-		_on_selection_changed(path, battle.board.glyphs_of(path), EffectPreview.word_for(battle.board.glyphs_of(path)), _ready_action.get("target", {}))
+		_on_selection_changed(path, battle.board.glyphs_of(path), EffectPreview.word_for(battle.board.glyphs_of(path), battle), _ready_action.get("target", {}))
 	else:
 		_bubble.set_context(_selection_context(path))
 
@@ -676,7 +676,7 @@ func _fill_ready(path: Array, target: Dictionary) -> void:
 				_board_view.picked_cells.append(target[key])
 		for place in target.get("places", []):
 			_board_view.picked_cells.append(place[1])
-	_on_selection_changed(path, battle.board.glyphs_of(path), EffectPreview.word_for(battle.board.glyphs_of(path)), target)
+	_on_selection_changed(path, battle.board.glyphs_of(path), EffectPreview.word_for(battle.board.glyphs_of(path), battle), target)
 	var hint := "已选目标 · 按发动确认"
 	if _target_kind >= 0:
 		var tile: Vector2i = target.get("tile", Vector2i(-1, -1))
@@ -1085,7 +1085,7 @@ func _run_pair(path: Array, mode: String) -> void:
 
 func _pick_prompt(path: Array, instruction: String) -> void:
 	var glyphs := battle.board.glyphs_of(path)
-	var word := Database.get_word_by_glyphs(glyphs)
+	var word := EffectPreview.word_for(glyphs, battle)
 	_bubble.set_text("".join(glyphs), (EffectPreview.word_text(word, battle, path, {"picking": true}, true) + "\n" if word != null else "") + instruction, SpeechBubble.State.PREVIEW)
 	_bubble.set_context(_selection_context(path))
 	_update_input()
@@ -1405,7 +1405,7 @@ func _choose_solo_release(path: Array, target: Dictionary) -> bool:
 func _choose_compound_copy(path: Array, target: Dictionary) -> bool:
 	if target.has("compound_uid") or not battle.has_ability("next_compound") or not battle.board.valid_path(path):
 		return false
-	var word := Database.get_word_by_glyphs(battle.board.glyphs_of(path))
+	var word := EffectPreview.word_for(battle.board.glyphs_of(path), battle)
 	if word == null or word.length() < BattleBalance.i("long_word_threshold", 3):
 		return false
 	var cards: Array = []

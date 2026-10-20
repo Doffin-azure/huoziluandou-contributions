@@ -84,7 +84,7 @@ static func normalize_target(raw: Dictionary) -> Dictionary:
 
 static func request(b: BattleState, path: Array) -> Dictionary:
 	var glyphs := b.board.glyphs_of(path) if b.board.valid_path(path) else []
-	var word := EffectDescriptions.word_for(glyphs) if glyphs.size() >= 2 else null
+	var word := EffectDescriptions.word_for(glyphs, b) if glyphs.size() >= 2 else null
 	var source := b.board.get_xy(path[0]) if path.size() == 1 else null
 	var interaction := interaction_of(word)
 	var required := required_for_word(word) if word != null else (solo_requires_target(b, source.data, path) if source != null else EffectData.Target.NONE)
@@ -220,7 +220,7 @@ static func validate_builtin(b: BattleState, handler: String, path: Array, targe
 		var candidate := EffectHandlersActions.gild_candidate(target)
 		if candidate == null:
 			return "镀金：请选择字袋中一枚未镀金的实体字"
-		var word: WordData = Database.get_word_by_glyphs_string("".join(b.board.glyphs_of(path)))
+		var word: WordData = EffectDescriptions.word_for(b.board.glyphs_of(path), b)
 		var cost := int(word.effects[0].args.get("cost", 0)) if word != null else 0
 		if EffectUtil.available(b) < EffectUtil.discounted_cost(b, cost):
 			return "镀金：铜钱不足（需%d）" % cost

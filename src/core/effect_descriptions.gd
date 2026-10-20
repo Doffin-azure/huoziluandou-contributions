@@ -2,10 +2,13 @@ extends RefCounted
 class_name EffectDescriptions
 ## 只读预览：不得执行 handler、抽字、退款、洗牌或消耗随机数。
 
-static func word_for(glyphs: Array) -> WordData:
+## b 给了就按出字时的规则补上遗物认的词（反字模倒连、叠字钱三连），预览和实际出字一致
+static func word_for(glyphs: Array, b: BattleState = null) -> WordData:
 	var word := Database.get_word_by_glyphs(glyphs)
 	if word == null and glyphs.has("过"):
 		word = Database.get_word_by_glyphs(glyphs.filter(func(g): return g != "过"))
+	if word == null and b != null:
+		word = Relics.fallback_word(b, glyphs)
 	return word
 
 static func word_text(word: WordData, b: BattleState, path: Array = [], target: Dictionary = {}, concise := false) -> String:
