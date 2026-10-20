@@ -121,7 +121,7 @@ static func condition_met(condition: Variant) -> bool:
 	return false
 
 
-static func resolve(effects: Array, rng: RandomNumberGenerator) -> Dictionary:
+static func resolve(effects: Array, rng: RandomNumberGenerator, offer_relics := false) -> Dictionary:
 	## 有目标选择的选项先返回待选数据；不产生任何副作用，取消选择可安全重选。
 	var plan := _removal_plan(effects)
 	if not plan.get("ok", false): return plan
@@ -131,8 +131,8 @@ static func resolve(effects: Array, rng: RandomNumberGenerator) -> Dictionary:
 	var total := 0
 	for count: int in removal_counts: total += count
 	if total > 0:
-		return {"ok": true, "pending": _pending(effects, removal_counts, [], total)}
-	return _execute(effects, removal_counts, [], rng)
+		return {"ok": true, "pending": _pending(effects, removal_counts, [], total, offer_relics)}
+	return _execute(effects, removal_counts, [], rng, offer_relics)
 
 
 static func _removal_plan(effects: Array) -> Dictionary:
@@ -153,7 +153,7 @@ static func _removal_plan(effects: Array) -> Dictionary:
 	return {"ok": true, "counts": removal_counts}
 
 
-static func resume(pending: Dictionary, glyph: String, rng: RandomNumberGenerator) -> Dictionary:
+static func resume(pending: Dictionary, glyph: String, rng: RandomNumberGenerator, offer_relics := false) -> Dictionary:
 	if str(pending.get("type", "")) != "remove_character" or not (pending.get("glyphs", []) as Array).has(glyph):
 		return {"ok": false, "reason": "无效删字选择"}
 	var plan := _removal_plan(pending.get("effects", []))
@@ -168,18 +168,19 @@ static func resume(pending: Dictionary, glyph: String, rng: RandomNumberGenerato
 	if not _can_complete_removal(pending.get("effects", []), pending.get("removal_counts", []), selected):
 		return {"ok": false, "reason": "可删除的字已变化，请取消后重新选择"}
 	var remaining := int(pending.get("remaining", 0)) - 1
+	offer_relics = offer_relics or bool(pending.get("offer_relics", false))
 	if remaining > 0:
-		return {"ok": true, "pending": _pending(pending.get("effects", []), pending.get("removal_counts", []), selected, remaining)}
-	return _execute(pending.get("effects", []), pending.get("removal_counts", []), selected, rng)
+		return {"ok": true, "pending": _pending(pending.get("effects", []), pending.get("removal_counts", []), selected, remaining, offer_relics)}
+	return _execute(pending.get("effects", []), pending.get("removal_counts", []), selected, rng, offer_relics)
 
 
-static func _pending(effects: Array, removal_counts: Array, selected: Array, remaining: int) -> Dictionary:
+static func _pending(effects: Array, removal_counts: Array, selected: Array, remaining: int, offer_relics := false) -> Dictionary:
 	var counts := remaining_counts({"selected": selected})
 	# Only offer a choice if the rest of the required targets can still be filled.
 	var glyphs: Array = counts.keys().filter(func(g):
 		return int(counts[g]) > 0 and _can_complete_removal(effects, removal_counts, selected + [g]))
 	return {"type": "remove_character", "effects": effects.duplicate(true), "removal_counts": removal_counts.duplicate(),
-		"selected": selected.duplicate(), "remaining": remaining, "glyphs": glyphs}
+		"selected": selected.duplicate(), "remaining": remaining, "glyphs": glyphs, "offer_relics": offer_relics}
 
 
 static func remaining_counts(pending: Dictionary) -> Dictionary:
@@ -232,7 +233,10 @@ static func _match_removal(index: int, targets: Array, candidates: Array, assign
 	return false
 
 
-static func _execute(effects: Array, removal_counts: Array, selected: Array, rng: RandomNumberGenerator) -> Dictionary:
+static func _execute(effects: Array, removal_counts: Array, selected: Array, rng: RandomNumberGenerator, offer_relics := false, reserved: Array = []) -> Dictionary:
+	# Random finds are revealed before pickup. Costs and other option effects settle once.
+	# Explicitly named relic options retain their stated pickup effect.
+	var relic_offers: Array = []
 	var selected_index := 0
 	for index in effects.size():
 		var effect: Dictionary = effects[index]
@@ -290,8 +294,9 @@ static func _execute(effects: Array, removal_counts: Array, selected: Array, rng
 				var branch: Array = effect.get("then", []) if condition_met(effect.get("condition", {})) else effect.get("else", [])
 				var branch_counts: Array[int] = []
 				for _branch_effect in branch: branch_counts.append(0)
-				var branch_result := _execute(branch, branch_counts, [], rng)
+				var branch_result := _execute(branch, branch_counts, [], rng, offer_relics, reserved + relic_offers)
 				if not branch_result.get("ok", false): return branch_result
+				relic_offers.append_array(branch_result.get("relic_offers", []))
 			"gain_character":
 				var character: CharacterData = _specific_character(str(effect.get("glyph", "")))
 				if character == null:
@@ -321,8 +326,11 @@ static func _execute(effects: Array, removal_counts: Array, selected: Array, rng
 					if effect.has("fallback_gold"): GameState.add_gold(int(effect.fallback_gold))
 					continue
 				if relic_id == "random":
-					var choices: Array = Relics.roll_choices(GameState.relics, rng, 1, relic_pool)
+					var choices: Array = Relics.roll_choices(GameState.relics + reserved + relic_offers, rng, 1, relic_pool)
 					relic_id = str(choices[0]) if not choices.is_empty() else ""
+					if offer_relics and not relic_id.is_empty():
+						relic_offers.append(relic_id)
+						continue
 				if relic_id.is_empty() or not GameState.add_relic(relic_id):
 					if effect.has("fallback_gold"): GameState.add_gold(int(effect.fallback_gold))
 					else: return {"ok": false, "reason": "没有可获得的遗物"}
@@ -343,7 +351,7 @@ static func _execute(effects: Array, removal_counts: Array, selected: Array, rng
 					if character == null or not GameState.remove_character_id(character.id):
 						return {"ok": false, "reason": "所选字已不存在"}
 					selected_index += 1
-	return {"ok": true, "pending": {}}
+	return {"ok": true, "pending": {}, "relic_offers": relic_offers}
 
 
 static func debt_amount() -> int:

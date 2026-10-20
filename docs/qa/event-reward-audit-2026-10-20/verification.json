@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-20",
+  "baseline": "bdbe9ee433554c7e3d2c5aca524f55ebd1c74308",
+  "scope": "37 events in the horizontal node-map flow, optional random relic pickup, HP costs, saved event rewards",
+  "godot": "4.7.2.stable",
+  "tests": [
+    {
+      "suite": "event-reward-audit",
+      "checks": 61,
+      "failures": 0,
+      "log": "event-reward-audit.log"
+    },
+    {
+      "suite": "event-system",
+      "checks": 631,
+      "failures": 0,
+      "log": "event-system.log"
+    },
+    {
+      "suite": "event-interaction",
+      "checks": 43,
+      "failures": 0,
+      "log": "event-interaction.log"
+    },
+    {
+      "suite": "event-art",
+      "checks": 525,
+      "failures": 0,
+      "log": "event-art.log"
+    },
+    {
+      "suite": "node-route",
+      "checks": 196,
+      "failures": 0,
+      "log": "node-route.log"
+    },
+    {
+      "suite": "node-route-runtime",
+      "checks": 29,
+      "failures": 0,
+      "log": "node-route-runtime.log"
+    },
+    {
+      "suite": "achievement-run",
+      "checks": 30,
+      "failures": 0,
+      "log": "achievement-run.log"
+    },
+    {
+      "suite": "achievement-hooks",
+      "checks": 22,
+      "failures": 0,
+      "log": "achievement-hooks.log"
+    },
+    {
+      "suite": "mobile-layout",
+      "checks": 297,
+      "failures": 0,
+      "log": "mobile-layout.log"
+    },
+    {
+      "suite": "relic-audit",
+      "checks": 144,
+      "failures": 0,
+      "log": "relic-audit.log"
+    },
+    {
+      "suite": "native-vivo-y33",
+      "checks": 27,
+      "failures": 0,
+      "log": "native-vivo-y33.log"
+    },
+    {
+      "suite": "native-reference-2664",
+      "checks": 27,
+      "failures": 0,
+      "log": "native-reference-2664.log"
+    }
+  ],
+  "mobile_layout_profiles": 11,
+  "native_render_profiles": [
+    "vivo-y33",
+    "reference-2664"
+  ],
+  "legacy_map_compile": "legacy-map-compile.log",
+  "android_device_tested": false,
+  "notes": [
+    "Some standalone suites retain existing ObjectDB/resources-in-use cleanup warnings; raw logs are included.",
+    "Screen captures are desktop Forward+ rendering at the selected mobile profile aspect ratios.",
+    "Paid event costs remain paid when an offered relic is declined.",
+    "Includes remote relic audit fixes and pending setup preservation after optional pickup."
+  ],
+  "screenshots": [
+    "vivo-y33-event-relic.png",
+    "reference-2664-event-relic.png"
+  ]
+}

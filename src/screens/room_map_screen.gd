@@ -136,7 +136,7 @@ func refresh() -> void:
 		return
 	_update_stats()
 	if run.phase=="battle": return
-	var node_screen: String = {"reward":"reward_screen.gd", "event":"event_screen.gd", "event_choose":"event_screen.gd",
+	var node_screen: String = {"reward":"reward_screen.gd", "event":"event_screen.gd", "event_choose":"event_screen.gd", "event_relic":"event_screen.gd",
 		"event_board":"event_board_screen.gd", "shop":"shop_screen.gd", "shop_choose":"shop_screen.gd",
 		"rest":"rest_screen.gd", "rest_choose":"rest_screen.gd"}.get(run.phase,"")
 	if not node_screen.is_empty():
@@ -259,15 +259,21 @@ func _treasure_receipt() -> void:
 	_receipt_open = true
 	var receipt: Dictionary = run.contents[run.current_room].get("treasure",{})
 	var id := str(receipt.get("relic",""))
+	var pending := bool(receipt.get("pending",false))
 	var overlay := ChoiceOverlay.new()
-	overlay.setup({"title":"宝藏 · 碑间遗器", "body":("获得遗物「%s」\n%s" % [Relics.name_of(id),Relics.desc_of(id)]) if not id.is_empty() else "普通遗物已取尽，获得 30 铜钱。",
-		"relic_id":id,"options":[{"text":"收下，继续前行","primary":true}]})
-	overlay.chose.connect(func(_index):
-		if not id.is_empty():
+	overlay.z_index = 100
+	var options: Array = [{"text":"收下，继续前行","primary":true,"disabled":pending and GameState.has_relic(id)}]
+	if pending: options.append({"text":"放弃遗物"})
+	overlay.setup({"title":"宝藏 · 碑间遗器", "body":("%s遗物「%s」\n%s" % ["发现" if pending else "获得",Relics.name_of(id),Relics.desc_of(id)]) if not id.is_empty() else "普通遗物已取尽，获得 30 铜钱。",
+		"relic_id":id,"options":options,"dismissible":pending,"dismiss_on_backdrop":false,"cancel_index":1})
+	overlay.chose.connect(func(index: int):
+		var result: Dictionary = run.apply({"type":"treasure_ack" if index==0 else "treasure_skip"})
+		if not result.get("ok",false): _receipt_open = false; refresh(); return
+		if not str(result.get("relic","")).is_empty():
 			RelicRewardFlow.bind_owned(self,id,func(_id):
-				run.apply({"type":"treasure_ack"}); _receipt_open = false; refresh())
+				run._save_if_enabled(); _receipt_open = false; refresh())
 		else:
-			run.apply({"type":"treasure_ack"}); _receipt_open = false; refresh())
+			_receipt_open = false; refresh())
 	add_child(overlay)
 
 

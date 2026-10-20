@@ -153,7 +153,9 @@ func _run() -> void:
 	_check(battle_start.ok and battle_relic_room.phase == "encounter" and battle_relic_room.spawned_battle, "死地取器进入事件战斗")
 	battle_relic_room.begin_live_battle()
 	battle_relic_room.finish_live_battle(true)
-	_check(battle_relic_room.phase == "map" and GameState.relics.size() == battle_relic_before + 1, "死地取器战斗胜利后获得遗物")
+	_check(battle_relic_room.phase == "event_relic" and GameState.relics.size() == battle_relic_before, "死地取器胜利后先展示遗物，不强制拾取")
+	var claim: Dictionary = battle_relic_room.apply({"type":"event_relic_take"})
+	_check(claim.ok and battle_relic_room.phase == "map" and GameState.relics.size() == battle_relic_before + 1, "死地取器确认后才获得遗物")
 	var chaos_room = ROOM_RUN.new()
 	chaos_room.reset({"seed": 7306}); chaos_room.autosave = false
 	chaos_room.phase = "event"; chaos_room.event_node = "start"

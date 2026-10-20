@@ -118,6 +118,7 @@ func _start_event() -> void:
 	ids.erase(event_id); event_bags[key] = ids; last_event_id = event_id
 	if not event_id.is_empty() and not seen_events.has(event_id): seen_events.append(event_id)
 	pending_event_effect.clear()
+	pending_event_relics.clear()
 	event_board.clear()
 	_log("奇遇：" + str(event_data.get("title", "")))
 	phase = "event"
@@ -129,14 +130,17 @@ func _apply_event(action: Dictionary) -> Dictionary:
 	var index := int(action.get("index", -1))
 	if index < 0 or index >= options.size() or not EventEffects.option_available(options[index]): return _fail("无效事件选项")
 	var option: Dictionary = options[index]
-	var result: Dictionary = EventEffects.resolve(option.get("effects", []), GameState.rng)
+	var result: Dictionary = EventEffects.resolve(option.get("effects", []), GameState.rng, true)
 	if not result.get("ok", false): return _fail(str(result.get("reason", "事件结算失败")))
 	pending_event_effect = result.get("pending", {})
+	pending_event_relics = result.get("relic_offers", [])
 	pending_event_next = str(option.get("goto", ""))
 	pending_spawn = str(option.get("spawn", ""))
 	pending_spawn_relic = str(option.get("spawn_relic", ""))
 	if pending_event_effect.is_empty():
-		if bool(option.get("board", false)):
+		if GameState.player_hp <= 0 or not pending_event_relics.is_empty():
+			_advance_event()
+		elif bool(option.get("board", false)):
 			_start_event_board()
 		elif pending_spawn.is_empty():
 			_advance_event()
@@ -149,6 +153,9 @@ func _apply_event(action: Dictionary) -> Dictionary:
 
 
 func _advance_event() -> void:
+	if GameState.player_hp <= 0 or not pending_event_relics.is_empty():
+		super._advance_event()
+		return
 	var spawn := pending_spawn
 	pending_spawn = ""
 	if not spawn.is_empty() and pending_event_next.is_empty():
@@ -224,7 +231,7 @@ func _leave_event_board() -> Dictionary:
 	return {"ok": true, "phase": phase}
 
 
-## 事件可以附带一次即时遭遇：宝箱直接发普通遗物，战斗在事件房间结束后打开。
+## 事件附带的宝箱先展示遗物；战斗胜利后也保留领取或放弃的选择。
 func _spawn_after_event(kind: String) -> void:
 	Achievements.event_completed(str(event_data.get("id", "")))
 	pending_spawn = ""
@@ -233,10 +240,7 @@ func _spawn_after_event(kind: String) -> void:
 	pending_glyphs.clear()
 	match kind:
 		"treasure":
-			if _grant_treasure_relic().is_empty():
-				GameState.add_gold(30)
-				_log("宝箱：普通遗物已收集完，改为铜钱 +30")
-			_complete_node()
+			_offer_event_relic("random", 30)
 		"battle":
 			spawned_battle = true
 			spawn_battle_relic = pending_spawn_relic
@@ -246,6 +250,12 @@ func _spawn_after_event(kind: String) -> void:
 			_log("奇遇：拦路的字影扑了上来")
 		_:
 			_complete_node()
+
+
+func _offer_event_relic(mode: String, fallback_gold: int) -> void:
+	var result := EventEffects.resolve([{"type":"gain_relic", "relic":mode, "fallback_gold":fallback_gold}], GameState.rng, true)
+	pending_event_relics = result.get("relic_offers", [])
+	_advance_event()
 
 
 func _grant_treasure_relic() -> String:
@@ -371,13 +381,17 @@ func _arrive(id: String) -> void:
 		"rest": phase = "rest"
 		"shop": _start_shop()
 		"treasure":
-			var found := _grant_treasure_relic()
+			var found := ""
+			if layout_kind=="node_graph":
+				var offers: Array = Relics.roll_choices(GameState.relics,GameState.rng,1)
+				if not offers.is_empty(): found = str(offers[0])
+			else: found = _grant_treasure_relic()
 			if found.is_empty():
 				GameState.add_gold(30)
 				_log("宝箱：普通遗物已收集完，改为铜钱 +30")
 			if layout_kind=="node_graph":
 				if not contents.has(current_room): contents[current_room] = {}
-				contents[current_room]["treasure"] = {"relic":found}
+				contents[current_room]["treasure"] = {"relic":found, "pending":not found.is_empty()}
 				phase = "treasure"
 			else: _complete_node()
 
@@ -536,9 +550,9 @@ func finish_live_battle(victory: bool) -> void:
 		return
 	# 事件战斗的遗物奖励替代普通战后三选一。
 	if spawned_battle and not spawn_battle_relic.is_empty():
-		_grant_battle_relic(spawn_battle_relic)
+		var relic_reward := spawn_battle_relic
 		spawn_battle_relic = ""
-		_complete_node()
+		_offer_event_relic(relic_reward, 35)
 		_save_if_enabled()
 		return
 	var kind: String = graph.rooms[current_room].kind
@@ -616,6 +630,7 @@ func _complete_node() -> void:
 	resolved[current_room] = true
 	_sync_content()
 	reward_options.clear(); shop_offers.clear(); event_data = {}; pending_glyphs.clear(); pending_event_effect.clear(); pending_event_next = ""; event_node = "start"
+	pending_event_relics.clear()
 	GameState.clear_event_temp_hp()
 	phase = "act_end" if current_room==graph.boss else "map"
 	battle_h = null
@@ -645,7 +660,10 @@ func legal_actions() -> Array:
 		return stock
 	if phase=="encounter": return [{"type":"interact","label":"开战"}]
 	if phase=="act_end": return [{"type":"next_act","label":"完成远征" if GameState.act_index==3 else "进入下一幕"}]
-	if phase=="treasure": return [{"type":"treasure_ack","label":"收下宝藏"}]
+	if phase=="treasure":
+		var actions: Array = [{"type":"treasure_ack","label":"收下宝藏"}]
+		if contents.get(current_room,{}).get("treasure",{}).get("pending",false): actions.append({"type":"treasure_skip","label":"放弃遗物"})
+		return actions
 	if phase=="rest": return super.legal_actions()+[{"type":"leave_service","label":"不休整，离开"}]
 	return super.legal_actions()
 
@@ -666,7 +684,18 @@ func apply(action: Dictionary) -> Dictionary:
 			Achievements.finish_run(true)
 		else: _load_act(GameState.act_index+1)
 		result = {"ok":true,"phase":phase}
-	elif type=="treasure_ack" and phase=="treasure": _complete_node(); result = {"ok":true,"phase":phase}
+	elif type in ["treasure_ack","treasure_skip"] and phase=="treasure":
+		var receipt: Dictionary = contents.get(current_room,{}).get("treasure",{})
+		var relic := str(receipt.get("relic",""))
+		if type=="treasure_ack" and bool(receipt.get("pending",false)) and not GameState.add_relic(relic):
+			return _fail("这件遗物已经拥有或已失效，可放弃领取")
+		if type=="treasure_ack" and bool(receipt.get("pending",false)) and Relics.needs_bind(relic):
+			for inst: CharInstance in GameState.deck:
+				if GameState.bind_relic(relic,inst.id()): break
+		if type=="treasure_ack" and bool(receipt.get("pending",false)): Relics.queue_setup(relic)
+		receipt["pending"] = false
+		_complete_node()
+		result = {"ok":true,"phase":phase,"relic":relic if type=="treasure_ack" else ""}
 	elif type=="leave_service" and phase=="rest": _complete_node(); result = {"ok":true,"phase":phase}
 	elif type=="event_word" and phase=="event_board": result = _resolve_event_board(action.get("path", []))
 	elif type=="event_board_leave" and phase=="event_board": result = _leave_event_board()
@@ -722,7 +751,7 @@ func observe() -> Dictionary:
 	result["plan_choices"] = plan_choices() if travel!=null or layout_kind=="node_graph" else []
 	result["rooms"] = graph.rooms.values().map(func(r):return {"id":r.id,"kind":r.kind,"next":r.next.duplicate(),"visited":visited_rooms.has(r.id),"sealed":sealed.has(r.id)})
 	result["node_type"] = kind
-	if phase in ["event", "event_choose"]:
+	if phase in ["event", "event_choose", "event_relic"]:
 		var current: Dictionary = current_event()
 		var options: Array = current.get("options", [])
 		result["event"] = {
@@ -734,6 +763,7 @@ func observe() -> Dictionary:
 			"acts": event_data.get("acts", []).duplicate(),
 			"tags": event_data.get("tags", []).duplicate(),
 			"options": options.duplicate(true),
+			"relic_offers": pending_event_relics.duplicate(),
 		}
 		if phase == "event_choose":
 			result["event"]["pending_removal"] = {
@@ -757,6 +787,7 @@ func save_run(path := SAVE_PATH) -> Error:
 	data.run["achievements"] = Achievements.export_run()
 	if travel!=null: data.run["forward"] = {"history":travel.history.duplicate(),"departed":travel.departed}
 	data.run["planned_route"] = planned_route.duplicate()
+	data.run["pending_event_relics"] = pending_event_relics.duplicate()
 	data.player = {"hp":GameState.player_hp,"max_hp":GameState.player_max_hp,"gold":GameState.gold,"sequence":GameState.battle_sequence,"relics":GameState.relics,"binds":GameState.relic_binds,"counters":GameState.relic_counters,"reduction":GameState.permanent_damage_reduction,"deck":[]}
 	data.player["revive_charges"] = GameState.revive_charges
 	for inst in GameState.deck:
@@ -801,6 +832,7 @@ static func restore(path := SAVE_PATH, as_nodes := false):
 	run.seen_events = state.get("seen_events", [])
 	run.event_bags = state.get("event_bags",{}); run.last_event_id = str(state.get("last_event_id",""))
 	run.event_node = state.get("event_node", "start"); run.pending_event_next = state.get("pending_event_next", "")
+	run.pending_event_relics = state.get("pending_event_relics", [])
 	GameState.event_temp_hp = int(state.get("event_temp_hp", 0))
 	run.position = state.position; run.phase = state.phase
 	run._restore_travel(state.get("forward",{}))

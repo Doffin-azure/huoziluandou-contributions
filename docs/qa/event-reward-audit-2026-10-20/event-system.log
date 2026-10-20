@@ -1,0 +1,636 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 68 / 词 165 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+  ✓ 事件 ID 唯一：ink_pool
+  ✓ ink_pool 有标题和正文
+  ✓ ink_pool 至少有两个选项
+  ✓ ink_pool 保持三个选项的固定结构
+  ✓ ink_pool 标注可用幕
+  ✓ ink_pool 带检索标签
+  ✓ ink_pool 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_character
+  ✓ ink_pool 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ ink_pool 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：broken_stele
+  ✓ broken_stele 有标题和正文
+  ✓ broken_stele 至少有两个选项
+  ✓ broken_stele 保持三个选项的固定结构
+  ✓ broken_stele 标注可用幕
+  ✓ broken_stele 带检索标签
+  ✓ broken_stele 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gain_character
+  ✓ broken_stele 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ 效果类型受支持：damage
+  ✓ broken_stele 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：old_bookshop
+  ✓ old_bookshop 有标题和正文
+  ✓ old_bookshop 至少有两个选项
+  ✓ old_bookshop 保持三个选项的固定结构
+  ✓ old_bookshop 标注可用幕
+  ✓ old_bookshop 带检索标签
+  ✓ old_bookshop 的选项效果是可校验的数据
+  ✓ 效果类型受支持：remove_character
+  ✓ old_bookshop 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ old_bookshop 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ 事件 ID 唯一：lantern_pages
+  ✓ lantern_pages 有标题和正文
+  ✓ lantern_pages 至少有两个选项
+  ✓ lantern_pages 保持三个选项的固定结构
+  ✓ lantern_pages 标注可用幕
+  ✓ lantern_pages 带检索标签
+  ✓ lantern_pages 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ lantern_pages 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_character
+  ✓ lantern_pages 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ 事件 ID 唯一：well_echo
+  ✓ well_echo 有标题和正文
+  ✓ well_echo 至少有两个选项
+  ✓ well_echo 保持三个选项的固定结构
+  ✓ well_echo 标注可用幕
+  ✓ well_echo 带检索标签
+  ✓ well_echo 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ well_echo 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ 效果类型受支持：gain_pollution
+  ✓ well_echo 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：foundation_stone
+  ✓ foundation_stone 有标题和正文
+  ✓ foundation_stone 至少有两个选项
+  ✓ foundation_stone 保持三个选项的固定结构
+  ✓ foundation_stone 标注可用幕
+  ✓ foundation_stone 带检索标签
+  ✓ foundation_stone 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_character
+  ✓ foundation_stone 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ foundation_stone 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：borrow_life
+  ✓ borrow_life 有标题和正文
+  ✓ borrow_life 至少有两个选项
+  ✓ borrow_life 保持三个选项的固定结构
+  ✓ borrow_life 标注可用幕
+  ✓ borrow_life 带检索标签
+  ✓ borrow_life 的选项效果是可校验的数据
+  ✓ 效果类型受支持：borrow_life
+  ✓ borrow_life 的选项效果是可校验的数据
+  ✓ 效果类型受支持：borrow_life
+  ✓ borrow_life 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：debt_collector
+  ✓ debt_collector 有标题和正文
+  ✓ debt_collector 至少有两个选项
+  ✓ debt_collector 保持三个选项的固定结构
+  ✓ debt_collector 标注可用幕
+  ✓ debt_collector 带检索标签
+  ✓ debt_collector 的选项效果是可校验的数据
+  ✓ 效果类型受支持：repay_life_hp
+  ✓ debt_collector 的选项效果是可校验的数据
+  ✓ 效果类型受支持：repay_life_max_hp
+  ✓ debt_collector 的选项效果是可校验的数据
+  ✓ 效果类型受支持：refuse_debt
+  ✓ 效果类型受支持：gain_pollution
+  ✓ 事件 ID 唯一：mossy_steps
+  ✓ mossy_steps 有标题和正文
+  ✓ mossy_steps 至少有两个选项
+  ✓ mossy_steps 保持三个选项的固定结构
+  ✓ mossy_steps 标注可用幕
+  ✓ mossy_steps 带检索标签
+  ✓ mossy_steps 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gain_character
+  ✓ mossy_steps 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ mossy_steps 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：rain_corridor
+  ✓ rain_corridor 有标题和正文
+  ✓ rain_corridor 至少有两个选项
+  ✓ rain_corridor 保持三个选项的固定结构
+  ✓ rain_corridor 标注可用幕
+  ✓ rain_corridor 带检索标签
+  ✓ rain_corridor 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal_percent
+  ✓ rain_corridor 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_character
+  ✓ rain_corridor 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ 事件 ID 唯一：pine_roots
+  ✓ pine_roots 有标题和正文
+  ✓ pine_roots 至少有两个选项
+  ✓ pine_roots 保持三个选项的固定结构
+  ✓ pine_roots 标注可用幕
+  ✓ pine_roots 带检索标签
+  ✓ pine_roots 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_character
+  ✓ pine_roots 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ pine_roots 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：angler_pool
+  ✓ angler_pool 有标题和正文
+  ✓ angler_pool 至少有两个选项
+  ✓ angler_pool 保持三个选项的固定结构
+  ✓ angler_pool 标注可用幕
+  ✓ angler_pool 带检索标签
+  ✓ angler_pool 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gold
+  ✓ angler_pool 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ angler_pool 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：stone_table_score
+  ✓ stone_table_score 有标题和正文
+  ✓ stone_table_score 至少有两个选项
+  ✓ stone_table_score 保持三个选项的固定结构
+  ✓ stone_table_score 标注可用幕
+  ✓ stone_table_score 带检索标签
+  ✓ stone_table_score 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gain_character
+  ✓ stone_table_score 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ stone_table_score 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ 事件 ID 唯一：kite_in_tree
+  ✓ kite_in_tree 有标题和正文
+  ✓ kite_in_tree 至少有两个选项
+  ✓ kite_in_tree 保持三个选项的固定结构
+  ✓ kite_in_tree 标注可用幕
+  ✓ kite_in_tree 带检索标签
+  ✓ kite_in_tree 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_character
+  ✓ kite_in_tree 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ kite_in_tree 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：old_gardener
+  ✓ old_gardener 有标题和正文
+  ✓ old_gardener 至少有两个选项
+  ✓ old_gardener 保持三个选项的固定结构
+  ✓ old_gardener 标注可用幕
+  ✓ old_gardener 带检索标签
+  ✓ old_gardener 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gold
+  ✓ old_gardener 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal_percent
+  ✓ old_gardener 的选项效果是可校验的数据
+  ✓ 效果类型受支持：max_hp
+  ✓ 事件 ID 唯一：old_inkstone
+  ✓ old_inkstone 有标题和正文
+  ✓ old_inkstone 至少有两个选项
+  ✓ old_inkstone 保持三个选项的固定结构
+  ✓ old_inkstone 标注可用幕
+  ✓ old_inkstone 带检索标签
+  ✓ old_inkstone 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_character
+  ✓ old_inkstone 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ old_inkstone 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：ferry_no_boat
+  ✓ ferry_no_boat 有标题和正文
+  ✓ ferry_no_boat 至少有两个选项
+  ✓ ferry_no_boat 保持三个选项的固定结构
+  ✓ ferry_no_boat 标注可用幕
+  ✓ ferry_no_boat 带检索标签
+  ✓ ferry_no_boat 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_character
+  ✓ ferry_no_boat 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ ferry_no_boat 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：lost_type_case
+  ✓ lost_type_case 有标题和正文
+  ✓ lost_type_case 至少有两个选项
+  ✓ lost_type_case 保持三个选项的固定结构
+  ✓ lost_type_case 标注可用幕
+  ✓ lost_type_case 带检索标签
+  ✓ lost_type_case 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_character
+  ✓ lost_type_case 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ lost_type_case 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：rubbing_worker
+  ✓ rubbing_worker 有标题和正文
+  ✓ rubbing_worker 至少有两个选项
+  ✓ rubbing_worker 保持三个选项的固定结构
+  ✓ rubbing_worker 标注可用幕
+  ✓ rubbing_worker 带检索标签
+  ✓ rubbing_worker 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gold
+  ✓ rubbing_worker 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_character
+  ✓ rubbing_worker 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：floating_lantern
+  ✓ floating_lantern 有标题和正文
+  ✓ floating_lantern 至少有两个选项
+  ✓ floating_lantern 保持三个选项的固定结构
+  ✓ floating_lantern 标注可用幕
+  ✓ floating_lantern 带检索标签
+  ✓ floating_lantern 的选项效果是可校验的数据
+  ✓ 效果类型受支持：max_hp
+  ✓ 效果类型受支持：heal
+  ✓ floating_lantern 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ floating_lantern 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：night_knock
+  ✓ night_knock 有标题和正文
+  ✓ night_knock 至少有两个选项
+  ✓ night_knock 保持三个选项的固定结构
+  ✓ night_knock 标注可用幕
+  ✓ night_knock 带检索标签
+  ✓ night_knock 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gain_character
+  ✓ 效果类型受支持：gain_pollution
+  ✓ night_knock 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ night_knock 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ 事件 ID 唯一：niche_offering
+  ✓ niche_offering 有标题和正文
+  ✓ niche_offering 至少有两个选项
+  ✓ niche_offering 保持三个选项的固定结构
+  ✓ niche_offering 标注可用幕
+  ✓ niche_offering 带检索标签
+  ✓ niche_offering 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ 效果类型受支持：gain_pollution
+  ✓ niche_offering 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ niche_offering 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：jade_case
+  ✓ jade_case 有标题和正文
+  ✓ jade_case 至少有两个选项
+  ✓ jade_case 保持三个选项的固定结构
+  ✓ jade_case 标注可用幕
+  ✓ jade_case 带检索标签
+  ✓ jade_case 的选项效果是可校验的数据
+  ✓ 效果类型受支持：spend_gold
+  ✓ jade_case 的选项效果是可校验的数据
+  ✓ 效果类型受支持：spend_gold
+  ✓ jade_case 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：buy_case
+  ✓ buy_case 有标题和正文
+  ✓ buy_case 至少有两个选项
+  ✓ buy_case 保持三个选项的固定结构
+  ✓ buy_case 标注可用幕
+  ✓ buy_case 带检索标签
+  ✓ buy_case 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_relic
+  ✓ buy_case 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gain_character
+  ✓ buy_case 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ 事件 ID 唯一：carry_jade
+  ✓ carry_jade 有标题和正文
+  ✓ carry_jade 至少有两个选项
+  ✓ carry_jade 保持三个选项的固定结构
+  ✓ carry_jade 标注可用幕
+  ✓ carry_jade 带检索标签
+  ✓ carry_jade 的选项效果是可校验的数据
+  ✓ 效果类型受支持：if
+  ✓ carry_jade 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gold
+  ✓ carry_jade 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：snatch_gold
+  ✓ snatch_gold 有标题和正文
+  ✓ snatch_gold 至少有两个选项
+  ✓ snatch_gold 保持三个选项的固定结构
+  ✓ snatch_gold 标注可用幕
+  ✓ snatch_gold 带检索标签
+  ✓ snatch_gold 的选项效果是可校验的数据
+  ✓ 效果类型受支持：if
+  ✓ snatch_gold 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ snatch_gold 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：bed_censer
+  ✓ bed_censer 有标题和正文
+  ✓ bed_censer 至少有两个选项
+  ✓ bed_censer 保持三个选项的固定结构
+  ✓ bed_censer 标注可用幕
+  ✓ bed_censer 带检索标签
+  ✓ bed_censer 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_relic
+  ✓ bed_censer 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ bed_censer 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ 事件 ID 唯一：trim_words
+  ✓ trim_words 有标题和正文
+  ✓ trim_words 至少有两个选项
+  ✓ trim_words 保持三个选项的固定结构
+  ✓ trim_words 标注可用幕
+  ✓ trim_words 带检索标签
+  ✓ trim_words 的选项效果是可校验的数据
+  ✓ 效果类型受支持：remove_character
+  ✓ trim_words 的选项效果是可校验的数据
+  ✓ 效果类型受支持：remove_character
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_character
+  ✓ trim_words 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：delete_poems
+  ✓ delete_poems 有标题和正文
+  ✓ delete_poems 至少有两个选项
+  ✓ delete_poems 保持三个选项的固定结构
+  ✓ delete_poems 标注可用幕
+  ✓ delete_poems 带检索标签
+  ✓ delete_poems 的选项效果是可校验的数据
+  ✓ 效果类型受支持：remove_character
+  ✓ 效果类型受支持：max_hp
+  ✓ delete_poems 的选项效果是可校验的数据
+  ✓ 效果类型受支持：remove_character
+  ✓ 效果类型受支持：gold
+  ✓ delete_poems 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：return_brush
+  ✓ return_brush 有标题和正文
+  ✓ return_brush 至少有两个选项
+  ✓ return_brush 保持三个选项的固定结构
+  ✓ return_brush 标注可用幕
+  ✓ return_brush 带检索标签
+  ✓ return_brush 的选项效果是可校验的数据
+  ✓ 效果类型受支持：remove_character
+  ✓ 效果类型受支持：gain_relic
+  ✓ return_brush 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gain_pollution
+  ✓ return_brush 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 事件 ID 唯一：ink_wash
+  ✓ ink_wash 有标题和正文
+  ✓ ink_wash 至少有两个选项
+  ✓ ink_wash 保持三个选项的固定结构
+  ✓ ink_wash 标注可用幕
+  ✓ ink_wash 带检索标签
+  ✓ ink_wash 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：remove_pollution
+  ✓ ink_wash 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：remove_pollution
+  ✓ ink_wash 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：purge_mirror
+  ✓ purge_mirror 有标题和正文
+  ✓ purge_mirror 至少有两个选项
+  ✓ purge_mirror 保持三个选项的固定结构
+  ✓ purge_mirror 标注可用幕
+  ✓ purge_mirror 带检索标签
+  ✓ purge_mirror 的选项效果是可校验的数据
+  ✓ 效果类型受支持：remove_pollution
+  ✓ 效果类型受支持：max_hp
+  ✓ purge_mirror 的选项效果是可校验的数据
+  ✓ 效果类型受支持：remove_pollution
+  ✓ purge_mirror 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：xuanji_board
+  ✓ xuanji_board 有标题和正文
+  ✓ xuanji_board 至少有两个选项
+  ✓ xuanji_board 保持三个选项的固定结构
+  ✓ xuanji_board 标注可用幕
+  ✓ xuanji_board 带检索标签
+  ✓ xuanji_board 的选项效果是可校验的数据
+  ✓ xuanji_board 的选项效果是可校验的数据
+  ✓ xuanji_board 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：lantern_riddle
+  ✓ lantern_riddle 有标题和正文
+  ✓ lantern_riddle 至少有两个选项
+  ✓ lantern_riddle 保持三个选项的固定结构
+  ✓ lantern_riddle 标注可用幕
+  ✓ lantern_riddle 带检索标签
+  ✓ lantern_riddle 的选项效果是可校验的数据
+  ✓ lantern_riddle 的选项效果是可校验的数据
+  ✓ lantern_riddle 的选项效果是可校验的数据
+  ✓ 事件 ID 唯一：chaos_dice
+  ✓ chaos_dice 有标题和正文
+  ✓ chaos_dice 至少有两个选项
+  ✓ chaos_dice 保持三个选项的固定结构
+  ✓ chaos_dice 标注可用幕
+  ✓ chaos_dice 带检索标签
+  ✓ chaos_dice 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gain_relic
+  ✓ chaos_dice 的选项效果是可校验的数据
+  ✓ 效果类型受支持：gold
+  ✓ chaos_dice 的选项效果是可校验的数据
+  ✓ 效果类型受支持：heal
+  ✓ 事件 ID 唯一：battle_relic
+  ✓ battle_relic 有标题和正文
+  ✓ battle_relic 至少有两个选项
+  ✓ battle_relic 保持三个选项的固定结构
+  ✓ battle_relic 标注可用幕
+  ✓ battle_relic 带检索标签
+  ✓ battle_relic 的选项效果是可校验的数据
+  ✓ battle_relic 的选项效果是可校验的数据
+  ✓ 效果类型受支持：damage
+  ✓ 效果类型受支持：gain_relic
+  ✓ battle_relic 的选项效果是可校验的数据
+  ✓ 效果类型受支持：spend_gold
+  ✓ 效果类型受支持：gain_relic
+  ✓ 事件 ID 唯一：shefu
+  ✓ shefu 有标题和正文
+  ✓ shefu 至少有两个选项
+  ✓ shefu 保持三个选项的固定结构
+  ✓ shefu 标注可用幕
+  ✓ shefu 带检索标签
+  ✓ shefu 的选项效果是可校验的数据
+  ✓ shefu 的选项效果是可校验的数据
+  ✓ shefu 的选项效果是可校验的数据
+  ✓ 第1幕有可用事件池
+  ✓ 第1幕事件池只含本幕事件：ink_pool
+  ✓ 第1幕事件池只含本幕事件：broken_stele
+  ✓ 第1幕事件池只含本幕事件：old_bookshop
+  ✓ 第1幕事件池只含本幕事件：lantern_pages
+  ✓ 第1幕事件池只含本幕事件：well_echo
+  ✓ 第1幕事件池只含本幕事件：foundation_stone
+  ✓ 第1幕事件池只含本幕事件：borrow_life
+  ✓ 第1幕事件池只含本幕事件：mossy_steps
+  ✓ 第1幕事件池只含本幕事件：rain_corridor
+  ✓ 第1幕事件池只含本幕事件：pine_roots
+  ✓ 第1幕事件池只含本幕事件：angler_pool
+  ✓ 第1幕事件池只含本幕事件：stone_table_score
+  ✓ 第1幕事件池只含本幕事件：kite_in_tree
+  ✓ 第1幕事件池只含本幕事件：old_gardener
+  ✓ 第1幕事件池只含本幕事件：jade_case
+  ✓ 第1幕事件池只含本幕事件：buy_case
+  ✓ 第1幕事件池只含本幕事件：bed_censer
+  ✓ 第1幕事件池只含本幕事件：ink_wash
+  ✓ 第1幕事件池只含本幕事件：lantern_riddle
+  ✓ 第1幕事件池只含本幕事件：shefu
+  ✓ 第2幕有可用事件池
+  ✓ 第2幕事件池只含本幕事件：ink_pool
+  ✓ 第2幕事件池只含本幕事件：broken_stele
+  ✓ 第2幕事件池只含本幕事件：old_bookshop
+  ✓ 第2幕事件池只含本幕事件：lantern_pages
+  ✓ 第2幕事件池只含本幕事件：well_echo
+  ✓ 第2幕事件池只含本幕事件：foundation_stone
+  ✓ 第2幕事件池只含本幕事件：borrow_life
+  ✓ 第2幕事件池只含本幕事件：rain_corridor
+  ✓ 第2幕事件池只含本幕事件：pine_roots
+  ✓ 第2幕事件池只含本幕事件：angler_pool
+  ✓ 第2幕事件池只含本幕事件：stone_table_score
+  ✓ 第2幕事件池只含本幕事件：kite_in_tree
+  ✓ 第2幕事件池只含本幕事件：old_gardener
+  ✓ 第2幕事件池只含本幕事件：old_inkstone
+  ✓ 第2幕事件池只含本幕事件：ferry_no_boat
+  ✓ 第2幕事件池只含本幕事件：lost_type_case
+  ✓ 第2幕事件池只含本幕事件：rubbing_worker
+  ✓ 第2幕事件池只含本幕事件：floating_lantern
+  ✓ 第2幕事件池只含本幕事件：niche_offering
+  ✓ 第2幕事件池只含本幕事件：jade_case
+  ✓ 第2幕事件池只含本幕事件：buy_case
+  ✓ 第2幕事件池只含本幕事件：carry_jade
+  ✓ 第2幕事件池只含本幕事件：snatch_gold
+  ✓ 第2幕事件池只含本幕事件：bed_censer
+  ✓ 第2幕事件池只含本幕事件：trim_words
+  ✓ 第2幕事件池只含本幕事件：delete_poems
+  ✓ 第2幕事件池只含本幕事件：return_brush
+  ✓ 第2幕事件池只含本幕事件：ink_wash
+  ✓ 第2幕事件池只含本幕事件：purge_mirror
+  ✓ 第2幕事件池只含本幕事件：xuanji_board
+  ✓ 第2幕事件池只含本幕事件：lantern_riddle
+  ✓ 第2幕事件池只含本幕事件：chaos_dice
+  ✓ 第2幕事件池只含本幕事件：battle_relic
+  ✓ 第2幕事件池只含本幕事件：shefu
+  ✓ 第3幕有可用事件池
+  ✓ 第3幕事件池只含本幕事件：broken_stele
+  ✓ 第3幕事件池只含本幕事件：old_bookshop
+  ✓ 第3幕事件池只含本幕事件：foundation_stone
+  ✓ 第3幕事件池只含本幕事件：borrow_life
+  ✓ 第3幕事件池只含本幕事件：angler_pool
+  ✓ 第3幕事件池只含本幕事件：old_gardener
+  ✓ 第3幕事件池只含本幕事件：old_inkstone
+  ✓ 第3幕事件池只含本幕事件：ferry_no_boat
+  ✓ 第3幕事件池只含本幕事件：lost_type_case
+  ✓ 第3幕事件池只含本幕事件：rubbing_worker
+  ✓ 第3幕事件池只含本幕事件：floating_lantern
+  ✓ 第3幕事件池只含本幕事件：night_knock
+  ✓ 第3幕事件池只含本幕事件：niche_offering
+  ✓ 第3幕事件池只含本幕事件：buy_case
+  ✓ 第3幕事件池只含本幕事件：carry_jade
+  ✓ 第3幕事件池只含本幕事件：snatch_gold
+  ✓ 第3幕事件池只含本幕事件：trim_words
+  ✓ 第3幕事件池只含本幕事件：delete_poems
+  ✓ 第3幕事件池只含本幕事件：return_brush
+  ✓ 第3幕事件池只含本幕事件：ink_wash
+  ✓ 第3幕事件池只含本幕事件：purge_mirror
+  ✓ 第3幕事件池只含本幕事件：xuanji_board
+  ✓ 第3幕事件池只含本幕事件：lantern_riddle
+  ✓ 第3幕事件池只含本幕事件：chaos_dice
+  ✓ 第3幕事件池只含本幕事件：battle_relic
+  ✓ 第3幕事件池只含本幕事件：shefu
+  ✓ roll 按幕过滤事件
+  ✓ roll 优先避开本局已出现的事件
+  ✓ 事件全部用完后回退到本幕完整池
+  ✓ heal_percent 按最大气血结算
+  ✓ max_hp 提升上限并保留治疗量
+  ✓ gain_pollution 把污染字加入字袋
+  ✓ gain_character 可以指定字形
+  ✓ 未知事件效果被拒绝
+  ✓ 临时气血优先吸收事件伤害
+  ✓ 条件可以检查持有特定字
+  ✓ 事件可以获得事件遗物
+  ✓ 事件随机池只发事件遗物：["life_debt"]
+  ✓ 铜钱不足时事件投入失败
+  ✓ 事件可以投入铜钱
+  ✓ 概率失败时只拿保底铜钱
+  ✓ 概率成功时只发普通遗物：["palindrome"]
+  ✓ 韫椟待贾有 5 个连续节点和 3 个入口选项
+  ✓ 韫椟待贾第二节点显示 25% 概率
+  ✓ 无字灯一次抽三题
+  ✓ 灯谜选项只显示谜面：“格外大方”（打一字）
+  ✓ 灯谜选项只显示谜面：“沱江水”（打一字）
+  ✓ 灯谜选项只显示谜面：“千里相逢”（打一字）
+  ✓ 无字灯三题答案不重复：["回", "清", "重"]
+  ✓ 无字灯按谜底发放字：回
+  ✓ 射覆用固定种子生成同一组奖励
+  ✓ 射覆选项不显示奖励内容：揭开左边的碗
+  ✓ 射覆选项不显示奖励内容：揭开中间的碗
+  ✓ 射覆选项不显示奖励内容：揭开右边的碗
+  ✓ 射覆三只碗只有一只藏稀有字
+  ✓ 射覆选择有字碗后只结算该碗
+  ✓ 纯益事件可以空手离开
+  ✓ 老园丁：听旧事最大气血 +10
+  ✓ 死地取器进入事件战斗
+  ✓ 死地取器胜利后先展示遗物，不强制拾取
+  ✓ 死地取器确认后才获得遗物
+  ✓ 乱文骨骰事件发放指定遗物并重铸字袋
+  ✓ 无字灯在庭院事件流程中结算一次
+  ✓ 韫椟待贾投钱后进入下一节点并扣 8 铜钱
+  ✓ 找到可测试的稀有字
+  ✓ 可以检查字袋里是否有稀有字
+  ✓ 稀有字删除浮层只列出稀有字
+  ✓ 稀有字删除可以结算
+  ✓ 可以检查污染字数量
+  ✓ 涤除清空污染字并扣 3 最大气血
+  ✓ 裁字可以进入连删两枚阶段
+  ✓ 连续删两枚后结算扣血和稀有字
+  ✓ 无效事件选择被拒绝且不改变状态
+  ✓ 自动化流程按目录结算铜钱并推进
+  ✓ 删字事件进入显式的待选字阶段
+  ✓ 自动化流程完成删字并只推进一次
+  ✓ 重复提交旧字选择不会重复结算
+  ✓ 房间图生成事件房
+  ✓ 庭院模式共用事件目录与删字阶段
+  ✓ 待选事件效果可以保存
+  ✓ 读档恢复事件的待选效果
+  ✓ 庭院模式读档后共用删字结算
+  ✓ 没有寿契时讨债事件不进池
+  ✓ 借寿立刻回血并记下寿债
+  ✓ 持有寿契后讨债事件进入事件池
+  ✓ 讨债可以按 2:1 折算为最大气血
+  ✓ 首次抽取的事件记入已出现列表
+  ✓ 同一局再次抽取时避开已出现事件
+  ✓ 已出现事件列表可以保存
+  ✓ 读档恢复已出现事件列表
+  ✓ 读档保留当前抽取袋和上次事件
+  ✓ 保存的随机状态保证下一事件不因读档重抽
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 本幕抽取袋耗尽前事件不重复
+  ✓ 新一轮抽取不紧接着重复上次事件
+  ✓ 条件失效后清理抽取袋，不回退到其他幕
+  ✓ 独立事件资源可登记，无需修改解释器
+  ✓ 重复稳定 ID 被拒绝
+  ✓ 扩展资源沿用幕、标签和权重
+  ✓ 零权重事件不被选择
+[event_system_test] PASS=631 FAIL=0

@@ -1,0 +1,149 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[Database] 字 68 / 词 165 / 敌人 29 / 幕 3 / 污染 4
+[Debug] 调试控制台：按 ~ 或 F1 打开（/help 查看命令）
+  ✓ 定义完整：strike「刻刀」档次 2
+  ✓ 定义完整：breach「蚀刻」档次 2
+  ✓ 定义完整：slab「压字石」档次 3
+  ✓ 定义完整：press「对开版」档次 3
+  ✓ 定义完整：sleep「安神香」档次 1
+  ✓ 定义完整：clean「净版布」档次 1
+  ✓ 定义完整：wheel「转轮架」档次 2
+  ✓ 定义完整：powerbank「蓄电瓶」档次 1
+  ✓ 定义完整：fireman「火种」档次 1
+  ✓ 定义完整：fertilizer「蔓生墨」档次 3
+  ✓ 定义完整：skyfire「天火」档次 2
+  ✓ 定义完整：blitz「急就章」档次 2
+  ✓ 定义完整：egg「字种」档次 2
+  ✓ 定义完整：buckler「铜护板」档次 1
+  ✓ 定义完整：barrier「纸屏风」档次 1
+  ✓ 定义完整：empty_case「空铅盒」档次 2
+  ✓ 定义完整：stay_wax「留字蜡」档次 2
+  ✓ 定义完整：amber「朱砂印泥」档次 3
+  ✓ 定义完整：ghost_hand「补字鬼手」档次 2
+  ✓ 定义完整：cracked_bottle「裂墨瓶」档次 2
+  ✓ 定义完整：rotting_fruit「褪墨」档次 2
+  ✓ 定义完整：chaos_dice「乱文骨骰」档次 3
+  ✓ 定义完整：black_water「黑水墨」档次 2
+  ✓ 定义完整：life_lantern「命灯」档次 2
+  ✓ 定义完整：life_debt「寿契」档次 2
+  ✓ 定义完整：chain「连字环」档次 3
+  ✓ 定义完整：question「问字签」档次 2
+  ✓ 定义完整：goldleaf「泥金笔」档次 2
+  ✓ 定义完整：moon「月字模」档次 2
+  ✓ 定义完整：slot「叠字钱」档次 2
+  ✓ 定义完整：death「判官笔」档次 1
+  ✓ 定义完整：ruin「生死簿」档次 1
+  ✓ 定义完整：rubbing「复字拓片」档次 1
+  ✓ 定义完整：midas「金字碑」档次 3
+  ✓ 定义完整：monkey「许愿笺」档次 3
+  ✓ 定义完整：palindrome「反字模」档次 2
+  ✓ 定义完整：binding「串字绳」档次 2
+  ✓ 定义完整：proof「校勘尺」档次 1
+  ✓ 定义完整：vial「还魂墨」档次 1
+  ✓ TIER 里没有多余的 id：strike
+  ✓ TIER 里没有多余的 id：breach
+  ✓ TIER 里没有多余的 id：slab
+  ✓ TIER 里没有多余的 id：press
+  ✓ TIER 里没有多余的 id：sleep
+  ✓ TIER 里没有多余的 id：clean
+  ✓ TIER 里没有多余的 id：wheel
+  ✓ TIER 里没有多余的 id：powerbank
+  ✓ TIER 里没有多余的 id：fireman
+  ✓ TIER 里没有多余的 id：fertilizer
+  ✓ TIER 里没有多余的 id：skyfire
+  ✓ TIER 里没有多余的 id：blitz
+  ✓ TIER 里没有多余的 id：egg
+  ✓ TIER 里没有多余的 id：buckler
+  ✓ TIER 里没有多余的 id：barrier
+  ✓ TIER 里没有多余的 id：empty_case
+  ✓ TIER 里没有多余的 id：stay_wax
+  ✓ TIER 里没有多余的 id：amber
+  ✓ TIER 里没有多余的 id：ghost_hand
+  ✓ TIER 里没有多余的 id：cracked_bottle
+  ✓ TIER 里没有多余的 id：rotting_fruit
+  ✓ TIER 里没有多余的 id：chaos_dice
+  ✓ TIER 里没有多余的 id：black_water
+  ✓ TIER 里没有多余的 id：life_lantern
+  ✓ TIER 里没有多余的 id：life_debt
+  ✓ TIER 里没有多余的 id：chain
+  ✓ TIER 里没有多余的 id：question
+  ✓ TIER 里没有多余的 id：goldleaf
+  ✓ TIER 里没有多余的 id：moon
+  ✓ TIER 里没有多余的 id：slot
+  ✓ TIER 里没有多余的 id：death
+  ✓ TIER 里没有多余的 id：ruin
+  ✓ TIER 里没有多余的 id：rubbing
+  ✓ TIER 里没有多余的 id：midas
+  ✓ TIER 里没有多余的 id：monkey
+  ✓ TIER 里没有多余的 id：palindrome
+  ✓ TIER 里没有多余的 id：binding
+  ✓ TIER 里没有多余的 id：proof
+  ✓ TIER 里没有多余的 id：vial
+  ✓ 名单里的 id 都有定义：black_water
+  ✓ 名单里的 id 都有定义：life_lantern
+  ✓ 名单里的 id 都有定义：life_debt
+  ✓ 名单里的 id 都有定义：black_water
+  ✓ 名单里的 id 都有定义：life_lantern
+  ✓ 名单里的 id 都有定义：fireman
+  ✓ 名单里的 id 都有定义：chaos_dice
+  ✓ 名单里的 id 都有定义：death
+  ✓ 名单里的 id 都有定义：ruin
+  ✓ 名单里的 id 都有定义：goldleaf
+  ✓ 名单里的 id 都有定义：rubbing
+  ✓ 名单里的 id 都有定义：monkey
+  ✓ 黑水墨、命灯不会从普通池或事件池滚出
+  ✓ 其余遗物都能滚到（37 件）
+  ✓ 旧存档 / 事件显式给出隐藏遗物时不报错
+  ✓ 判官笔：卖掉再买只给一枚【死】（1）
+  ✓ 生死簿：卖掉再买只给一枚【亡】（1）
+  ✓ 乱文骨骰：重铸后多 3 枚
+  ✓ 乱文骨骰：卖掉再买不再重铸（15）
+  ✓ 泥金笔：第一次拿到要挑字
+  ✓ 泥金笔：卖掉再买不再挑字
+  ✓ 复字拓片：第一次拿到要挑字
+  ✓ 复字拓片：卖掉再买不再挑字
+  ✓ 火种：卖掉再买不重复给火（+4）
+  ✓ 金字碑：全部镀金
+  ✓ 金字碑：之后拿到的也镀金
+  ✓ 金字碑：战斗收购得到的字也镀金
+  ✓ 金字碑失去后：原本泥金笔镀的仍是金字
+  ✓ 金字碑失去后：它镀的金全部退掉，不能卖掉白嫖
+  ✓ 金字碑 + 乱文骨骰：重铸出的新字也镀金
+  ✓ 金字碑：重金悬赏的收入也算，满 20 化为金像（收入 30）
+  ✓ 千字同文：许下【击】
+  ✓ 千字同文：污染字不会被洗成许愿字
+  ✓ 千字同文 + 乱文骨骰：重铸后仍全是【击】
+  ✓ 许愿笺卖掉：愿望记录保留
+  ✓ 许愿笺再买回来：不能重新许愿
+  ✓ 许愿笺再买回来：原来的千字同文恢复生效
+  ✓ 裂墨瓶：【复】返还不翻倍，不会越返越多（1）
+  ✓ 裂墨瓶：返还一半也按实际数（返 1，余 1）
+  ✓ 裂墨瓶：普通获得储能照常翻倍（7）
+  ✓ 裂墨瓶：先清空剩下的 3 储能，再结算蓄能 +2×2，留到下回合（4）
+  ✓ 裂墨瓶 + 蓄电瓶：开局 4×2 = 8 储能（8）
+  ✓ 补字鬼手：字袋、弃字堆都空，没补上不扣次数（3/3）
+  ✓ 补字鬼手：打出 1 枚补 1 枚，扣 1 次
+  ✓ 还魂墨 + 朱砂印泥：满血开局，2 点回血转成持久盾（2）
+  ✓ 朱砂印泥：不能获得格挡时不给盾
+  ✓ 连字环：不自动打【投币】（要花铜钱）
+  ✓ 连字环：不自动打【合击】（会排进合击队列）
+  ✓ 连字环：普通攻击词【击破】照常自动打
+  ✓ 连字环：合击队列进行中不自动出词
+  ✓ 校勘尺：只洗掉灼痕、还带别的污染，不算净化
+  ✓ 校勘尺：两枚洗干净，补 1 字
+  ✓ 校勘尺：字袋空了补不上，净化数先攒着（2）
+  ✓ 急就章：第一回合敌人不出手
+  ✓ 急就章：只跳过行动，灼烧照常结算（-3）
+  ✓ 急就章：第二回合恢复行动
+  ✓ 事件给泥金笔：记下待补的挑字
+  ✓ 事件给许愿笺：排在后面等许愿
+  ✓ 待补的挑字 / 许愿随存档保存
+  ✓ 按入手顺序一件件补（goldleaf → monkey）
+  ✓ 已经许过愿的不再弹
+  ✓ 没有可镀的字时不排挑字
+  ✓ 反字模：倒连【连重】按【重连】取交互（choose_three_tiles）
+  ✓ 反字模：只在本场持有时预览认倒连
+  ✓ 叠字钱：三连相同字的预览不再显示不成词
+  ✓ 无界面开战：还魂墨的开局回血不被血量设定抹掉（52）
+[relic_audit_test] PASS=144 FAIL=0

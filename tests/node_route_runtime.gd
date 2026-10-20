@@ -23,7 +23,8 @@ func run_checks() -> void:
 	check(map.find_children("*","SubViewport",true,false).is_empty(),"2D map has no 3D viewport")
 	var before: int = GameState.rng.state
 	var geometry: Dictionary = map.map_view.points.duplicate()
-	check(not map._action.visible and map.map_view.size.y>map.size.y*.8,"initial map fills the screen without a detail footer or unavailable travel action")
+	# The shared inventory occupies the top strip; the route fills the remaining content.
+	check(not map._action.visible and map.map_view.size.y>map.content.size.y*.8,"initial map fills available content without a detail footer or unavailable travel action")
 	var far: String = run.graph.boss
 	map._select_node(far)
 	check(run.planned_route.is_empty() and not map._action.visible,"inspecting a distant node does not invent a route or enable travel")

@@ -338,10 +338,10 @@ const EVENTS := [
 		"title": "墨池浮灯",
 		"body": "一盏纸灯漂在墨池上，灯芯是半枚烧焦的字。\n灯影一灭，庭院便像闭上了眼；灯影再亮，池面已经换了一个季节。",
 		"acts": [2, 3],
-		"tags": ["heal", "gold"],
+		"tags": ["heal", "gold", "max_hp"],
 		"options": [
-			{"text": "捞起纸灯（失去 4 气血，回复 20 气血）", "primary": true, "effects": [
-				{"type": "damage", "amount": 4},
+			{"text": "捞起纸灯（最大气血 -4，回复 20 气血）", "primary": true, "effects": [
+				{"type": "max_hp", "amount": -4},
 				{"type": "heal", "amount": 20},
 			]},
 			{"text": "取灯油（获得 18 铜钱）", "effects": [{"type": "gold", "amount": 18}]},

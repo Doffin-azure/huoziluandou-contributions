@@ -53,7 +53,7 @@ func _build() -> void:
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	dim.gui_input.connect(func(event):
-		if cfg.get("dismissible", false) and _dim_tap.matches(event, dim):
+		if cfg.get("dismissible", false) and cfg.get("dismiss_on_backdrop", true) and _dim_tap.matches(event, dim):
 			_on_choose(int(cfg.get("cancel_index", 0))))
 	_sheet.add_child(dim)
 
@@ -240,11 +240,13 @@ func _resize_relic_options(scale: float) -> void:
 func _layout() -> void:
 	if not is_inside_tree() or is_queued_for_deletion() or _panel == null or size.y < 1: return
 	var scale := JourneyStyle.touch_scale(self)
+	var safe := ScreenLayout.safe_rect(self)
+	var area := safe.size
 	if cfg.get("physical_relics", false): _resize_relic_options(scale)
 	var top := 16.0 * scale
 	if _peek_button != null:
 		_peek_button.size = Vector2(200, 48) * scale
-		_peek_button.position = Vector2(size.x - _peek_button.size.x - 16 * scale, top)
+		_peek_button.position = safe.position + Vector2(area.x - _peek_button.size.x - 16 * scale, top)
 		top += _peek_button.size.y + 8 * scale
 	_fit_scroll_options()
 	var skin := _panel.get_theme_stylebox("panel")
@@ -252,8 +254,8 @@ func _layout() -> void:
 	if cfg.get("physical_relics", false):
 		var count: int = cfg.get("options", []).filter(func(option): return option.has("relic_id")).size()
 		width = 400.0 if count == 1 else 1000.0
-	_panel.size = Vector2(minf(width * scale, size.x - 32 * scale), minf(_padding.get_combined_minimum_size().y + skin.get_minimum_size().y, size.y - top - 16 * scale))
-	_panel.position = Vector2((size.x - _panel.size.x) * 0.5, top + (size.y - top - 16 * scale - _panel.size.y) * 0.5)
+	_panel.size = Vector2(minf(width * scale, area.x - 32 * scale), minf(_padding.get_combined_minimum_size().y + skin.get_minimum_size().y, area.y - top - 16 * scale))
+	_panel.position = safe.position + Vector2((area.x - _panel.size.x) * 0.5, top + (area.y - top - 16 * scale - _panel.size.y) * 0.5)
 
 
 func _toggle_peek() -> void:

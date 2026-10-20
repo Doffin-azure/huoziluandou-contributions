@@ -157,6 +157,13 @@ func refresh() -> void:
 			if GameState.event_temp_hp>0: choices_box.add_child(Ink.caption("借寿余火：%d" % GameState.event_temp_hp))
 			choices_box.add_child(Ink.body(current_event.get("body",run.event_data.get("body",""))))
 			_render_actions()
+		elif run.phase=="event_relic":
+			if not run.pending_event_relics.is_empty():
+				var id := str(run.pending_event_relics[0])
+				choices_box.add_child(Ink.h2("发现「%s」" % Relics.name_of(id)))
+				choices_box.add_child(Ink.body(Relics.desc_of(id)))
+				choices_box.add_child(Ink.caption("可放弃遗物；已付代价不返还。"))
+			_render_actions()
 		elif run.phase=="rest":
 			choices_box.add_child(Ink.body("息灯休整，选择一项。")); _render_actions()
 		elif run.phase=="shop":
@@ -313,7 +320,9 @@ func _render_actions() -> void:
 		var button := _button(text,func():
 			var result: Dictionary = run.apply(action)
 			if not result.get("ok",false): run._log(str(result.get("reason","操作失败")))
-			refresh(),bool(action.get("primary",false)))
+			if action.type=="event_relic_take" and result.get("ok",false):
+				RelicRewardFlow.bind_owned(self,str(result.get("relic","")),func(_id): run._save_if_enabled(); refresh())
+			else: refresh(),bool(action.get("primary",false)))
 		if action.type=="shop_buy": button.disabled = GameState.gold<int(action.price)
 		choices_box.add_child(button)
 
@@ -326,6 +335,8 @@ func _action_text(action: Dictionary) -> String:
 		"shop_leave": return "离开字肆"
 		"rest": return {"heal":"回复%d气血" % int(action.get("amount",0)),"remove":"删去一枚字","upgrade":"为一枚字镀金"}[action.kind]
 		"event": return action.text
+		"event_relic_take": return "收下「%s」" % Relics.name_of(str(action.relic))
+		"event_relic_skip": return "放弃遗物"
 		"pick": return "【%s】" % action.glyph
 	return str(action.get("label",action.type))
 

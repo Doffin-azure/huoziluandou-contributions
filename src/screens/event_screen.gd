@@ -7,6 +7,8 @@ var _event: Dictionary
 var _done := false
 var _pending_removal := false
 var _pending_effect: Dictionary = {}
+var _pending_relics: Array = []
+var _relic_offer_open := false
 var _picker_generation := 0
 var _scroll: ScrollContainer
 var _page: Control
@@ -36,9 +38,9 @@ const EVENTS: Array = preload("res://src/data/event_catalog.gd").EVENTS
 
 
 func save_checkpoint() -> Dictionary:
-	if _done or _pending_removal: return {}
+	if (_done and _pending_relics.is_empty()) or _pending_removal: return {}
 	var snapshot := super.save_checkpoint()
-	snapshot.screen = {"event": _event}
+	snapshot.screen = {"event": _event, "relic_offers": _pending_relics.duplicate()}
 	return snapshot
 
 
@@ -46,16 +48,16 @@ func save_checkpoint() -> Dictionary:
 func build(root: Control) -> void:
 	node = params.get("node", null)
 	var saved: Dictionary = params.get("_saved_screen", {})
-	if saved.has("event"):
+	if params.get("room_run",false) and GameState.room_run!=null:
+		_room_session = preload("res://src/screens/room_node_session.gd").new(GameState.room_run)
+		_event = _room_session.run.current_event()
+	elif saved.has("event"):
 		_event = saved.event
+		_pending_relics = saved.get("relic_offers", []).duplicate()
 	else:
-		if params.get("room_run",false) and GameState.room_run!=null:
-			_room_session = preload("res://src/screens/room_node_session.gd").new(GameState.room_run)
-			_event = _room_session.run.current_event()
-		else:
-			var pool: Array = EventEffects.all().filter(func(event): return EventEffects.condition_met(event.get("requires", {})))
-			if pool.is_empty(): pool = EventEffects.all()
-			_event = EventEffects.node(pool[GameState.rng.randi_range(0, pool.size() - 1)])
+		var pool: Array = EventEffects.all().filter(func(event): return EventEffects.condition_met(event.get("requires", {})))
+		if pool.is_empty(): pool = EventEffects.all()
+		_event = EventEffects.node(pool[GameState.rng.randi_range(0, pool.size() - 1)])
 
 		if _room_session == null:
 			var side := RelicRewardFlow.side_rng("event")
@@ -105,6 +107,8 @@ func build(root: Control) -> void:
 	_copy.minimum_size_changed.connect(_place.call_deferred)
 	_layout.call_deferred()
 	if _room_session!=null and _room_session.run.phase=="event_choose": _resume_room_choice.call_deferred()
+	elif not _pending_relics.is_empty() or (_room_session!=null and _room_session.run.phase=="event_relic"):
+		_show_relic_offer.call_deferred()
 
 
 func _render_event() -> void:
@@ -144,7 +148,7 @@ func _render_event() -> void:
 		b.button_down.connect(func(): label.add_theme_color_override("font_color", JourneyStyle.TEXT))
 		b.button_up.connect(func(): label.add_theme_color_override("font_color", JourneyStyle.TEXT))
 		b.pressed.connect(_choose.bind(i))
-		b.disabled = not EventEffects.option_available(opt) or (_room_session!=null and _room_session.run.phase=="event_choose")
+		b.disabled = not EventEffects.option_available(opt) or (_room_session!=null and _room_session.run.phase!="event")
 		_copy.add_child(b)
 		_buttons.append(b)
 		_choice_labels.append(label)
@@ -251,11 +255,12 @@ func _choose(index: int) -> void:
 	if not relic.is_empty():
 		RelicRewardFlow.grant(self, relic, func(_id): _finish())
 		return
-	var result: Dictionary = EventEffects.resolve(_event.options[index].get("effects", []), GameState.rng)
+	var result: Dictionary = EventEffects.resolve(_event.options[index].get("effects", []), GameState.rng, true)
 	if not result.get("ok", false):
 		_restore_choices(str(result.get("reason", "事件结算失败")))
 		return
 	_pending_effect = result.get("pending", {})
+	_pending_relics = result.get("relic_offers", [])
 	_continue_effects()
 
 
@@ -276,7 +281,8 @@ func _leave_event() -> void:
 
 func _continue_effects() -> void:
 	if _pending_effect.is_empty():
-		_finish()
+		if GameState.player_hp > 0 and not _pending_relics.is_empty(): _show_relic_offer()
+		else: _finish()
 		return
 	_open_removal_picker()
 
@@ -320,15 +326,54 @@ func _on_removed(character: CharacterData, generation := -1) -> void:
 	if generation < 0: generation = _picker_generation
 	if generation != _picker_generation or not _pending_removal: return
 	_pending_removal = false
-	var result: Dictionary = EventEffects.resume(_pending_effect, character.glyph, GameState.rng)
+	var result: Dictionary = EventEffects.resume(_pending_effect, character.glyph, GameState.rng, true)
 	if not result.get("ok", false):
 		_restore_choices(str(result.get("reason", "事件删字失败")))
 		return
 	_pending_effect = result.get("pending", {})
+	_pending_relics = result.get("relic_offers", [])
 	_continue_effects()
 
 
+func _show_relic_offer() -> void:
+	if _relic_offer_open: return
+	var offers: Array = _room_session.run.pending_event_relics if _room_session!=null else _pending_relics
+	if offers.is_empty(): return
+	_done = true
+	for button in _buttons: button.disabled = true
+	if is_instance_valid(_leave_button): _leave_button.disabled = true
+	_relic_offer_open = true
+	var id := str(offers[0])
+	var overlay := ChoiceOverlay.new()
+	overlay.name = "EventRelicOffer"
+	overlay.z_index = 100
+	overlay.setup({"title":"发现「%s」" % Relics.name_of(id), "relic_id":id,
+		"body":Relics.desc_of(id)+"\n\n可放弃遗物；已付代价不返还。", "compact":true, "dismissible":true, "dismiss_on_backdrop":false, "cancel_index":1,
+		"options":[{"text":"收下", "primary":true, "disabled":GameState.has_relic(id)}, {"text":"放弃遗物"}]})
+	overlay.chose.connect(func(index: int):
+		if not is_inside_tree() or is_queued_for_deletion(): return
+		_relic_offer_open = false
+		if _room_session!=null:
+			var result: Dictionary = _room_session.apply({"type":"event_relic_take" if index==0 else "event_relic_skip"})
+			if result.get("ok",false) and not str(result.get("relic","")).is_empty():
+				RelicRewardFlow.bind_owned(self,id,func(_id):
+					_room_session.run._save_if_enabled(); _room_event_result(result))
+			else: _room_event_result(result)
+		else:
+			if index==0 and not GameState.add_relic(id):
+				_show_relic_offer.call_deferred(); return
+			if index==0: Relics.queue_setup(id)
+			_pending_relics.pop_front()
+			if index==0: RelicRewardFlow.bind_owned(self,id,func(_id): _continue_effects())
+			else: _continue_effects())
+	add_child(overlay)
+	SaveManager.request_save()
+
+
 func _finish() -> void:
+	if GameState.player_hp <= 0:
+		goto("res://src/screens/run_result_screen.gd", {"victory":false, "location":str(_event.get("title","")), "room_run":_room_session!=null})
+		return
 	if _room_session!=null: goto("res://src/screens/room_map_screen.gd"); return
 	# 经典模式：事件里拿到要挑字 / 许愿的遗物，离开前补上
 	if not Relics.next_pending_peek().is_empty():
@@ -341,6 +386,9 @@ func _finish() -> void:
 
 
 func _room_event_result(result: Dictionary) -> void:
+	if _room_session.current() and _room_session.run.phase=="event_relic":
+		_show_relic_offer.call_deferred()
+		return
 	if not result.ok:
 		if _room_session.current() and _room_session.run.phase == "event_choose":
 			_room_session.apply({"type":"cancel_pick"})

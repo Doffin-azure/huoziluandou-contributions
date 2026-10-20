@@ -27,6 +27,7 @@ var pending_glyphs: Array = []
 var pending_kind := ""
 var pending_index := -1
 var pending_event_effect: Dictionary = {}
+var pending_event_relics: Array = []
 var seed := 1
 var log_lines: Array = []
 
@@ -42,6 +43,7 @@ func reset(cfg: Dictionary = {}) -> void:
 	pending_kind = ""
 	pending_index = -1
 	pending_event_effect.clear()
+	pending_event_relics.clear()
 	log_lines.clear()
 	GameState.rng.seed = seed
 	GameState.start_new_run(str(cfg.get("starter", "v03")), cfg.get("deck", []))
@@ -151,7 +153,7 @@ func observe() -> Dictionary:
 		d["reward"] = reward_options.map(func(c): return {"glyph": c.glyph, "rarity": c.rarity})
 	if phase == "shop":
 		d["shop"] = shop_offers.map(func(o): return {"kind": o.kind, "price": o.price, "glyph": (o.character.glyph if o.character != null else "")})
-	if phase in ["event", "event_choose"]:
+	if phase in ["event", "event_choose", "event_relic"]:
 		var current: Dictionary = current_event()
 		var options: Array = current.get("options", [])
 		d["event"] = {
@@ -162,6 +164,7 @@ func observe() -> Dictionary:
 			"illustration": current.get("illustration", event_data.get("illustration", "")),
 			"options": options.map(func(option): return str(option.get("text", ""))),
 			"option_effects": options.map(func(option): return option.get("effects", []).duplicate(true)),
+			"relic_offers": pending_event_relics.duplicate(),
 		}
 		if phase == "event_choose":
 			d["event"]["pending_removal"] = {
@@ -205,6 +208,9 @@ func legal_actions() -> Array:
 				out4.append({"type": "event", "index": i, "text": opts[i].text, "primary": bool(opts[i].get("primary", false))})
 			if bool(current_event().get("allow_leave", true)): out4.append({"type": "event_leave"})
 			return out4
+		"event_relic":
+			if pending_event_relics.is_empty(): return []
+			return [{"type":"event_relic_take", "relic":pending_event_relics[0]}, {"type":"event_relic_skip"}]
 		"rest":
 			return [
 				{"type": "rest", "kind": "heal", "amount": _heal_amount()},
@@ -228,6 +234,7 @@ func apply(action: Dictionary) -> Dictionary:
 		"shop": return _apply_shop(t, action)
 		"shop_choose", "event_choose", "rest_choose": return _apply_pick(action)
 		"event": return _apply_event(action)
+		"event_relic": return _apply_event_relic(t)
 		"rest": return _apply_rest(t, action)
 		"fork": return _apply_fork(action)
 	return {"ok": false, "reason": "phase=%s 无动作" % phase}
@@ -377,9 +384,10 @@ func _apply_pick(action: Dictionary) -> Dictionary:
 		pending_glyphs.clear()
 		phase = "shop"
 	elif phase == "event_choose":
-		var result: Dictionary = EventEffects.resume(pending_event_effect, g, GameState.rng)
+		var result: Dictionary = EventEffects.resume(pending_event_effect, g, GameState.rng, true)
 		if not result.get("ok", false): return {"ok": false, "reason": str(result.get("reason", "事件选择失败"))}
 		pending_event_effect = result.get("pending", {})
+		pending_event_relics = result.get("relic_offers", [])
 		_log("事件删字：%s" % g)
 		if pending_event_effect.is_empty():
 			pending_glyphs.clear()
@@ -447,6 +455,7 @@ func _start_event() -> void:
 	event_node = "start"
 	pending_event_next = ""
 	pending_event_effect.clear()
+	pending_event_relics.clear()
 	pending_glyphs.clear()
 	phase = "event"
 
@@ -462,9 +471,10 @@ func _apply_event(action: Dictionary) -> Dictionary:
 	var options: Array = current.get("options", [])
 	if index < 0 or index >= options.size() or not EventEffects.option_available(options[index]): return {"ok": false, "reason": "无效事件选项"}
 	var option: Dictionary = options[index]
-	var result: Dictionary = EventEffects.resolve(option.get("effects", []), GameState.rng)
+	var result: Dictionary = EventEffects.resolve(option.get("effects", []), GameState.rng, true)
 	if not result.get("ok", false): return {"ok": false, "reason": str(result.get("reason", "事件结算失败"))}
 	pending_event_effect = result.get("pending", {})
+	pending_event_relics = result.get("relic_offers", [])
 	pending_event_next = str(option.get("goto", ""))
 	if pending_event_effect.is_empty():
 		_advance_event()
@@ -472,6 +482,25 @@ func _apply_event(action: Dictionary) -> Dictionary:
 		pending_glyphs = pending_event_effect.get("glyphs", [])
 		phase = "event_choose"
 	return {"ok": true, "phase": phase}
+
+
+func _apply_event_relic(action_type: String) -> Dictionary:
+	if pending_event_relics.is_empty() or action_type not in ["event_relic_take", "event_relic_skip"]:
+		return {"ok":false, "reason":"没有待领取的事件遗物"}
+	var id := str(pending_event_relics[0])
+	if action_type == "event_relic_take":
+		if not GameState.add_relic(id): return {"ok":false, "reason":"这件遗物已经拥有或已失效，可放弃领取"}
+		# Headless callers retain a valid default binding; the UI may select another entity.
+		if Relics.needs_bind(id):
+			for inst: CharInstance in GameState.deck:
+				if GameState.bind_relic(id, inst.id()): break
+		Relics.queue_setup(id)
+		_log("事件：获得遗物「%s」" % Relics.name_of(id))
+	else:
+		_log("事件：放弃遗物「%s」" % Relics.name_of(id))
+	pending_event_relics.pop_front()
+	_advance_event()
+	return {"ok":true, "phase":phase, "relic":id if action_type == "event_relic_take" else ""}
 
 
 func _apply_rest(t: String, action: Dictionary) -> Dictionary:
@@ -499,6 +528,14 @@ func _apply_fork(action: Dictionary) -> Dictionary:
 
 
 func _advance_event() -> void:
+	if GameState.player_hp <= 0:
+		pending_event_relics.clear()
+		Achievements.finish_run(false)
+		phase = "defeat"
+		return
+	if not pending_event_relics.is_empty():
+		phase = "event_relic"
+		return
 	pending_event_effect.clear()
 	pending_glyphs.clear()
 	var next := pending_event_next
@@ -514,6 +551,7 @@ func _advance_event() -> void:
 
 func _complete_node() -> void:
 	pending_event_effect.clear()
+	pending_event_relics.clear()
 	pending_event_next = ""
 	pending_glyphs.clear()
 	event_node = "start"

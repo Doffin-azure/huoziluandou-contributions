@@ -127,6 +127,17 @@ func _run() -> void:
 				bounds(screen,restored,"event error notice")
 				screen._restore_choices(); await frames()
 			await capture(screen,event_id)
+		run = fresh("event")
+		run.event_data = EVENTS.get_event("buy_case").duplicate(true); run.event_node = "start"; run._sync_content()
+		GameState.relics = Relics.normal_pool().filter(func(id):return id!="chaos_dice")
+		screen = await open_screen("event_screen",{"room_run":true})
+		screen._choose(0); await frames()
+		var offer: ChoiceOverlay = screen.get_node_or_null("EventRelicOffer")
+		check(offer!=null,"random event relic is previewed before pickup")
+		if offer!=null:
+			bounds(screen,offer.find_children("*","Button",true,false),"event relic take and skip")
+			await capture(screen,"event-relic")
+			offer._on_choose(1); await frames()
 		run = fresh("shop")
 		screen = await open_screen("shop_screen",{"room_run":true})
 		var shop_controls: Array = [screen._hud.action_button,screen._hud.secondary_button,screen._hud.tertiary_button,screen._hud.status_label]
